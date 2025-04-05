@@ -1,0 +1,126 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+    --light-grey: #F5F5F5;
+    --grey: #A3AED0;
+    --light-green: #A3D0A5;
+    --green: #169B00;
+    --dark-green: #226839;
+    --sea-green: #C2E695;
+
+}
+
+.chart-container .google-visualization-columnchart-bar {
+    border-radius: 10px;
+}
+
+@keyframes slider {
+    from {
+        transform: translateX(0);
+    }
+
+    to {
+        transform: translateX(-100%);
+    }
+}
+
+
+.brands {
+    animation: slider 20s linear infinite;
+}
+
+.brands_container:hover .brands {
+    animation-play-state: paused;
+}
+
+.brands img {
+    display: inline-block;
+    margin: 0 18px;
+    width: 15%;
+    /* aspect-ratio: 1/1.2; */
+}
+
+/* .custom-bullet {
+    display: inline-block;
+    width: 50px;
+    height: 10px;
+    background-color: #22c55e;
+    margin: 0 5px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.swiper-pagination-bullet-active {
+    background-color: #15803d !important;
+} */
+
+/* Campaign Phases Custom Pagination  */
+
+.phases_custom_bullet {
+    display: inline-block;
+    width: 30px !important;
+    height: 30px !important;
+    /* background-color: #000000 !important; */
+    margin: 0 5px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.1s;
+}
+
+.phases_pagination .swiper-pagination-bullet-active {
+    background-color: #15803d !important;
+    height: 75px !important;
+    border-radius: 20px;
+}
+
+/* Case Study */
+.case_studies_card:nth-child(odd) div {
+    transform: rotate(-2deg);
+}
+
+.case_studies_card:nth-child(even) div {
+    transform: rotate(2deg);
+}
+
+.case_studies_card:nth-child(4n + 1) div {
+    background-color: var(--green);
+}
+
+.case_studies_card:nth-child(4n + 2) div {
+    background-color: var(--dark-green);
+}
+
+.case_studies_card:nth-child(4n + 3) div {
+    background-color: var(--sea-green);
+}
+
+.case_studies_card:nth-child(4n + 4) div {
+    background-color: #0D5D00;
+}
+
+
+/* Plans.jsx */
+.plan:nth-child(odd) .plan_header {
+    background: linear-gradient(5deg, rgba(0, 0, 0, .3), rgba(22, 155, 0, .5));
+}
+
+.plan:nth-child(even) .plan_header {
+    background: linear-gradient(15deg, rgba(0, 0, 0, .3), rgba(255, 255, 255, .3));
+}
+
+.plan:nth-child(odd) button {
+    background-color: rgba(255, 255, 255, .3);
+}
+
+.plan:nth-child(even) button {
+    background-color: #002B21;
+}
+
+/* Auth Gradient */
+.auth-gradient{
+    background: linear-gradient(120deg, #4CAF50 0%, white 30%);
+
+}
