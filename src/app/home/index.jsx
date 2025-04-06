@@ -68,7 +68,7 @@ const index = () => {
                 {/* <HowItWorks /> */}
                 <CompaignPhases />
                 <Comparison />
-                <Benefits />
+                {/* <Benefits /> */}
                 <CTA audience={"Agencies"} headline={"Ready to take your influencer campaigns to the next level?"} text={"Phyo streamlines influencer marketing for agencies. Manage client accounts in a single dashboard, assign tasks with role-based access, and negotiate better deals using historical cost data. Save time with bulk searches, automated reports, and global influencer access. Ideal for agencies focused on efficiency and ROI."} />
                 {/*<Feature />
                 <WhyPhyo />

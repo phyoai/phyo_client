@@ -87,8 +87,7 @@ export default function SignupForm() {
                         <span className="text-green-600">Phyo</span>
                     </h1>
                     <p className="mt-4 text-lg text-gray-700">
-                        Lorem <span className="font-bold text-green-600">ipsum</span> <span className="font-bold">sectetur</span>
-                        <br /> amet, <span className="text-green-600">con.</span>
+                    Find influencers in seconds. Launch campaigns in minutes.
                     </p>
                 </div>
             </div>

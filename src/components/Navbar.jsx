@@ -35,7 +35,7 @@ export default function Navbar() {
           {/* Desktop Buttons */}
           <div className="hidden md:flex space-x-4">
             <Link href="/login">
-              <p className="px-4 py-2 rounded-full border border-[color:var(--dark-green)] text-[color:var(--dark-green)] hover:text-white">
+              <p className="px-4 py-2 rounded-full border border-[color:var(--dark-green)] text-[color:var(--dark-green)] ">
                 Login
               </p>
             </Link>

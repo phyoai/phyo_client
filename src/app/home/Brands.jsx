@@ -12,7 +12,7 @@ const Brands = () => {
                     <img src="/brands/Netflix.png" alt="brand_1" />
                     <img src="/brands/NordVPN.png" alt="brand_1" />
                     <img src="/brands/unacademy.png" alt="brand_1" />
-                    <img src="/brands/zupee.png" alt="brand_1" />
+                    {/* <img src="/brands/zupee.png" alt="brand_1" /> */}
                 </div>
                 <div className='inline-block brands '>
                     <img src="/brands/mpl.png" alt="brand_1" />
