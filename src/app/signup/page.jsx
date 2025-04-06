@@ -65,7 +65,7 @@ export default function SignupForm() {
         try {
             const response = await axios({
                 method: "post",
-                baseURL: "http://localhost:8000/api",
+                baseURL: "https://api.phyo.ai/api",
                 url: "/user/signup",
                 data,
             })
