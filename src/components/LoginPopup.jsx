@@ -19,6 +19,7 @@ const LoginPopup = ({ isOpen, onClose, prompt }) => {
             <div className="mt-4 flex justify-end gap-2">
                 <button
                     onClick={() => {
+                        console.log("Prompt in popup:", prompt);
                         localStorage.setItem("searchPrompt", prompt)
                         router.push("/login")
                     }}

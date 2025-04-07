@@ -9,7 +9,6 @@ const Hero = ({ handleSubmit, token }) => {
     const handleFind = () => {
         if (!token) {
             setIsPopupOpen(true);
-
             return;
         }
         handleSubmit(prompt)
@@ -17,10 +16,15 @@ const Hero = ({ handleSubmit, token }) => {
 
     useEffect(() => {
         const savedPrompt = localStorage.getItem("searchPrompt")
+        console.log("Saved prompt:", savedPrompt);
+        
         if (savedPrompt) {
+            console.log("Running in the if");
+            
             setPrompt(savedPrompt)
-            localStorage.removeItem("searchPrompt") // clear it if you only want it used once
+            localStorage.removeItem("searchPrompt")
         }
+        console.log("Running out of if");
     }, [])
 
     return (
