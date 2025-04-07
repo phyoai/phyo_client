@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { Card, Heading } from './ContentTypeDistribution';
-import { ageDistributionData, creatorData } from '@/data/data';
+// import { ageDistributionData, creatorData } from '@/data/data';
 
 const AudienceNewDesign = ({ creator }) => {
     const [active, setActive] = useState("all")
