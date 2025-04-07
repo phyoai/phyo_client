@@ -33,7 +33,7 @@ export default function Navbar({ token }) {
           </div> */}
 
           {/* Desktop Buttons */}
-          {token && <div className="hidden md:flex space-x-4">
+          {token ? "" : <div className="hidden md:flex space-x-4">
             <Link href="/login">
               <p className="px-4 py-2 rounded-full border border-[color:var(--dark-green)] text-[color:var(--dark-green)] ">
                 Login
