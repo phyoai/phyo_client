@@ -3,7 +3,7 @@
 import { useRef } from "react";
 import { useRouter } from "next/navigation";
 
-const LoginPopup = ({ isOpen, onClose }) => {
+const LoginPopup = ({ isOpen, onClose, prompt }) => {
     const dialogRef = useRef(null);
     const router = useRouter();
 
@@ -18,7 +18,10 @@ const LoginPopup = ({ isOpen, onClose }) => {
             <p className="mt-2 text-gray-600">You need to log in to perform this action.</p>
             <div className="mt-4 flex justify-end gap-2">
                 <button
-                    onClick={() => router.push("/login")}
+                    onClick={() => {
+                        localStorage.setItem("searchPrompt", prompt)
+                        router.push("/login")
+                    }}
                     className="px-4 py-2 bg-blue-500 text-white rounded-md"
                 >
                     Go to Login

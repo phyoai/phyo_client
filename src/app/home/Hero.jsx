@@ -1,20 +1,27 @@
 import LoginPopup from "../../components/LoginPopup"
 import Image from 'next/image'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 
 const Hero = ({ handleSubmit, token }) => {
     const [prompt, setPrompt] = useState("")
     const [isPopupOpen, setIsPopupOpen] = useState(false);
 
     const handleFind = () => {
-
-
         if (!token) {
             setIsPopupOpen(true);
+
             return;
         }
         handleSubmit(prompt)
     }
+
+    useEffect(() => {
+        const savedPrompt = localStorage.getItem("searchPrompt")
+        if (savedPrompt) {
+            setPrompt(savedPrompt)
+            localStorage.removeItem("searchPrompt") // clear it if you only want it used once
+        }
+    }, [])
 
     return (
         <div className='relative'>
@@ -44,7 +51,7 @@ const Hero = ({ handleSubmit, token }) => {
             <Image src={"/star1.png"} width={60} height={60} alt='star' className='hidden sm:block absolute top-[20%] left-[15%]' />
             <Image src={"/star2.png"} width={50} height={50} alt='star' className='absolute sm:bottom-[20%] sm:right-[5%] left-[5%] top-[-10%]' />
 
-            <LoginPopup isOpen={isPopupOpen} onClose={() => setIsPopupOpen(false)} />
+            <LoginPopup isOpen={isPopupOpen} onClose={() => setIsPopupOpen(false)} prompt={prompt} />
         </div>
     )
 }
