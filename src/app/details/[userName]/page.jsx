@@ -1,5 +1,5 @@
 "use client"
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import  Sidebar  from '../../../components/Sidebar'
 import Navbar from '../../../components/Navbar'
 import ProfileCard from './ProfileCard'
@@ -15,11 +15,9 @@ import About from './About'
 import AudienceNewDesign from './AudienceNewDesign'
 import CollaborationCharges from './CollaborationCharges'
 // import { useParams } from 'react-router-dom'
-
-import axios from 'axios'
 import { useParams } from 'next/navigation'
 
-const index = () => {
+const page = () => {
   const { userName } = useParams()
   const [url, setUrl] = useState(userName)
   const { data: creator, isLoading } = useFetchInstagramStatistics(creatorData.data, url)
@@ -82,5 +80,5 @@ const PageLoader = () => {
   )
 }
 
-export default index
+export default page
 
