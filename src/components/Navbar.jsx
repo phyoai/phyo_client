@@ -1,11 +1,9 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { cookies } from "next/headers";
 
-export default function Navbar() {
+export default function Navbar({ token }) {
   const [isOpen, setIsOpen] = useState(false);
-  const token = cookies().get("authtoken")?.value || null
 
   return (
     <nav className="w-full bg-white shadow-md fixed top-0 left-0 z-50">

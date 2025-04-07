@@ -50,7 +50,7 @@ const index = ({ token }) => {
     return (
         <div className=''>
             <div className='pt-[52px] relative z-10'>
-                <Navbar />
+                <Navbar token={token} />
                 {/* <Header /> */}
                 <div className='mt-[60px]'>
                     <Hero handleSubmit={getInfluencers} fetchingState={fetchingState} token={token} />
