@@ -2,8 +2,11 @@
 
 import React, { useState } from 'react'
 import Plans from './Plans'
+
+import WhyPhyo from './WhyPhyo'
 import Navbar from '../../components/Navbar'
 import Footer from '../../components/Footer'
+import Feature from './Feature'
 import Faq from './Faq'
 import Testimonials from './Testimonials'
 import Hero from './Hero'
@@ -25,7 +28,6 @@ const index = ({ token }) => {
         try {
             const res = await axios({
                 method: "post",
-                // baseURL: "https://api.phyo.ai",
                 baseURL: "https://api.phyo.ai",
                 url: "/api/ask",
                 data: {
