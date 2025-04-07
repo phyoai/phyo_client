@@ -1,9 +1,11 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { cookies } from "next/headers";
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
+  const token = cookies().get("authtoken")?.value || null
 
   return (
     <nav className="w-full bg-white shadow-md fixed top-0 left-0 z-50">
@@ -33,7 +35,7 @@ export default function Navbar() {
           </div> */}
 
           {/* Desktop Buttons */}
-          <div className="hidden md:flex space-x-4">
+          {token && <div className="hidden md:flex space-x-4">
             <Link href="/login">
               <p className="px-4 py-2 rounded-full border border-[color:var(--dark-green)] text-[color:var(--dark-green)] ">
                 Login
@@ -44,7 +46,7 @@ export default function Navbar() {
                 Sign Up
               </p>
             </Link>
-          </div>
+          </div>}
 
           {/* Mobile Menu Button */}
           <div className="md:hidden">
