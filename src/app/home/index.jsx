@@ -1,29 +1,22 @@
 "use client"
 
-import { MoveRight } from 'lucide-react'
 import React, { useState } from 'react'
 import Plans from './Plans'
-import WhyPhyo from './WhyPhyo'
-import Navbar from '@/components/Navbar'
-import Footer from '@/components/Footer'
-import Feature from './Feature'
+import Navbar from '../../components/Navbar'
+import Footer from '../../components/Footer'
 import Faq from './Faq'
 import Testimonials from './Testimonials'
 import Hero from './Hero'
-import How from './How'
 import { InfluencersList } from './Search'
 import axios from 'axios'
 import Brands from './Brands'
 import CTA from './CTA'
-import Benefits from './Benefits'
 import Image from 'next/image'
 import Comparison from './Comparison'
-import HowItWorks from './HowItWorks'
 import CompaignPhases from './CompaignPhases'
-import CaseStudies from './CaseStudies'
 
 
-const index = () => {
+const index = ({ token }) => {
     const [influencers, setInfluencers] = useState([])
     const [fetchingState, setFetchingState] = useState("idle")
 
@@ -58,7 +51,7 @@ const index = () => {
                 <Navbar />
                 {/* <Header /> */}
                 <div className='mt-[60px]'>
-                    <Hero handleSubmit={getInfluencers} fetchingState={fetchingState} />
+                    <Hero handleSubmit={getInfluencers} fetchingState={fetchingState} token={token} />
                 </div>
                 <InfluencersList influencers={influencers} fetchingState={fetchingState} />
                 <ImageGroup />
