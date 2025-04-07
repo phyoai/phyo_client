@@ -3,18 +3,18 @@ import Image from "next/image";
 const testimonials = [
   {
     id: 1,
-    logo: "/oasis-logo.png", // Replace with actual logo path
-    quote: "Our partnership with Qoruz marks a pivotal step in our journey. Qoruz has been integral to our influencer marketing strategy, aiding us from identification to ROI metrics...",
-    name: "Soumyadip Chatterjee",
-    role: "Chief Marketing Officer",
+    logo: "/ninjacart.png", // Replace with actual logo path
+    quote: "It was great collaborating with the Pyromedia team, they have a strong grasp of data and are proficient in platform like LinkedIn, Instagram and YouTube. I wholeheartedly recommend their service. ",
+    name: "Suheil Mohan",
+    role: "Head of Brand (NinjaCart)",
     avatar: "/dummyAvatar.jpg", // Replace with actual image path
   },
   {
     id: 2,
-    logo: "/oasis-logo.png", // Replace with   actual logo path
-    quote: "Qoruz is the most effective influencer platform in terms of cost, effort, and convenience. Their multi-filter features and detailed influencer database help us make informed decisions...",
-    name: "Megha Punjabi",
-    role: "Manager of Influencer Marketing",
+    logo: "/kalash.avif", // Replace with   actual logo path
+    quote: "As a fintech brand, especially in the digital gold sector, we were really hesitant about trying an influencer campaign. However,the Pyro teamchanged our mindset with their top notch services. ",
+    name: "Aman Bansal",
+    role: "Founder (Kalash)",
     avatar: "/dummyAvatar1.jpg", // Replace with actual image path
   },
 ];

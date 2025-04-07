@@ -22,7 +22,7 @@ const InfluencerCard = ({ influencer }) => {
         return encodeURI(t);
     }
     return (
-        <div className='bg-white flex justify-between overflow-hidden rounded-md cursor-pointer' onClick={() => router.push(`/details/${influencer.user_name}`)}>
+        <div className='bg-[#ffffff] rounded-lg flex justify-between overflow-hidden  shadow-md sm:mx-[350px] cursor-pointer' onClick={() => router.push(`/details/${influencer.user_name}`)}>
             <img src={loadImage(influencer?.image)} alt="profile" width={50} height={50} className='w-[280px] aspect-square rounded-full relative -top-[50px] -left-[50px]' />
             <div className='mr-auto flex flex-col gap-[15px] self-center ml-[50px]'>
                 <p className='font-medium text-[24px] relative -left-[30px]'>{influencer?.name}</p>
@@ -70,3 +70,9 @@ const InfluencerCard = ({ influencer }) => {
 }
 
 export default InfluencerCard
+
+
+
+
+
+

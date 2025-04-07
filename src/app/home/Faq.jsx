@@ -36,7 +36,7 @@ export default function Faq() {
               {faq.question}
               {openIndex === index ? <Minus className="text-green-600" /> : <Plus className="text-green-600" />}
             </button>
-            {openIndex === index && <p className="text-gray-700 pb-3">{faq.answer}</p>}
+            {openIndex === index && <p className="text-[#00674F] font-medium pb-3">{faq.answer}</p>}
           </div>
         ))}
       </div>

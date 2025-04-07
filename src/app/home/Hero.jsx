@@ -35,3 +35,7 @@ const Hero = ({ handleSubmit, fetchingState }) => {
 }
 
 export default Hero
+
+
+
+

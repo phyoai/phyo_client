@@ -25,7 +25,7 @@ const formFields = [
         name: 'mobileNumber',
         label: 'Phone number',
         type: 'tel',
-        placeholder: '1234567890',
+        placeholder: '9876543211',
         validation: { required: 'Phone number is required' },
     },
     {
