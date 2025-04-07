@@ -41,6 +41,7 @@ export default function LoginForm() {
                 baseURL: "https://api.phyo.ai/api",
                 url: "/user/login",
                 data,
+                withCredentials: true
             })
             alert(`Login Successful: ${response.data.message}`);
             router.push("/")
