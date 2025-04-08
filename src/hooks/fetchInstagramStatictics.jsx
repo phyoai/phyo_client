@@ -10,7 +10,7 @@ export default function useFetchInstagramStatistics(initialData, userName) {
         try {
             const res = await axios({
                 method: "get",
-                url: "https://api.phyo.ai/details",
+                url: "http://localhost:8000/details",
                 params: {
                     userName
                 },

@@ -38,7 +38,7 @@ export default function LoginForm() {
         try {
             const response = await axios({
                 method: "post",
-                baseURL: "https://api.phyo.ai/api",
+                baseURL: "http://localhost:8000/api",
                 url: "/user/login",
                 data,
                 withCredentials: true

@@ -12,7 +12,7 @@ const index = () => {
         try {
             const res = await axios({
                 method: "post",
-                baseURL: "https://api.phyo.ai",
+                baseURL: "http://localhost:8000",
                 url: "/api/ask",
                 data: {
                     prompt
