@@ -2,7 +2,10 @@ import Image from 'next/image'
 import React from 'react'
 import { Swiper, SwiperSlide } from 'swiper/react'
 import { Autoplay, EffectFade, Pagination } from 'swiper/modules'
-import 'swiper/css/effect-fade'
+import 'swiper/css'; // ← This is crucial
+import 'swiper/css/effect-fade';
+import 'swiper/css/pagination';
+
 
 const phasesData = [
     {
@@ -29,8 +32,8 @@ const CompaignPhases = () => {
     return (
         <section>
             <div className='flex flex-col-reverse md:flex-row gap-5 items-center p-6 md:p-[100px]'>
-                <div className='phases_pagination flex flex-col gap-2'></div>
-                <div className="flex-grow max-w-full md:max-w-[90%]">
+                <div className='phases_pagination flex flex-row sm:flex-col gap-2'></div>
+                <div className="flex-grow max-w-full">
                     <Swiper
                         slidesPerView={1}
                         autoplay

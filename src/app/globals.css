@@ -76,6 +76,13 @@
     border-radius: 20px;
 }
 
+@media screen and (max-width: 768px) {
+    .phases_pagination .swiper-pagination-bullet-active {
+        height: 30px !important;
+        width: 75px !important;
+    }
+}
+
 /* Case Study */
 .case_studies_card:nth-child(odd) div {
     transform: rotate(-2deg);
