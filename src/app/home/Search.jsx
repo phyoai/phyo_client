@@ -6,7 +6,7 @@ import axios from 'axios'
 const index = () => {
     const [influencers, setInfluencers] = useState([])
     const [fetchingState, setFetchingState] = useState("idle")
-
+    
     const getInfluencers = async (prompt) => {
         setFetchingState("loading")
         try {
@@ -20,7 +20,7 @@ const index = () => {
             })
             if (res.data.data.length < 1) {
                 setFetchingState("notFound")
-            }else {
+            } else {
                 setInfluencers(res.data.data)
                 setFetchingState("success")
             }
@@ -38,7 +38,7 @@ const index = () => {
                 <Header handleSubmit={getInfluencers} fetchingState={fetchingState} />
                 <InfluencersList influencers={influencers} fetchingState={fetchingState} />
             </div>
-
+            
             {/* Background div */}
             <div className='h-[400px] w-[300px] rounded-full bg-[color:var(--green)] blur-[180px] shadow-2xl absolute -right-[100px] top-[20vh]'></div>
         </div>
@@ -50,10 +50,16 @@ const Header = ({ handleSubmit, fetchingState }) => {
     return (
         <div>
             <h1 className='text-[color:var(--light-green)] font-semibold text-[64px] text-center'>Ai Search</h1>
-            <h2 className='text-white text-[40px] font-medium text-center'>Find top right  influencer for your brand</h2>
+            <h2 className='text-white text-[40px] font-medium text-center'>Find top right influencer for your brand</h2>
             <div className='mt-[55px] border-2 border-[color:var(--dark-green)] flex p-2 pl-[40px] rounded-xl'>
                 <input onChange={(e) => setPrompt(e.target.value)} type="text" placeholder="Example: Find influencers who have followers around 50k and posts videos on Vlogs from delhi" className='outline-none bg-transparent border-none flex-grow py-2 text-white' />
-                <button className='bg-white px-6 py-2 rounded-md' onClick={() => handleSubmit(prompt)}>{fetchingState === "loading" ? "Finding" : "Find"}</button>
+                <button 
+                    className='bg-white px-6 py-2 rounded-md' 
+                    onClick={() => handleSubmit(prompt)}
+                    disabled={fetchingState === "loading"}
+                >
+                    {fetchingState === "loading" ? "Finding..." : "Find"}
+                </button>
             </div>
         </div>
     )
@@ -62,13 +68,26 @@ const Header = ({ handleSubmit, fetchingState }) => {
 export const InfluencersList = ({ influencers, fetchingState }) => {
     return (
         <>
-            {fetchingState === "idle" ? <p className='text-center mt-[150px]'>Enter the prompt and hit the find buttong to find influencers</p> : fetchingState === "error" ? <p className='text-center mt-[150px]'>Something went wrong while fetching please try ageain</p> : fetchingState === "loading" ? <p className='text-center mt-[150px]'>Fetching influencers Please wait</p> : <div className='flex flex-col gap-[20px] mt-[150px]'>
-                {
-                    influencers?.map((influencer, i) => {
-                        return <InfluencerCard influencer={influencer} key={i} />
-                    })
-                }
-            </div>}
+            {fetchingState === "idle" ? (
+                <p className='text-center mt-[150px] text-white'>Enter the prompt and hit the find button to find influencers</p>
+            ) : fetchingState === "error" ? (
+                <p className='text-center mt-[150px] text-white'>Something went wrong while fetching. Please try again.</p>
+            ) : fetchingState === "loading" ? (
+                <p className='text-center mt-[150px] text-white'>Fetching influencers. Please wait...</p>
+            ) : fetchingState === "notFound" ? (
+                <div className='text-center mt-[150px]'>
+                    <p className='text-white text-xl font-medium'>Sorry, no influencers found for this prompt.</p>
+                    <p className='text-gray-400 mt-2'>Please enter the prompt properly</p>
+                </div>
+            ) : (
+                <div className='flex flex-col gap-[20px] mt-[150px]'>
+                    {
+                        influencers?.map((influencer, i) => {
+                            return <InfluencerCard influencer={influencer} key={i} />
+                        })
+                    }
+                </div>
+            )}
         </>
     )
 }
