@@ -10,21 +10,21 @@ const Brands = () => {
 
                 {/* Scrolling logos */}
                 <div className='inline-block brands space-x-6'>
-                    <img src="/brands/mpl.png" alt="brand_1" className='h-[60px] px-2 inline-block' />
-                    <img src="/brands/bajaj-finserv.png" alt="brand_2" className='h-[60px] px-2 inline-block' />
-                    <img src="/brands/Netflix.png" alt="brand_3" className='h-[60px] px-2 inline-block' />
-                    <img src="/brands/NordVPN.png" alt="brand_4" className='h-[60px] px-2 inline-block' />
-                    <img src="/brands/unacademy.png" alt="brand_5" className='h-[60px] px-2 inline-block' />
-                    <img src="/brands/mpl.png" alt="brand_6" className='h-[60px] px-2 inline-block' />
-                    <img src="/brands/bajaj-finserv.png" alt="brand_7" className='h-[60px] px-2 inline-block' />
-                    <img src="/brands/Netflix.png" alt="brand_8" className='h-[60px] px-2 inline-block' />
-                    <img src="/brands/NordVPN.png" alt="brand_9" className='h-[60px] px-2 inline-block' />
-                    <img src="/brands/unacademy.png" alt="brand_10" className='h-[60px] px-2 inline-block' />
-                    <img src="/brands/zupee.png" alt="brand_11" className='h-[60px] px-2 inline-block' />
+                    <img src="/brands/mpl.png" alt="brand_1" className='h-[30px] sm:h-[30px] sm:h-[60px] aspect-video sm:aspect-square aspect-video sm:aspect-square  px-2 inline-block' />
+                    <img src="/brands/bajaj-finserv.png" alt="brand_2" className='h-[30px] sm:h-[60px] aspect-video sm:aspect-square px-2 inline-block' />
+                    <img src="/brands/Netflix.png" alt="brand_3" className='h-[30px] sm:h-[60px] aspect-video sm:aspect-square px-2 inline-block' />
+                    <img src="/brands/NordVPN.png" alt="brand_4" className='h-[30px] sm:h-[60px] aspect-video sm:aspect-square px-2 inline-block' />
+                    <img src="/brands/unacademy.png" alt="brand_5" className='h-[30px] sm:h-[60px] aspect-video sm:aspect-square px-2 inline-block' />
+                    <img src="/brands/mpl.png" alt="brand_6" className='h-[30px] sm:h-[60px] aspect-video sm:aspect-square px-2 inline-block' />
+                    <img src="/brands/bajaj-finserv.png" alt="brand_7" className='h-[30px] sm:h-[60px] aspect-video sm:aspect-square px-2 inline-block' />
+                    <img src="/brands/Netflix.png" alt="brand_8" className='h-[30px] sm:h-[60px] aspect-video sm:aspect-square px-2 inline-block' />
+                    <img src="/brands/NordVPN.png" alt="brand_9" className='h-[30px] sm:h-[60px] aspect-video sm:aspect-square px-2 inline-block' />
+                    <img src="/brands/unacademy.png" alt="brand_10" className='h-[30px] sm:h-[60px] aspect-video sm:aspect-square px-2 inline-block' />
+                    <img src="/brands/zupee.png" alt="brand_11" className='h-[30px] sm:h-[60px] aspect-video sm:aspect-square px-2 inline-block' />
                 </div>
 {/* 
                 <div className='inline-block brands space-x-6'>
-                    <img src="/brands/mpl.png" alt="brand_6" className='h-[60px] px-2 inline-block' />
+                    <img src="/brands/mpl.png" alt="brand_6" className='h-[30px] sm:h-[60px] aspect-video sm:aspect-square px-2 inline-block' />
                     <img src="/brands/bajaj-finserv.png" alt="brand_7" className='h-[40px] px-2 inline-block' />
                     <img src="/brands/Netflix.png" alt="brand_8" className='h-[40px] px-2 inline-block' />
                     <img src="/brands/NordVPN.png" alt="brand_9" className='h-[40px] px-2 inline-block' />

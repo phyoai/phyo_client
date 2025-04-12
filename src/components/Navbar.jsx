@@ -87,18 +87,18 @@ export default function Navbar({ token }) {
             <Link href="/">
               <p className="block text-gray-700 hover:text-[color:var(--dark-green)]">Contact</p>
             </Link>
-            <div className="flex space-x-4">
-              <Link href="/">
+            {token ? "" : <div className="flex space-x-4">
+              <Link href="/login">
                 <p className="w-full px-4 py-2 rounded-full border border-[color:var(--dark-green)] text-[color:var(--dark-green)] text-center hover:bg-[color:var(--dark-green)] hover:text-white">
                   Login
                 </p>
               </Link>
-              <Link href="/">
+              <Link href="/signup">
                 <p className="w-full px-4 py-2 rounded-full bg-[color:var(--dark-green)] text-white text-center hover:bg-blue-600">
                   Sign Up
                 </p>
               </Link>
-            </div>
+            </div>}
           </div>
         </div>
       )}

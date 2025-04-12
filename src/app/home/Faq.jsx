@@ -24,7 +24,7 @@ export default function Faq() {
   };
 
   return (
-    <div className="max-w-[80%] mx-auto p-6">
+    <div className="sm:max-w-[80%] mx-auto p-6">
       <h2 className="text-3xl font-bold text-center mb-6">Frequently Asked Questions</h2>
       <div className="space-y-4">
         {faqs.map((faq, index) => (
