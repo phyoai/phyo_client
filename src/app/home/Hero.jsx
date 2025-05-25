@@ -39,7 +39,6 @@ const Hero = ({ handleSubmit, token }) => {
             </h1>
             <h2 className='text-[28px] font-medium text-center'>Search Influencers in Seconds</h2>
 
-
             <p className="text-center text-[#59565F] mt-2 text-[9px] sm:text-[16px] sm:w-[40%] w-[80%] mx-auto">
                 Phyo is your AI-powered solution for modern influencer marketing. Find creators in seconds, analyze their audience quality, and collaborate seamlessly. Track campaigns in real-time, compare costs, and optimize strategies, all in one platform. Built for brands and agencies aiming to save time and achieve measurable results without the guesswork.
             </p>
