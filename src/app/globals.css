@@ -9,7 +9,15 @@
     --green: #169B00;
     --dark-green: #226839;
     --sea-green: #C2E695;
+}
 
+input[type=number] {
+    -moz-appearance: textfield;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
 }
 
 .chart-container .google-visualization-columnchart-bar {
@@ -127,7 +135,6 @@
 }
 
 /* Auth Gradient */
-.auth-gradient{
+.auth-gradient {
     background: linear-gradient(120deg, #4CAF50 0%, white 30%);
-
 }

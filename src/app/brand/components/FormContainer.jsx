@@ -5,6 +5,9 @@ import TextInput from "../../../components/Inputs/TextInput";
 import Select from "@/components/Inputs/Select";
 import FileInput from "@/components/Inputs/FileInput";
 import RadioInput from "@/components/Inputs/RadioInput";
+import Distribution from "@/components/Inputs/Distribution";
+import CollaborationCharges from "@/components/Inputs/CollaborationCharges";
+import AudienceLocation from "@/components/Inputs/AudienceLocation";
 
 const FormContainer = ({ steps }) => {
   const methods = useForm({ mode: "onBlur" });
@@ -33,8 +36,14 @@ const FormContainer = ({ steps }) => {
             return <Select key={field.name} {...field} />;
           } else if (field.type === "file") {
             return <FileInput key={field.name} {...field} />;
-          } else if(field.type === "radio") {
+          } else if (field.type === "radio") {
             return <RadioInput key={field.name} {...field} />;
+          } else if (field.type === "distribution") {
+            return <Distribution key={field.name} {...field} />
+          } else if (field.type === "collaborationCharges") {
+            return <CollaborationCharges key={field.name} {...field} />;
+          } else if (field.type === "audienceLocation") {
+            return <AudienceLocation key={field.name} {...field} />;
           } else {
             return <TextInput key={field.name} {...field} />;
           }
