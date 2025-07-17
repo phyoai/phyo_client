@@ -1,4 +1,4 @@
-import FormContainer from '@/app/brand/components/FormContainer'
+import FormContainer from '../../../app/brand/components/FormContainer'
 import Image from 'next/image'
 import React from 'react'
 

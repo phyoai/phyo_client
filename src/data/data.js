@@ -17,7 +17,6 @@ export const GenderAgeDistributionData = [
   
   export const GenderAgeDistributionOptions = {
     title: "Audience's age and gender distribution",
-    // chartArea: { width: "50%" },
     hAxis: {
       title: "Age Ranges",
       textStyle: { fontName: "Arial", fontSize: 12 },
@@ -34,7 +33,6 @@ export const GenderAgeDistributionData = [
       italic: false,
     },
     colors: ["#B2FD84", "#3CB448"],
-    // bar: { groupWidth: "50%" }, // Bar width
   };
   
   export const audienceByCountry = [
@@ -401,3 +399,11 @@ export const GenderAgeDistributionData = [
         "userCount": 98127
     }
   }
+
+
+
+
+
+
+
+
