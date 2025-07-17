@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { Suspense } from 'react';
 
-export default function BrandSettings() {
+function BrandSettingsContent() {
   return (
     <div>
       <h1 className="text-2xl font-bold mb-6">Settings</h1>
@@ -61,5 +61,13 @@ export default function BrandSettings() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function BrandSettings() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <BrandSettingsContent />
+    </Suspense>
   );
 } 

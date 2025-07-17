@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Suspense } from 'react';
 import CampaignReport from './CampaignReport';
 import TopInfluencer from './TopInfluencer';
 import PostTimeLine from './PostTimeLine'
@@ -7,7 +7,7 @@ import EngagementSection from './EngagementSection'
 import PostLiveAndTotalViewsSection from './PostLiveAndTotalViewsSection'
 import BudgetAndAudienceSection from './BudgetAndAudienceSection'
 
-export default function BrandDashboard() {
+function DashboardContent() {
   return (
     <div>
       <CampaignReport/>
@@ -18,6 +18,14 @@ export default function BrandDashboard() {
       <PostLiveAndTotalViewsSection/>
       <BudgetAndAudienceSection/>
     </div>
+  );
+}
+
+export default function BrandDashboard() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <DashboardContent />
+    </Suspense>
   );
 }
 
