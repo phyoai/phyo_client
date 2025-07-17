@@ -1,5 +1,5 @@
 'use client'
-import React, { useEffect } from 'react';
+import React, { useEffect, Suspense } from 'react';
 import { usePathname } from 'next/navigation';
 import BrandSidebar from '../../components/BrandSidebar';
 import ProtectedRoute from '../../components/ProtectedRoute';
@@ -23,13 +23,15 @@ export default function BrandLayout({ children }) {
   console.log('BrandLayout: Rendering protected layout');
   
   return (
-    <ProtectedRoute userType="BRAND">
-      <div className="flex min-h-screen">
-        <BrandSidebar />
-        <main className="flex-1 ml-64 p-8">
-          {children}
-        </main>
-      </div>
-    </ProtectedRoute>
+    <Suspense fallback={<div>Loading...</div>}>
+      <ProtectedRoute userType="BRAND">
+        <div className="flex min-h-screen">
+          <BrandSidebar />
+          <main className="flex-1 ml-64 p-8">
+            {children}
+          </main>
+        </div>
+      </ProtectedRoute>
+    </Suspense>
   );
 } 

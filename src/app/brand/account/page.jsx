@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { Suspense } from 'react';
 
-export default function BrandAccount() {
+function BrandAccountContent() {
   return (
     <div>
       <h1 className="text-2xl font-bold mb-6">Account</h1>
@@ -88,5 +88,13 @@ export default function BrandAccount() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function BrandAccount() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <BrandAccountContent />
+    </Suspense>
   );
 } 

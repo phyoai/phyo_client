@@ -1,7 +1,7 @@
 'use client';
 
 import { useForm } from 'react-hook-form';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '../context/AuthContext';
@@ -50,7 +50,7 @@ const formFields = [
     },
 ];
 
-export default function SignupForm() {
+function SignupForm() {
     const {
         register,
         handleSubmit,
@@ -164,5 +164,13 @@ export default function SignupForm() {
                 </div>
             </div>
         </div>
+    );
+}
+
+export default function SignupPage() {
+    return (
+        <Suspense fallback={<div>Loading...</div>}>
+            <SignupForm />
+        </Suspense>
     );
 }

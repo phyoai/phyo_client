@@ -1,5 +1,5 @@
 import Image from 'next/image'
-import React from 'react'
+import React, { Suspense } from 'react'
 import FormContainer from '../components/FormContainer'
 
 const page = () => {
@@ -41,7 +41,9 @@ const page = () => {
                 <Image src={"/welcome.png"} width={200} height={300} alt='brand' className='absolute bottom-0 left-0 w-[30%] h-[70%]' />
             </div>
             <div className='bg-white rounded-lg w-[50%] h-full'>
-                <FormContainer steps={steps} />
+                <Suspense fallback={<div>Loading...</div>}>
+                    <FormContainer steps={steps} />
+                </Suspense>
             </div>
         </div>
     )
