@@ -1,10 +1,10 @@
 'use client';
 
 import { useForm } from 'react-hook-form';
-import { useState } from 'react';
-import axios from 'axios';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { useAuth } from '../context/AuthContext';
 
 const formFields = [
     {
@@ -31,46 +31,74 @@ export default function LoginForm() {
     } = useForm();
 
     const [loading, setLoading] = useState(false);
-    const router = useRouter()
+    const [error, setError] = useState('');
+    const router = useRouter();
+    const searchParams = useSearchParams();
+    const { login, isAuthenticated } = useAuth();
+
+    // Check if user is already authenticated
+    useEffect(() => {
+        if (isAuthenticated()) {
+            const redirect = searchParams.get('redirect') || '/';
+            router.push(redirect);
+        }
+    }, [isAuthenticated, router, searchParams]);
 
     const onSubmit = async (data) => {
         setLoading(true);
+        setError('');
+
         try {
-            const response = await axios({
-                method: "post",
-                baseURL: "https://api.phyo.ai/api",
-                url: "/user/login",
-                data,
-                withCredentials: true
-            })
-            alert(`Login Successful: ${response.data.message}`);
-            router.push("/")
+            const result = await login(data.email, data.password);
+            
+            if (result.success) {
+                // Redirect to the original requested URL or default dashboard
+                const redirect = searchParams.get('redirect') || '/brand/dashboard';
+                router.push(redirect);
+            } else {
+                setError(result.error || 'Login failed');
+            }
         } catch (error) {
-            alert(`Login Failed: ${error.response?.data?.message || 'Something went wrong!'}`);
+            setError('An unexpected error occurred');
         } finally {
             setLoading(false);
         }
     };
 
+    // Show loading if checking authentication
+    if (isAuthenticated()) {
+        return (
+            <div className="min-h-screen flex items-center justify-center">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600"></div>
+            </div>
+        );
+    }
+
     return (
         <div className="flex h-screen auth-gradient">
             {/* Left Section */}
-            <div className="hidden lg:flex flex-1 items-center justify-center  p-10">
+            <div className="hidden lg:flex flex-1 items-center justify-center p-10">
                 <div>
                     <h1 className="text-4xl font-bold text-black">
                         <span className="text-green-600">Phyo</span>
                     </h1>
                     <p className="mt-4 text-lg text-gray-700">
-                    Find the right creators. Run better campaigns. All in one place.
+                        Find the right creators. Run better campaigns. All in one place.
                     </p>
                 </div>
             </div>
 
             {/* Right Section */}
-            <div className="flex-1 flex items-center justify-center p-6 bg-white ">
+            <div className="flex-1 flex items-center justify-center p-6 bg-white">
                 <div className="max-w-md w-full">
                     <h2 className="text-[40px] font-semibold mb-4">Login</h2>
                     <p className="text-gray-500 mb-6">Welcome back</p>
+
+                    {error && (
+                        <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
+                            {error}
+                        </div>
+                    )}
 
                     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
                         {formFields.map((field) => (
@@ -88,23 +116,17 @@ export default function LoginForm() {
                             </div>
                         ))}
 
-                        <div className="flex justify-between items-center">
-                            <label className="flex items-center space-x-2 text-sm">
-                                <input type="checkbox" className="form-checkbox" />
-                                <span>Remember me</span>
-                            </label>
-                            <a href="#" className="text-sm text-blue-500 hover:underline">
-                                Forgot password?
-                            </a>
-                        </div>
-
-                        <button type="submit" disabled={loading} className="w-full bg-[color:var(--green)] py-[10px] text-white cursor-pointer">
+                        <button 
+                            type="submit" 
+                            disabled={loading} 
+                            className="w-full bg-[color:var(--green)] py-[10px] text-white cursor-pointer disabled:opacity-50"
+                        >
                             {loading ? 'Logging in...' : 'Login'}
                         </button>
 
                         <p className="text-sm text-center mt-4">
-                            Don’t have an account?{' '}
-                            <Link href="/signup" className="text-blue-500 hover:underline">Register</Link>
+                            Don't have an account?{' '}
+                            <Link href="/signup" className="text-blue-500 hover:underline">Sign Up</Link>
                         </p>
                     </form>
                 </div>

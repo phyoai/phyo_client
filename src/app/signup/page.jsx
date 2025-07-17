@@ -1,10 +1,10 @@
 'use client';
 
 import { useForm } from 'react-hook-form';
-import { useState } from 'react';
-import axios from 'axios';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { useAuth } from '../context/AuthContext';
 
 const formFields = [
     {
@@ -58,25 +58,54 @@ export default function SignupForm() {
     } = useForm();
 
     const [loading, setLoading] = useState(false);
-    const router = useRouter()
+    const [error, setError] = useState('');
+    const router = useRouter();
+    const searchParams = useSearchParams();
+    const { signup, isAuthenticated } = useAuth();
+
+    // Check if user is already authenticated
+    useEffect(() => {
+        if (isAuthenticated()) {
+            const redirect = searchParams.get('redirect') || '/brand/dashboard';
+            router.push(redirect);
+        }
+    }, [isAuthenticated, router, searchParams]);
 
     const onSubmit = async (data) => {
         setLoading(true);
+        setError('');
+
         try {
-            const response = await axios({
-                method: "post",
-                baseURL: "https://api.phyo.ai/api",
-                url: "/user/signup",
-                data,
-            })
-            alert(`Signup Successful: ${response.data.message}`);
-            router.push("/")
+            // Add user type to signup data
+            const signupData = {
+                ...data,
+                type: 'BRAND' // Default to brand type for now
+            };
+
+            const result = await signup(signupData);
+            
+            if (result.success) {
+                // Redirect to the original requested URL or default dashboard
+                const redirect = searchParams.get('redirect') || '/brand/dashboard';
+                router.push(redirect);
+            } else {
+                setError(result.error || 'Signup failed');
+            }
         } catch (error) {
-            alert(`Signup Failed: ${error.response?.data?.message || 'Something went wrong!'}`);
+            setError('An unexpected error occurred');
         } finally {
             setLoading(false);
         }
     };
+
+    // Show loading if checking authentication
+    if (isAuthenticated()) {
+        return (
+            <div className="min-h-screen flex items-center justify-center">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600"></div>
+            </div>
+        );
+    }
 
     return (
         <div className="flex h-screen auth-gradient">
@@ -87,7 +116,7 @@ export default function SignupForm() {
                         <span className="text-green-600">Phyo</span>
                     </h1>
                     <p className="mt-4 text-lg text-gray-700">
-                    Find influencers in seconds. Launch campaigns in minutes.
+                        Find influencers in seconds. Launch campaigns in minutes.
                     </p>
                 </div>
             </div>
@@ -96,6 +125,12 @@ export default function SignupForm() {
             <div className="flex-1 flex items-center justify-center p-6 bg-white">
                 <div className="max-w-md w-full">
                     <h2 className="text-[40px] font-semibold mb-4">Register</h2>
+
+                    {error && (
+                        <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
+                            {error}
+                        </div>
+                    )}
 
                     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
                         {formFields.map((field) => (
@@ -113,7 +148,11 @@ export default function SignupForm() {
                             </div>
                         ))}
 
-                        <button type="submit" disabled={loading} className="w-full bg-[color:var(--green)] py-[10px] text-white cursor-pointer">
+                        <button 
+                            type="submit" 
+                            disabled={loading} 
+                            className="w-full bg-[color:var(--green)] py-[10px] text-white cursor-pointer disabled:opacity-50"
+                        >
                             {loading ? 'Signing up...' : 'Create'}
                         </button>
 

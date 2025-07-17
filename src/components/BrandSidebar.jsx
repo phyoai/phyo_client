@@ -2,6 +2,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useAuth } from '../app/context/AuthContext';
 import {
   LayoutDashboard,
   Mail,
@@ -13,6 +14,7 @@ import {
 
 const BrandSidebar = () => {
   const pathname = usePathname();
+  const { logout } = useAuth();
 
   const navItems = [
     { name: 'Dashboard', href: '/brand/dashboard', icon: LayoutDashboard },
@@ -26,15 +28,20 @@ const BrandSidebar = () => {
     { name: 'Logout Account', href: '/logout', icon: LogOut, isLogout: true },
   ];
 
+  const handleLogout = () => {
+    logout();
+  };
+
   return (
     <div className="h-screen w-64 bg-white border-r border-gray-200 fixed left-0 top-0 flex flex-col">
       {/* Logo Section */}
       <div className="p-6">
-        <img 
-          src="/logo.png" 
-          alt="Ph40" 
-          className="h-8 w-auto"
-        />
+        <div className="flex items-center">
+          <div className="h-8 w-8 bg-green-600 rounded-lg flex items-center justify-center">
+            <span className="text-white font-bold text-lg">P</span>
+          </div>
+          <span className="ml-2 text-xl font-bold text-gray-900">Phyo</span>
+        </div>
       </div>
 
       {/* Main Navigation */}
@@ -71,10 +78,7 @@ const BrandSidebar = () => {
               return (
                 <button
                   key={item.name}
-                  onClick={() => {
-                    // Add logout logic here
-                    console.log('Logout clicked');
-                  }}
+                  onClick={handleLogout}
                   className="flex items-center w-full px-3 py-3 text-sm font-medium text-red-600 hover:bg-red-50 hover:text-red-700 rounded-lg transition-colors"
                 >
                   <Icon className="mr-3 h-5 w-5" />
@@ -120,3 +124,6 @@ const BrandSidebar = () => {
 };
 
 export default BrandSidebar;
+
+
+
