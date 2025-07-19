@@ -9,23 +9,24 @@ import BudgetAndAudienceSection from './BudgetAndAudienceSection'
 
 function DashboardContent() {
   return (
-    <div>
-      <CampaignReport/>
+    <div className='text-black'>
+      {/* <CampaignReport/>
       <TopInfluencer/>
       <PostTimeLine/>
       <InfluencersTable/>
       <EngagementSection/>
       <PostLiveAndTotalViewsSection/>
-      <BudgetAndAudienceSection/>
+      <BudgetAndAudienceSection/> */}
+      hi vishnu
     </div>
   );
 }
 
 export default function BrandDashboard() {
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    // <Suspense fallback={<div>Loading...</div>}>
+    // </Suspense>
       <DashboardContent />
-    </Suspense>
   );
 }
 

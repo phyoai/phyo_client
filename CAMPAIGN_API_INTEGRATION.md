@@ -4,7 +4,7 @@ This document describes the integration of the campaign creation API into the Al
 
 ## Overview
 
-The campaign creation functionality has been integrated with the backend API at `http://localhost:4000/api/campaigns`. The integration includes:
+The campaign creation functionality has been integrated with the backend API at `https://phyo-server.onrender.com/api/campaigns`. The integration includes:
 
 1. **API Utility Functions** (`src/utils/api.js`)
 2. **Form Data Transformation**

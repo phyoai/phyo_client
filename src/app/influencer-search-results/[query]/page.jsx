@@ -1,7 +1,7 @@
 import React from 'react';
 
 async function getInfluencers(query) {
-  const res = await fetch('http://localhost:4000/api/ask', {
+  const res = await fetch('https://phyo-server.onrender.com/api/ask', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ prompt: query }),
