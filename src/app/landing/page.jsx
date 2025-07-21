@@ -9,7 +9,7 @@ import ComparisonTable from './ComparisonTable'
 import CTASection from './CTASection'
 import Footer from './components/Footer'
 import PricingSection from './PricingSection'
-import InfluencerList from './InfluencerList'
+// import InfluencerList from './InfluencerList'
 
 
 
@@ -23,7 +23,7 @@ const page = () => {
       <PricingSection/>
       <FAQSection/>
       <ComparisonTable/>
-      <InfluencerList/>
+      {/* <InfluencerList/> */}
       <CTASection/>
       <Footer/>
     </div>

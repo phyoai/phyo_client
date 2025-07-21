@@ -10,7 +10,7 @@ const InfluencerList = () => {
     const fetchInfluencers = async () => {
       setLoading(true)
       try {
-        const res = await fetch('http://localhost:4000/api/ask', {
+        const res = await fetch('http://13.60.179.244/api/ask', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
