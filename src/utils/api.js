@@ -2,7 +2,7 @@ import axios from 'axios';
 
 // Create axios instance with base configuration
 const api = axios.create({
-  baseURL: 'https://phyo-server.onrender.com/api',
+  baseURL: 'http://13.60.179.244/api',
   headers: {
     'Content-Type': 'application/json',
   },

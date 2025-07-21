@@ -96,7 +96,7 @@ const page = () => {
         }
 
         // If no session data, fetch from API
-        const response = await fetch(`https://phyo-server.onrender.com/api/ask/details?userName=${encodeURIComponent(userName)}`);
+        const response = await fetch(`http://13.60.179.244/api/ask/details?userName=${encodeURIComponent(userName)}`);
         if (!response.ok) throw new Error('Failed to fetch influencer data');
         const data = await response.json();
         console.log('API Response:', data);
