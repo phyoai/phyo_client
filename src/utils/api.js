@@ -2,7 +2,7 @@ import axios from 'axios';
 
 // Create axios instance with base configuration
 const api = axios.create({
-  baseURL: 'http://13.60.179.244/api',
+  baseURL: 'https://api.phyo.ai/api',
   headers: {
     'Content-Type': 'application/json',
   },

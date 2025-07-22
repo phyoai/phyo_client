@@ -4,7 +4,7 @@ This document describes the integration of the campaign creation API into the Al
 
 ## Overview
 
-The campaign creation functionality has been integrated with the backend API at `http://13.60.179.244/api/campaigns`. The integration includes:
+The campaign creation functionality has been integrated with the backend API at `https://api.phyo.ai/api/campaigns`. The integration includes:
 
 1. **API Utility Functions** (`src/utils/api.js`)
 2. **Form Data Transformation**
