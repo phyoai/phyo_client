@@ -1,5 +1,5 @@
 'use client'
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { ChevronLeft, ChevronRight, X, Upload, Calendar, Check, Users } from 'lucide-react';
 import { campaignAPI } from '../../../utils/api';
 
@@ -31,7 +31,9 @@ const AllCampaignsSection = () => {
     campaignStartDate: '',
     campaignEndDate: '',
     productImages: [],
-    
+    budget: '', // NEW
+    numberOfLivePosts: '', // NEW
+    reels: [], // NEW
     // Target Influencer
     influencerCount: '',
     niche: '',
@@ -42,6 +44,8 @@ const AllCampaignsSection = () => {
     ageRangeMin: '',
     ageRangeMax: ''
   });
+
+  const fileInputRef = useRef(null);
 
   // Campaign data will be fetched from API
 
@@ -100,6 +104,37 @@ const AllCampaignsSection = () => {
     setFormData(prev => ({
       ...prev,
       [field]: value
+    }));
+  };
+
+  const handleImageChange = (e) => {
+    const files = Array.from(e.target.files);
+    // For preview, create object URLs
+    const images = files.map(file => ({
+      file,
+      url: URL.createObjectURL(file)
+    }));
+    setFormData(prev => ({
+      ...prev,
+      productImages: images
+    }));
+  };
+
+  // Handler for adding reel URLs
+  const [reelInput, setReelInput] = useState('');
+  const handleAddReel = () => {
+    if (reelInput.trim()) {
+      setFormData(prev => ({
+        ...prev,
+        reels: [...prev.reels, reelInput.trim()]
+      }));
+      setReelInput('');
+    }
+  };
+  const handleRemoveReel = (idx) => {
+    setFormData(prev => ({
+      ...prev,
+      reels: prev.reels.filter((_, i) => i !== idx)
     }));
   };
 
@@ -171,6 +206,9 @@ const AllCampaignsSection = () => {
       campaignStartDate: '',
       campaignEndDate: '',
       productImages: [],
+      budget: '',
+      numberOfLivePosts: '',
+      reels: [],
       influencerCount: '',
       niche: '',
       followerCountMin: '',
@@ -313,17 +351,97 @@ const AllCampaignsSection = () => {
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Add Images of Product for your Campaign
               </label>
-              <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
+              <input
+                type="file"
+                accept="image/*"
+                multiple
+                ref={fileInputRef}
+                style={{ display: 'none' }}
+                onChange={handleImageChange}
+              />
+              <div
+                className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer"
+                onClick={() => fileInputRef.current && fileInputRef.current.click()}
+              >
                 <Upload className="w-8 h-8 text-gray-400 mx-auto mb-2" />
                 <p className="text-sm text-blue-600 cursor-pointer hover:text-blue-700">
                   Click here to upload or drop media here
                 </p>
               </div>
               <div className="grid grid-cols-3 gap-4 mt-4">
-                <div className="aspect-square bg-gray-200 rounded-lg"></div>
-                <div className="aspect-square bg-gray-200 rounded-lg"></div>
-                <div className="aspect-square bg-gray-200 rounded-lg"></div>
+                {formData.productImages && formData.productImages.length > 0 ? (
+                  formData.productImages.map((img, idx) => (
+                    <div key={idx} className="aspect-square bg-gray-200 rounded-lg overflow-hidden flex items-center justify-center">
+                      <img src={img.url || img} alt={`Product ${idx + 1}`} className="object-cover w-full h-full" />
+                    </div>
+                  ))
+                ) : (
+                  Array.from({ length: 3 }).map((_, idx) => (
+                    <div key={idx} className="aspect-square bg-gray-200 rounded-lg"></div>
+                  ))
+                )}
               </div>
+            </div>
+
+            {/* Budget */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Budget (USD)
+              </label>
+              <input
+                type="number"
+                value={formData.budget}
+                onChange={e => handleInputChange('budget', e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                placeholder="500"
+                min="0"
+              />
+            </div>
+
+            {/* Number of Live Posts */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Number of Live Posts
+              </label>
+              <input
+                type="number"
+                value={formData.numberOfLivePosts}
+                onChange={e => handleInputChange('numberOfLivePosts', e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                placeholder="2"
+                min="0"
+              />
+            </div>
+
+            {/* Reels URLs */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Reels (Add video URLs)
+              </label>
+              <div className="flex gap-2 mb-2">
+                <input
+                  type="url"
+                  value={reelInput}
+                  onChange={e => setReelInput(e.target.value)}
+                  className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                  placeholder="https://example.com/reel.mp4"
+                />
+                <button
+                  type="button"
+                  onClick={handleAddReel}
+                  className="px-3 py-2 bg-green-600 text-white rounded-md hover:bg-green-700"
+                >
+                  Add
+                </button>
+              </div>
+              <ul className="space-y-1">
+                {formData.reels.map((url, idx) => (
+                  <li key={idx} className="flex items-center gap-2">
+                    <span className="truncate flex-1 text-xs text-gray-700">{url}</span>
+                    <button type="button" onClick={() => handleRemoveReel(idx)} className="text-red-500 text-xs">Remove</button>
+                  </li>
+                ))}
+              </ul>
             </div>
 
             {/* Campaign Name */}
@@ -685,20 +803,42 @@ const AllCampaignsSection = () => {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
+                  {/* Product Images Preview */}
                   <div className="grid grid-cols-2 gap-2 mb-4">
-                    <div className="aspect-square bg-gray-200 rounded-lg"></div>
-                    <div className="aspect-square bg-gray-200 rounded-lg"></div>
-                    <div className="aspect-square bg-gray-200 rounded-lg"></div>
-                    <div className="aspect-square bg-gray-200 rounded-lg"></div>
+                    {formData.productImages && formData.productImages.length > 0 ? (
+                      formData.productImages.map((img, idx) => (
+                        <div key={idx} className="aspect-square bg-gray-200 rounded-lg overflow-hidden flex items-center justify-center">
+                          <img src={img.url || img} alt={`Product ${idx + 1}`} className="object-cover w-full h-full" />
+                        </div>
+                      ))
+                    ) : (
+                      Array.from({ length: 4 }).map((_, idx) => (
+                        <div key={idx} className="aspect-square bg-gray-200 rounded-lg"></div>
+                      ))
+                    )}
+                  </div>
+                  {/* Reels Preview */}
+                  <div className="mt-2">
+                    <h4 className="font-semibold text-gray-900 mb-1">Reels</h4>
+                    <ul className="space-y-1">
+                      {formData.reels && formData.reels.length > 0 ? (
+                        formData.reels.map((url, idx) => (
+                          <li key={idx} className="text-xs text-blue-700 truncate">{url}</li>
+                        ))
+                      ) : (
+                        <li className="text-xs text-gray-400">No reels added</li>
+                      )}
+                    </ul>
                   </div>
                 </div>
-                
                 <div>
                   <h4 className="font-semibold text-gray-900 mb-2">Timelines and Qualifications</h4>
                   <div className="space-y-2 text-sm text-gray-600">
                     <p>Application Deadline: {formData.applicationDeadline || 'Not set'}</p>
                     <p>Campaign Start: {formData.campaignStartDate || 'Not set'}</p>
                     <p>Campaign End: {formData.campaignEndDate || 'Not set'}</p>
+                    <p>Budget: {formData.budget || 'Not set'}</p>
+                    <p>Number of Live Posts: {formData.numberOfLivePosts || 'Not set'}</p>
                   </div>
                 </div>
               </div>
@@ -757,17 +897,24 @@ const AllCampaignsSection = () => {
     try {
       // Transform formData to match the API structure
       const transformedData = {
-        productImages: formData.productImages.length > 0 ? formData.productImages : ['https://example.com/placeholder.jpg'],
+        productImages: formData.productImages.length > 0
+          ? formData.productImages.map(img => img.url || img)
+          : ['https://example.com/placeholder.jpg'],
         campaignName: formData.campaignName,
         campaignType: formData.campaignType,
         campaignBrief: formData.campaignBrief,
-        deliverables: formData.deliverables ? [formData.deliverables] : [],
+        deliverables: formData.deliverables
+          ? Array.isArray(formData.deliverables)
+            ? formData.deliverables
+            : [formData.deliverables]
+          : [],
         compensation: {
           type: formData.compensation,
           amount: formData.compensationAmount ? parseInt(formData.compensationAmount) : undefined,
           currency: formData.compensationCurrency,
           description: formData.compensationDetails
         },
+        budget: formData.budget ? parseInt(formData.budget) : undefined,
         timelines: {
           applicationDeadline: new Date(formData.applicationDeadline).toISOString(),
           campaignStartDate: new Date(formData.campaignStartDate).toISOString(),
@@ -787,6 +934,8 @@ const AllCampaignsSection = () => {
             max: parseInt(formData.ageRangeMax) || 65
           }
         },
+        numberOfLivePosts: formData.numberOfLivePosts ? parseInt(formData.numberOfLivePosts) : undefined,
+        reels: formData.reels,
         status: 'Draft'
       };
 

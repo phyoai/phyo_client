@@ -63,12 +63,23 @@ const FormContainer = ({ steps }) => {
 
         const result = await signup(signupData);
         
-        if (result.success) {
+        if (result.success && isAuthenticated()) {
           // Redirect to the original requested URL or default dashboard
           const redirect = searchParams.get('redirect') || '/brand/dashboard';
           router.push(redirect);
+        } else if (!isAuthenticated()) {
+          setError('You must be authenticated to access the dashboard.');
         } else {
-          setError(result.error || 'Signup failed');
+          if ((result.error || '').toLowerCase().includes('already exist')) {
+            setError(
+              <span>
+                User with this email already exists.{' '}
+                <a href="/login" className="text-blue-600 underline">Login here</a>.
+              </span>
+            );
+          } else {
+            setError(result.error || 'Signup failed');
+          }
         }
       } catch (error) {
         setError('An unexpected error occurred');

@@ -1,8 +1,25 @@
+'use client'
 import Image from 'next/image'
 import React, { Suspense } from 'react'
 import FormContainer from '../components/FormContainer'
+import { useAuth } from '../../context/AuthContext';
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 
 const page = () => {
+    const { isAuthenticated, isBrand, loading } = useAuth();
+    const router = useRouter();
+
+    useEffect(() => {
+      if (!loading && isAuthenticated() && isBrand()) {
+        router.replace('/brand/dashboard');
+      }
+    }, [isAuthenticated, isBrand, loading, router]);
+
+    if (!loading && isAuthenticated() && isBrand()) {
+      return null; // Or a loader if you want
+    }
+
     const steps = [{
         title: "Brand Registration",
         description: "Create your account to get started",

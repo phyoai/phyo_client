@@ -479,7 +479,7 @@ const page = () => {
             </div>
 
             {/* Related Accounts */}
-            {creator.brightDataProfile.related_accounts && creator.brightDataProfile.related_accounts.length > 0 && (
+            {/* {creator.brightDataProfile.related_accounts && creator.brightDataProfile.related_accounts.length > 0 && (
               <div className="mt-8">
                 <h3 className="text-lg font-semibold text-gray-700 mb-4">Related Accounts</h3>
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
@@ -495,12 +495,12 @@ const page = () => {
                   ))}
                 </div>
               </div>
-            )}
+            )} */}
           </div>
         )}
 
         {/* Platform Link */}
-        {currentData?.link && currentData.link !== '-' && (
+        {/* {currentData?.link && currentData.link !== '-' && (
           <div className="bg-white rounded-xl shadow-lg p-6 mb-8">
             <h2 className="text-2xl font-bold text-gray-800 mb-4">{platformName} Profile</h2>
             <a 
@@ -516,13 +516,13 @@ const page = () => {
               Visit {platformName} Profile
             </a>
           </div>
-        )}
+        )} */}
 
         {/* Conditional Content Based on Platform */}
         {activeTab === 'instagram' && <InstagramReelsSection creator={creator} />}
         {activeTab === 'youtube' && <YouTubeVideosSection creator={creator} />}
         
-        <RawJsonSection creator={creator} />
+        {/* <RawJsonSection creator={creator} /> */}
       </div>
     </div>
   )

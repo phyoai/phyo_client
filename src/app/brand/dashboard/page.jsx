@@ -10,13 +10,13 @@ import BudgetAndAudienceSection from './BudgetAndAudienceSection'
 function DashboardContent() {
   return (
     <div className='text-black'>
-      {/* <CampaignReport/>
+      <CampaignReport/>
       <TopInfluencer/>
       <PostTimeLine/>
       <InfluencersTable/>
       <EngagementSection/>
       <PostLiveAndTotalViewsSection/>
-      <BudgetAndAudienceSection/> */}
+      <BudgetAndAudienceSection/>
       hi vishnu
     </div>
   );

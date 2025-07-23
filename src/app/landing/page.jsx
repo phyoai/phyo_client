@@ -9,13 +9,14 @@ import ComparisonTable from './ComparisonTable'
 import CTASection from './CTASection'
 import Footer from './components/Footer'
 import PricingSection from './PricingSection'
+import Navbar from './components/Navbar'
 // import InfluencerList from './InfluencerList'
-
 
 
 const page = () => {
   return (
     <div>
+      <Navbar />
       <Hero/>
       <FeatureText/>
       <FeatureSection/>
