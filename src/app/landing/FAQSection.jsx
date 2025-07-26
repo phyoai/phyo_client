@@ -36,26 +36,13 @@ const FAQSection = () => {
     <section className="py-20 px-6 ">
       <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-16 items-start">
         {/* Left Side - Illustration */}
-        <div className="relative">
-          <div className="bg-green-100 rounded-3xl p-12 relative overflow-hidden">
-            {/* Abstract illustration placeholder */}
-            <div className="relative z-10 flex items-center justify-center space-x-4">
-              <div className="bg-white rounded-2xl p-8 shadow-lg transform rotate-12 hover:rotate-6 transition-transform duration-300">
-                <div className="w-16 h-16 bg-gray-200 rounded-lg flex items-center justify-center">
-                  <span className="text-gray-600 font-medium text-sm">Graphic</span>
-                </div>
-              </div>
-              <div className="bg-white rounded-2xl p-8 shadow-lg transform -rotate-6 hover:rotate-0 transition-transform duration-300">
-                <div className="w-16 h-16 bg-gray-300 rounded-lg flex items-center justify-center">
-                  <span className="text-gray-700 font-medium text-sm">Graphic</span>
-                </div>
-              </div>
-            </div>
-            
-            {/* Decorative background elements */}
-            <div className="absolute top-4 left-4 w-8 h-8 bg-green-200 rounded-full opacity-50"></div>
-            <div className="absolute bottom-8 right-8 w-12 h-12 bg-green-300 rounded-full opacity-30"></div>
-            <div className="absolute top-1/2 left-8 w-6 h-6 bg-green-400 rounded-full opacity-40"></div>
+        <div className="relative mt-40">
+          <div className="bg-green-100 rounded-3xl p-12 relative overflow-hidden flex items-center justify-center min-h-[340px]">
+            <img 
+              src="/faq.png" 
+              alt="FAQ Illustration" 
+              className="w-full h-full object-contain max-h-72 rounded-2xl shadow-lg" 
+            />
           </div>
         </div>
 

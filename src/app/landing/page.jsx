@@ -21,7 +21,7 @@ const page = () => {
       <FeatureText/>
       <FeatureSection/>
       <StatsSection/>
-      <PricingSection/>
+      {/* <PricingSection/> */}
       <FAQSection/>
       <ComparisonTable/>
       {/* <InfluencerList/> */}

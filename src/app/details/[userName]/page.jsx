@@ -296,40 +296,48 @@ const page = () => {
         {/* Platform Stats Overview */}
         <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8'>
           {/* Followers */}
-          <div className='bg-white rounded-xl shadow-lg p-6 text-center'>
-            <div className={`text-3xl font-bold mb-2 ${activeTab === 'instagram' ? 'text-pink-600' : 'text-red-600'}`}>
-              {formatValue(currentData?.followers || 0)}
+          {currentData?.followers > 0 && (
+            <div className='bg-white rounded-xl shadow-lg p-6 text-center'>
+              <div className={`text-3xl font-bold mb-2 ${activeTab === 'instagram' ? 'text-pink-600' : 'text-red-600'}`}>
+                {formatValue(currentData?.followers)}
+              </div>
+              <div className='text-gray-600 font-medium'>
+                {activeTab === 'instagram' ? 'Followers' : 'Subscribers'}
+              </div>
             </div>
-            <div className='text-gray-600 font-medium'>
-              {activeTab === 'instagram' ? 'Followers' : 'Subscribers'}
-            </div>
-          </div>
+          )}
 
           {/* Collaboration Charges - Reel/Video */}
-          <div className='bg-white rounded-xl shadow-lg p-6 text-center'>
-            <div className='text-3xl font-bold text-green-600 mb-2'>
-              ₹{formatValue(currentData?.collaborationCharges?.reel || 0)}
+          {currentData?.collaborationCharges?.reel > 0 && (
+            <div className='bg-white rounded-xl shadow-lg p-6 text-center'>
+              <div className='text-3xl font-bold text-green-600 mb-2'>
+                ₹{formatValue(currentData?.collaborationCharges?.reel)}
+              </div>
+              <div className='text-gray-600 font-medium'>
+                {activeTab === 'instagram' ? 'Reel Rate' : 'Video Rate'}
+              </div>
             </div>
-            <div className='text-gray-600 font-medium'>
-              {activeTab === 'instagram' ? 'Reel Rate' : 'Video Rate'}
-            </div>
-          </div>
+          )}
 
           {/* Post Rate */}
-          <div className='bg-white rounded-xl shadow-lg p-6 text-center'>
-            <div className='text-3xl font-bold text-blue-600 mb-2'>
-              ₹{formatValue(currentData?.collaborationCharges?.post || 0)}
+          {currentData?.collaborationCharges?.post > 0 && (
+            <div className='bg-white rounded-xl shadow-lg p-6 text-center'>
+              <div className='text-3xl font-bold text-blue-600 mb-2'>
+                ₹{formatValue(currentData?.collaborationCharges?.post)}
+              </div>
+              <div className='text-gray-600 font-medium'>Post Rate</div>
             </div>
-            <div className='text-gray-600 font-medium'>Post Rate</div>
-          </div>
+          )}
 
           {/* Story Rate */}
-          <div className='bg-white rounded-xl shadow-lg p-6 text-center'>
-            <div className='text-3xl font-bold text-purple-600 mb-2'>
-              ₹{formatValue(currentData?.collaborationCharges?.story || 0)}
+          {currentData?.collaborationCharges?.story > 0 && (
+            <div className='bg-white rounded-xl shadow-lg p-6 text-center'>
+              <div className='text-3xl font-bold text-purple-600 mb-2'>
+                ₹{formatValue(currentData?.collaborationCharges?.story)}
+              </div>
+              <div className='text-gray-600 font-medium'>Story Rate</div>
             </div>
-            <div className='text-gray-600 font-medium'>Story Rate</div>
-          </div>
+          )}
         </div>
 
         {/* Demographics Section */}
@@ -341,35 +349,40 @@ const page = () => {
             <h2 className="text-2xl font-bold text-gray-800 mb-6">Profile Analytics</h2>
             
             {/* Key Metrics Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-              <div className="bg-gradient-to-r from-blue-50 to-blue-100 rounded-lg p-4 text-center">
-                <div className="text-2xl font-bold text-blue-600 mb-1">
-                  {formatValue(creator.brightDataProfile.followers)}
+            {/* <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+              {creator.brightDataProfile.followers > 0 && (
+                <div className="bg-gradient-to-r from-blue-50 to-blue-100 rounded-lg p-4 text-center">
+                  <div className="text-2xl font-bold text-blue-600 mb-1">
+                    {formatValue(creator.brightDataProfile.followers)}
+                  </div>
+                  <div className="text-sm text-blue-700 font-medium">Total Followers</div>
                 </div>
-                <div className="text-sm text-blue-700 font-medium">Total Followers</div>
-              </div>
-              
-              <div className="bg-gradient-to-r from-green-50 to-green-100 rounded-lg p-4 text-center">
-                <div className="text-2xl font-bold text-green-600 mb-1">
-                  {formatValue(creator.brightDataProfile.following)}
+              )}
+              {creator.brightDataProfile.following > 0 && (
+                <div className="bg-gradient-to-r from-green-50 to-green-100 rounded-lg p-4 text-center">
+                  <div className="text-2xl font-bold text-green-600 mb-1">
+                    {formatValue(creator.brightDataProfile.following)}
+                  </div>
+                  <div className="text-sm text-green-700 font-medium">Following</div>
                 </div>
-                <div className="text-sm text-green-700 font-medium">Following</div>
-              </div>
-              
-              <div className="bg-gradient-to-r from-purple-50 to-purple-100 rounded-lg p-4 text-center">
-                <div className="text-2xl font-bold text-purple-600 mb-1">
-                  {formatValue(creator.brightDataProfile.posts_count)}
+              )}
+              {creator.brightDataProfile.posts_count > 0 && (
+                <div className="bg-gradient-to-r from-purple-50 to-purple-100 rounded-lg p-4 text-center">
+                  <div className="text-2xl font-bold text-purple-600 mb-1">
+                    {formatValue(creator.brightDataProfile.posts_count)}
+                  </div>
+                  <div className="text-sm text-purple-700 font-medium">Total Posts</div>
                 </div>
-                <div className="text-sm text-purple-700 font-medium">Total Posts</div>
-              </div>
-              
-              <div className="bg-gradient-to-r from-orange-50 to-orange-100 rounded-lg p-4 text-center">
-                <div className="text-2xl font-bold text-orange-600 mb-1">
-                  {creator.brightDataProfile.avg_engagement ? (creator.brightDataProfile.avg_engagement * 100).toFixed(2) + '%' : 'N/A'}
+              )}
+              {creator.brightDataProfile.avg_engagement && creator.brightDataProfile.avg_engagement > 0 && (
+                <div className="bg-gradient-to-r from-orange-50 to-orange-100 rounded-lg p-4 text-center">
+                  <div className="text-2xl font-bold text-orange-600 mb-1">
+                    {(creator.brightDataProfile.avg_engagement * 100).toFixed(2) + '%'}
+                  </div>
+                  <div className="text-sm text-orange-700 font-medium">Avg Engagement</div>
                 </div>
-                <div className="text-sm text-orange-700 font-medium">Avg Engagement</div>
-              </div>
-            </div>
+              )}
+            </div> */}
 
             {/* Profile Details */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
