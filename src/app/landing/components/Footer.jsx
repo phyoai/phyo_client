@@ -16,7 +16,7 @@ const Footer = () => {
           <div className="md:col-span-1">
             <div className="mb-6">
               <Image 
-                src="/logo.png" 
+                src="/logo_white.png" 
                 alt="PHYO Logo" 
                 width={120} 
                 height={40}

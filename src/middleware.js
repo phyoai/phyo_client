@@ -16,8 +16,8 @@ export function middleware(request) {
         '/brand/inbox',
         '/brand/settings',
         '/influencer',
-        '/service-provider',
-        '/details'
+        '/service-provider'
+        // '/details' is now public
     ];
     
     // Check if the current path is a protected route

@@ -13,7 +13,7 @@ export default function BrandLayout({ children }) {
   }, [pathname]);
   
   // Don't protect the signup page
-  const isSignupPage = pathname === '/brand/signup';
+  const isSignupPage = pathname === '/brand/signup' || '/brand/login';
   
   if (isSignupPage) {
     console.log('BrandLayout: Rendering signup page without protection');
@@ -46,3 +46,8 @@ export default function BrandLayout({ children }) {
     </div>
   );
 } 
+
+
+
+
+

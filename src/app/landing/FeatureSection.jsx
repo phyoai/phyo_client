@@ -24,7 +24,7 @@ const FeatureSection = () => {
           <div className="relative">
             <div className="relative z-10 bg-white rounded-2xl shadow-2xl p-6 transform rotate-1 hover:rotate-0 transition-transform duration-300">
               <Image
-                src="/landing/feature1.png"
+                src="/feature4.png"
                 alt="Creator search interface"
                 width={600}
                 height={400}
@@ -88,7 +88,7 @@ const FeatureSection = () => {
           <div className="relative">
             <div className="relative z-10 bg-white rounded-2xl shadow-2xl p-6 transform rotate-1 hover:rotate-0 transition-transform duration-300">
               <Image
-                src="/landing/feature1.png"
+                src="/feature3.png"
                 alt="Campaign management interface"
                 width={600}
                 height={400}
