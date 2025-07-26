@@ -44,7 +44,7 @@ const CTASection = () => {
             {/* Dashboard Content */}
             <div className="bg-white rounded-2xl overflow-hidden shadow-xl">
               <Image
-                src="/feature1.png"
+                src="/free-trial.png"
                 alt="Phyo Dashboard Interface"
                 width={700}
                 height={500}
