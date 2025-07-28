@@ -69,6 +69,9 @@ const ProfileImage = ({ src, alt, name, className }) => {
 };
 
 const Hero = () => {
+  // State for responsive background
+  const [isMobile, setIsMobile] = useState(false);
+  
   // Load from sessionStorage if available
   const [prompt, setPrompt] = useState(() => {
     if (typeof window !== 'undefined') {
@@ -86,6 +89,22 @@ const Hero = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const router = useRouter();
+
+  // Handle responsive background
+  React.useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 640);
+    };
+    
+    // Check on mount
+    checkMobile();
+    
+    // Add resize listener
+    window.addEventListener('resize', checkMobile);
+    
+    // Cleanup
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   // Persist prompt and results to sessionStorage
   React.useEffect(() => {
@@ -151,9 +170,9 @@ const Hero = () => {
 
   return (
     <div 
-      className="min-h-screen bg-cover bg-center bg-no-repeat bg-fixed relative flex flex-col items-center justify-start sm:justify-center px-4 sm:px-6 py-4 sm:py-0 overflow-x-hidden"
+      className="min-h-screen bg-cover bg-center bg-no-repeat bg-fixed relative flex flex-col items-center justify-start sm:justify-center px-0 sm:px-6 py-4 sm:py-0 overflow-x-hidden w-full max-w-full box-border"
       style={{
-        backgroundImage: "url('/landing/hero_bg1.jpg')",
+        backgroundImage: `url(${isMobile ? '/Phone.png' : '/landing/hero_bg1.jpg'})`,
         backgroundSize: 'cover',
         backgroundPosition: 'center center',
         backgroundAttachment: 'scroll'
@@ -163,7 +182,7 @@ const Hero = () => {
       <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-white via-white/60 to-transparent pointer-events-none z-20"></div>
       
       {/* Content */}
-      <div className="relative z-10 max-w-6xl mx-auto mt-16 sm:mt-20 lg:mt-[95px] text-center w-full overflow-x-hidden">
+      <div className="relative z-10 max-w-6xl mx-auto mt-16 sm:mt-20 lg:mt-[95px] text-center w-full max-w-full overflow-x-hidden px-0 sm:px-2 box-border">
      
 
         {/* Main heading */}
@@ -179,73 +198,72 @@ const Hero = () => {
         </p>
 
         {/* Search bar */}
-        <div className="relative max-w-4xl mx-auto mb-12 sm:mb-20 px-2">
-          <div className="flex flex-col sm:flex-row items-center bg-white rounded-2xl sm:rounded-full shadow-2xl overflow-hidden">
-            <input
-              type="text"
-              placeholder="Describe the influencers you need (e.g. I need influencers in mumbai with 10k to 100k followers in the fashion category, primarily female audience aged 18-35)"
-              className="flex-1 px-4 sm:px-8 py-4 sm:py-2 text-base sm:text-lg text-gray-700 placeholder-gray-400 outline-none w-full"
-              value={prompt}
-              onChange={e => setPrompt(e.target.value)}
-              onKeyDown={handleInput}
-            />
-            <button
-              className="bg-green-500 hover:bg-green-600 transition-colors duration-200 p-4 sm:p-6 m-2 rounded-full w-full sm:w-auto flex items-center justify-center"
-              onClick={handleSearch}
-              disabled={loading}
-              aria-label="Search"
-            >
-              {loading ? (
-                <svg className="w-5 h-5 sm:w-6 sm:h-6 text-white animate-spin" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-              ) : (
-                <svg 
-                  className="w-5 h-5 sm:w-6 sm:h-6 text-white"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                  />
-                </svg>
-              )}
-              <span className="ml-2 sm:hidden text-white font-medium">
-                {loading ? 'Searching...' : 'Search'}
-              </span>
-            </button>
-          </div>
-        </div>
-
+        <div className="relative max-w-4xl mx-auto mb-12 sm:mb-20 px-4 sm:px-2 ">
+  <div className="flex flex-col sm:flex-row items-center bg-white rounded-2xl sm:rounded-full shadow-2xl overflow-hidden w-full max-w-full">
+    <input
+      type="text"
+      placeholder="Describe the influencers you need (e.g. I need influencers in mumbai )"
+      className="flex-1 px-4 sm:px-8 py-4 sm:py-2 text-base sm:text-lg text-gray-700 placeholder-gray-400 outline-none w-full min-w-0"
+      value={prompt}
+      onChange={e => setPrompt(e.target.value)}
+      onKeyDown={handleInput}
+    />
+    <button
+      className="bg-green-500 hover:bg-green-600 transition-colors duration-200 p-4 sm:p-6 m-2 rounded-full w-full sm:w-auto flex items-center justify-center px-4 sm:px-6"
+      onClick={handleSearch}
+      disabled={loading}
+      aria-label="Search"
+    >
+      {loading ? (
+        <svg className="w-5 h-5 sm:w-6 sm:h-6 text-white animate-spin" fill="none" viewBox="0 0 24 24">
+          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+      ) : (
+        <svg 
+          className="w-5 h-5 sm:w-6 sm:h-6 text-white"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+          />
+        </svg>
+      )}
+      <span className="ml-2 sm:hidden text-white font-medium">
+        {loading ? 'Searching...' : 'Search'}
+      </span>
+    </button>
+  </div>
+</div>
         {/* Loading and Error States */}
         {loading && <div className="text-center text-white mb-4 font-medium px-4">Searching for influencers...</div>}
         {error && <div className="text-center text-red-400 mb-4 bg-red-100 rounded-lg px-4 py-2 inline-block mx-4">{error}</div>}
 
         {/* Influencer search results */}
         {results.length > 0 && (
-          <div className="max-w-5xl mx-auto mb-10 flex flex-col gap-4 sm:gap-6 px-2">
+          <div className="max-w-5xl mx-auto mb-10 flex flex-col gap-4 sm:gap-6 px-4 sm:px-2 w-full max-w-full">
             <div className="text-white mb-2 sm:mb-4 font-medium">
               Found {results.length} influencer{results.length > 1 ? 's' : ''}
             </div>
             {results.map((influencer, index) => (
               <div
                 key={influencer.user_name || influencer._id || index}
-                className="bg-white rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer transform hover:scale-[1.02] hover:border-green-200 border-2 border-transparent"
+                className="bg-white rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer transform sm:hover:scale-[1.02] hover:border-green-200 border-2 border-transparent w-full max-w-full box-border mb-4"
                 onClick={() => handleCardClick(influencer)}
               >
-                <div className="flex flex-col sm:flex-row items-start gap-4 sm:gap-6">
+                <div className="flex flex-col sm:flex-row items-start gap-4 sm:gap-6 min-w-0">
                   {/* Profile Image */}
-                  <div className="relative flex-shrink-0 self-center sm:self-start">
+                  <div className="relative flex-shrink-0 self-center sm:self-start min-w-0">
                     <ProfileImage
                       src={influencer.brightDataProfile?.profile_image_link || influencer.image}
                       alt={influencer.name || influencer.user_name}
                       name={influencer.name || influencer.user_name}
-                      className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl"
+                      className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl min-w-0"
                     />
                     {/* Verified Badge */}
                     {influencer.brightDataProfile?.is_verified && (
@@ -258,18 +276,18 @@ const Hero = () => {
                   </div>
 
                   {/* Content */}
-                  <div className="flex-1 min-w-0 w-full">
+                  <div className="flex-1 min-w-0 w-full break-words">
                     {/* Name and Basic Info */}
-                    <div className="flex flex-col sm:flex-row items-start sm:justify-between mb-2 gap-2">
-                      <div className="text-center sm:text-left w-full sm:w-auto">
-                        <h3 className="text-lg sm:text-xl font-bold text-gray-900 truncate">
+                    <div className="flex flex-col sm:flex-row items-start sm:justify-between mb-2 gap-2 min-w-0">
+                      <div className="text-center sm:text-left w-full sm:w-auto min-w-0 break-words">
+                        <h3 className="text-lg sm:text-xl font-bold text-gray-900 truncate break-words">
                           {influencer.brightDataProfile?.full_name || 
                            influencer.name || 
                            influencer.user_name}
                         </h3>
-                        <p className="text-sm text-gray-500">@{influencer.user_name}</p>
+                        <p className="text-sm text-gray-500 truncate break-words">@{influencer.user_name}</p>
                       </div>
-                      <div className="flex items-center gap-1 bg-green-100 px-2 py-1 rounded-full self-center sm:self-start">
+                      <div className="flex items-center gap-1 bg-green-100 px-2 py-1 rounded-full self-center sm:self-start min-w-0">
                         <svg className="w-3 h-3 sm:w-4 sm:h-4 text-green-600" fill="currentColor" viewBox="0 0 20 20">
                           <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
                         </svg>
@@ -418,13 +436,13 @@ const Hero = () => {
 
         {/* Feature Image */}
         {results.length === 0 && !loading && (
-          <div className="max-w-5xl mx-auto px-2">
+          <div className="max-w-2xl mx-auto px-8 sm:px-2 px-16 w-full max-w-full">
             <Image
               src="/landing/hero_feature.png"
               alt="Phyo AI Influencer Search Platform Preview"
               width={1200}
               height={600}
-              className="w-full h-auto rounded-lg shadow-2xl"
+              className="w-full h-auto rounded-lg shadow-2xl max-w-full"
               priority={true}
             />
           </div>
