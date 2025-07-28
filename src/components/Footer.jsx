@@ -28,6 +28,11 @@ const Footer = () => {
       <div className='flex-1 mt-8'>
         <h3 className='text-[#5FC34E] leading-[24px] pb-[14px] text-[16px]'>FOLLOW US</h3>
         <span className='flex gap-x-4'> <Instagram />  <Facebook />  <Twitter /> <Linkedin /></span>
+        <div className='mt-4'>
+          <Link href="/privacy-policy" className='text-[#59565F] hover:text-[#5FC34E] transition-colors text-[12px]'>
+            Privacy Policy
+          </Link>
+        </div>
       </div>
     </footer>
   )

@@ -19,7 +19,7 @@ const Navbar = () => {
         {/* Desktop Navigation */}
         <ul className="hidden md:flex space-x-6 lg:space-x-8">
           <li>
-            <Link href="/brand/signup" className="text-white hover:text-blue-300 font-medium transition-colors text-sm lg:text-base">
+            <Link href="/brand/login" className="text-white hover:text-blue-300 font-medium transition-colors text-sm lg:text-base">
               Brand
             </Link>
           </li>
