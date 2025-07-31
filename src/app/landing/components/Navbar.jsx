@@ -16,8 +16,8 @@ const Navbar = () => {
           <img src="/logo_white.png" alt="Logo" className="h-8 sm:h-10 w-auto mr-2 sm:mr-4" />
         </div>
 
-        {/* Desktop Navigation */}
-        <ul className="hidden md:flex space-x-6 lg:space-x-8">
+        {/* Desktop Navigation - Centered */}
+        <ul className="hidden md:flex space-x-6 lg:space-x-8 absolute left-1/2 transform -translate-x-1/2">
           <li>
             <Link href="/brand/login" className="text-white hover:text-blue-300 font-medium transition-colors text-sm lg:text-base">
               Brand
@@ -30,38 +30,49 @@ const Navbar = () => {
           </li>
           <li>
             <Link href="#" className="text-white hover:text-blue-300 font-medium transition-colors text-sm lg:text-base">
-              AGENCY
+              Agency
             </Link>
           </li>
           <li>
             <Link href="#" className="text-white hover:text-blue-300 font-medium transition-colors text-sm lg:text-base">
-              CONTACT
+              Contact
             </Link>
           </li>
         </ul>
 
-        {/* Mobile Menu Button */}
-        <button
-          onClick={toggleMenu}
-          className="md:hidden flex items-center justify-center w-10 h-10 text-white hover:text-blue-300 transition-colors"
-          aria-label="Toggle menu"
-        >
-          <svg
-            className="w-6 h-6"
-            fill="none"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth="2"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
+        {/* Sign In Button and Mobile Menu Button */}
+        <div className="flex items-center space-x-4">
+          {/* Sign In Button */}
+          <Link 
+            href="/login" 
+            className="hidden md:inline-flex border border-white text-white hover:bg-white hover:text-black font-medium px-4 py-2 rounded-full transition-colors text-sm lg:text-base"
           >
-            {isMenuOpen ? (
-              <path d="M6 18L18 6M6 6l12 12" />
-            ) : (
-              <path d="M4 6h16M4 12h16M4 18h16" />
-            )}
-          </svg>
-        </button>
+            Sign In
+          </Link>
+
+          {/* Mobile Menu Button */}
+          <button
+            onClick={toggleMenu}
+            className="md:hidden flex items-center justify-center w-10 h-10 text-white hover:text-blue-300 transition-colors"
+            aria-label="Toggle menu"
+          >
+            <svg
+              className="w-6 h-6"
+              fill="none"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              {isMenuOpen ? (
+                <path d="M6 18L18 6M6 6l12 12" />
+              ) : (
+                <path d="M4 6h16M4 12h16M4 18h16" />
+              )}
+            </svg>
+          </button>
+        </div>
       </div>
 
       {/* Mobile Navigation Menu */}
@@ -70,8 +81,8 @@ const Navbar = () => {
           <div className="bg-black/20 backdrop-blur-lg rounded-lg mx-4 p-4">
             <ul className="space-y-4">
               <li>
-                <Link 
-                  href="/brand/signup" 
+                <Link
+                  href="/brand/signup"
                   className="block text-white hover:text-blue-300 font-medium transition-colors py-2 text-base"
                   onClick={() => setIsMenuOpen(false)}
                 >
@@ -79,8 +90,8 @@ const Navbar = () => {
                 </Link>
               </li>
               <li>
-                <Link 
-                  href="#" 
+                <Link
+                  href="#"
                   className="block text-white hover:text-blue-300 font-medium transition-colors py-2 text-base"
                   onClick={() => setIsMenuOpen(false)}
                 >
@@ -88,21 +99,30 @@ const Navbar = () => {
                 </Link>
               </li>
               <li>
-                <Link 
-                  href="#" 
+                <Link
+                  href="#"
                   className="block text-white hover:text-blue-300 font-medium transition-colors py-2 text-base"
                   onClick={() => setIsMenuOpen(false)}
                 >
-                  AGENCY
+                  Agency
                 </Link>
               </li>
               <li>
-                <Link 
-                  href="#" 
+                <Link
+                  href="#"
                   className="block text-white hover:text-blue-300 font-medium transition-colors py-2 text-base"
                   onClick={() => setIsMenuOpen(false)}
                 >
-                  CONTACT
+                  Contact
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/signin"
+                  className="block border border-white text-white hover:bg-white hover:text-black font-medium transition-colors py-2 px-4 rounded-full text-base text-center"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  Sign In
                 </Link>
               </li>
             </ul>
