@@ -668,7 +668,7 @@ const Hero = () => {
         <AnimatePresence>
           {results.length === 0 && !loading && (
             <motion.div 
-              className="max-w-[1100px] mx-auto px-8 sm:px-2 px-16 w-full max-w-full"
+              className="max-w-[1100px] mx-auto px-8 sm:px-2 px-8 "
               variants={featureImageVariants}
               initial="hidden"
               animate="visible"
@@ -681,7 +681,7 @@ const Hero = () => {
                 <Image
                   src="/landing/hero_feature.png"
                   alt="Phyo AI Influencer Search Platform Preview"
-                  width={1000}
+                  width={800}
                   height={600}
                   className="w-full h-auto rounded-lg shadow-2xl max-w-full"
                   priority={true}
@@ -690,6 +690,7 @@ const Hero = () => {
             </motion.div>
           )}
         </AnimatePresence>
+
       </motion.div>
     </div>
   );
