@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
+import LogoIcon from '../../../components/Icons/logo'
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -13,11 +14,12 @@ const Navbar = () => {
       <div className="flex items-center justify-between max-w-7xl mx-auto">
         {/* Logo */}
         <div className="flex items-center flex-shrink-0">
-          <img src="/logo_white.png" alt="Logo" className="h-8 sm:h-10 w-auto mr-2 sm:mr-4" />
+          {/* <img src="/logo_white.png" alt="Logo" className="h-8 sm:h-10 w-auto mr-2 sm:mr-4" /> */}
+          <LogoIcon />
         </div>
 
         {/* Desktop Navigation - Centered */}
-        <ul className="hidden md:flex space-x-6 lg:space-x-8 absolute left-1/2 transform -translate-x-1/2">
+        {/* <ul className="hidden md:flex space-x-6 lg:space-x-8 absolute left-1/2 transform -translate-x-1/2">
           <li>
             <Link href="/brand/login" className="text-white hover:text-blue-300 font-medium transition-colors text-sm lg:text-base">
               Brand
@@ -38,7 +40,7 @@ const Navbar = () => {
               Contact
             </Link>
           </li>
-        </ul>
+        </ul> */}
 
         {/* Sign In Button and Mobile Menu Button */}
         <div className="flex items-center space-x-4">
