@@ -28,7 +28,7 @@
     ".next/types/**/*.ts",
     "**/*.ts",
     "**/*.tsx"
-, "src/app/brand/dashboard/page.jsx", "src/app/influencer/layout.jsx", "src/app/landing/page.jsx", "src/app/landing/components/Navbar.jsx", "src/app/landing/StatsSection.jsx"  ],
+, "src/app/brand/dashboard/page.jsx", "src/app/influencer/layout.jsx", "src/app/landing/page.jsx", "src/app/landing/components/Navbar.jsx", "src/app/landing/StatsSection.jsx", "src/components/Icons/logo.jsx"  ],
   "exclude": [
     "node_modules"
   ]

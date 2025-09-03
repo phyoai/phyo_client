@@ -23,7 +23,7 @@ const PrivacyPolicy = () => {
               1. Introduction
             </h2>
             <p className="text-gray-700 text-sm sm:text-base leading-relaxed mb-4">
-              Welcome to Phyo ("we," "our," or "us"). We are committed to protecting your privacy and ensuring the security of your personal information. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our AI-powered influencer search platform and payment processing services through Razorpay.
+              Welcome to Phyo. We are committed to protecting your privacy and ensuring the security of your personal information. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our AI-powered influencer search platform and payment processing services through Razorpay.
             </p>
             <p className="text-gray-700 text-sm sm:text-base leading-relaxed mb-4">
               Your Personal Data shall be processed in accordance with this Privacy Policy, the Digital Personal Data Protection Act, 2023, Information Technology Act, 2000, and any applicable rules and regulations thereunder.
@@ -326,16 +326,9 @@ const PrivacyPolicy = () => {
           <div className="border-t border-gray-200 pt-6 mt-8">
             <div className="flex flex-col sm:flex-row justify-between items-center">
               <p className="text-gray-600 text-xs sm:text-sm mb-4 sm:mb-0">
-                © {new Date().getFullYear()} Phyo. All rights reserved. | Compliant with DPDP Act 2023 & RBI Guidelines
+                © {new Date().getFullYear()} Phyo. All rights reserved.
               </p>
-              <div className="flex space-x-4">
-                <Link href="/terms" className="text-blue-600 hover:text-blue-800 text-xs sm:text-sm">
-                  Terms of Service
-                </Link>
-                <Link href="/support" className="text-blue-600 hover:text-blue-800 text-xs sm:text-sm">
-                  Support
-                </Link>
-              </div>
+          
             </div>
           </div>
         </div>

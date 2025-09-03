@@ -58,7 +58,7 @@ const Footer = () => {
           </div>
 
           {/* My Account */}
-          <div>
+          {/* <div>
             <h3 className="text-lg font-semibold mb-4">My Account</h3>
             <ul className="space-y-2">
               <li><Link href="#" className="text-gray-300 hover:text-white transition-colors text-sm">My Account</Link></li>
@@ -67,22 +67,22 @@ const Footer = () => {
               <li><Link href="#" className="text-gray-300 hover:text-white transition-colors text-sm">Features</Link></li>
               <li><Link href="#" className="text-gray-300 hover:text-white transition-colors text-sm">Settings</Link></li>
             </ul>
-          </div>
+          </div> */}
 
           {/* Links */}
           <div>
             <h3 className="text-lg font-semibold mb-4">Links</h3>
             <ul className="space-y-2">
-              <li><Link href="#" className="text-gray-300 hover:text-white transition-colors text-sm">Contact</Link></li>
+              {/* <li><Link href="#" className="text-gray-300 hover:text-white transition-colors text-sm">Contact</Link></li>
               <li><Link href="#" className="text-gray-300 hover:text-white transition-colors text-sm">Explore</Link></li>
               <li><Link href="#" className="text-gray-300 hover:text-white transition-colors text-sm">About Us</Link></li>
-              <li><Link href="#" className="text-gray-300 hover:text-white transition-colors text-sm">How it Works</Link></li>
+              <li><Link href="#" className="text-gray-300 hover:text-white transition-colors text-sm">How it Works</Link></li> */}
               <li><Link href="/privacy-policy" className="text-gray-300 hover:text-white transition-colors text-sm">Privacy Policy</Link></li>
             </ul>
           </div>
 
           {/* Product */}
-          <div>
+          {/* <div>
             <h3 className="text-lg font-semibold mb-4">Product</h3>
             <ul className="space-y-2">
               <li><Link href="#" className="text-gray-300 hover:text-white transition-colors text-sm">Features</Link></li>
@@ -90,7 +90,7 @@ const Footer = () => {
               <li><Link href="#" className="text-gray-300 hover:text-white transition-colors text-sm">How it Works</Link></li>
               <li><Link href="#" className="text-gray-300 hover:text-white transition-colors text-sm">Request a Demo</Link></li>
             </ul>
-          </div>
+          </div> */}
         </div>
 
         {/* Payment Methods and Copyright */}
@@ -99,20 +99,7 @@ const Footer = () => {
             <div className="mb-4 md:mb-0">
               <p className="text-gray-300 text-sm">2025 Phyo Media. All rights reserved.</p>
             </div>
-            <div className="flex space-x-4">
-              {/* Payment method logos */}
-              <div className="flex items-center space-x-2">
-                <div className="bg-white rounded px-2 py-1">
-                  <span className="text-blue-600 font-bold text-xs">Razorpay</span>
-                </div>
-                <div className="bg-white rounded px-2 py-1">
-                  <span className="text-blue-600 font-bold text-xs">PayPal</span>
-                </div>
-                <div className="bg-white rounded px-2 py-1">
-                  <span className="text-purple-600 font-bold text-xs">stripe</span>
-                </div>
-              </div>
-            </div>
+         
           </div>
         </div>
       </div>
