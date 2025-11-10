@@ -1,18 +1,153 @@
 'use client'
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useAuth } from '../context/AuthContext';
+import paymentService from '../../utils/payment';
+import { useRouter } from 'next/navigation';
 
 const PricingSection = () => {
   const [billingCycle, setBillingCycle] = useState('annually');
+  const [loading, setLoading] = useState(false);
+  const [processingPlan, setProcessingPlan] = useState(null);
+  const [userPlan, setUserPlan] = useState(null);
+  const { isAuthenticated } = useAuth();
+  const router = useRouter();
+
+  // Load Razorpay script
+  useEffect(() => {
+    if (typeof window !== 'undefined' && !window.Razorpay) {
+      const script = document.createElement('script');
+      script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+      script.async = true;
+      document.head.appendChild(script);
+    }
+
+    // Check user's current plan
+    if (isAuthenticated()) {
+      checkUserPlan();
+    }
+  }, [isAuthenticated]);
+
+  const checkUserPlan = async () => {
+    try {
+      const response = await paymentService.getUserPlan();
+      if (response.success) {
+        setUserPlan(response.data.currentPlan);
+      }
+    } catch (error) {
+      console.error('Error fetching user plan:', error);
+    }
+  };
+
+  const handlePlanClick = async (plan) => {
+    if (plan.price === '$0') {
+      // Handle free plan
+      alert('Free plan is already available to all users!');
+      return;
+    }
+
+    if (!isAuthenticated()) {
+      // Redirect to signup/login
+      const currentPath = window.location.pathname;
+      router.push(`/brand/signup?redirect=${encodeURIComponent(currentPath)}`);
+      return;
+    }
+
+    setLoading(true);
+    setProcessingPlan(plan.name);
+
+    try {
+      // Map plan to API plan ID
+      const planId = getPlanId(plan.name);
+      const interval = billingCycle === 'annually' ? 'YEARLY' : 'MONTHLY';
+
+      // Create payment order
+      const orderResponse = await paymentService.createOrder(planId, interval);
+      
+      if (orderResponse.success) {
+        // Initialize Razorpay payment
+        const rzp = paymentService.initializeRazorpay(
+          orderResponse.data,
+          // Success callback
+          async (response) => {
+            try {
+              const verificationResponse = await paymentService.verifyPayment(
+                response.razorpay_order_id,
+                response.razorpay_payment_id,
+                response.razorpay_signature,
+                planId
+              );
+
+              if (verificationResponse.success) {
+                alert('Payment successful! Your subscription has been activated.');
+                await checkUserPlan(); // Refresh user plan
+              } else {
+                alert('Payment verification failed. Please contact support.');
+              }
+            } catch (error) {
+              console.error('Payment verification error:', error);
+              alert('Payment verification failed. Please contact support.');
+            }
+          },
+          // Failure callback
+          (error) => {
+            console.error('Payment failed:', error);
+            alert('Payment was cancelled or failed. Please try again.');
+          }
+        );
+
+        rzp.open();
+      } else {
+        throw new Error(orderResponse.error || 'Failed to create order');
+      }
+    } catch (error) {
+      console.error('Payment error:', error);
+      alert(error.message || 'Payment failed. Please try again.');
+    } finally {
+      setLoading(false);
+      setProcessingPlan(null);
+    }
+  };
+
+  const getPlanId = (planName) => {
+    const planMapping = {
+      'Bronze': 'bronze-monthly',
+      'Silver': 'silver-monthly',
+      'Gold': 'gold-monthly',
+      'Premium': 'premium-monthly'
+    };
+    return planMapping[planName] || 'bronze-monthly';
+  };
+
+  const getPrice = (plan) => {
+    if (plan.name === 'Bronze') return '$0';
+    if (plan.name === 'Silver') return '$19';
+    if (plan.name === 'Gold') return '$79';
+    if (plan.name === 'Premium') return '$199';
+    return plan.price;
+  };
+
+  const getDisplayPrice = (plan) => {
+    const basePrice = getPrice(plan);
+    if (basePrice === '$0') return '$0';
+    
+    if (billingCycle === 'annually') {
+      // Show 15% discount for annual billing
+      const monthlyPrice = parseInt(basePrice.replace('$', ''));
+      const annualPrice = Math.round(monthlyPrice * 12 * 0.85);
+      return `$${annualPrice}`;
+    }
+    return basePrice;
+  };
 
   const plans = [
     {
-      name: 'Starter',
+      name: 'Bronze',
       price: '$0',
       period: 'Free Forever',
       description: 'Perfect for early-stage creators, startups, and curious users.',
-      buttonText: 'Start Free',
+      buttonText: isAuthenticated() && userPlan === 'BRONZE' ? 'Current Plan' : 'Start Free',
       buttonStyle: 'bg-green-500 hover:bg-green-600',
-      billing: 'Billed in one annual payment.',
+      billing: 'Free forever, no credit card required.',
       features: [
         '10 Credits/month',
         '5 Influencer Searches',
@@ -23,16 +158,16 @@ const PricingSection = () => {
       ]
     },
     {
-      name: 'Bronze',
-      price: '$20',
+      name: 'Silver',
+      price: '$19',
       period: 'Month',
       description: 'Best for freelancers, boutique agencies, or small teams.',
-      buttonText: 'Start Now',
+      buttonText: isAuthenticated() && userPlan === 'SILVER' ? 'Current Plan' : 'Start Now',
       buttonStyle: 'bg-green-500 hover:bg-green-600',
-      billing: 'Billed in one monthly payment.',
+      billing: `Billed ${billingCycle === 'annually' ? 'annually' : 'monthly'}.`,
       highlight: true,
       features: [
-        '100 Credits/month',
+        '50 Credits/month',
         '10 Advanced Searches',
         '4 Campaign Reports',
         'Creator Insights (Advanced)',
@@ -44,15 +179,15 @@ const PricingSection = () => {
       ]
     },
     {
-      name: 'Silver',
-      price: '$50',
+      name: 'Gold',
+      price: '$79',
       period: 'Month',
-      description: 'Perfect for early-stage creators, startups, and curious users.',
-      buttonText: 'Start Now',
+      description: 'Perfect for growing brands and mid-size teams.',
+      buttonText: isAuthenticated() && userPlan === 'GOLD' ? 'Current Plan' : 'Start Now',
       buttonStyle: 'bg-green-500 hover:bg-green-600',
-      billing: 'Billed in one monthly payment.',
+      billing: `Billed ${billingCycle === 'annually' ? 'annually' : 'monthly'}.`,
       features: [
-        '200 Credits/month',
+        '250 Credits/month',
         '20 Deep Searches',
         '10 AI-Powered Campaign Reports',
         'Dedicated Chat Support',
@@ -65,15 +200,15 @@ const PricingSection = () => {
       ]
     },
     {
-      name: 'Gold',
-      price: '$100',
+      name: 'Premium',
+      price: '$199',
       period: 'Month',
       description: 'Perfect for global agencies managing multiple campaigns.',
-      buttonText: 'Start Now',
+      buttonText: isAuthenticated() && userPlan === 'PREMIUM' ? 'Current Plan' : 'Start Now',
       buttonStyle: 'bg-green-500 hover:bg-green-600',
-      billing: 'Billed in one monthly payment.',
+      billing: `Billed ${billingCycle === 'annually' ? 'annually' : 'monthly'}.`,
       features: [
-        '500 Credits/month',
+        'Unlimited Credits/month',
         '100 Smart Searches',
         'AI Competitor Analysis (Track 5 competitors)',
         'Trend Analyzer (5 trends/month)',
@@ -163,18 +298,29 @@ const PricingSection = () => {
               <div className="mb-6">
                 <h3 className="text-white text-xl font-semibold mb-2">{plan.name}</h3>
                 <div className="flex items-baseline mb-2">
-                  <span className="text-4xl font-bold text-white">{plan.price}</span>
-                  {plan.price !== '$0' && (
+                  <span className="text-4xl font-bold text-white">{getDisplayPrice(plan)}</span>
+                  {getDisplayPrice(plan) !== '$0' && (
                     <span className="text-gray-400 ml-1">/{plan.period}</span>
                   )}
-                  {plan.price === '$0' && (
+                  {getDisplayPrice(plan) === '$0' && (
                     <span className="text-gray-400 ml-2 text-sm">{plan.period}</span>
                   )}
                 </div>
                 <p className="text-gray-400 text-sm mb-4">{plan.description}</p>
                 
-                <button className={`w-full py-3 px-6 rounded-lg font-medium transition-colors ${plan.buttonStyle} text-white`}>
-                  {plan.buttonText}
+                <button
+                  onClick={() => handlePlanClick(plan)}
+                  disabled={loading && processingPlan === plan.name}
+                  className={`w-full py-3 px-6 rounded-lg font-medium transition-colors ${plan.buttonStyle} text-white disabled:opacity-50 disabled:cursor-not-allowed`}
+                >
+                  {loading && processingPlan === plan.name ? (
+                    <div className="flex items-center justify-center">
+                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+                      Processing...
+                    </div>
+                  ) : (
+                    plan.buttonText
+                  )}
                 </button>
                 
                 <p className="text-gray-500 text-xs mt-3 text-center">{plan.billing}</p>
@@ -182,7 +328,9 @@ const PricingSection = () => {
 
               {/* Features */}
               <div>
-                <h4 className="text-white font-medium mb-4">Free Plan includes</h4>
+                <h4 className="text-white font-medium mb-4">
+                  {plan.name === 'Bronze' ? 'Free Plan includes' : `${plan.name} Plan includes`}
+                </h4>
                 <ul className="space-y-3">
                   {plan.features.map((feature, featureIndex) => (
                     <li key={featureIndex} className="flex items-start">
