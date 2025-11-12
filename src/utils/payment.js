@@ -2,7 +2,7 @@ import api from './api';
 
 class PaymentService {
   constructor() {
-    this.razorpayKey = process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID;
+    this.razorpayKey = process.env.RAZORPAY_KEY_ID;
   }
 
   // Get all available subscription plans
@@ -88,7 +88,7 @@ class PaymentService {
   // Initialize Razorpay payment
   initializeRazorpay(orderData, onSuccess, onFailure) {
     if (!this.razorpayKey) {
-      throw new Error('Razorpay key not found. Please check NEXT_PUBLIC_RAZORPAY_KEY_ID environment variable.');
+      throw new Error('Razorpay key not found. Please check RAZORPAY_KEY_ID environment variable.');
     }
 
     const options = {
