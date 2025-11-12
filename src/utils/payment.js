@@ -2,7 +2,7 @@ import api from './api';
 
 class PaymentService {
   constructor() {
-    this.razorpayKey = process.env.RAZORPAY_KEY_ID;
+    this.razorpayKey = process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID;
   }
 
   // Get all available subscription plans

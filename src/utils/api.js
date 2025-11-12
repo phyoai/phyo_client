@@ -2,7 +2,7 @@ import axios from 'axios';
 
 // Create axios instance with base configuration
 const api = axios.create({
-  baseURL: 'https://api.phyo.ai/api',
+  baseURL: process.env.NEXT_PUBLIC_API_URL || 'https://api.phyo.ai/api',
   headers: {
     'Content-Type': 'application/json',
   },

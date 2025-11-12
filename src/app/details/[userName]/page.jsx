@@ -96,7 +96,7 @@ const page = () => {
         }
 
         // If no session data, fetch from API
-        const response = await fetch(`https://api.phyo.ai/api/ask/details?userName=${encodeURIComponent(userName)}`);
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/ask/details?userName=${encodeURIComponent(userName)}`);
         if (!response.ok) throw new Error('Failed to fetch influencer data');
         const data = await response.json();
         console.log('API Response:', data);

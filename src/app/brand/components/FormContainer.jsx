@@ -62,7 +62,7 @@ const FormContainer = ({ steps }) => {
         ...data
       };
 
-      const response = await fetch('https://api.phyo.ai/api/user/signup', {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/user/signup`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -104,7 +104,7 @@ const FormContainer = ({ steps }) => {
     setOtpError('');
     
     try {
-      const response = await fetch('https://api.phyo.ai/api/user/verify-otp', {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/user/verify-otp`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

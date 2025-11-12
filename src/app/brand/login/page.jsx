@@ -85,7 +85,7 @@ const BrandLogin = () => {
     setForgotError('');
     
     try {
-      const response = await fetch('https://api.phyo.ai/api/user/forgot-password', {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/user/forgot-password`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -118,7 +118,7 @@ const BrandLogin = () => {
     setForgotError('');
     
     try {
-      const response = await fetch('https://api.phyo.ai/api/user/verify-code', {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/user/verify-code`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -164,7 +164,7 @@ const BrandLogin = () => {
     setForgotError('');
     
     try {
-      const response = await fetch('https://api.phyo.ai/api/user/reset-password', {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/user/reset-password`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

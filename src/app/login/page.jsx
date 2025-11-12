@@ -59,7 +59,7 @@ function LoginForm() {
     const loginAPI = async (email, password) => {
         console.log('Attempting login for:', email); // Debug log
         
-        const response = await fetch('https://api.phyo.ai/api/user/login', {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/user/login`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

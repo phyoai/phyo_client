@@ -46,7 +46,7 @@ export const AuthProvider = ({ children }) => {
   // Login function
   const login = async (email, password) => {
     try {
-      const response = await fetch('https://api.phyo.ai/api/user/login', {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/user/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -77,7 +77,7 @@ export const AuthProvider = ({ children }) => {
   // Signup function
   const signup = async (userData) => {
     try {
-      const response = await fetch('https://api.phyo.ai/api/user/signup', {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/user/signup`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

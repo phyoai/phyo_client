@@ -12,8 +12,8 @@ const index = () => {
         try {
             const res = await axios({
                 method: "post",
-                baseURL: "https://api.phyo.ai",
-                url: "/api/ask",
+                baseURL: process.env.NEXT_PUBLIC_API_URL || "https://api.phyo.ai/api",
+                url: "/ask",
                 data: {
                     prompt
                 }
