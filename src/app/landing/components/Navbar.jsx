@@ -1,9 +1,41 @@
-import React, { useState } from 'react';
+'use client'
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import LogoIcon from '../../../components/Icons/logo'
+import { authUtils } from '../../../utils/api';
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const router = useRouter();
+
+  // Check authentication status on mount and when storage changes
+  useEffect(() => {
+    const checkAuth = () => {
+      setIsAuthenticated(authUtils.isAuthenticated());
+    };
+    
+    checkAuth();
+    
+    // Listen for storage changes (login/logout events)
+    window.addEventListener('storage', checkAuth);
+    
+    // Custom event for same-tab auth changes
+    window.addEventListener('authChange', checkAuth);
+    
+    return () => {
+      window.removeEventListener('storage', checkAuth);
+      window.removeEventListener('authChange', checkAuth);
+    };
+  }, []);
+
+  const handleLogout = () => {
+    authUtils.logout();
+    setIsAuthenticated(false);
+    window.dispatchEvent(new Event('authChange'));
+    router.push('/login');
+  };
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -44,13 +76,30 @@ const Navbar = () => {
 
         {/* Sign In Button and Mobile Menu Button */}
         <div className="flex items-center space-x-4">
-          {/* Sign In Button */}
-          <Link 
-            href="/login" 
-            className="hidden md:inline-flex border border-white text-white hover:bg-white hover:text-black font-medium px-4 py-2 rounded-full transition-colors text-sm lg:text-base"
-          >
-            Sign In
-          </Link>
+          {/* Sign In/Dashboard Button - Desktop */}
+          {!isAuthenticated ? (
+            <Link 
+              href="/login" 
+              className="hidden md:inline-flex border border-white text-white hover:bg-white hover:text-black font-medium px-4 py-2 rounded-full transition-colors text-sm lg:text-base"
+            >
+              Sign In
+            </Link>
+          ) : (
+            <div className="hidden md:flex items-center space-x-3">
+              <Link 
+                href="/brand/dashboard" 
+                className="border border-white text-white hover:bg-white hover:text-black font-medium px-4 py-2 rounded-full transition-colors text-sm lg:text-base"
+              >
+                Dashboard
+              </Link>
+              <button
+                onClick={handleLogout}
+                className="bg-white text-black hover:bg-gray-200 font-medium px-4 py-2 rounded-full transition-colors text-sm lg:text-base"
+              >
+                Logout
+              </button>
+            </div>
+          )}
 
           {/* Mobile Menu Button */}
           <button
@@ -118,15 +167,40 @@ const Navbar = () => {
                   Contact
                 </Link>
               </li>
-              <li>
-                <Link
-                  href="/signin"
-                  className="block border border-white text-white hover:bg-white hover:text-black font-medium transition-colors py-2 px-4 rounded-full text-base text-center"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  Sign In
-                </Link>
-              </li>
+              {!isAuthenticated ? (
+                <li>
+                  <Link
+                    href="/login"
+                    className="block border border-white text-white hover:bg-white hover:text-black font-medium transition-colors py-2 px-4 rounded-full text-base text-center"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    Sign In
+                  </Link>
+                </li>
+              ) : (
+                <>
+                  <li>
+                    <Link
+                      href="/brand/dashboard"
+                      className="block border border-white text-white hover:bg-white hover:text-black font-medium transition-colors py-2 px-4 rounded-full text-base text-center"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      Dashboard
+                    </Link>
+                  </li>
+                  <li>
+                    <button
+                      onClick={() => {
+                        handleLogout();
+                        setIsMenuOpen(false);
+                      }}
+                      className="block w-full bg-white text-black hover:bg-gray-200 font-medium transition-colors py-2 px-4 rounded-full text-base text-center"
+                    >
+                      Logout
+                    </button>
+                  </li>
+                </>
+              )}
             </ul>
           </div>
         </div>
