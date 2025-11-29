@@ -114,4 +114,40 @@ export const campaignAPI = {
   }
 };
 
+// AI Search API functions
+export const searchAPI = {
+  // AI-powered influencer search
+  askSearch: async (prompt) => {
+    try {
+      const response = await api.post('/ask', { prompt });
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error.message;
+    }
+  }
+};
+
+// Auth utility functions
+export const authUtils = {
+  // Check if user is authenticated
+  isAuthenticated: () => {
+    if (typeof window === 'undefined') return false;
+    const token = localStorage.getItem('authToken') || getCookie('authToken');
+    return !!token;
+  },
+  
+  // Get current user token
+  getToken: () => {
+    if (typeof window === 'undefined') return null;
+    return localStorage.getItem('authToken') || getCookie('authToken');
+  },
+  
+  // Logout user
+  logout: () => {
+    if (typeof window === 'undefined') return;
+    localStorage.removeItem('authToken');
+    document.cookie = 'authToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+  }
+};
+
 export default api; 

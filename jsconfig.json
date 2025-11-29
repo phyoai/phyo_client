@@ -6,7 +6,8 @@
       "@/components/*": ["./src/components/*"],
       "@/app/*": ["./src/app/*"],
       "@/hooks/*": ["./src/hooks/*"],
-      "@/data/*": ["./src/data/*"]
+      "@/data/*": ["./src/data/*"],
+      "@/utils/*": ["./src/utils/*"]
     }
   }
 }

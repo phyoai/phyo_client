@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
+import { searchAPI, authUtils } from '../../utils/api';
 
 // Custom Image Component using Next.js Image
 const ProfileImage = ({ src, alt, name, className }) => {
@@ -72,24 +73,20 @@ const ProfileImage = ({ src, alt, name, className }) => {
 const Hero = () => {
   // State for responsive background
   const [isMobile, setIsMobile] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [showLoginModal, setShowLoginModal] = useState(false);
   
   // Load from sessionStorage if available
-  const [prompt, setPrompt] = useState(() => {
-    if (typeof window !== 'undefined') {
-      return sessionStorage.getItem('searchPrompt') || "";
-    }
-    return "";
-  });
-  const [results, setResults] = useState(() => {
-    if (typeof window !== 'undefined') {
-      const stored = sessionStorage.getItem('searchResults');
-      return stored ? JSON.parse(stored) : [];
-    }
-    return [];
-  });
+  const [prompt, setPrompt] = useState("");
+  const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const router = useRouter();
+
+  // Check authentication on mount
+  React.useEffect(() => {
+    setIsAuthenticated(authUtils.isAuthenticated());
+  }, []);
 
   // Handle responsive background
   React.useEffect(() => {
@@ -107,45 +104,35 @@ const Hero = () => {
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  // Persist prompt and results to sessionStorage
-  React.useEffect(() => {
-    if (typeof window !== 'undefined') {
-      sessionStorage.setItem('searchPrompt', prompt);
-    }
-  }, [prompt]);
-  React.useEffect(() => {
-    if (typeof window !== 'undefined') {
-      sessionStorage.setItem('searchResults', JSON.stringify(results));
-    }
-  }, [results]);
-
   const handleSearch = async () => {
+    // Check authentication first
+    if (!isAuthenticated) {
+      setShowLoginModal(true);
+      return;
+    }
+
     if (!prompt.trim()) return;
+    
     setLoading(true);
     setError(null);
     setResults([]);
+    
     try {
-      const res = await fetch('https://api.phyo.ai/api/ask', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt }),
-      });
-      const data = await res.json();
+      const data = await searchAPI.askSearch(prompt);
+      
       if (data.success && Array.isArray(data.data)) {
-        setResults(data.data);
-        // Save to sessionStorage
-        sessionStorage.setItem('searchResults', JSON.stringify(data.data));
-        sessionStorage.setItem('searchPrompt', prompt);
+        // Show only top 3 results
+        setResults(data.data.slice(0, 3));
       } else {
         setResults([]);
         setError("No influencers found for your query.");
-        sessionStorage.setItem('searchResults', JSON.stringify([]));
       }
     } catch (err) {
-      setError("Failed to fetch influencers.");
+      console.error('Search error:', err);
+      setError(err.message || "Failed to fetch influencers. Please try again.");
       setResults([]);
-      sessionStorage.setItem('searchResults', JSON.stringify([]));
     }
+    
     setLoading(false);
   };
 
@@ -158,24 +145,70 @@ const Hero = () => {
     setResults([]);
     setPrompt("");
     setError(null);
-    sessionStorage.removeItem('searchResults');
-    sessionStorage.removeItem('searchPrompt');
   };
 
   const formatFollowers = (count) => {
     if (count >= 1000000) {
       return (count / 1000000).toFixed(1) + 'M';
     } else if (count >= 1000) {
-      return (count / 1000).toFixed(1) + 'k';
+      return (count / 1000).toFixed(1) + 'K';
     }
     return count?.toString() || '0';
   };
 
-  const handleCardClick = (influencer) => {
-    // Store the influencer data in sessionStorage for the detail page
-    sessionStorage.setItem('currentInfluencer', JSON.stringify(influencer));
-    router.push(`/details/${encodeURIComponent(influencer.user_name || influencer._id)}`);
+  const formatEngagement = (engagement) => {
+    if (!engagement) return 'N/A';
+    // avg_engagement is already a percentage value (e.g., 1.09 = 1.09%)
+    return engagement.toFixed(2) + '%';
   };
+
+  // Login Modal Component
+  const LoginModal = () => (
+    <AnimatePresence>
+      {showLoginModal && (
+        <motion.div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm px-4"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          onClick={() => setShowLoginModal(false)}
+        >
+          <motion.div
+            className="bg-white rounded-2xl p-6 sm:p-8 max-w-md w-full shadow-2xl"
+            initial={{ scale: 0.9, y: 20 }}
+            animate={{ scale: 1, y: 0 }}
+            exit={{ scale: 0.9, y: 20 }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="text-center mb-6">
+              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                </svg>
+              </div>
+              <h2 className="text-2xl font-bold text-gray-900 mb-2">Login Required</h2>
+              <p className="text-gray-600">Please login to use the AI search feature and discover influencers.</p>
+            </div>
+            
+            <div className="space-y-3">
+              <button
+                onClick={() => router.push('/login')}
+                className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-6 rounded-full transition-colors"
+              >
+                Login to Continue
+              </button>
+              <button
+                onClick={() => setShowLoginModal(false)}
+                className="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold py-3 px-6 rounded-full transition-colors"
+              >
+                Maybe Later
+              </button>
+            </div>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
 
   // Animation variants
   const containerVariants = {
@@ -272,12 +305,15 @@ const Hero = () => {
         backgroundAttachment: 'scroll'
       }}
     >
+      {/* Login Modal */}
+      <LoginModal />
+      
       {/* White fade overlay for entire bottom section */}
       <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-white via-white/60 to-transparent pointer-events-none z-20"></div>
       
       {/* Content */}
       <motion.div 
-        className="relative z-10 max-w-6xl mx-auto mt-16 sm:mt-20 lg:mt-[95px] text-center w-full max-w-full overflow-x-hidden px-0 sm:px-2 box-border"
+        className="relative z-10 max-w-6xl mx-auto mt-16 sm:mt-20 lg:mt-[95px] text-center w-full overflow-x-hidden px-0 sm:px-2 box-border"
         variants={containerVariants}
         initial="hidden"
         animate="visible"
@@ -400,50 +436,44 @@ const Hero = () => {
         <AnimatePresence>
           {results.length > 0 && (
             <motion.div 
-              className="max-w-6xl mx-auto mb-10 flex flex-col gap-4 sm:gap-6 px-4 sm:px-2 w-full max-w-full"
+              className="max-w-6xl mx-auto mb-10 flex flex-col gap-4 sm:gap-6 px-4 sm:px-2 w-full"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.5 }}
             >
               <motion.div 
-                className="text-white mb-2 sm:mb-4 font-medium"
+                className="text-white mb-2 sm:mb-4 font-medium text-lg"
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5 }}
               >
-                Found {results.length} influencer{results.length > 1 ? 's' : ''}
+                Top {results.length} Influencer{results.length > 1 ? 's' : ''} Found
               </motion.div>
+              
               {results.map((influencer, index) => (
                 <motion.div
-                  key={influencer.user_name || influencer._id || index}
-                  className="bg-white rounded-2xl p-2 sm:p-6 shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer transform border-2 border-transparent w-full max-w-3xl mx-auto box-border mb-4"
+                  key={influencer.username || index}
+                  className="bg-white rounded-2xl p-4 sm:p-6 shadow-lg w-full max-w-3xl mx-auto"
                   variants={cardVariants}
                   initial="hidden"
                   animate="visible"
-                  whileHover="hover"
                   transition={{ delay: index * 0.1 }}
-                  onClick={() => handleCardClick(influencer)}
                   layout
                 >
-                  <div className="flex flex-col sm:flex-row items-start gap-4 sm:gap-6 min-w-0">
+                  <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-6">
                     {/* Profile Image */}
-                    <div className="relative flex-shrink-0 self-center sm:self-start min-w-0">
-                      <motion.div
-                        whileHover={{ scale: 1.05, rotate: 2 }}
-                        transition={{ duration: 0.3 }}
-                      >
-                        <ProfileImage
-                          src={influencer.brightDataProfile?.profile_image_link || influencer.image}
-                          alt={influencer.name || influencer.user_name}
-                          name={influencer.name || influencer.user_name}
-                          className="w-20 h-20 sm:w-60 sm:h-60 rounded-2xl min-w-0"
-                        />
-                      </motion.div>
+                    <div className="relative flex-shrink-0">
+                      <ProfileImage
+                        src={influencer.profile_pic_url}
+                        alt={influencer.profile_name || influencer.username}
+                        name={influencer.profile_name || influencer.username}
+                        className="w-20 h-20 sm:w-24 sm:h-24 rounded-full"
+                      />
                       {/* Verified Badge */}
-                      {influencer.brightDataProfile?.is_verified && (
+                      {influencer.is_verified && (
                         <motion.div 
-                          className="absolute -top-1 -right-1 sm:-top-2 sm:-right-2 bg-green-500 rounded-full p-1 shadow-lg"
+                          className="absolute -top-1 -right-1 bg-blue-500 rounded-full p-1 shadow-lg"
                           initial={{ scale: 0 }}
                           animate={{ scale: 1 }}
                           transition={{ delay: 0.3, type: "spring", stiffness: 200 }}
@@ -456,207 +486,93 @@ const Hero = () => {
                     </div>
 
                     {/* Content */}
-                    <motion.div 
-                      className="flex-1 min-w-0 w-full break-words"
-                      initial={{ opacity: 0, x: -20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: 0.2, duration: 0.5 }}
-                    >
-                      {/* Name and Basic Info */}
-                      <div className="flex flex-col sm:flex-row items-start sm:justify-between mb-2 gap-2 min-w-0">
-                        <div className="text-center sm:text-left w-full sm:w-auto min-w-0 break-words">
-                          <h3 className="text-lg sm:text-xl font-bold text-gray-900 truncate break-words">
-                            {influencer.brightDataProfile?.full_name || 
-                             influencer.name || 
-                             influencer.user_name}
-                          </h3>
-                          <p className="text-sm text-gray-500 truncate break-words">@{influencer.user_name}</p>
-                        </div>
+                    <div className="flex-1 min-w-0 w-full text-center sm:text-left">
+                      {/* Name */}
+                      <div className="mb-3">
+                        <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-1">
+                          {influencer.profile_name || influencer.username}
+                        </h3>
+                        <p className="text-sm text-gray-500">@{influencer.username}</p>
+                      </div>
+
+                      {/* Stats Grid */}
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
+                        {/* Followers */}
                         <motion.div 
-                          className="flex items-center gap-1 bg-green-100 px-2 py-1 rounded-full self-center sm:self-start min-w-0"
-                          initial={{ scale: 0, rotate: -180 }}
-                          animate={{ scale: 1, rotate: 0 }}
-                          transition={{ delay: 0.4, type: "spring" }}
-                        >
-                          <svg className="w-3 h-3 sm:w-4 sm:h-4 text-green-600" fill="currentColor" viewBox="0 0 20 20">
-                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-                          </svg>
-                          <span className="text-xs font-medium text-green-700">Top Pick</span>
-                        </motion.div>
-                      </div>
-                      
-                      {/* Description */}
-                      <p className="text-gray-600 text-sm mb-3 line-clamp-3 sm:line-clamp-2 leading-relaxed text-center sm:text-left">
-                        {influencer.brightDataProfile?.biography || 
-                         influencer.bio || 
-                         `${influencer.name || influencer.user_name} is a content creator specializing in ${influencer.categoryInstagram || 'various topics'}.`}
-                      </p>
-
-                      {/* Location and Details */}
-                      <div className="flex items-center justify-center sm:justify-start gap-2 sm:gap-4 mb-4 text-xs sm:text-sm text-gray-500 flex-wrap">
-                        <div className="flex items-center gap-1">
-                          <svg className="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                          </svg>
-                          <span>{influencer.city || 'Location not specified'}</span>
-                        </div>
-                        {influencer.language && (
-                          <>
-                            <span className="hidden sm:inline">•</span>
-                            <span>{influencer.language}</span>
-                          </>
-                        )}
-                        {influencer.gender && (
-                          <>
-                            <span className="hidden sm:inline">•</span>
-                            <span className="capitalize">{influencer.gender}</span>
-                          </>
-                        )}
-                      </div>
-
-                      {/* Social Media Stats */}
-                      <div className="flex items-center justify-center sm:justify-start gap-4 sm:gap-6 mb-4 flex-wrap">
-                        {/* Instagram */}
-                        {(influencer.instagramData?.followers || influencer.brightDataProfile?.followers) && (
-                          <motion.div 
-                            className="flex items-center gap-2 text-sm"
-                            whileHover={{ scale: 1.05 }}
-                            transition={{ duration: 0.2 }}
-                          >
-                            <div className="w-6 h-6 sm:w-8 sm:h-8 bg-gradient-to-r from-pink-500 to-purple-500 rounded-lg flex items-center justify-center">
-                              <svg className="w-3 h-3 sm:w-4 sm:h-4 text-white" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.40z"/>
-                              </svg>
-                            </div>
-                            <div>
-                              <div className="font-semibold text-gray-700 text-xs sm:text-sm">
-                                {formatFollowers(influencer.brightDataProfile?.followers || influencer.instagramData?.followers)}
-                              </div>
-                              <div className="text-xs text-gray-500">followers</div>
-                            </div>
-                          </motion.div>
-                        )}
-
-                        {/* Posts Count */}
-                        {influencer.brightDataProfile?.posts_count && (
-                          <motion.div 
-                            className="flex items-center gap-2 text-sm"
-                            whileHover={{ scale: 1.05 }}
-                            transition={{ duration: 0.2 }}
-                          >
-                            <div className="w-6 h-6 sm:w-8 sm:h-8 bg-blue-500 rounded-lg flex items-center justify-center">
-                              <svg className="w-3 h-3 sm:w-4 sm:h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                              </svg>
-                            </div>
-                            <div>
-                              <div className="font-semibold text-gray-700 text-xs sm:text-sm">{influencer.brightDataProfile.posts_count}</div>
-                              <div className="text-xs text-gray-500">posts</div>
-                            </div>
-                          </motion.div>
-                        )}
-
-                        {influencer.brightDataProfile?.avg_engagement && (
-                          <motion.div 
-                            className="flex items-center gap-2 text-sm"
-                            whileHover={{ scale: 1.05 }}
-                            transition={{ duration: 0.2 }}
-                          >
-                            <div className="w-6 h-6 sm:w-8 sm:h-8 bg-green-500 rounded-lg flex items-center justify-center">
-                              <svg className="w-3 h-3 sm:w-4 sm:h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-                              </svg>
-                            </div>
-                            <div>
-                              <div className="font-semibold text-gray-700 text-xs sm:text-sm">
-                                {(influencer.brightDataProfile.avg_engagement * 100).toFixed(1)}%
-                              </div>
-                              <div className="text-xs text-gray-500">engagement</div>
-                            </div>
-                          </motion.div>
-                        )}
-                      </div>
-
-                      {/* Category Tags */}
-                      <motion.div 
-                        className="flex flex-wrap justify-center sm:justify-start gap-2 mb-4"
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.3, duration: 0.5 }}
-                      >
-                        {influencer.categoryInstagram && (
-                          <motion.span 
-                            className="px-2 sm:px-3 py-1 bg-green-100 text-green-700 text-xs sm:text-sm rounded-full font-medium"
-                            whileHover={{ scale: 1.05, backgroundColor: "#dcfce7" }}
-                            transition={{ duration: 0.2 }}
-                          >
-                            #{influencer.categoryInstagram}
-                          </motion.span>
-                        )}
-                        {influencer.brightDataProfile?.category_name && 
-                         influencer.brightDataProfile.category_name !== influencer.categoryInstagram && (
-                          <motion.span 
-                            className="px-2 sm:px-3 py-1 bg-blue-100 text-blue-700 text-xs sm:text-sm rounded-full font-medium"
-                            whileHover={{ scale: 1.05, backgroundColor: "#dbeafe" }}
-                            transition={{ duration: 0.2 }}
-                          >
-                            #{influencer.brightDataProfile.category_name}
-                          </motion.span>
-                        )}
-                        {influencer.brightDataProfile?.business_category_name && 
-                         influencer.brightDataProfile.business_category_name !== 'None' && (
-                          <motion.span 
-                            className="px-2 sm:px-3 py-1 bg-purple-100 text-purple-700 text-xs sm:text-sm rounded-full font-medium"
-                            whileHover={{ scale: 1.05, backgroundColor: "#f3e8ff" }}
-                            transition={{ duration: 0.2 }}
-                          >
-                            #{influencer.brightDataProfile.business_category_name}
-                          </motion.span>
-                        )}
-                      </motion.div>
-
-                      {/* Action Buttons */}
-                      <motion.div 
-                        className="flex flex-col sm:flex-row gap-2 sm:gap-3 pt-2"
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.4, duration: 0.5 }}
-                      >
-                        <motion.button 
-                          className="flex items-center justify-center gap-2 px-4 py-2 bg-[#00674F] text-white rounded-full hover:bg-green-700 transition-colors font-medium shadow-sm text-sm"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleCardClick(influencer);
-                          }}
-                          whileHover={{ scale: 1.05, backgroundColor: "#059669" }}
-                          whileTap={{ scale: 0.95 }}
+                          className="bg-gradient-to-br from-pink-50 to-purple-50 rounded-xl p-3 sm:p-4"
+                          whileHover={{ scale: 1.02 }}
                           transition={{ duration: 0.2 }}
                         >
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                          </svg>
-                          View Full Profile
-                        </motion.button>
-                        {(influencer.instagramData?.link || influencer.brightDataProfile?.profile_url) && (
-                          <motion.a 
-                            href={influencer.instagramData?.link || influencer.brightDataProfile?.profile_url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="flex items-center justify-center gap-2 px-4 py-2 border border-green-600 text-green-600 rounded-full hover:bg-green-50 transition-colors font-medium shadow-sm text-sm"
-                            onClick={(e) => e.stopPropagation()}
-                            whileHover={{ scale: 1.05, backgroundColor: "#f0fdf4" }}
-                            whileTap={{ scale: 0.95 }}
-                            transition={{ duration: 0.2 }}
-                          >
-                            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                              <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.40z"/>
+                          <div className="flex items-center gap-2 mb-1">
+                            <svg className="w-4 h-4 text-pink-600" fill="currentColor" viewBox="0 0 20 20">
+                              <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z" />
                             </svg>
-                            Visit Instagram
-                          </motion.a>
-                        )}
-                      </motion.div>
-                    </motion.div>
+                            <span className="text-xs text-gray-600 font-medium">Followers</span>
+                          </div>
+                          <div className="text-lg sm:text-xl font-bold text-gray-900">
+                            {formatFollowers(influencer.followers)}
+                          </div>
+                        </motion.div>
+
+                        {/* Following */}
+                        <motion.div 
+                          className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-xl p-3 sm:p-4"
+                          whileHover={{ scale: 1.02 }}
+                          transition={{ duration: 0.2 }}
+                        >
+                          <div className="flex items-center gap-2 mb-1">
+                            <svg className="w-4 h-4 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                              <path d="M8 9a3 3 0 100-6 3 3 0 000 6zM8 11a6 6 0 016 6H2a6 6 0 016-6zM16 7a1 1 0 10-2 0v1h-1a1 1 0 100 2h1v1a1 1 0 102 0v-1h1a1 1 0 100-2h-1V7z" />
+                            </svg>
+                            <span className="text-xs text-gray-600 font-medium">Following</span>
+                          </div>
+                          <div className="text-lg sm:text-xl font-bold text-gray-900">
+                            {formatFollowers(influencer.following)}
+                          </div>
+                        </motion.div>
+
+                        {/* Posts */}
+                        <motion.div 
+                          className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-3 sm:p-4"
+                          whileHover={{ scale: 1.02 }}
+                          transition={{ duration: 0.2 }}
+                        >
+                          <div className="flex items-center gap-2 mb-1">
+                            <svg className="w-4 h-4 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clipRule="evenodd" />
+                            </svg>
+                            <span className="text-xs text-gray-600 font-medium">Posts</span>
+                          </div>
+                          <div className="text-lg sm:text-xl font-bold text-gray-900">
+                            {influencer.posts_count || 0}
+                          </div>
+                        </motion.div>
+
+                        {/* Engagement */}
+                        <motion.div 
+                          className="bg-gradient-to-br from-orange-50 to-amber-50 rounded-xl p-3 sm:p-4"
+                          whileHover={{ scale: 1.02 }}
+                          transition={{ duration: 0.2 }}
+                        >
+                          <div className="flex items-center gap-2 mb-1">
+                            <svg className="w-4 h-4 text-orange-600" fill="currentColor" viewBox="0 0 20 20">
+                              <path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z" />
+                            </svg>
+                            <span className="text-xs text-gray-600 font-medium">Engagement</span>
+                          </div>
+                          <div className="text-lg sm:text-xl font-bold text-gray-900">
+                            {formatEngagement(influencer.avg_engagement)}
+                          </div>
+                        </motion.div>
+                      </div>
+
+                      {/* Biography */}
+                      {influencer.biography && (
+                        <p className="text-gray-600 text-sm mt-4 line-clamp-2 leading-relaxed">
+                          {influencer.biography}
+                        </p>
+                      )}
+                    </div>
                   </div>
                 </motion.div>
               ))}
@@ -668,7 +584,7 @@ const Hero = () => {
         <AnimatePresence>
           {results.length === 0 && !loading && (
             <motion.div 
-              className="max-w-[1100px] mx-auto px-8 sm:px-2 px-8 "
+              className="max-w-[1100px] mx-auto px-8 sm:px-2"
               variants={featureImageVariants}
               initial="hidden"
               animate="visible"
