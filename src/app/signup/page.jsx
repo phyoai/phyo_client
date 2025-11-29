@@ -242,29 +242,29 @@ function SignupForm() {
     // Show loading if checking authentication
     if (isAuthenticated()) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-50 to-blue-50">
-                <div className="animate-spin rounded-full h-16 w-16 border-4 border-green-500 border-t-transparent"></div>
+            <div className="min-h-screen flex items-center justify-center bg-white">
+                <div className="animate-spin rounded-full h-16 w-16 border-4 border-[#00897B] border-t-transparent"></div>
             </div>
         );
     }
 
     if (showOTP) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-50 via-blue-50 to-purple-50">
-                <div className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md mx-4">
+            <div className="min-h-screen flex items-center justify-center bg-[#F8F8F8] p-4">
+                <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8 w-full max-w-md">
                     <div className="text-center mb-8">
-                        <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <div className="w-16 h-16 bg-[#E8F5E9] rounded-full flex items-center justify-center mx-auto mb-4">
                             <span className="text-2xl">📧</span>
                         </div>
-                        <h2 className="text-3xl font-bold text-gray-800 mb-2">Verify Your Email</h2>
+                        <h2 className="text-3xl font-bold text-gray-900 mb-2">Verify Your Email</h2>
                         <p className="text-gray-600">
                             We've sent a 6-digit code to<br />
-                            <span className="font-semibold text-green-600">{signupData?.email}</span>
+                            <span className="font-semibold text-[#00897B]">{signupData?.email}</span>
                         </p>
                     </div>
 
                     {error && (
-                        <div className="mb-6 p-4 bg-red-50 border border-red-200 text-red-700 rounded-xl text-center">
+                        <div className="mb-6 p-4 bg-red-50 border border-red-200 text-red-700 rounded-lg text-center">
                             {error}
                         </div>
                     )}
@@ -278,7 +278,7 @@ function SignupForm() {
                                 maxLength="1"
                                 value={digit}
                                 onChange={(e) => handleOTPChange(index, e.target.value)}
-                                className="w-12 h-12 text-center text-xl font-bold border-2 border-gray-300 rounded-xl focus:border-green-500 focus:outline-none transition-colors"
+                                className="w-12 h-12 text-center text-xl font-bold border-2 border-gray-300 rounded-lg focus:border-[#00897B] focus:outline-none transition-colors"
                             />
                         ))}
                     </div>
@@ -286,7 +286,7 @@ function SignupForm() {
                     <button
                         onClick={handleOTPSubmit}
                         disabled={otpLoading || otp.join('').length !== 6}
-                        className="w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold py-4 rounded-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-[1.02]"
+                        className="w-full bg-[#00897B] hover:bg-[#00796B] text-white font-semibold py-4 rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         {otpLoading ? (
                             <div className="flex items-center justify-center">
@@ -302,7 +302,7 @@ function SignupForm() {
                         <p className="text-gray-600 mb-2">Didn't receive the code?</p>
                         <button
                             onClick={resendOTP}
-                            className="text-green-600 hover:text-green-700 font-semibold transition-colors"
+                            className="text-[#00897B] hover:text-[#00796B] font-semibold transition-colors"
                         >
                             Resend Code
                         </button>
@@ -313,107 +313,99 @@ function SignupForm() {
     }
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-50 via-blue-50 to-purple-50 p-4">
-            <div className="bg-white rounded-2xl shadow-2xl overflow-hidden max-w-4xl w-full">
-                <div className="flex flex-col lg:flex-row">
-                    {/* Left Section */}
-                    <div className="lg:w-1/2 bg-gradient-to-br from-green-500 to-green-600 p-12 flex items-center justify-center">
-                        <div className="text-center text-white">
-                            <div className="mb-8">
-                                <h1 className="text-5xl font-bold mb-2">
-                                    <span className="text-white">Phyo</span>
-                                </h1>
-                                <div className="w-20 h-1 bg-white mx-auto rounded-full"></div>
-                            </div>
-                            <h2 className="text-2xl font-semibold mb-4">Welcome to the Future</h2>
-                            <p className="text-lg text-green-100 leading-relaxed">
-                                Find influencers in seconds.<br />
-                                Launch campaigns in minutes.<br />
-                                <span className="font-semibold">Join thousands of creators today.</span>
-                            </p>
-                            <div className="mt-8 flex justify-center space-x-4">
-                                <div className="w-3 h-3 bg-white rounded-full opacity-80"></div>
-                                <div className="w-3 h-3 bg-white rounded-full opacity-60"></div>
-                                <div className="w-3 h-3 bg-white rounded-full opacity-40"></div>
-                            </div>
+        <div className="min-h-screen flex flex-col lg:flex-row">
+            {/* Left Section - Illustration with Green Background */}
+            <div className="hidden lg:flex lg:w-1/2 bg-[#F1FFEF] relative">
+                {/* Logo - Top Left */}
+                <div className="absolute top-8 left-8 z-10">
+                    <h1 className="text-3xl font-bold text-gray-900">phyo</h1>
+                </div>
+
+                {/* Illustration Container */}
+                <div className="w-full h-full flex items-center justify-center p-12">
+                    <div className="relative w-full max-w-lg h-full flex items-center justify-center">
+                        {/* Social Media Icons - Positioned around illustration */}
+                        <div className="absolute top-1/4 left-16 w-16 h-16 bg-[#2C3E50] rounded-full flex items-center justify-center z-10 shadow-lg">
+                            <svg className="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                            </svg>
+                        </div>
+                        
+                        <div className="absolute top-1/3 left-32 w-12 h-12 bg-[#2C3E50] rounded-full flex items-center justify-center z-10 shadow-lg">
+                            <svg className="w-7 h-7 text-white" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M7.8 2h8.4C19.4 2 22 4.6 22 7.8v8.4a5.8 5.8 0 0 1-5.8 5.8H7.8C4.6 22 2 19.4 2 16.2V7.8A5.8 5.8 0 0 1 7.8 2m-.2 2A3.6 3.6 0 0 0 4 7.6v8.8C4 18.39 5.61 20 7.6 20h8.8a3.6 3.6 0 0 0 3.6-3.6V7.6C20 5.61 18.39 4 16.4 4H7.6m9.65 1.5a1.25 1.25 0 0 1 1.25 1.25A1.25 1.25 0 0 1 17.25 8 1.25 1.25 0 0 1 16 6.75a1.25 1.25 0 0 1 1.25-1.25M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3z"/>
+                            </svg>
+                        </div>
+
+                        {/* Main Illustration - Centered */}
+                        <div className="relative flex items-center justify-center">
+                            <img 
+                                src="/welcome.png" 
+                                alt="Welcome Illustration" 
+                                className="w-full max-w-lg object-contain"
+                            />
                         </div>
                     </div>
+                </div>
+            </div>
 
-                    {/* Right Section */}
-                    <div className="lg:w-1/2 p-12">
-                        <div className="max-w-md mx-auto">
-                            <div className="text-center mb-8">
-                                <h2 className="text-4xl font-bold text-gray-800 mb-2">Create Account</h2>
-                                <p className="text-gray-600">Start your journey with us today</p>
+            {/* Right Section - Signup Form */}
+            <div className="w-full lg:w-1/2 flex items-center justify-center bg-[#F1FFEF] min-h-screen p-8">
+                <div className="w-full max-w-md bg-white rounded-3xl shadow-md p-10">
+                    <div className="mb-8">
+                        <h2 className="text-3xl font-bold text-gray-900 mb-2">Create Account</h2>
+                        <p className="text-gray-600 text-sm">
+                            Already have an account?{' '}
+                            <Link href="/login" className="text-[#00897B] font-semibold hover:underline">
+                                Sign In
+                            </Link>
+                        </p>
+                    </div>
+
+                    {error && (
+                        <div className="mb-6 p-4 bg-red-50 border border-red-200 text-red-700 rounded-lg">
+                            <div className="flex items-center">
+                                <span className="mr-2">⚠️</span>
+                                {error}
                             </div>
+                        </div>
+                    )}
 
-                            {error && (
-                                <div className="mb-6 p-4 bg-red-50 border border-red-200 text-red-700 rounded-xl">
-                                    <div className="flex items-center">
-                                        <span className="mr-2">⚠️</span>
-                                        {error}
-                                    </div>
-                                </div>
-                            )}
-
-                            <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-                                {formFields.map((field) => (
-                                    <div key={field.name} className="relative">
-                                        <label className="block text-sm font-semibold text-gray-700 mb-2">
-                                            {field.label}
-                                        </label>
-                                        <div className="relative">
-                                            <span className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400">
-                                                {field.icon}
-                                            </span>
-                                            <input
-                                                type={field.type}
-                                                placeholder={field.placeholder}
-                                                {...register(field.name, field.validation)}
-                                                className="w-full pl-12 pr-4 py-4 border-2 border-gray-200 rounded-xl focus:border-green-500 focus:outline-none transition-all duration-200 text-gray-700 placeholder-gray-400"
-                                            />
-                                        </div>
-                                        {errors[field.name] && (
-                                            <p className="text-red-500 text-sm mt-2 flex items-center">
-                                                <span className="mr-1">⚠️</span>
-                                                {errors[field.name].message}
-                                            </p>
-                                        )}
-                                    </div>
-                                ))}
-
-                                <button 
-                                    type="submit" 
-                                    disabled={loading}
-                                    className="w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold py-4 rounded-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-[1.02] shadow-lg"
-                                >
-                                    {loading ? (
-                                        <div className="flex items-center justify-center">
-                                            <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent mr-2"></div>
-                                            Creating Account...
-                                        </div>
-                                    ) : (
-                                        <div className="flex items-center justify-center">
-                                            <span className="mr-2">🚀</span>
-                                            Create Account
-                                        </div>
-                                    )}
-                                </button>
-
-                                <div className="text-center pt-6 border-t border-gray-200">
-                                    <p className="text-gray-600">
-                                        Already have an account?{' '}
-                                        <Link 
-                                            href="/login" 
-                                            className="text-green-600 hover:text-green-700 font-semibold transition-colors hover:underline"
-                                        >
-                                            Sign In
-                                        </Link>
+                    <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+                        {formFields.map((field) => (
+                            <div key={field.name}>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    {field.label}
+                                </label>
+                                <input
+                                    type={field.type}
+                                    placeholder={field.placeholder}
+                                    {...register(field.name, field.validation)}
+                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00897B] focus:border-transparent outline-none transition-all text-gray-900 placeholder-gray-400"
+                                />
+                                {errors[field.name] && (
+                                    <p className="text-red-500 text-sm mt-1.5">
+                                        {errors[field.name].message}
                                     </p>
+                                )}
+                            </div>
+                        ))}
+
+                        <button 
+                            type="submit" 
+                            disabled={loading}
+                            className="w-full bg-[#00674F] hover:bg-[#00796B] text-white font-semibold py-3.5 rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed mt-6"
+                        >
+                            {loading ? (
+                                <div className="flex items-center justify-center">
+                                    <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent mr-2"></div>
+                                    Creating Account...
                                 </div>
-                            </form>
-                        </div>
-                    </div>
+                            ) : (
+                                'Sign Up'
+                            )}
+                        </button>
+                    </form>
                 </div>
             </div>
         </div>
@@ -423,8 +415,8 @@ function SignupForm() {
 export default function SignupPage() {
     return (
         <Suspense fallback={
-            <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-50 to-blue-50">
-                <div className="animate-spin rounded-full h-16 w-16 border-4 border-green-500 border-t-transparent"></div>
+            <div className="min-h-screen flex items-center justify-center bg-white">
+                <div className="animate-spin rounded-full h-16 w-16 border-4 border-[#00897B] border-t-transparent"></div>
             </div>
         }>
             <SignupForm />
