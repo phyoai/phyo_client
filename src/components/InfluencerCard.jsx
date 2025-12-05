@@ -5,6 +5,7 @@ import React from 'react'
 
 const InfluencerCard = ({ influencer }) => {
     const router = useRouter()
+    
     function loadImage(url) {
         if (!url) return '';
         
@@ -24,93 +25,129 @@ const InfluencerCard = ({ influencer }) => {
         return encodeURI(t);
     }
     
-    // Calculate total followers only if both values exist
+    // Handle click to navigate to details page
+    const handleCardClick = (e) => {
+        e.stopPropagation();
+        // Get username from either the new API format or old format
+        const username = influencer?.username || influencer?.user_name;
+        console.log('Card clicked! Username:', username);
+        console.log('Full influencer data:', influencer);
+        if (username) {
+            console.log('Navigating to:', `/influencer-details/${username}`);
+            router.push(`/influencer-details/${username}`);
+        } else {
+            console.error('No username found in influencer data');
+        }
+    };
+    
+    // Support both new API format (from BrightScraper) and old format
+    const displayName = influencer?.profile_name || influencer?.name;
+    const profileImage = influencer?.profile_pic_url || influencer?.image;
+    const displayUsername = influencer?.username || influencer?.user_name;
+    
+    // New API format data
+    const followers = influencer?.followers;
+    const engagement = influencer?.avg_engagement;
+    const postsCount = influencer?.posts_count;
+    const isVerified = influencer?.is_verified;
+    
+    // Old format data
     const totalFollowers = 
         influencer?.instagramData?.followers && influencer?.youtubeData?.followers ? 
         influencer.instagramData.followers + influencer.youtubeData.followers : 
         null;
     
     return (
-        <div className='bg-white rounded-lg flex justify-between pb-2 overflow-hidden shadow-md sm:mx-96 cursor-pointer' onClick={() => router.push(`/details/${influencer.user_name}`)}>
-            {influencer?.image && (
+        <div 
+            className='bg-white rounded-lg flex justify-between pb-2 overflow-hidden shadow-md sm:mx-96 cursor-pointer hover:shadow-xl transition-shadow duration-300 relative z-10' 
+            onClick={handleCardClick}
+            onMouseEnter={() => console.log('Mouse entered card')}
+            style={{ cursor: 'pointer', userSelect: 'none' }}
+        >
+            {profileImage && (
                 <img 
-                    src={loadImage(influencer.image)} 
+                    src={loadImage(profileImage)} 
                     alt="profile" 
                     width={50} 
                     height={50} 
-                    className='w-72 aspect-square rounded-full relative -top-12 -left-12' 
+                    className='w-72 aspect-square rounded-full relative -top-12 -left-12 object-cover' 
                 />
             )}
             <div className='mr-auto flex flex-col gap-4 self-center ml-12'>
-                {influencer?.name && (
-                    <p className='font-medium text-2xl relative -left-8'>{influencer.name}</p>
+                {displayName && (
+                    <div>
+                        <p className='font-medium text-2xl relative -left-8 flex items-center gap-2'>
+                            {displayName}
+                            {isVerified && <span className='text-blue-500'>✓</span>}
+                        </p>
+                        {displayUsername && (
+                            <p className='text-[color:var(--green)] font-medium relative -left-8'>@{displayUsername}</p>
+                        )}
+                    </div>
                 )}
                 
+                {/* New API format - Show followers and engagement */}
+                {followers && (
+                    <div className='flex items-center gap-4'>
+                        <p className='flex items-center gap-2'>
+                            <Instagram size={18} className='text-[color:var(--green)]' />
+                            <span className='font-semibold'>{followers.toLocaleString()}</span> followers
+                        </p>
+                        {postsCount && (
+                            <p className='text-gray-600'>{postsCount} posts</p>
+                        )}
+                    </div>
+                )}
+                
+                {engagement && (
+                    <p className='flex items-center gap-2 bg-[color:var(--sea-green)] px-3 py-1 rounded-md w-fit'>
+                        <ThumbsUp size={18} className='text-[color:var(--dark-green)]' />
+                        <span className='font-semibold text-[color:var(--dark-green)]'>{engagement.toFixed(2)}%</span>
+                        <span className='text-sm text-[color:var(--dark-green)]'>engagement</span>
+                    </p>
+                )}
+                
+                {/* Old format data (for backward compatibility) */}
                 {(influencer?.categoryYouTube || influencer?.categoryInstagram) && (
                     <span className='flex items-center gap-1.5'>
                         <p className='mr-2.5'>Type</p>
                         {influencer?.categoryYouTube && (
-                            <p className='p-1 text-[color:var(--dark-green)] border-2 border-[color:var(--dark-green)]'>
+                            <p className='p-1 text-[color:var(--dark-green)] border-2 border-[color:var(--dark-green)] text-sm'>
                                 {influencer.categoryYouTube}
                             </p>
                         )}
                         {influencer?.categoryInstagram && (
-                            <p className='p-1 text-[color:var(--dark-green)] border-2 border-[color:var(--dark-green)]'>
+                            <p className='p-1 text-[color:var(--dark-green)] border-2 border-[color:var(--dark-green)] text-sm'>
                                 {influencer.categoryInstagram}
                             </p>
                         )}
                     </span>
                 )}
                 
-                {totalFollowers !== null && (
-                    <p>Total Followers <span className='font-semibold'>{totalFollowers}</span></p>
+                {totalFollowers !== null && !followers && (
+                    <p>Total Followers <span className='font-semibold'>{totalFollowers.toLocaleString()}</span></p>
                 )}
                 
-                {(influencer?.youtubeData?.followers || influencer?.instagramData?.followers) && (
+                {(influencer?.youtubeData?.followers || influencer?.instagramData?.followers) && !followers && (
                     <>
                         <p>Followers</p>
                         <span className='flex gap-4'>
                             {influencer?.youtubeData?.followers !== null && influencer?.youtubeData?.followers !== undefined && (
-                                <p className='flex gap-2 bg-[color:var(--dark-green)] px-4 py-2 rounded-md text-white'>
-                                    <Youtube />
-                                    {influencer.youtubeData.followers}
+                                <p className='flex gap-2 bg-[color:var(--dark-green)] px-4 py-2 rounded-md text-white text-sm'>
+                                    <Youtube size={18} />
+                                    {influencer.youtubeData.followers.toLocaleString()}
                                 </p>
                             )}
                             {influencer?.instagramData?.followers !== null && influencer?.instagramData?.followers !== undefined && (
-                                <p className='flex gap-2 bg-[color:var(--dark-green)] px-4 py-2 rounded-md text-white'>
-                                    <Instagram />
-                                    {influencer.instagramData.followers}
+                                <p className='flex gap-2 bg-[color:var(--dark-green)] px-4 py-2 rounded-md text-white text-sm'>
+                                    <Instagram size={18} />
+                                    {influencer.instagramData.followers.toLocaleString()}
                                 </p>
                             )}
                         </span>
                     </>
                 )}
             </div>
-
-            {/* <div className='bg-gray-100 px-10 py-8 flex flex-col justify-end relative'>
-                <Heart className='absolute top-[5%] right-[5%] text-[color:var(--green)]' />
-                
-                {influencer?.instagramData?.averageEngagement !== null && influencer?.instagramData?.averageEngagement !== undefined && (
-                    <span>
-                        <p className='font-medium text-xs text-gray-500 flex items-center gap-2'>Engagement Rate <ThumbsUp size={18} /></p>
-                        <p className='font-semibold text-xl text-gray-800'>{influencer.instagramData.averageEngagement}</p>
-                    </span>
-                )}
-                
-                {influencer?.instagramData?.averageLikes !== null && influencer?.instagramData?.averageLikes !== undefined && (
-                    <span>
-                        <p className='font-medium text-xs text-gray-500 flex gap-2 items-center'>Average Likes <ChartColumnIncreasing size={18} /></p>
-                        <p className='font-semibold text-xl text-gray-800'>{influencer.instagramData.averageLikes}</p>
-                    </span>
-                )}
-                
-                {influencer?.instagramData?.averageViews !== null && influencer?.instagramData?.averageViews !== undefined && (
-                    <span>
-                        <p className='font-medium text-xs text-gray-500 flex gap-2 items-center'>View rate <Eye size={18} /></p>
-                        <p className='font-semibold text-xl text-gray-800'>{influencer.instagramData.averageViews}</p>
-                    </span>
-                )}
-            </div> */}
         </div>
     )
 }

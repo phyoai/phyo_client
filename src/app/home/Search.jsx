@@ -6,8 +6,31 @@ import axios from 'axios'
 const index = () => {
     const [influencers, setInfluencers] = useState([])
     const [fetchingState, setFetchingState] = useState("idle")
+    const [prompt, setPrompt] = useState("")
     
-    const getInfluencers = async (prompt) => {
+    // Restore previous search on mount
+    React.useEffect(() => {
+        try {
+            const savedResults = localStorage.getItem('home_search_results');
+            const savedPrompt = localStorage.getItem('home_search_prompt');
+            
+            if (savedResults) {
+                const parsedResults = JSON.parse(savedResults);
+                if (Array.isArray(parsedResults) && parsedResults.length > 0) {
+                    setInfluencers(parsedResults);
+                    setFetchingState("success");
+                }
+            }
+            
+            if (savedPrompt) {
+                setPrompt(savedPrompt);
+            }
+        } catch (err) {
+            console.error('Error restoring search results:', err);
+        }
+    }, []);
+    
+    const getInfluencers = async (searchPrompt) => {
         setFetchingState("loading")
         try {
             const res = await axios({
@@ -15,13 +38,20 @@ const index = () => {
                 baseURL: "https://api.phyo.ai",
                 url: "/api/ask",
                 data: {
-                    prompt
+                    prompt: searchPrompt
                 }
             })
             if (res.data.data.length < 1) {
                 setFetchingState("notFound")
+                // Clear localStorage if no results
+                localStorage.removeItem('home_search_results');
+                localStorage.removeItem('home_search_prompt');
             } else {
                 setInfluencers(res.data.data)
+                // Store in localStorage for persistence
+                localStorage.setItem('influencer_search_results', JSON.stringify(res.data.data))
+                localStorage.setItem('home_search_results', JSON.stringify(res.data.data))
+                localStorage.setItem('home_search_prompt', searchPrompt)
                 setFetchingState("success")
             }
             
@@ -29,13 +59,21 @@ const index = () => {
             alert("Could not fetch the influencers")
             setFetchingState("error")
             console.log(error);
+            // Clear localStorage on error
+            localStorage.removeItem('home_search_results');
+            localStorage.removeItem('home_search_prompt');
         }
     }
     return (
         <div className='relative bg-black overflow-hidden min-h-screen'>
             {/* Content container */}
             <div className='max-w-[1200px] mx-auto pt-[130px] relative z-10'>
-                <Header handleSubmit={getInfluencers} fetchingState={fetchingState} />
+                <Header 
+                    handleSubmit={getInfluencers} 
+                    fetchingState={fetchingState} 
+                    prompt={prompt} 
+                    setPrompt={setPrompt} 
+                />
                 <InfluencersList influencers={influencers} fetchingState={fetchingState} />
             </div>
             
@@ -45,14 +83,19 @@ const index = () => {
     )
 }
 
-const Header = ({ handleSubmit, fetchingState }) => {
-    const [prompt, setPrompt] = useState("")
+const Header = ({ handleSubmit, fetchingState, prompt, setPrompt }) => {
     return (
         <div>
             <h1 className='text-[color:var(--light-green)] font-semibold text-[64px] text-center'>Ai Search</h1>
             <h2 className='text-white text-[40px] font-medium text-center'>Find top right influencer for your brand</h2>
             <div className='mt-[55px] border-2 border-[color:var(--dark-green)] flex p-2 pl-[40px] rounded-xl'>
-                <input onChange={(e) => setPrompt(e.target.value)} type="text" placeholder="Example: Find influencers who have followers around 50k and posts videos on Vlogs from delhi" className='outline-none bg-transparent border-none flex-grow py-2 text-white' />
+                <input 
+                    value={prompt}
+                    onChange={(e) => setPrompt(e.target.value)} 
+                    type="text" 
+                    placeholder="Example: Find influencers who have followers around 50k and posts videos on Vlogs from delhi" 
+                    className='outline-none bg-transparent border-none flex-grow py-2 text-white' 
+                />
                 <button 
                     className='bg-white px-6 py-2 rounded-md' 
                     onClick={() => handleSubmit(prompt)}
