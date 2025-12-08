@@ -119,60 +119,12 @@ export default function EngagementCard({ avgEngagement, followers, demographics 
         </ResponsiveContainer>
       </div>
 
-      {/* Estimated Metrics */}
-      <div className="grid grid-cols-2 gap-3">
-        <MetricCard
-          icon={<Heart size={18} />}
-          label="Est. Likes"
-          value={formatNumber(estimatedLikes)}
-          color="bg-red-50 text-red-600"
-        />
-        <MetricCard
-          icon={<MessageCircle size={18} />}
-          label="Est. Comments"
-          value={formatNumber(estimatedComments)}
-          color="bg-blue-50 text-blue-600"
-        />
-        <MetricCard
-          icon={<Share2 size={18} />}
-          label="Est. Shares"
-          value={formatNumber(estimatedShares)}
-          color="bg-green-50 text-green-600"
-        />
-        <MetricCard
-          icon={<Eye size={18} />}
-          label="Est. Reach"
-          value={formatNumber(estimatedLikes * 3)}
-          color="bg-purple-50 text-purple-600"
-        />
-      </div>
-
       {/* Info Note */}
       <div className="mt-4 p-3 bg-gray-50 rounded-lg">
         <p className="text-xs text-gray-600">
-          <strong>Formula:</strong> Engagement Rate = (Likes + Comments) / Followers × 100
+          <strong>Note:</strong> Engagement rate shows the percentage of followers who interact with the content through likes, comments, and shares.
         </p>
       </div>
     </motion.div>
   );
-}
-
-function MetricCard({ icon, label, value, color }) {
-  return (
-    <motion.div
-      whileHover={{ scale: 1.05 }}
-      className={`${color} rounded-xl p-3 flex flex-col items-center justify-center`}
-    >
-      <div className="mb-1">{icon}</div>
-      <p className="text-xs font-medium opacity-80">{label}</p>
-      <p className="text-lg font-bold">{value}</p>
-    </motion.div>
-  );
-}
-
-function formatNumber(num) {
-  if (!num) return '0';
-  if (num >= 1000000) return `${(num / 1000000).toFixed(1)}M`;
-  if (num >= 1000) return `${(num / 1000).toFixed(1)}K`;
-  return num.toString();
 }

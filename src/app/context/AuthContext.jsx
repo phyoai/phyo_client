@@ -107,11 +107,20 @@ export const AuthProvider = ({ children }) => {
 
   // Logout function
   const logout = () => {
+    // Clear all auth state first
     setUser(null);
     setToken(null);
+    
+    // Clear localStorage
     localStorage.removeItem('authToken');
+    localStorage.removeItem('userData');
+    localStorage.removeItem('userEmail');
+    
+    // Clear cookies
     document.cookie = 'authToken=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
-    router.push('/'); // Redirect to home page instead of login
+    
+    // Force a hard redirect to login page to clear any cached state
+    window.location.href = '/login';
   };
 
   // Check if user is authenticated

@@ -2,10 +2,13 @@
 
 import { motion } from 'framer-motion';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
-import { MapPin, Globe } from 'lucide-react';
+import { MapPin, Globe, Info } from 'lucide-react';
+import { useState } from 'react';
 
 export default function LocationChart({ data, title, type = 'country' }) {
   if (!data) return null;
+  
+  const [showTooltip, setShowTooltip] = useState(false);
 
   const chartData = Object.entries(data)
     .map(([name, value]) => ({
@@ -16,6 +19,10 @@ export default function LocationChart({ data, title, type = 'country' }) {
     .slice(0, 5); // Show top 5
 
   const colors = ['#10B981', '#3B82F6', '#8B5CF6', '#F59E0B', '#EF4444'];
+  
+  const tooltipText = type === 'country' 
+    ? "This shows the top countries where the influencer's audience is located. It helps you understand the geographic distribution of their followers."
+    : "This shows the top cities where the influencer's audience is located. It gives you detailed insights into specific urban areas where their followers are concentrated.";
 
   const CustomTooltip = ({ active, payload }) => {
     if (active && payload && payload.length) {
@@ -41,11 +48,35 @@ export default function LocationChart({ data, title, type = 'country' }) {
       transition={{ duration: 0.4, delay: 0.2 }}
       className="bg-white rounded-xl shadow-md border border-gray-200 p-6"
     >
-      <div className="flex items-center gap-2 mb-5">
-        <div className={`bg-gradient-to-br ${type === 'country' ? 'from-purple-50 to-purple-100' : 'from-orange-50 to-orange-100'} p-2.5 rounded-lg`}>
-          <Icon className={iconColor} size={20} />
+      <div className="flex items-center justify-between mb-5">
+        <div className="flex items-center gap-2">
+          <div className={`bg-gradient-to-br ${type === 'country' ? 'from-purple-50 to-purple-100' : 'from-orange-50 to-orange-100'} p-2.5 rounded-lg`}>
+            <Icon className={iconColor} size={20} />
+          </div>
+          <h3 className="text-lg font-bold text-gray-900">{title}</h3>
         </div>
-        <h3 className="text-lg font-bold text-gray-900">{title}</h3>
+        
+        {/* Tooltip Icon */}
+        <div className="relative">
+          <button
+            onMouseEnter={() => setShowTooltip(true)}
+            onMouseLeave={() => setShowTooltip(false)}
+            className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+          >
+            <Info size={18} className="text-gray-400" />
+          </button>
+          
+          {showTooltip && (
+            <motion.div
+              initial={{ opacity: 0, y: 5 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="absolute right-0 top-full mt-2 w-64 bg-gray-800 text-white text-xs p-3 rounded-lg shadow-lg z-10"
+            >
+              <div className="absolute -top-1 right-4 w-2 h-2 bg-gray-800 transform rotate-45"></div>
+              {tooltipText}
+            </motion.div>
+          )}
+        </div>
       </div>
 
       <ResponsiveContainer width="100%" height={300}>

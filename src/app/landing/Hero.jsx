@@ -5,6 +5,18 @@ import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import { searchAPI, authUtils } from '../../utils/api';
 
+// Add shimmer animation to global styles
+if (typeof document !== 'undefined') {
+  const style = document.createElement('style');
+  style.textContent = `
+    @keyframes shimmer {
+      0% { background-position: -200% 0; }
+      100% { background-position: 200% 0; }
+    }
+  `;
+  document.head.appendChild(style);
+}
+
 // Custom Image Component using Next.js Image
 const ProfileImage = ({ src, alt, name, className }) => {
   const [imageError, setImageError] = useState(false);
@@ -202,6 +214,85 @@ const Hero = () => {
     // avg_engagement is already a percentage value (e.g., 1.09 = 1.09%)
     return engagement.toFixed(2) + '%';
   };
+
+  // Skeleton Card Component
+  const SkeletonCard = () => (
+    <motion.div
+      className="bg-white rounded-2xl p-4 sm:p-6 shadow-lg w-full max-w-3xl mx-auto"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+    >
+      <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-6">
+        {/* Profile Image Skeleton */}
+        <div className="relative flex-shrink-0">
+          <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 animate-pulse" 
+               style={{ 
+                 backgroundSize: '200% 100%',
+                 animation: 'shimmer 1.5s infinite'
+               }}
+          />
+        </div>
+
+        {/* Content Skeleton */}
+        <div className="flex-1 min-w-0 w-full text-center sm:text-left">
+          {/* Name Skeleton */}
+          <div className="mb-3">
+            <div className="h-7 bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 rounded-lg mb-2 w-3/4 mx-auto sm:mx-0 animate-pulse"
+                 style={{ 
+                   backgroundSize: '200% 100%',
+                   animation: 'shimmer 1.5s infinite'
+                 }}
+            />
+            <div className="h-4 bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 rounded-lg w-1/2 mx-auto sm:mx-0 animate-pulse"
+                 style={{ 
+                   backgroundSize: '200% 100%',
+                   animation: 'shimmer 1.5s infinite'
+                 }}
+            />
+          </div>
+
+          {/* Stats Grid Skeleton */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
+            {[1, 2, 3, 4].map((i) => (
+              <div key={i} className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl p-3 sm:p-4">
+                <div className="h-4 bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 rounded mb-2 w-3/4 animate-pulse"
+                     style={{ 
+                       backgroundSize: '200% 100%',
+                       animation: 'shimmer 1.5s infinite',
+                       animationDelay: `${i * 0.1}s`
+                     }}
+                />
+                <div className="h-6 bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 rounded w-1/2 animate-pulse"
+                     style={{ 
+                       backgroundSize: '200% 100%',
+                       animation: 'shimmer 1.5s infinite',
+                       animationDelay: `${i * 0.1}s`
+                     }}
+                />
+              </div>
+            ))}
+          </div>
+
+          {/* Biography Skeleton */}
+          <div className="mt-4 space-y-2">
+            <div className="h-4 bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 rounded w-full animate-pulse"
+                 style={{ 
+                   backgroundSize: '200% 100%',
+                   animation: 'shimmer 1.5s infinite'
+                 }}
+            />
+            <div className="h-4 bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 rounded w-3/4 animate-pulse"
+                 style={{ 
+                   backgroundSize: '200% 100%',
+                   animation: 'shimmer 1.5s infinite'
+                 }}
+            />
+          </div>
+        </div>
+      </div>
+    </motion.div>
+  );
 
   // Login Modal Component
   const LoginModal = () => (
@@ -447,20 +538,38 @@ const Hero = () => {
           </div>
         </motion.div>
 
-        {/* Loading and Error States */}
+        {/* Loading Skeleton Cards */}
         <AnimatePresence>
           {loading && (
             <motion.div 
-              className="text-center text-white mb-4 font-medium px-4"
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.3 }}
+              className="max-w-6xl mx-auto mb-10 flex flex-col gap-4 sm:gap-6 px-4 sm:px-2 w-full"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.5 }}
             >
-              Searching for influencers...
+              <motion.div 
+                className="text-white mb-2 sm:mb-4 font-medium text-lg flex items-center justify-center gap-2"
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
+              >
+                <svg className="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Searching for influencers...
+              </motion.div>
+              
+              {/* Show 2 skeleton cards */}
+              {[1, 2].map((i) => (
+                <SkeletonCard key={i} />
+              ))}
             </motion.div>
           )}
-          {error && (
+          
+          {/* Error State */}
+          {error && !loading && (
             <motion.div 
               className="text-center text-red-400 mb-4 bg-red-100 rounded-lg px-4 py-2 inline-block mx-4"
               initial={{ opacity: 0, scale: 0.9 }}

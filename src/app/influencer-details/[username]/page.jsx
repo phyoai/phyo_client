@@ -327,9 +327,6 @@ export default function InfluencerDetailsPage() {
             title="Top Cities"
             type="city"
           />
-
-          {/* Language Distribution */}
-          <LanguageChart data={demographics?.language_distribution} />
         </div>
       </div>
     </div>

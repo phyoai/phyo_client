@@ -92,31 +92,11 @@ export default function AudienceQualityCard({ demographics }) {
         <p className={`text-2xl font-bold ${qualityColor}`}>{qualityLevel}</p>
       </div>
 
-      {/* Fake Followers Alert */}
-      <div className="space-y-3">
-        <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-          <div className="flex items-center gap-2">
-            {fakeFollowers < 10 ? (
-              <CheckCircle className="text-green-500" size={20} />
-            ) : (
-              <AlertCircle className="text-orange-500" size={20} />
-            )}
-            <span className="text-sm font-medium text-gray-700">Fake Followers</span>
-          </div>
-          <span className={`font-bold ${fakeFollowers < 10 ? 'text-green-600' : 'text-orange-600'}`}>
-            {fakeFollowers.toFixed(1)}%
-          </span>
-        </div>
-
-        <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-          <div className="flex items-center gap-2">
-            <TrendingUp className="text-blue-500" size={20} />
-            <span className="text-sm font-medium text-gray-700">Real Users</span>
-          </div>
-          <span className="font-bold text-blue-600">
-            {demographics.real_users_analyzed || 0}
-          </span>
-        </div>
+      {/* Info Note */}
+      <div className="p-3 bg-gray-50 rounded-lg">
+        <p className="text-xs text-gray-600">
+          <strong>Note:</strong> Audience quality score indicates the authenticity and engagement level of the influencer's followers based on multiple factors.
+        </p>
       </div>
 
     </motion.div>

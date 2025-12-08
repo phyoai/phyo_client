@@ -2,6 +2,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useAuth } from '@/app/context/AuthContext';
 import {
   LayoutDashboard,
   Inbox,
@@ -15,6 +16,7 @@ import {
 
 const ServiceProviderSidebar = () => {
   const pathname = usePathname();
+  const { logout } = useAuth();
 
   const navItems = [
     { name: 'Dashboard', href: '/service-provider/dashboard', icon: LayoutDashboard },
@@ -75,10 +77,7 @@ const ServiceProviderSidebar = () => {
               return (
                 <button
                   key={item.name}
-                  onClick={() => {
-                    // Add logout logic here
-                    console.log('Logout clicked');
-                  }}
+                  onClick={logout}
                   className="flex items-center w-full px-3 py-3 text-sm font-medium text-red-600 hover:bg-red-50 hover:text-red-700 rounded-lg transition-colors"
                 >
                   <Icon className="mr-3 h-5 w-5" />
