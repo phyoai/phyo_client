@@ -12,13 +12,8 @@ const nextConfig = {
             },
         ],
     },
-    webpack: (config) => {
-        config.resolve.alias = {
-            ...config.resolve.alias,
-            '@': './src'
-        };
-        return config;
-    }
+    // Empty turbopack config to silence the warning
+    turbopack: {},
 };
 
 export default nextConfig;
