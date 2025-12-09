@@ -507,7 +507,7 @@ function SignupForm() {
 }
 
 export default function SignupPage() {
-    const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || '';
+    const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || '1056581199715-rk69h1nevsldlek1sb3oft4itnnd5qoo.apps.googleusercontent.com';
     
     return (
         <GoogleOAuthProvider clientId={clientId}>
