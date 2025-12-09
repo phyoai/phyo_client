@@ -165,14 +165,24 @@ const Hero = () => {
         localStorage.setItem('landing_search_prompt', prompt);
       } else {
         setResults([]);
-        setError("No influencers found for your query.");
+        // Check if error is about credits/free searches
+        if (data.upgradeRequired || data.error?.includes('free searches') || data.error?.includes('credits')) {
+          setError(data.error || "No free searches remaining. Please upgrade your plan for more credits.");
+        } else {
+          setError(data.error || "No influencers found for your query.");
+        }
         // Clear localStorage if no results
         localStorage.removeItem('landing_search_results');
         localStorage.removeItem('landing_search_prompt');
       }
     } catch (err) {
       console.error('Search error:', err);
-      setError(err.message || "Failed to fetch influencers. Please try again.");
+      // Check if the error response contains credit/upgrade information
+      if (err.upgradeRequired || err.message?.includes('free searches') || err.message?.includes('credits')) {
+        setError(err.message || "No free searches remaining. Please upgrade your plan for more credits.");
+      } else {
+        setError(err.message || "Failed to fetch influencers. Please try again.");
+      }
       setResults([]);
       // Clear localStorage on error
       localStorage.removeItem('landing_search_results');
@@ -575,13 +585,79 @@ const Hero = () => {
           {/* Error State */}
           {error && !loading && (
             <motion.div 
-              className="text-center text-red-400 mb-4 bg-red-100 rounded-lg px-4 py-2 inline-block mx-4"
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.9 }}
+              className="max-w-4xl mx-auto mb-8 px-4"
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.3 }}
             >
-              {error}
+              <div className={`rounded-2xl shadow-2xl p-5 sm:p-6 ${
+                error.includes('free searches') || error.includes('credits') || error.includes('upgrade')
+                  ? 'bg-gradient-to-r from-orange-500 to-red-500'
+                  : 'bg-gradient-to-r from-red-500 to-pink-500'
+              }`}>
+                <div className="flex items-start gap-4">
+                  <div className="flex-shrink-0">
+                    {error.includes('free searches') || error.includes('credits') || error.includes('upgrade') ? (
+                      <svg className="w-6 h-6 sm:w-8 sm:h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7" />
+                      </svg>
+                    ) : (
+                      <svg className="w-6 h-6 sm:w-8 sm:h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                    )}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="text-white font-bold text-lg sm:text-xl mb-2">
+                      {error.includes('free searches') || error.includes('credits') || error.includes('upgrade')
+                        ? '🚀 Upgrade Required'
+                        : 'Search Error'}
+                    </h3>
+                    <p className="text-white/90 text-sm sm:text-base leading-relaxed">
+                      {error}
+                    </p>
+                    {(error.includes('free searches') || error.includes('credits') || error.includes('upgrade')) && (
+                      <motion.button
+                        onClick={() => {
+                          setError(null); // Close the error notification
+                          setTimeout(() => {
+                            const pricingSection = document.getElementById('pricing-section');
+                            if (pricingSection) {
+                              pricingSection.scrollIntoView({ 
+                                behavior: 'smooth', 
+                                block: 'start',
+                                inline: 'nearest'
+                              });
+                            } else {
+                              // Fallback: try to scroll by finding the section another way
+                              console.warn('Pricing section not found, trying fallback...');
+                              window.scrollTo({
+                                top: document.documentElement.scrollHeight * 0.6,
+                                behavior: 'smooth'
+                              });
+                            }
+                          }, 100);
+                        }}
+                        className="mt-4 bg-white text-orange-600 font-semibold py-2 px-6 rounded-full hover:bg-gray-100 transition-colors text-sm sm:text-base shadow-lg"
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                      >
+                        View Pricing Plans
+                      </motion.button>
+                    )}
+                  </div>
+                  <button
+                    onClick={() => setError(null)}
+                    className="flex-shrink-0 text-white/80 hover:text-white transition-colors"
+                    aria-label="Close notification"
+                  >
+                    <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
             </motion.div>
           )}
         </AnimatePresence>

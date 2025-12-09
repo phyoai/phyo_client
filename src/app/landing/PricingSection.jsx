@@ -225,6 +225,7 @@ const PricingSection = () => {
 
   return (
     <section 
+      id="pricing-section"
       className="relative bg-cover bg-center bg-no-repeat py-20 px-4"
       style={{ backgroundImage: 'url(/landing/pricing_bg.jpg)' }}
     >
