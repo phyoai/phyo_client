@@ -22,6 +22,23 @@ const ProfileImage = ({ src, alt, name, className }) => {
   const getCorsProxyUrl = (url) => {
     if (!url) return '';
     
+    // Check if URL might be expired (has oe parameter with old timestamp)
+    try {
+      const urlObj = new URL(url);
+      const oeParam = urlObj.searchParams.get('oe');
+      if (oeParam) {
+        // oe parameter is a hex timestamp, convert to check if expired
+        const timestamp = parseInt(oeParam, 16) * 1000; // Convert to milliseconds
+        const now = Date.now();
+        if (timestamp < now) {
+          console.log('⚠️ URL signature expired, showing fallback');
+          return ''; // Return empty to trigger fallback
+        }
+      }
+    } catch (e) {
+      // If URL parsing fails, continue with proxy
+    }
+    
     // Google Translate proxy method
     let p = url?.split("/") || [""];
     let t = '';
@@ -43,16 +60,16 @@ const ProfileImage = ({ src, alt, name, className }) => {
     setImageError(true);
   };
 
-  // Fallback to initials if image fails or no src
-  if (imageError || !src) {
+  const imageUrl = getCorsProxyUrl(src);
+
+  // Fallback to initials if image fails, no src, or URL is expired
+  if (imageError || !src || !imageUrl) {
     return (
       <div className={`${className} bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center text-white font-bold text-sm sm:text-lg border-2 border-gray-200`}>
         {getInitials(name)}
       </div>
     );
   }
-
-  const imageUrl = getCorsProxyUrl(src || "https://instagram.fmad19-2.fna.fbcdn.net/v/t51.2885-19/350624574_796732218766635_3766412963048210668_n.jpg?stp=dst-jpg_s320x320_tt6&_nc_ht=instagram.fmad19-2.fna.fbcdn.net&_nc_cat=103&_nc_oc=Q6cZ2QFLIS5hs2NQ7ce0bZnzUdc9qfgCXcIVP_k-K1UIW8PFPTXmN6Dn9eX15F0PtHT6vRw&_nc_ohc=7XZ9iUF4f-sQ7kNvwEmlFEC&_nc_gid=LkyQUJkfM5nc2ICE5e4SKQ&edm=AOQ1c0wBAAAA&ccb=7-5&oh=00_AfTuCn4EvoRgsyZkjFReEyqgSmZHwyCt_Z18aX2SefgeZA&oe=687E3F1B&_nc_sid=8b3546");
 
   return (
     <div className="relative">
