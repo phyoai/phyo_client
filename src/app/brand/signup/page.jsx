@@ -6,7 +6,7 @@ import { useAuth } from '../../context/AuthContext';
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
-const page = () => {
+export default function Page() {
     const { isAuthenticated, isBrand, loading } = useAuth();
     const router = useRouter();
 
@@ -65,5 +65,3 @@ const page = () => {
         </div>
     )
 }
-
-export default page

@@ -6,9 +6,9 @@ import { Users, Info } from 'lucide-react';
 import { useState } from 'react';
 
 export default function AgeChart({ data }) {
-  if (!data) return null;
-  
   const [showTooltip, setShowTooltip] = useState(false);
+  
+  if (!data) return null;
 
   const chartData = Object.entries(data)
     .map(([age, value]) => ({

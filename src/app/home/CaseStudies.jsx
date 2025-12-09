@@ -12,8 +12,8 @@ const CaseStudies = () => {
                     spaceBetween={20}
                 >
                     {
-                        caseStudiesData.map((ele) => {
-                            return <SwiperSlide className='overflow-visible case_studies_card p-[20px]'>
+                        caseStudiesData.map((ele, index) => {
+                            return <SwiperSlide key={index} className='overflow-visible case_studies_card p-[20px]'>
                                 <div className='w-full h-[550px]'>
 
                                 </div>

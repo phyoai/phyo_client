@@ -3,7 +3,7 @@ import React, { useState } from 'react'
 import InfluencerCard from '../../components/InfluencerCard'
 import axios from 'axios'
 
-const index = () => {
+export default function Search() {
     const [influencers, setInfluencers] = useState([])
     const [fetchingState, setFetchingState] = useState("idle")
     const [prompt, setPrompt] = useState("")
@@ -134,5 +134,3 @@ export const InfluencersList = ({ influencers, fetchingState }) => {
         </>
     )
 }
-
-export default index

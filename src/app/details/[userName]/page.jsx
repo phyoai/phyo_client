@@ -73,7 +73,7 @@ const ProfileImage = ({ src, alt, name, className }) => {
   );
 };
 
-const page = () => {
+export default function Page() {
   const { userName } = useParams()
   const [creator, setCreator] = useState(null)
   const [isLoading, setIsLoading] = useState(true)
@@ -466,5 +466,3 @@ const page = () => {
     </div>
   )
 }
-
-export default page

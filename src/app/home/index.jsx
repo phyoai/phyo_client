@@ -19,7 +19,7 @@ import Comparison from './Comparison'
 import CompaignPhases from './CompaignPhases'
 
 
-const index = ({ token }) => {
+export default function Home({ token }) {
     const [influencers, setInfluencers] = useState([])
     const [fetchingState, setFetchingState] = useState("idle")
 
@@ -106,6 +106,3 @@ const Header = () => {
         </div>
     )
 }
-
-
-export default index

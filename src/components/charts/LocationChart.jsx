@@ -6,9 +6,9 @@ import { MapPin, Globe, Info } from 'lucide-react';
 import { useState } from 'react';
 
 export default function LocationChart({ data, title, type = 'country' }) {
-  if (!data) return null;
-  
   const [showTooltip, setShowTooltip] = useState(false);
+  
+  if (!data) return null;
 
   const chartData = Object.entries(data)
     .map(([name, value]) => ({

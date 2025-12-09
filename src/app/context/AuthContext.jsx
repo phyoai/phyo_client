@@ -21,12 +21,14 @@ export const AuthProvider = ({ children }) => {
   // Check for existing token on mount
   useEffect(() => {
     const checkAuth = () => {
-      const storedToken = localStorage.getItem('authToken') || getCookie('authToken');
-      if (storedToken) {
-        setToken(storedToken);
-        // You can also verify the token with your backend here
-        // For now, we'll assume the token is valid
-        setUser({ token: storedToken }); // You can decode JWT or fetch user data
+      if (typeof window !== 'undefined') {
+        const storedToken = localStorage.getItem('authToken') || getCookie('authToken');
+        if (storedToken) {
+          setToken(storedToken);
+          // You can also verify the token with your backend here
+          // For now, we'll assume the token is valid
+          setUser({ token: storedToken }); // You can decode JWT or fetch user data
+        }
       }
       setLoading(false);
     };
@@ -62,8 +64,10 @@ export const AuthProvider = ({ children }) => {
         setUser(data.user || data.data || { email, token: authToken });
         
         // Store token in localStorage and cookie
-        localStorage.setItem('authToken', authToken);
-        document.cookie = `authToken=${authToken}; path=/; max-age=${60 * 60 * 24 * 7}`; // 7 days
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('authToken', authToken);
+          document.cookie = `authToken=${authToken}; path=/; max-age=${60 * 60 * 24 * 7}`; // 7 days
+        }
         
         return { success: true, data };
       } else {
@@ -93,8 +97,10 @@ export const AuthProvider = ({ children }) => {
         setUser(data.data || data.user || { email: userData.email, token: authToken });
         
         // Store token in localStorage and cookie
-        localStorage.setItem('authToken', authToken);
-        document.cookie = `authToken=${authToken}; path=/; max-age=${60 * 60 * 24 * 7}`; // 7 days
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('authToken', authToken);
+          document.cookie = `authToken=${authToken}; path=/; max-age=${60 * 60 * 24 * 7}`; // 7 days
+        }
         
         return { success: true, data };
       } else {
@@ -111,16 +117,18 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
     setToken(null);
     
-    // Clear localStorage
-    localStorage.removeItem('authToken');
-    localStorage.removeItem('userData');
-    localStorage.removeItem('userEmail');
-    
-    // Clear cookies
-    document.cookie = 'authToken=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
-    
-    // Force a hard redirect to login page to clear any cached state
-    window.location.href = '/login';
+    if (typeof window !== 'undefined') {
+      // Clear localStorage
+      localStorage.removeItem('authToken');
+      localStorage.removeItem('userData');
+      localStorage.removeItem('userEmail');
+      
+      // Clear cookies
+      document.cookie = 'authToken=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+      
+      // Force a hard redirect to login page to clear any cached state
+      window.location.href = '/login';
+    }
   };
 
   // Check if user is authenticated

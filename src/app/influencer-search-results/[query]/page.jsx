@@ -38,7 +38,9 @@ export default function SearchResultsPage() {
       if (result.success && result.data) {
         setData(result.data);
         // Store in localStorage for the detail page
-        localStorage.setItem('influencer_search_results', JSON.stringify(result.data));
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('influencer_search_results', JSON.stringify(result.data));
+        }
       } else {
         throw new Error(result.message || 'No data found');
       }

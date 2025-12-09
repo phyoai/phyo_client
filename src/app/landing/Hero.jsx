@@ -1,21 +1,9 @@
 "use client";
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import { searchAPI, authUtils } from '../../utils/api';
-
-// Add shimmer animation to global styles
-if (typeof document !== 'undefined') {
-  const style = document.createElement('style');
-  style.textContent = `
-    @keyframes shimmer {
-      0% { background-position: -200% 0; }
-      100% { background-position: 200% 0; }
-    }
-  `;
-  document.head.appendChild(style);
-}
 
 // Custom Image Component using Next.js Image
 const ProfileImage = ({ src, alt, name, className }) => {
@@ -95,27 +83,43 @@ const Hero = () => {
   const [error, setError] = useState(null);
   const router = useRouter();
 
+  // Add shimmer animation to global styles
+  useEffect(() => {
+    if (typeof document !== 'undefined') {
+      const style = document.createElement('style');
+      style.textContent = `
+        @keyframes shimmer {
+          0% { background-position: -200% 0; }
+          100% { background-position: 200% 0; }
+        }
+      `;
+      document.head.appendChild(style);
+    }
+  }, []);
+
   // Check authentication and restore previous search on mount
   React.useEffect(() => {
     setIsAuthenticated(authUtils.isAuthenticated());
     
     // Restore previous search results from localStorage
-    try {
-      const savedResults = localStorage.getItem('landing_search_results');
-      const savedPrompt = localStorage.getItem('landing_search_prompt');
+    if (typeof window !== 'undefined') {
+      try {
+        const savedResults = localStorage.getItem('landing_search_results');
+        const savedPrompt = localStorage.getItem('landing_search_prompt');
       
-      if (savedResults) {
-        const parsedResults = JSON.parse(savedResults);
-        if (Array.isArray(parsedResults) && parsedResults.length > 0) {
-          setResults(parsedResults);
+        if (savedResults) {
+          const parsedResults = JSON.parse(savedResults);
+          if (Array.isArray(parsedResults) && parsedResults.length > 0) {
+            setResults(parsedResults);
+          }
         }
+        
+        if (savedPrompt) {
+          setPrompt(savedPrompt);
+        }
+      } catch (err) {
+        console.error('Error restoring search results:', err);
       }
-      
-      if (savedPrompt) {
-        setPrompt(savedPrompt);
-      }
-    } catch (err) {
-      console.error('Error restoring search results:', err);
     }
   }, []);
 
