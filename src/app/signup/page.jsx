@@ -85,7 +85,7 @@ function SignupForm() {
     const signupAPI = async (userData) => {
         console.log('Sending signup data:', userData); // Debug log
         
-        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api';
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://api.phyo.ai/api';
         const response = await fetch(`${apiUrl}/user/signup`, {
             method: 'POST',
             headers: {
@@ -109,7 +109,7 @@ function SignupForm() {
     const verifyOTPAPI = async (email, otpCode) => {
         console.log('Verifying OTP for:', email, 'with code:', otpCode); // Debug log
         
-        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api';
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://api.phyo.ai/api';
         const response = await fetch(`${apiUrl}/user/verify-otp`, {
             method: 'POST',
             headers: {
@@ -133,7 +133,7 @@ function SignupForm() {
     const googleSignupAPI = async (idToken) => {
         console.log('Attempting Google signup'); // Debug log
         
-        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api';
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://api.phyo.ai/api';
         const response = await fetch(`${apiUrl}/user/google`, {
             method: 'POST',
             headers: {

@@ -60,7 +60,7 @@ This document explains the Google OAuth integration implemented in the Phyo appl
 ### Backend API: `POST {API_URL}/user/google`
 
 The API URL is configured via environment variable:
-- **Development**: `http://localhost:4000/api`
+- **Development**: `https://api.phyo.ai/api`
 - **Production**: `https://api.phyo.ai/api`
 
 **Request Body:**
@@ -122,7 +122,7 @@ The API URL is configured via environment variable:
 ### Frontend (`.env.local`):
 ```env
 # API Base URL (change based on environment)
-NEXT_PUBLIC_API_URL=http://localhost:4000/api  # Development
+NEXT_PUBLIC_API_URL=https://api.phyo.ai/api  # Development
 # NEXT_PUBLIC_API_URL=https://api.phyo.ai/api  # Production
 
 # Google OAuth Client ID

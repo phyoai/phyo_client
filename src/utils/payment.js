@@ -2,7 +2,9 @@ import api from './api';
 
 class PaymentService {
   constructor() {
-    this.razorpayKey = process.env.RAZORPAY_KEY_ID;
+    // Use NEXT_PUBLIC_ prefix for client-side access in Next.js
+    // Fallback to non-prefixed version for backward compatibility
+    this.razorpayKey = process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || process.env.RAZORPAY_KEY_ID;
   }
 
   // Get all available subscription plans
@@ -87,12 +89,15 @@ class PaymentService {
 
   // Initialize Razorpay payment
   initializeRazorpay(orderData, onSuccess, onFailure) {
-    if (!this.razorpayKey) {
-      throw new Error('Razorpay key not found. Please check RAZORPAY_KEY_ID environment variable.');
+    // Prefer razorpayKey from API response, fallback to environment variable
+    const razorpayKey = orderData.razorpayKey || this.razorpayKey;
+    
+    if (!razorpayKey) {
+      throw new Error('Razorpay key not found. Please check NEXT_PUBLIC_RAZORPAY_KEY_ID environment variable or ensure the API returns razorpayKey.');
     }
 
     const options = {
-      key: this.razorpayKey,
+      key: razorpayKey,
       amount: orderData.amount,
       currency: orderData.currency,
       order_id: orderData.orderId,
