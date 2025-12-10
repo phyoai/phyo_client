@@ -45,13 +45,6 @@ const PricingSection = () => {
       return;
     }
 
-    if (!isAuthenticated()) {
-      // Redirect to signup/login
-      const currentPath = window.location.pathname;
-      router.push(`/brand/signup?redirect=${encodeURIComponent(currentPath)}`);
-      return;
-    }
-
     setLoading(true);
     setProcessingPlan(plan.name);
 
@@ -60,7 +53,8 @@ const PricingSection = () => {
       const planId = getPlanId(plan.name);
       const interval = billingCycle === 'annually' ? 'YEARLY' : 'MONTHLY';
 
-      // Create payment order
+      // Create payment order - directly proceed without checking authentication
+      // If user is not authenticated, API will return error which we'll handle
       const orderResponse = await paymentService.createOrder(planId, interval);
       
       if (orderResponse.success) {
@@ -95,13 +89,23 @@ const PricingSection = () => {
           }
         );
 
-        rzp.open();
+        // Open Razorpay payment modal directly
+        if (rzp) {
+          rzp.open();
+        }
       } else {
         throw new Error(orderResponse.error || 'Failed to create order');
       }
     } catch (error) {
       console.error('Payment error:', error);
-      alert(error.message || 'Payment failed. Please try again.');
+      // Check if error is due to authentication
+      if (error.response?.status === 401 || error.message?.includes('401') || error.message?.includes('Unauthorized')) {
+        alert('Please login or signup to proceed with payment. Redirecting to login...');
+        const currentPath = window.location.pathname;
+        router.push(`/brand/signup?redirect=${encodeURIComponent(currentPath)}`);
+      } else {
+        alert(error.message || 'Payment failed. Please try again.');
+      }
     } finally {
       setLoading(false);
       setProcessingPlan(null);

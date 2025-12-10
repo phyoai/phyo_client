@@ -61,7 +61,7 @@ function LoginForm() {
     const loginAPI = async (email, password) => {
         console.log('Attempting login for:', email); // Debug log
         
-        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api';
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://api.phyo.ai/api';
         const response = await fetch(`${apiUrl}/user/login`, {
             method: 'POST',
             headers: {
@@ -85,7 +85,7 @@ function LoginForm() {
     const googleLoginAPI = async (idToken) => {
         console.log('Attempting Google login'); // Debug log
         
-        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api';
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://api.phyo.ai/api';
         const response = await fetch(`${apiUrl}/user/google`, {
             method: 'POST',
             headers: {
