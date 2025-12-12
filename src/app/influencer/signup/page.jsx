@@ -1,3 +1,4 @@
+'use client'
 import FormContainer from '../../brand/components/FormContainer'
 import Image from 'next/image'
 import React, { Suspense } from 'react'
@@ -5,101 +6,198 @@ import React, { Suspense } from 'react'
 const page = () => {
     const steps = [{
         title: "Influencer Registration",
-        description: "",
+        description: "Create your account to get started",
         submit: "Create Account",
-        fields: [{ name: "email", type: "email", placeholder: "Email", label: "Email", required: true }, { name: "password", type: "password", placeholder: "Password", label: "Password", required: true }, { name: "confirmPassword", type: "password", placeholder: "Confirm Password", label: "Confirm Password", required: true }],
+        fields: [
+            { name: "email", type: "email", placeholder: "Email", label: "Email", required: true }, 
+            { name: "password", type: "password", placeholder: "Password", label: "Password", required: true }, 
+            { name: "confirmPassword", type: "password", placeholder: "Confirm Password", label: "Confirm Password", required: true }
+        ],
     }, {
-        title: "Gender Distribution of your audience?",
-        description: "",
-        submit: "Next",
-        fields: [{
-            name: "genderDistribution", type: "distribution", placeholder: "Gender Distribution", label: "", required: true, options: [
-                { value: "MEN", label: "Men" },
-                { value: "WOMEN", label: "Women" }
-            ]
-        }],
+        title: "Personal Information",
+        description: "Tell us about yourself",
+        submit: "Continue",
+        fields: [
+            { name: "full_name", type: "text", placeholder: "Your Full Name", label: "Full Name", required: true },
+            { name: "stage_name", type: "text", placeholder: "Your Stage/Creator Name", label: "Stage Name", required: false },
+            { name: "date_of_birth", type: "date", placeholder: "YYYY-MM-DD", label: "Date of Birth", required: false },
+            { name: "gender", type: "select", placeholder: "Select gender", label: "Gender", required: false, options: [
+                { value: "Male", label: "Male" },
+                { value: "Female", label: "Female" },
+                { value: "Other", label: "Other" },
+                { value: "Prefer not to say", label: "Prefer not to say" }
+            ]},
+            { name: "location.city", type: "text", placeholder: "Los Angeles", label: "City", required: false },
+            { name: "location.state", type: "text", placeholder: "California", label: "State/Province", required: false },
+            { name: "location.country", type: "select", placeholder: "Select country", label: "Country", required: false, options: [
+                { value: "USA", label: "United States" },
+                { value: "UK", label: "United Kingdom" },
+                { value: "Canada", label: "Canada" },
+                { value: "Australia", label: "Australia" },
+                { value: "India", label: "India" },
+                { value: "Germany", label: "Germany" },
+                { value: "France", label: "France" },
+                { value: "Brazil", label: "Brazil" },
+                { value: "Mexico", label: "Mexico" },
+                { value: "Other", label: "Other" }
+            ]},
+            { name: "bio", type: "textarea", placeholder: "Tell us about yourself and your content...", label: "Bio (max 500 characters)", required: false, maxLength: 500 }
+        ],
     }, {
-        title: "Age Distribution of your audience?",
-        description: "",
-        submit: "Next",
-        fields: [{
-            name: "ageDistribution", type: "distribution", placeholder: "Gender Distribution", label: "", required: true, options: [
-                { value: "13-17", label: "13-17 Years" },
-                { value: "18-24", label: "18-24 Years" },
-                { value: "25-34", label: "25-34 Years" },
-                { value: "35-44", label: "35-44 Years" },
-                { value: "45-54", label: "45-54 Years" },
-                { value: "55-64", label: "55-64 Years" },
-                { value: "65+", label: "65+ Years" },
-            ]
-        }],
+        title: "Social Media Presence",
+        description: "Connect your social media accounts",
+        submit: "Continue",
+        fields: [
+            { name: "social_media.instagram.username", type: "text", placeholder: "your_instagram_handle", label: "Instagram Username", required: true },
+            { name: "social_media.instagram.link", type: "text", placeholder: "https://instagram.com/yourhandle", label: "Instagram Profile Link", required: false },
+            { name: "social_media.youtube.channel_url", type: "text", placeholder: "https://youtube.com/@yourchannel", label: "YouTube Channel URL", required: false },
+            { name: "social_media.tiktok.username", type: "text", placeholder: "your_tiktok_handle", label: "TikTok Username", required: false },
+            { name: "social_media.facebook.profile_url", type: "text", placeholder: "https://facebook.com/yourprofile", label: "Facebook Profile URL", required: false },
+            { name: "social_media.twitter.username", type: "text", placeholder: "your_twitter_handle", label: "Twitter Username", required: false },
+            { name: "personal_website", type: "text", placeholder: "https://yourwebsite.com", label: "Personal Website", required: false }
+        ],
     }, {
-        title: "Where is Your Audience Based?",
-        description: "",
-        submit: "Next",
-        fields: [{
-            name: "audienceLocation",
-            type: "audienceLocation",
-            label: "Where is Your Audience Based?",
-            required: true
-        }],
+        title: "Content & Niches",
+        description: "What type of content do you create?",
+        submit: "Continue",
+        fields: [
+            { name: "niches", type: "multiselect", placeholder: "Select your niches", label: "Content Niches", required: false, options: [
+                { value: "Fashion", label: "Fashion" },
+                { value: "Beauty", label: "Beauty" },
+                { value: "Lifestyle", label: "Lifestyle" },
+                { value: "Travel", label: "Travel" },
+                { value: "Food", label: "Food" },
+                { value: "Fitness", label: "Fitness" },
+                { value: "Health", label: "Health" },
+                { value: "Technology", label: "Technology" },
+                { value: "Gaming", label: "Gaming" },
+                { value: "Music", label: "Music" },
+                { value: "Comedy", label: "Comedy" },
+                { value: "Education", label: "Education" },
+                { value: "Business", label: "Business" },
+                { value: "Finance", label: "Finance" },
+                { value: "Parenting", label: "Parenting" },
+                { value: "Home & Garden", label: "Home & Garden" },
+                { value: "Sports", label: "Sports" },
+                { value: "Art & Design", label: "Art & Design" },
+                { value: "Photography", label: "Photography" },
+                { value: "Sustainability", label: "Sustainability" }
+            ]},
+            { name: "languages_spoken", type: "multiselect", placeholder: "Select languages you speak", label: "Languages Spoken", required: false, options: [
+                { value: "English", label: "English" },
+                { value: "Spanish", label: "Spanish" },
+                { value: "French", label: "French" },
+                { value: "German", label: "German" },
+                { value: "Chinese", label: "Chinese" },
+                { value: "Japanese", label: "Japanese" },
+                { value: "Portuguese", label: "Portuguese" },
+                { value: "Hindi", label: "Hindi" },
+                { value: "Arabic", label: "Arabic" },
+                { value: "Russian", label: "Russian" }
+            ]},
+            { name: "portfolio.content_highlights", type: "textarea", placeholder: "Describe your content style, achievements, average engagement rates...", label: "Content Highlights", required: false }
+        ],
     }, {
-        title: "Set Your Collaboration Charges",
-        description: "Please specify your charges for different types of content collaborations",
-        submit: "Done!",
-        fields: [{
-            name: "collaborationCharges",
-            type: "collaborationCharges",
-            label: "Collaboration Charges",
-            required: true
-        }],
-    }
-        // {
-        //     title: "What is Your Profession/Role ?",
-        //     description: "",
-        //     submit: "Next",
-        //     fields: [{ name: "profession", type: "text", placeholder: "e.g Graphic Designer, Illustrator", label: "", required: true }],
-        // }, {
-        //     title: "How many years of experience do you have ?",
-        //     description: "",
-        //     submit: "Next",
-        //     fields: [{
-        //         name: "experience", type: "select", placeholder: "", label: "Years of Experience", required: true, options: [
-        //             { value: "1", label: "0-1" },
-        //             { value: "2", label: "1-2" },
-        //             { value: "2+", label: "2+ years" },
-        //         ]
-        //     }],
-        // }, {
-        //     title: "Tell us about your skills",
-        //     description: "",
-        //     submit: "Next",
-        //     fields: [{ name: "description", type: "text", placeholder: "e.g Adobe Photoshop, Figma etc", label: "", required: true }],
-        // }, {
-        //     title: "Share your work to boost your profile",
-        //     description: "",
-        //     submit: "Next",
-        //     fields: [{ name: "portfolio", type: "text", placeholder: "e.g Behance, Dribble", label: "Portfolio Link", required: true }, { name: "resume", type: "file", placeholder: "Click or drag file to this area to upload", label: "Upload Resume", required: true }],
-        // }, {
-        //     title: "Let's us know your availability",
-        //     description: "",
-        //     submit: "Done!!",
-        //     fields: [{ name: "availability", type: "radio", placeholder: "e.g Full-Time, PART-TIME", label: "", options: [
-        //         {label: "Full Time", value: "FULL_TIME"},
-        //         {label: "Half Time", value: "HALF_TIME"},
-        //         {label: "Freelance", value: "FREELANCE"},
-        //     ], required: true }],
-        // }
-    ]
+        title: "Collaboration Charges",
+        description: "Set your rates for different types of content",
+        submit: "Continue",
+        fields: [
+            { name: "rate_card.instagram_post", type: "number", placeholder: "5000", label: "Instagram Post (USD)", required: false },
+            { name: "rate_card.instagram_story", type: "number", placeholder: "2000", label: "Instagram Story (USD)", required: false },
+            { name: "rate_card.instagram_reel", type: "number", placeholder: "7500", label: "Instagram Reel (USD)", required: false },
+            { name: "rate_card.youtube_video", type: "number", placeholder: "15000", label: "YouTube Video (USD)", required: false },
+            { name: "rate_card.tiktok_video", type: "number", placeholder: "6000", label: "TikTok Video (USD)", required: false },
+            { name: "rate_card.blog_post", type: "number", placeholder: "3000", label: "Blog Post (USD)", required: false }
+        ],
+    }, {
+        title: "Availability & Preferences",
+        description: "Set your availability and working preferences",
+        submit: "Continue",
+        fields: [
+            { name: "availability.current_availability", type: "select", placeholder: "Current availability", label: "Current Availability", required: false, options: [
+                { value: "Available for new collaborations", label: "Available for new collaborations" },
+                { value: "Fully booked", label: "Fully booked" },
+                { value: "Available with limited capacity", label: "Available with limited capacity" },
+                { value: "On break", label: "On break" }
+            ]},
+            { name: "availability.monthly_campaign_capacity", type: "number", placeholder: "5", label: "Monthly Campaign Capacity", required: false },
+            { name: "availability.preferred_campaign_types", type: "multiselect", placeholder: "Preferred campaign types", label: "Preferred Campaign Types", required: false, options: [
+                { value: "Product Reviews", label: "Product Reviews" },
+                { value: "Brand Ambassadorships", label: "Brand Ambassadorships" },
+                { value: "Sponsored Content", label: "Sponsored Content" },
+                { value: "Event Coverage", label: "Event Coverage" },
+                { value: "Giveaways", label: "Giveaways" },
+                { value: "Long-term Partnerships", label: "Long-term Partnerships" }
+            ]},
+            { name: "availability.industries_work_with", type: "multiselect", placeholder: "Industries you work with", label: "Industries You Work With", required: false, options: [
+                { value: "Fashion", label: "Fashion" },
+                { value: "Beauty", label: "Beauty" },
+                { value: "Technology", label: "Technology" },
+                { value: "Health & Wellness", label: "Health & Wellness" },
+                { value: "Food & Beverage", label: "Food & Beverage" },
+                { value: "Travel", label: "Travel" },
+                { value: "Automotive", label: "Automotive" },
+                { value: "Finance", label: "Finance" },
+                { value: "Gaming", label: "Gaming" },
+                { value: "Sports", label: "Sports" }
+            ]},
+            { name: "availability.industries_avoid", type: "multiselect", placeholder: "Industries you avoid", label: "Industries You Avoid", required: false, options: [
+                { value: "Tobacco", label: "Tobacco" },
+                { value: "Alcohol", label: "Alcohol" },
+                { value: "Fast Food", label: "Fast Food" },
+                { value: "Gambling", label: "Gambling" },
+                { value: "Political", label: "Political" },
+                { value: "Adult Content", label: "Adult Content" }
+            ]}
+        ],
+    }, {
+        title: "Final Details & Upload",
+        description: "Complete your profile with additional information",
+        submit: "Complete Registration",
+        fields: [
+            { name: "profile_picture", type: "file", label: "Profile Picture", required: false, accept: "image/*" },
+            { name: "cover_photo", type: "file", label: "Cover Photo", required: false, accept: "image/*" },
+            { name: "media_kit", type: "file", label: "Media Kit (PDF)", required: false, accept: ".pdf" },
+            { name: "payment_details.paypal_email", type: "email", placeholder: "your@paypal.com", label: "PayPal Email", required: false },
+            { name: "payment_details.bank_account_holder_name", type: "text", placeholder: "Account Holder Name", label: "Bank Account Holder Name", required: false },
+            { name: "notifications.email_preferences", type: "checkbox", label: "Enable email notifications", required: false },
+            { name: "notifications.push_notifications", type: "checkbox", label: "Enable push notifications", required: false },
+            { name: "notifications.campaign_recommendations", type: "checkbox", label: "Receive campaign recommendations", required: false }
+        ]
+    }];
+    
     return (
-        <div className='bg-[#F1FFEF] flex gap-5 h-screen p-5'>
-            <div className='w-1/2'>
-                <Image src={"/welcome.png"} width={200} height={300} alt='brand' className='absolute bottom-0 left-0 w-[30%] h-[70%]' />
+        <div className='min-h-screen bg-gradient-to-br from-purple-50 to-pink-100 flex'>
+            {/* Left side - Illustration (hidden on mobile) */}
+            <div className='hidden lg:flex lg:w-1/2 relative items-center justify-center p-8'>
+                <div className="relative">
+                    <Image 
+                        src="/welcome.png" 
+                        width={400} 
+                        height={500} 
+                        alt='influencer registration' 
+                        className='object-contain max-w-full max-h-[80vh]' 
+                    />
+                    <div className="absolute top-4 left-4 bg-white/80 backdrop-blur-sm rounded-lg p-4 max-w-sm">
+                        <h3 className="text-lg font-bold text-gray-800 mb-2">Join Our Creator Community</h3>
+                        <p className="text-gray-600 text-sm">
+                            Connect with top brands and monetize your influence with our AI-powered platform.
+                        </p>
+                    </div>
+                </div>
             </div>
-            <div className='bg-white rounded-lg w-[50%] h-full'>
-                <Suspense fallback={<div>Loading...</div>}>
-                    <FormContainer steps={steps} />
-                </Suspense>
+            
+            {/* Right side - Form */}
+            <div className='w-full lg:w-1/2 flex items-center justify-center p-4'>
+                <div className='bg-white rounded-2xl shadow-xl w-full max-w-4xl h-[90vh] max-h-[900px] overflow-hidden'>
+                    <Suspense fallback={
+                        <div className="flex items-center justify-center h-full">
+                            <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-purple-600"></div>
+                        </div>
+                    }>
+                        <FormContainer steps={steps} theme="influencer" />
+                    </Suspense>
+                </div>
             </div>
         </div>
     )

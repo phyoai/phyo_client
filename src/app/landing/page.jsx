@@ -1,5 +1,5 @@
 'use client'
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import Hero from './Hero'
 import FeatureText from './FeatureText'
 import FeatureSection from './FeatureSection'

@@ -569,6 +569,8 @@ const Hero = () => {
           </div>
         </motion.div>
 
+
+
         {/* Loading Skeleton Cards */}
         <AnimatePresence>
           {loading && (

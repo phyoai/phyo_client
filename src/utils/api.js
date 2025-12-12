@@ -2,7 +2,7 @@ import axios from 'axios';
 
 // Create axios instance with base configuration
 const api = axios.create({
-  baseURL: 'https://api.phyo.ai/api',
+  baseURL: 'http://localhost:4000/api',
   headers: {
     'Content-Type': 'application/json',
   },
@@ -32,11 +32,9 @@ api.interceptors.response.use(
     if (error.response?.status === 401) {
       // Handle unauthorized access
       localStorage.removeItem('authToken');
-      // Redirect to brand signup if needed
+      // Redirect to login page instead of brand signup
       if (typeof window !== 'undefined') {
-        const currentPath = window.location.pathname;
-        const signupUrl = `/brand/signup?redirect=${encodeURIComponent(currentPath)}`;
-        window.location.href = signupUrl;
+        window.location.href = '/login';
       }
     }
     return Promise.reject(error);
@@ -152,4 +150,221 @@ export const authUtils = {
   }
 };
 
-export default api; 
+// Auth API functions
+export const authAPI = {
+  // Register new user
+  register: async (userData) => {
+    try {
+      const response = await api.post('/auth/register', userData);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error.message;
+    }
+  },
+
+  // Login user
+  login: async (credentials) => {
+    try {
+      const response = await api.post('/auth/login', credentials);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error.message;
+    }
+  },
+
+  // Get registration status
+  getRegistrationStatus: async () => {
+    try {
+      const response = await api.get('/auth/registration-status');
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error.message;
+    }
+  }
+};
+
+// Brand API functions
+export const brandAPI = {
+  // Submit brand registration
+  submitRegistration: async (brandData, isFormData = false) => {
+    try {
+      const config = isFormData ? {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        }
+      } : {};
+      
+      const response = await api.post('/brand-requests/submit', brandData, config);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error.message;
+    }
+  },
+
+  // Get brand profile
+  getProfile: async () => {
+    try {
+      const response = await api.get('/brand-requests/profile');
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error.message;
+    }
+  },
+
+  // Update brand profile
+  updateProfile: async (updateData, isFormData = false) => {
+    try {
+      const config = isFormData ? {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        }
+      } : {};
+
+      const response = await api.put('/brand-requests/profile', updateData, config);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error.message;
+    }
+  },
+
+  // Admin functions
+  admin: {
+    // Get all brand requests
+    getRequests: async (params = {}) => {
+      try {
+        const response = await api.get('/brand-requests/admin/requests', { params });
+        return response.data;
+      } catch (error) {
+        throw error.response?.data || error.message;
+      }
+    },
+
+    // Approve brand request
+    approveRequest: async (id, adminNotes = '') => {
+      try {
+        const response = await api.put(`/brand-requests/admin/requests/${id}/approve`, {
+          admin_notes: adminNotes
+        });
+        return response.data;
+      } catch (error) {
+        throw error.response?.data || error.message;
+      }
+    },
+
+    // Reject brand request
+    rejectRequest: async (id, adminNotes = '') => {
+      try {
+        const response = await api.put(`/brand-requests/admin/requests/${id}/reject`, {
+          admin_notes: adminNotes
+        });
+        return response.data;
+      } catch (error) {
+        throw error.response?.data || error.message;
+      }
+    }
+  }
+};
+
+// Influencer API functions
+export const influencerAPI = {
+  // Submit influencer registration
+  submitRegistration: async (influencerData, isFormData = false) => {
+    try {
+      const config = isFormData ? {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        }
+      } : {};
+      
+      const response = await api.post('/influencer-requests/submit', influencerData, config);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error.message;
+    }
+  },
+
+  // Get influencer profile
+  getProfile: async () => {
+    try {
+      const response = await api.get('/influencer-requests/profile');
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error.message;
+    }
+  },
+
+  // Update influencer profile
+  updateProfile: async (updateData, isFormData = false) => {
+    try {
+      const config = isFormData ? {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        }
+      } : {};
+
+      const response = await api.put('/influencer-requests/profile', updateData, config);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error.message;
+    }
+  },
+
+  // Admin functions
+  admin: {
+    // Get all influencer requests
+    getRequests: async (params = {}) => {
+      try {
+        const response = await api.get('/influencer-requests/admin/requests', { params });
+        return response.data;
+      } catch (error) {
+        throw error.response?.data || error.message;
+      }
+    },
+
+    // Get single influencer request
+    getRequest: async (id) => {
+      try {
+        const response = await api.get(`/influencer-requests/admin/requests/${id}`);
+        return response.data;
+      } catch (error) {
+        throw error.response?.data || error.message;
+      }
+    },
+
+    // Approve influencer request
+    approveRequest: async (id, adminNotes = '') => {
+      try {
+        const response = await api.post(`/influencer-requests/admin/requests/${id}/approve`, {
+          admin_notes: adminNotes
+        });
+        return response.data;
+      } catch (error) {
+        throw error.response?.data || error.message;
+      }
+    },
+
+    // Reject influencer request
+    rejectRequest: async (id, adminNotes = '') => {
+      try {
+        const response = await api.post(`/influencer-requests/admin/requests/${id}/reject`, {
+          admin_notes: adminNotes
+        });
+        return response.data;
+      } catch (error) {
+        throw error.response?.data || error.message;
+      }
+    },
+
+    // Get influencer request stats
+    getStats: async () => {
+      try {
+        const response = await api.get('/influencer-requests/admin/requests/stats');
+        return response.data;
+      } catch (error) {
+        throw error.response?.data || error.message;
+      }
+    }
+  }
+};
+
+export default api;
