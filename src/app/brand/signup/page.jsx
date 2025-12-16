@@ -21,15 +21,6 @@ export default function Page() {
     }
 
     const steps = [{
-        title: "Brand Registration",
-        description: "Create your account to get started",
-        submit: "Create Account",
-        fields: [
-            { name: "email", type: "email", placeholder: "Enter your email", label: "Email", required: true },
-            { name: "password", type: "password", placeholder: "Create a password", label: "Password", required: true },
-            { name: "confirmPassword", type: "password", placeholder: "Confirm your password", label: "Confirm Password", required: true }
-        ],
-    }, {
         title: "Company Information",
         description: "Tell us about your company",
         submit: "Continue",
@@ -67,6 +58,16 @@ export default function Page() {
                 { value: "1000+", label: "1000+ employees" }
             ]},
             { name: "company_description", type: "textarea", placeholder: "Briefly describe your company", label: "Company Description", required: false }
+        ],
+    }, {
+        title: "Verification Documents",
+        description: "Provide your business verification documents",
+        submit: "Continue",
+        fields: [
+            { name: "verification_documents.tax_id", type: "text", placeholder: "TAX123456789", label: "Tax ID", required: false },
+            { name: "verification_documents.company_registration_number", type: "text", placeholder: "REG987654321", label: "Company Registration Number", required: false },
+            { name: "verification_documents.business_registration", type: "file", label: "Business Registration Certificate", required: false, accept: ".pdf,.doc,.docx" },
+            { name: "verification_documents.authorization_letter", type: "file", label: "Authorization Letter", required: false, accept: ".pdf,.doc,.docx" }
         ],
     }, {
         title: "Contact Information",
@@ -114,8 +115,7 @@ export default function Page() {
                 { value: "BRONZE", label: "Bronze - Free (Limited features)" },
                 { value: "SILVER", label: "Silver - $99/month" },
                 { value: "GOLD", label: "Gold - $199/month" },
-                { value: "PROFESSIONAL", label: "Professional - $299/month" },
-                { value: "ENTERPRISE", label: "Enterprise - Contact us" }
+                { value: "PREMIUM", label: "Premium - $299/month" }
             ]},
             { name: "preferences.notifications", type: "checkbox", label: "Email notifications", required: false },
             { name: "preferences.timezone", type: "select", placeholder: "Select timezone", label: "Timezone", required: false, options: [

@@ -137,7 +137,11 @@ const FormContainer = ({ steps, theme = 'brand' }) => {
           // Business details
           verification_documents: {
             tax_id: data.verification_documents?.tax_id,
-            company_registration_number: data.verification_documents?.company_registration_number
+            company_registration_number: data.verification_documents?.company_registration_number,
+            business_registration: data.verification_documents?.business_registration?.[0] ? 
+              URL.createObjectURL(data.verification_documents.business_registration[0]) : undefined,
+            authorization_letter: data.verification_documents?.authorization_letter?.[0] ? 
+              URL.createObjectURL(data.verification_documents.authorization_letter[0]) : undefined
           },
           
           // Billing and preferences
@@ -540,8 +544,8 @@ const FormContainer = ({ steps, theme = 'brand' }) => {
             
             {/* Progress Text */}
             <div className="mt-3 text-center text-sm text-gray-500">
-              {currentStep === 0 && "Let's get started with your basic information"}
-              {currentStep === 1 && "Tell us more about your company"}
+              {currentStep === 0 && "Let's get started with your company information"}
+              {currentStep === 1 && "Please provide your verification documents"}
               {currentStep === 2 && "Add your contact details"}
               {currentStep === 3 && "Connect your social media and brand assets"}
               {currentStep === 4 && "Almost done! Choose your preferences"}
