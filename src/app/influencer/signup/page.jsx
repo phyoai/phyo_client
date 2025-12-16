@@ -5,15 +5,6 @@ import React, { Suspense } from 'react'
 
 const page = () => {
     const steps = [{
-        title: "Influencer Registration",
-        description: "Create your account to get started",
-        submit: "Create Account",
-        fields: [
-            { name: "email", type: "email", placeholder: "Email", label: "Email", required: true }, 
-            { name: "password", type: "password", placeholder: "Password", label: "Password", required: true }, 
-            { name: "confirmPassword", type: "password", placeholder: "Confirm Password", label: "Confirm Password", required: true }
-        ],
-    }, {
         title: "Personal Information",
         description: "Tell us about yourself",
         submit: "Continue",
@@ -115,10 +106,10 @@ const page = () => {
         submit: "Continue",
         fields: [
             { name: "availability.current_availability", type: "select", placeholder: "Current availability", label: "Current Availability", required: false, options: [
-                { value: "Available for new collaborations", label: "Available for new collaborations" },
-                { value: "Fully booked", label: "Fully booked" },
-                { value: "Available with limited capacity", label: "Available with limited capacity" },
-                { value: "On break", label: "On break" }
+                { value: "Available", label: "Available" },
+                { value: "Fully Booked", label: "Fully Booked" },
+                { value: "Limited Capacity", label: "Available with Limited Capacity" },
+                { value: "On Break", label: "On Break" }
             ]},
             { name: "availability.monthly_campaign_capacity", type: "number", placeholder: "5", label: "Monthly Campaign Capacity", required: false },
             { name: "availability.preferred_campaign_types", type: "multiselect", placeholder: "Preferred campaign types", label: "Preferred Campaign Types", required: false, options: [
@@ -157,9 +148,7 @@ const page = () => {
         fields: [
             { name: "profile_picture", type: "file", label: "Profile Picture", required: false, accept: "image/*" },
             { name: "cover_photo", type: "file", label: "Cover Photo", required: false, accept: "image/*" },
-            { name: "media_kit", type: "file", label: "Media Kit (PDF)", required: false, accept: ".pdf" },
-            { name: "payment_details.paypal_email", type: "email", placeholder: "your@paypal.com", label: "PayPal Email", required: false },
-            { name: "payment_details.bank_account_holder_name", type: "text", placeholder: "Account Holder Name", label: "Bank Account Holder Name", required: false },
+            { name: "portfolio.media_kit", type: "file", label: "Media Kit (PDF)", required: false, accept: ".pdf" },
             { name: "notifications.email_preferences", type: "checkbox", label: "Enable email notifications", required: false },
             { name: "notifications.push_notifications", type: "checkbox", label: "Enable push notifications", required: false },
             { name: "notifications.campaign_recommendations", type: "checkbox", label: "Receive campaign recommendations", required: false }
@@ -167,7 +156,7 @@ const page = () => {
     }];
     
     return (
-        <div className='min-h-screen bg-gradient-to-br from-purple-50 to-pink-100 flex'>
+        <div className='min-h-screen bg-gradient-to-br from-green-50 to-green-100 flex'>
             {/* Left side - Illustration (hidden on mobile) */}
             <div className='hidden lg:flex lg:w-1/2 relative items-center justify-center p-8'>
                 <div className="relative">
@@ -192,7 +181,7 @@ const page = () => {
                 <div className='bg-white rounded-2xl shadow-xl w-full max-w-4xl h-[90vh] max-h-[900px] overflow-hidden'>
                     <Suspense fallback={
                         <div className="flex items-center justify-center h-full">
-                            <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-purple-600"></div>
+                            <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-green-600"></div>
                         </div>
                     }>
                         <FormContainer steps={steps} theme="influencer" />

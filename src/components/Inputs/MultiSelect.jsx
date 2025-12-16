@@ -12,7 +12,19 @@ const MultiSelect = ({
   error 
 }) => {
   const { register, watch, setValue } = useFormContext();
-  const selectedValues = watch(name) || [];
+  const rawSelected = watch(name);
+  const selectedValues = Array.isArray(rawSelected)
+    ? rawSelected
+    : rawSelected
+      ? (() => {
+          try {
+            const parsed = JSON.parse(rawSelected);
+            return Array.isArray(parsed) ? parsed : [];
+          } catch {
+            return [];
+          }
+        })()
+      : [];
   const [isOpen, setIsOpen] = useState(false);
 
   const handleToggleOption = (optionValue) => {
@@ -25,7 +37,7 @@ const MultiSelect = ({
       newValues = [...currentValues, optionValue];
     }
     
-    setValue(name, newValues);
+    setValue(name, newValues, { shouldDirty: true, shouldValidate: true });
   };
 
   return (
@@ -117,6 +129,7 @@ const MultiSelect = ({
         type="hidden"
         {...register(name, { required: required ? `${label} is required` : false })}
         value={JSON.stringify(selectedValues)}
+        onChange={() => {}}
       />
     </div>
   );

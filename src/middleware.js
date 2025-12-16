@@ -2,12 +2,24 @@
 import { NextResponse } from 'next/server';
 
 export function middleware(request) {
-    const { pathname } = request.nextUrl;
+    const { pathname, search } = request.nextUrl;
     
     // Get token from cookies
     const token = request.cookies.get('authToken')?.value;
+
+    // Public routes that should never be blocked
+    const publicRoutes = [
+        '/brand/signup',
+        '/brand/login',
+        '/login',
+        '/influencer/signup'
+    ];
+
+    if (publicRoutes.some(route => pathname.startsWith(route))) {
+        return NextResponse.next();
+    }
     
-    // Protected routes that require authentication (excluding signup)
+    // Protected routes that require authentication
     const protectedRoutes = [
         '/brand/dashboard',
         '/brand/campaigns',
@@ -20,7 +32,6 @@ export function middleware(request) {
         // '/details' is now public
     ];
     
-    // Check if the current path is a protected route
     const isProtectedRoute = protectedRoutes.some(route => 
         pathname.startsWith(route)
     );
@@ -28,7 +39,7 @@ export function middleware(request) {
     // If accessing a protected route without token, redirect to brand signup
     if (isProtectedRoute && !token) {
         const signupUrl = new URL('/brand/signup', request.url);
-        signupUrl.searchParams.set('redirect', pathname);
+        signupUrl.searchParams.set('redirect', `${pathname}${search || ''}`);
         return NextResponse.redirect(signupUrl);
     }
     
