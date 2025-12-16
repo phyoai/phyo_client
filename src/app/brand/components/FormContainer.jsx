@@ -46,13 +46,57 @@ const FormContainer = ({ steps, theme = 'brand' }) => {
   const { signup, isAuthenticated } = useAuth();
 
   // Check if user has already submitted a registration
-  const checkExistingRegistration = () => {
+  const checkExistingRegistration = async () => {
+    try {
+      // Prefer live status if authenticated
+      if (isAuthenticated) {
+        const statusResp = await authAPI.getRegistrationStatus();
+        const status = statusResp?.data || {};
+
+        if (theme === 'brand') {
+          if (['PENDING', 'APPROVED', 'DECLINED'].includes(status.brandRegistrationStatus)) {
+            setAlreadySubmitted(true);
+            setRegistrationMessage(
+              status.brandRegistrationStatus === 'PENDING'
+                ? 'Your Brand registration is pending approval.'
+                : status.brandRegistrationStatus === 'APPROVED'
+                  ? 'Your Brand account is already approved.'
+                  : 'Your Brand registration was declined. Please contact support.'
+            );
+            return true;
+          }
+        }
+
+        if (theme === 'influencer') {
+          if (['PENDING', 'APPROVED', 'REJECTED'].includes(status.influencerRegistrationStatus)) {
+            setAlreadySubmitted(true);
+            setRegistrationMessage(
+              status.influencerRegistrationStatus === 'PENDING'
+                ? 'Your Influencer registration is pending approval.'
+                : status.influencerRegistrationStatus === 'APPROVED'
+                  ? 'Your Influencer account is already approved.'
+                  : 'Your Influencer registration was rejected. Please contact support.'
+            );
+            return true;
+          }
+        }
+
+        // If server says NONE, clear any old local flags
+        localStorage.removeItem('brandRegistrationSubmitted');
+        localStorage.removeItem('influencerRegistrationSubmitted');
+        localStorage.removeItem('brandRegistrationBlocked');
+        localStorage.removeItem('influencerRegistrationBlocked');
+      }
+    } catch (err) {
+      console.error('Registration status check failed, falling back to local flags:', err);
+    }
+
+    // Fallback to legacy localStorage flags
     const brandSubmitted = localStorage.getItem('brandRegistrationSubmitted');
     const influencerSubmitted = localStorage.getItem('influencerRegistrationSubmitted');
     const brandBlocked = localStorage.getItem('brandRegistrationBlocked');
     const influencerBlocked = localStorage.getItem('influencerRegistrationBlocked');
     
-    // Check if user already submitted this type
     if (brandSubmitted && theme === 'brand') {
       setAlreadySubmitted(true);
       setRegistrationMessage('You have already submitted a brand registration. Please wait for our review.');
@@ -65,7 +109,6 @@ const FormContainer = ({ steps, theme = 'brand' }) => {
       return true;
     }
     
-    // Check if user is blocked from registering the other type
     if (brandBlocked && theme === 'brand') {
       setAlreadySubmitted(true);
       setRegistrationMessage('You have already submitted an influencer registration. You cannot register as a brand until your influencer application is reviewed.');
@@ -84,15 +127,130 @@ const FormContainer = ({ steps, theme = 'brand' }) => {
   // Check on component mount
   useEffect(() => {
     checkExistingRegistration();
-  }, [theme]);
+  }, [theme, isAuthenticated]);
 
   // Function to handle registration submission
   const initiateRegistration = async (data) => {
     setLoading(true);
     setError('');
+
+    const isValidUrl = (value) => {
+      if (!value) return false;
+      try {
+        const u = new URL(value);
+        return u.protocol === 'https:' || u.protocol === 'http:';
+      } catch (e) {
+        return false;
+      }
+    };
+
+    const buildBrandFormData = (formValues) => {
+      const formData = new FormData();
+      const appendIfPresent = (key, value) => {
+        if (value !== undefined && value !== null && value !== '') {
+          formData.append(key, value);
+        }
+      };
+
+      const firstFile = (...candidates) => {
+        for (const c of candidates) {
+          if (!c) continue;
+          if (c instanceof File) return c;
+          if (Array.isArray(c) && c[0] instanceof File) return c[0];
+          if (c instanceof FileList && c.length > 0) return c[0];
+        }
+        return null;
+      };
+
+      const allFiles = (...candidates) => {
+        for (const c of candidates) {
+          if (!c) continue;
+          if (Array.isArray(c) && c.length) return Array.from(c).filter(f => f instanceof File);
+          if (c instanceof FileList && c.length) return Array.from(c);
+          if (c instanceof File) return [c];
+        }
+        return [];
+      };
+
+      // Basic account info
+      appendIfPresent('email', formValues.email);
+      appendIfPresent('password', formValues.password);
+
+      // Company information
+      appendIfPresent('company_name', formValues.company_name || formValues.brandName);
+      appendIfPresent('website_url', formValues.website_url || formValues.website);
+      appendIfPresent('industry', formValues.industry);
+      appendIfPresent('company_type', formValues.company_type || 'Brand');
+      appendIfPresent('company_size', formValues.company_size);
+      appendIfPresent('company_description', formValues.company_description);
+      appendIfPresent('location', formValues.location);
+      appendIfPresent('country', formValues.country);
+
+      // Contact information
+      const contact = {
+        first_name: formValues.contact?.first_name || formValues['contact.first_name'] || formValues.first_name,
+        last_name: formValues.contact?.last_name || formValues['contact.last_name'] || formValues.last_name,
+        email: formValues.contact?.email || formValues['contact.email'] || formValues.email,
+        phone: formValues.contact?.phone || formValues['contact.phone'],
+        job_title: formValues.contact?.job_title || formValues['contact.job_title']
+      };
+      appendIfPresent('contact', JSON.stringify(contact));
+
+      // Social media and brand story
+      appendIfPresent('social_media', JSON.stringify(formValues.social_media || {}));
+      appendIfPresent('brand_story', formValues.brand_story);
+
+      // Brand assets (files)
+      const logoFile = firstFile(formValues.company_logo, formValues['company_logo']);
+      if (logoFile) {
+        formData.append('company_logo', logoFile);
+      }
+
+      const brandImages = allFiles(formValues.brand_images, formValues['brand_images']);
+      if (brandImages.length) {
+        brandImages.forEach((img) => formData.append('brand_images', img));
+      }
+
+      // Verification documents
+      const verificationDocuments = formValues.verification_documents || {
+        tax_id: formValues['verification_documents.tax_id'],
+        company_registration_number: formValues['verification_documents.company_registration_number'],
+        business_registration: formValues['verification_documents.business_registration'],
+        authorization_letter: formValues['verification_documents.authorization_letter']
+      };
+      appendIfPresent('verification_documents', JSON.stringify({
+        tax_id: verificationDocuments.tax_id,
+        company_registration_number: verificationDocuments.company_registration_number
+      }));
+
+      const businessRegistrationFile = firstFile(
+        verificationDocuments.business_registration,
+        formValues['verification_documents.business_registration']
+      );
+      if (businessRegistrationFile) formData.append('business_registration', businessRegistrationFile);
+
+      const authorizationLetterFile = firstFile(
+        verificationDocuments.authorization_letter,
+        formValues['verification_documents.authorization_letter']
+      );
+      if (authorizationLetterFile) formData.append('authorization_letter', authorizationLetterFile);
+
+      // Billing and preferences
+      appendIfPresent('billing_info', JSON.stringify(formValues.billing_info || {}));
+      appendIfPresent('subscription_plan', formValues.subscription_plan || 'BRONZE');
+      appendIfPresent('payment_method', JSON.stringify(formValues.payment_method || {}));
+      appendIfPresent('preferences', JSON.stringify(formValues.preferences || {}));
+      appendIfPresent('team_members', JSON.stringify(formValues.team_members || []));
+
+      // Account setup
+      appendIfPresent('account', JSON.stringify({ signup_method: 'email' }));
+
+      return formData;
+    };
     
     // Check if already submitted before proceeding
-    if (checkExistingRegistration()) {
+    const already = await checkExistingRegistration();
+    if (already) {
       setLoading(false);
       return;
     }
@@ -103,61 +261,19 @@ const FormContainer = ({ steps, theme = 'brand' }) => {
       const isInfluencerForm = data.full_name || data.stage_name || data.social_media?.instagram?.username;
       
       if (isBrandForm) {
-        // Handle brand registration
-        const brandData = {
-          // Basic account info
-          email: data.email,
-          password: data.password,
-          
-          // Company information
-          company_name: data.company_name || data.brandName,
-          website_url: data.website_url || data.website,
-          industry: data.industry,
-          company_type: data.company_type || 'Brand',
-          company_size: data.company_size,
-          company_description: data.company_description,
-          location: data.location,
-          country: data.country,
-          
-          // Contact information
-          contact: {
-            first_name: data.contact?.first_name || data.first_name,
-            last_name: data.contact?.last_name || data.last_name,
-            email: data.contact?.email || data.email,
-            phone: data.contact?.phone,
-            job_title: data.contact?.job_title
-          },
-          
-          // Social media
-          social_media: data.social_media || {},
-          
-          // Brand story and assets (files will be handled separately)
-          brand_story: data.brand_story,
-          
-          // Business details
-          verification_documents: {
-            tax_id: data.verification_documents?.tax_id,
-            company_registration_number: data.verification_documents?.company_registration_number,
-            business_registration: data.verification_documents?.business_registration?.[0] ? 
-              URL.createObjectURL(data.verification_documents.business_registration[0]) : undefined,
-            authorization_letter: data.verification_documents?.authorization_letter?.[0] ? 
-              URL.createObjectURL(data.verification_documents.authorization_letter[0]) : undefined
-          },
-          
-          // Billing and preferences
-          billing_info: data.billing_info || {},
-          subscription_plan: data.subscription_plan || 'BRONZE',
-          payment_method: data.payment_method || {},
-          preferences: data.preferences || {},
-          
-          // Account setup
-          account: {
-            signup_method: 'email'
-          }
-        };
+        // Frontend URL validation to prevent invalid website URLs
+        const website = data.website_url || data.website;
+        if (!isValidUrl(website)) {
+          setError('Please enter a valid website URL starting with http:// or https://');
+          setLoading(false);
+          return;
+        }
 
-        // Use the new brand API
-        const result = await brandAPI.submitRegistration(brandData);
+        // Handle brand registration
+        const formData = buildBrandFormData(data);
+
+        // Use the new brand API (multipart/form-data to support uploads)
+        const result = await brandAPI.submitRegistration(formData, true);
         
         if (result.message) {
           setRegistrationSuccess(true);

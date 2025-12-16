@@ -180,14 +180,19 @@ const Navbar = () => {
   // Check if buttons should be shown
   const shouldShowRegistrationButtons = () => {
     if (!isAuthenticated) return false;
+
+    const { brandRegistrationStatus, influencerRegistrationStatus } = registrationStatus;
+
+    // Hide buttons if any registration already approved
+    if (brandRegistrationStatus === 'APPROVED' || influencerRegistrationStatus === 'APPROVED') {
+      return false;
+    }
+
+    // Only show for base USER accounts
     if (!userType || userType === 'user' || userType === 'USER') {
-      const { brandRegistrationStatus, influencerRegistrationStatus } = registrationStatus;
-      // Hide buttons if either is approved
-      if (brandRegistrationStatus === 'APPROVED' || influencerRegistrationStatus === 'APPROVED') {
-        return false;
-      }
       return true;
     }
+
     return false;
   };
 
