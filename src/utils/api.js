@@ -268,7 +268,7 @@ export const brandAPI = {
 // Influencer API functions
 export const influencerAPI = {
   // Submit influencer registration
-  submitRegistration: async (influencerData, isFormData = false) => {
+ submitRegistration: async (influencerData, isFormData = false) => {
     try {
       const config = isFormData ? {
         headers: {

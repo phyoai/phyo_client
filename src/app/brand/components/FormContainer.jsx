@@ -247,6 +247,144 @@ const FormContainer = ({ steps, theme = 'brand' }) => {
 
       return formData;
     };
+
+    const buildInfluencerFormData = (formValues) => {
+      const formData = new FormData();
+      
+      const appendIfPresent = (key, value) => {
+        if (value !== undefined && value !== null && value !== '') {
+          formData.append(key, value);
+        }
+      };
+
+      const firstFile = (...candidates) => {
+        for (const c of candidates) {
+          if (!c) continue;
+          if (c instanceof File) return c;
+          if (Array.isArray(c) && c[0] instanceof File) return c[0];
+          if (c instanceof FileList && c.length > 0) return c[0];
+        }
+        return null;
+      };
+
+      // Helper to get value from nested or flat field names
+      const getValue = (nestedPath, flatPath) => {
+        return formValues[nestedPath] || formValues[flatPath];
+      };
+
+      // Personal Information
+      appendIfPresent('full_name', formValues.full_name);
+      appendIfPresent('stage_name', formValues.stage_name);
+      appendIfPresent('date_of_birth', formValues.date_of_birth);
+      appendIfPresent('gender', formValues.gender);
+      appendIfPresent('bio', formValues.bio);
+      appendIfPresent('personal_website', formValues.personal_website);
+
+      // Location - handle both nested and flat structures
+      const location = {
+        city: getValue('location.city', 'location.city') || formValues.location?.city,
+        state: getValue('location.state', 'location.state') || formValues.location?.state,
+        country: getValue('location.country', 'location.country') || formValues.location?.country
+      };
+      if (location.city || location.state || location.country) {
+        appendIfPresent('location', JSON.stringify(location));
+      }
+
+      // Arrays - send as JSON strings
+      appendIfPresent('languages_spoken', JSON.stringify(formValues.languages_spoken || []));
+      appendIfPresent('niches', JSON.stringify(formValues.niches || []));
+
+      // Social Media - handle flat field names from React Hook Form
+      const socialMedia = {
+        instagram: {
+          username: getValue('social_media.instagram.username', 'social_media.instagram.username') || formValues.social_media?.instagram?.username,
+          link: getValue('social_media.instagram.link', 'social_media.instagram.link') || formValues.social_media?.instagram?.link
+        },
+        youtube: {
+          channel_url: getValue('social_media.youtube.channel_url', 'social_media.youtube.channel_url') || formValues.social_media?.youtube?.channel_url
+        },
+        tiktok: {
+          username: getValue('social_media.tiktok.username', 'social_media.tiktok.username') || formValues.social_media?.tiktok?.username
+        },
+        facebook: {
+          profile_url: getValue('social_media.facebook.profile_url', 'social_media.facebook.profile_url') || formValues.social_media?.facebook?.profile_url
+        },
+        twitter: {
+          username: getValue('social_media.twitter.username', 'social_media.twitter.username') || formValues.social_media?.twitter?.username
+        }
+      };
+      
+      console.log('🔍 Debug - Social Media Data:', {
+        instagram_username: socialMedia.instagram.username,
+        instagram_link: socialMedia.instagram.link,
+        raw_formValues_keys: Object.keys(formValues).filter(k => k.includes('instagram'))
+      });
+      
+      appendIfPresent('social_media', JSON.stringify(socialMedia));
+
+      // Portfolio
+      const portfolio = {
+        content_highlights: getValue('portfolio.content_highlights', 'portfolio.content_highlights') || formValues.portfolio?.content_highlights
+      };
+      if (portfolio.content_highlights) {
+        appendIfPresent('portfolio', JSON.stringify(portfolio));
+      }
+
+      // Files
+      const profilePicture = firstFile(formValues.profile_picture, formValues['profile_picture']);
+      if (profilePicture) formData.append('profile_picture', profilePicture);
+
+      const coverPhoto = firstFile(formValues.cover_photo, formValues['cover_photo']);
+      if (coverPhoto) formData.append('cover_photo', coverPhoto);
+
+      const mediaKit = firstFile(getValue('portfolio.media_kit', 'portfolio.media_kit'));
+      if (mediaKit) formData.append('media_kit', mediaKit);
+
+      // Rate Card - handle flat field names
+      const rateCard = {
+        instagram_post: getValue('rate_card.instagram_post', 'rate_card.instagram_post') || formValues.rate_card?.instagram_post,
+        instagram_story: getValue('rate_card.instagram_story', 'rate_card.instagram_story') || formValues.rate_card?.instagram_story,
+        instagram_reel: getValue('rate_card.instagram_reel', 'rate_card.instagram_reel') || formValues.rate_card?.instagram_reel,
+        youtube_video: getValue('rate_card.youtube_video', 'rate_card.youtube_video') || formValues.rate_card?.youtube_video,
+        tiktok_video: getValue('rate_card.tiktok_video', 'rate_card.tiktok_video') || formValues.rate_card?.tiktok_video,
+        blog_post: getValue('rate_card.blog_post', 'rate_card.blog_post') || formValues.rate_card?.blog_post
+      };
+      if (Object.values(rateCard).some(v => v)) {
+        appendIfPresent('rate_card', JSON.stringify(rateCard));
+      }
+
+      // Availability - handle flat field names
+      const availability = {
+        current_availability: getValue('availability.current_availability', 'availability.current_availability') || formValues.availability?.current_availability,
+        monthly_campaign_capacity: getValue('availability.monthly_campaign_capacity', 'availability.monthly_campaign_capacity') || formValues.availability?.monthly_campaign_capacity,
+        preferred_campaign_types: formValues['availability.preferred_campaign_types'] || formValues.availability?.preferred_campaign_types || [],
+        industries_work_with: formValues['availability.industries_work_with'] || formValues.availability?.industries_work_with || [],
+        industries_avoid: formValues['availability.industries_avoid'] || formValues.availability?.industries_avoid || []
+      };
+      if (Object.values(availability).some(v => v)) {
+        appendIfPresent('availability', JSON.stringify(availability));
+      }
+
+      // Notifications - handle flat field names
+      const notifications = {
+        email_preferences: getValue('notifications.email_preferences', 'notifications.email_preferences') || formValues.notifications?.email_preferences || false,
+        push_notifications: getValue('notifications.push_notifications', 'notifications.push_notifications') || formValues.notifications?.push_notifications || false,
+        campaign_recommendations: getValue('notifications.campaign_recommendations', 'notifications.campaign_recommendations') || formValues.notifications?.campaign_recommendations || false
+      };
+      appendIfPresent('notifications', JSON.stringify(notifications));
+
+      // Contact
+      const contact = {
+        email: formValues.email || formValues['contact.email'],
+        phone: formValues.phone || formValues['contact.phone']
+      };
+      appendIfPresent('contact', JSON.stringify(contact));
+
+      // Account
+      appendIfPresent('account', JSON.stringify({ signup_method: 'email' }));
+
+      return formData;
+    };
     
     // Check if already submitted before proceeding
     const already = await checkExistingRegistration();
@@ -289,103 +427,11 @@ const FormContainer = ({ steps, theme = 'brand' }) => {
         }
         
       } else if (isInfluencerForm) {
-        // Handle influencer registration
-        const influencerData = {
-          // Basic account info
-          email: data.email,
-          password: data.password,
-          
-          // Personal information
-          full_name: data.full_name,
-          stage_name: data.stage_name,
-          date_of_birth: data.date_of_birth,
-          gender: data.gender,
-          location: {
-            city: data.location?.city || data['location.city'],
-            state: data.location?.state || data['location.state'],
-            country: data.location?.country || data['location.country']
-          },
-          languages_spoken: data.languages_spoken || [],
-          bio: data.bio,
-          personal_website: data.personal_website,
-          
-          // Content and niches
-          niches: data.niches || [],
-          
-          // Social media presence
-          social_media: {
-            instagram: {
-              username: data.social_media?.instagram?.username || data['social_media.instagram.username'],
-              link: data.social_media?.instagram?.link || data['social_media.instagram.link'],
-              connected: !!data.social_media?.instagram?.username || !!data['social_media.instagram.username']
-            },
-            youtube: {
-              channel_url: data.social_media?.youtube?.channel_url || data['social_media.youtube.channel_url'],
-              connected: !!data.social_media?.youtube?.channel_url || !!data['social_media.youtube.channel_url']
-            },
-            tiktok: {
-              username: data.social_media?.tiktok?.username || data['social_media.tiktok.username'],
-              connected: !!data.social_media?.tiktok?.username || !!data['social_media.tiktok.username']
-            },
-            facebook: {
-              profile_url: data.social_media?.facebook?.profile_url || data['social_media.facebook.profile_url'],
-              connected: !!data.social_media?.facebook?.profile_url || !!data['social_media.facebook.profile_url']
-            },
-            twitter: {
-              username: data.social_media?.twitter?.username || data['social_media.twitter.username'],
-              connected: !!data.social_media?.twitter?.username || !!data['social_media.twitter.username']
-            }
-          },
-          
-          // Portfolio and content
-          portfolio: {
-            content_highlights: data.portfolio?.content_highlights || data['portfolio.content_highlights']
-          },
-          
-          // Rate card
-          rate_card: {
-            instagram_post: data.rate_card?.instagram_post || data['rate_card.instagram_post'],
-            instagram_story: data.rate_card?.instagram_story || data['rate_card.instagram_story'],
-            instagram_reel: data.rate_card?.instagram_reel || data['rate_card.instagram_reel'],
-            youtube_video: data.rate_card?.youtube_video || data['rate_card.youtube_video'],
-            tiktok_video: data.rate_card?.tiktok_video || data['rate_card.tiktok_video'],
-            blog_post: data.rate_card?.blog_post || data['rate_card.blog_post']
-          },
-          
-          // Payment details
-          payment_details: {
-            paypal_email: data.payment_details?.paypal_email || data['payment_details.paypal_email'],
-            bank_account_holder_name: data.payment_details?.bank_account_holder_name || data['payment_details.bank_account_holder_name']
-          },
-          
-          // Availability and preferences
-          availability: {
-            current_availability: data.availability?.current_availability || data['availability.current_availability'],
-            monthly_campaign_capacity: data.availability?.monthly_campaign_capacity || data['availability.monthly_campaign_capacity'],
-            preferred_campaign_types: data.availability?.preferred_campaign_types || data['availability.preferred_campaign_types'] || [],
-            industries_work_with: data.availability?.industries_work_with || data['availability.industries_work_with'] || [],
-            industries_avoid: data.availability?.industries_avoid || data['availability.industries_avoid'] || []
-          },
-          
-          // Notifications
-          notifications: {
-            email_preferences: data.notifications?.email_preferences || data['notifications.email_preferences'] || false,
-            push_notifications: data.notifications?.push_notifications || data['notifications.push_notifications'] || false,
-            campaign_recommendations: data.notifications?.campaign_recommendations || data['notifications.campaign_recommendations'] || false
-          },
-          
-          // Contact and account
-          contact: {
-            email: data.email,
-            phone: data.phone
-          },
-          account: {
-            signup_method: 'email'
-          }
-        };
+        // Handle influencer registration with FormData
+        const formData = buildInfluencerFormData(data);
 
-        // Use the new influencer API
-        const result = await influencerAPI.submitRegistration(influencerData);
+        // Use the new influencer API with FormData (true flag for multipart)
+        const result = await influencerAPI.submitRegistration(formData, true);
         
         if (result.message) {
           setRegistrationSuccess(true);
@@ -413,7 +459,80 @@ const FormContainer = ({ steps, theme = 'brand' }) => {
   };
 
   const onSubmit = async (data) => {
+    // Clear previous errors
+    setError('');
+
     if (currentStep < steps.length - 1) {
+      // Get current form values from React Hook Form
+      const formValues = methods.getValues();
+      
+      console.log('🔍 Current Step:', currentStep);
+      console.log('📋 All Form Values:', formValues);
+      
+      // Validate current step's required fields before proceeding
+      const currentStepFields = steps[currentStep].fields;
+      const requiredFields = currentStepFields.filter(field => field.required);
+      const missingFields = [];
+
+      for (const field of requiredFields) {
+        // Handle nested field names (e.g., "location.city", "social_media.instagram.username")
+        let fieldValue = field.name.includes('.') 
+          ? field.name.split('.').reduce((obj, key) => obj?.[key], formValues)
+          : formValues[field.name];
+        
+        // Special handling for multiselect: parse JSON string if needed
+        if (field.type === 'multiselect' && typeof fieldValue === 'string') {
+          try {
+            fieldValue = JSON.parse(fieldValue);
+          } catch (e) {
+            console.log(`    ⚠️  Failed to parse JSON for "${field.name}":`, fieldValue);
+          }
+        }
+        
+        console.log(`  ✓ Checking field "${field.name}":`, fieldValue, `(type: ${typeof fieldValue})`);
+        
+        // Check if field is empty or invalid
+        let isEmpty = false;
+        
+        if (fieldValue === undefined || fieldValue === null) {
+          isEmpty = true;
+        } else if (typeof fieldValue === 'string') {
+          // For string fields, check if empty or just whitespace
+          if (fieldValue.trim() === '') {
+            isEmpty = true;
+          }
+        } else if (Array.isArray(fieldValue)) {
+          // For arrays (including parsed multiselect), check length
+          if (fieldValue.length === 0) {
+            isEmpty = true;
+          }
+        } else if (fieldValue instanceof FileList) {
+          // For file inputs
+          if (fieldValue.length === 0) {
+            isEmpty = true;
+          }
+        }
+
+        if (isEmpty) {
+          console.log(`    ❌ Field "${field.name}" is EMPTY`);
+          missingFields.push(field.label || field.name);
+        } else {
+          // console.log(`    ✅ Field "${field.name}" is VALID`);
+        }
+      }
+
+      if (missingFields.length > 0) {
+        // console.log('❌ Validation Failed. Missing fields:', missingFields);
+        setError(`Please fill in the following required fields: ${missingFields.join(', ')}`);
+        
+        // Scroll to top to show error
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        return; // Don't proceed to next step
+      }
+
+      // console.log('✅ Validation Passed. Moving to next step.');
+      
+      // If validation passes, move to next step
       setCurrentStep((prev) => prev + 1);
     } else {
       // Final submission - initiate registration
@@ -448,7 +567,7 @@ const FormContainer = ({ steps, theme = 'brand' }) => {
                 router.push('/');
               }}
               className={`w-full px-6 py-3 text-white rounded-lg font-semibold transition-colors duration-200 ${
-                theme === 'influencer' ? 'bg-purple-600 hover:bg-purple-700' : 'bg-green-600 hover:bg-green-700'
+                theme === 'influencer' ? 'bg-green-600 hover:bg-green-700' : 'bg-green-600 hover:bg-green-700'
               }`}
             >
               Back to Home
@@ -484,7 +603,7 @@ const FormContainer = ({ steps, theme = 'brand' }) => {
                 router.push('/');
               }}
               className={`w-full px-6 py-3 text-white rounded-lg font-semibold transition-colors duration-200 ${
-                theme === 'influencer' ? 'bg-purple-600 hover:bg-purple-700' : 'bg-green-600 hover:bg-green-700'
+                theme === 'influencer' ? 'bg-green-600 hover:bg-green-700' : 'bg-green-600 hover:bg-green-700'
               }`}
             >
               Back to Home
@@ -513,7 +632,7 @@ const FormContainer = ({ steps, theme = 'brand' }) => {
           <div className="w-full bg-gray-200 rounded-full h-2">
             <div 
               className={`h-2 rounded-full transition-all duration-300 ease-in-out ${
-                theme === 'influencer' ? 'bg-purple-600' : 'bg-green-600'
+                theme === 'influencer' ? 'bg-green-600' : 'bg-green-600'
               }`}
               style={{ width: `${((currentStep + 1) / steps.length) * 100}%` }}
             ></div>
@@ -526,19 +645,19 @@ const FormContainer = ({ steps, theme = 'brand' }) => {
                 key={index}
                 className={`flex flex-col items-center space-y-1 ${
                   index === currentStep 
-                    ? theme === 'influencer' ? 'text-purple-600' : 'text-green-600'
+                    ? theme === 'influencer' ? 'text-green-600' : 'text-green-600'
                     : index < currentStep 
-                      ? theme === 'influencer' ? 'text-purple-500' : 'text-green-500'
+                      ? theme === 'influencer' ? 'text-green-500' : 'text-green-500'
                       : 'text-gray-400'
                 }`}
               >
                 <div className={`
                   w-6 h-6 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-xs font-bold
                   ${index === currentStep 
-                    ? theme === 'influencer' ? 'bg-purple-600 text-white' : 'bg-green-600 text-white'
+                    ? theme === 'influencer' ? 'bg-green-600 text-white' : 'bg-green-600 text-white'
                     : index < currentStep 
                       ? theme === 'influencer' 
-                        ? 'bg-purple-100 text-purple-600 border-2 border-purple-600' 
+                        ? 'bg-green-100 text-green-600 border-2 border-green-600' 
                         : 'bg-green-100 text-green-600 border-2 border-green-600'
                       : 'bg-gray-200 text-gray-500'
                   }
@@ -640,7 +759,7 @@ const FormContainer = ({ steps, theme = 'brand' }) => {
                   onClick={methods.handleSubmit(onSubmit)}
                   disabled={loading}
                   className={`w-full sm:w-auto px-8 py-3 text-white rounded-lg font-semibold transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed ${
-                    theme === 'influencer' ? 'bg-purple-600 hover:bg-purple-700' : 'bg-green-600 hover:bg-green-700'
+                    theme === 'influencer' ? 'bg-green-600 hover:bg-green-700' : 'bg-green-600 hover:bg-green-700'
                   }`}
                 >
                   {loading ? (
