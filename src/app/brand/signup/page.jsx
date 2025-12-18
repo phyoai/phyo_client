@@ -43,7 +43,7 @@ export default function Page() {
                 { value: "Gaming", label: "Gaming" },
                 { value: "Other", label: "Other" }
             ]},
-            { name: "company_type", type: "select", placeholder: "Select company type", label: "Company Type", required: false, options: [
+            { name: "company_type", type: "select", placeholder: "Select company type", label: "Company Type", required: true, options: [
                 { value: "Brand", label: "Brand" },
                 { value: "Agency", label: "Marketing Agency" },
                 { value: "Startup", label: "Startup" },
@@ -65,7 +65,7 @@ export default function Page() {
         submit: "Continue",
         fields: [
             { name: "verification_documents.tax_id", type: "text", placeholder: "TAX123456789", label: "Tax ID", required: false },
-            { name: "verification_documents.company_registration_number", type: "text", placeholder: "REG987654321", label: "Company Registration Number", required: false },
+            { name: "verification_documents.company_registration_number", type: "text", placeholder: "REG987654321", label: "Company Registration Number", required: true },
             { name: "verification_documents.business_registration", type: "file", label: "Business Registration Certificate", required: false, accept: ".pdf,.doc,.docx" },
             { name: "verification_documents.authorization_letter", type: "file", label: "Authorization Letter", required: false, accept: ".pdf,.doc,.docx" }
         ],
@@ -76,11 +76,11 @@ export default function Page() {
         fields: [
             { name: "contact.first_name", type: "text", placeholder: "First Name", label: "First Name", required: true },
             { name: "contact.last_name", type: "text", placeholder: "Last Name", label: "Last Name", required: true },
-            { name: "contact.email", type: "email", placeholder: "Contact Email", label: "Contact Email", required: true },
+            { name: "contact.email", type: "email", placeholder: "Contact Email", label: "Contact Email", required: false },
             { name: "contact.phone", type: "text", placeholder: "+1 (555) 123-4567", label: "Phone Number", required: false },
             { name: "contact.job_title", type: "text", placeholder: "Marketing Manager", label: "Job Title", required: false },
-            { name: "location", type: "text", placeholder: "San Francisco", label: "City", required: false },
-            { name: "country", type: "select", placeholder: "Select country", label: "Country", required: false, options: [
+            { name: "location", type: "text", placeholder: "San Francisco", label: "City", required: true },
+            { name: "country", type: "select", placeholder: "Select country", label: "Country", required: true, options: [
                 { value: "USA", label: "United States" },
                 { value: "UK", label: "United Kingdom" },
                 { value: "Canada", label: "Canada" },
@@ -102,7 +102,7 @@ export default function Page() {
             { name: "social_media.linkedin", type: "text", placeholder: "https://linkedin.com/company/yourcompany", label: "LinkedIn URL", required: false },
             { name: "social_media.youtube", type: "text", placeholder: "https://youtube.com/yourcompany", label: "YouTube URL", required: false },
             { name: "social_media.tiktok", type: "text", placeholder: "https://tiktok.com/@yourcompany", label: "TikTok URL", required: false },
-            { name: "company_logo", type: "file", label: "Company Logo", required: false, accept: "image/*" },
+            { name: "company_logo", type: "file", label: "Company Logo", required: true, accept: "image/*" },
             { name: "brand_images", type: "file", label: "Brand Images (up to 10)", required: false, accept: "image/*", multiple: true },
             { name: "brand_story", type: "textarea", placeholder: "Tell your brand story...", label: "Brand Story", required: false }
         ],

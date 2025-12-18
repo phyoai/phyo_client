@@ -10,17 +10,17 @@ const page = () => {
         submit: "Continue",
         fields: [
             { name: "full_name", type: "text", placeholder: "Your Full Name", label: "Full Name", required: true },
-            { name: "stage_name", type: "text", placeholder: "Your Stage/Creator Name", label: "Stage Name", required: false },
-            { name: "date_of_birth", type: "date", placeholder: "YYYY-MM-DD", label: "Date of Birth", required: false },
-            { name: "gender", type: "select", placeholder: "Select gender", label: "Gender", required: false, options: [
+            { name: "stage_name", type: "text", placeholder: "Your Stage/Creator Name", label: "Stage Name", required: true },
+            { name: "date_of_birth", type: "date", placeholder: "YYYY-MM-DD", label: "Date of Birth", required: true },
+            { name: "gender", type: "select", placeholder: "Select gender", label: "Gender", required: true, options: [
                 { value: "Male", label: "Male" },
                 { value: "Female", label: "Female" },
                 { value: "Other", label: "Other" },
                 { value: "Prefer not to say", label: "Prefer not to say" }
             ]},
-            { name: "location.city", type: "text", placeholder: "Los Angeles", label: "City", required: false },
-            { name: "location.state", type: "text", placeholder: "California", label: "State/Province", required: false },
-            { name: "location.country", type: "select", placeholder: "Select country", label: "Country", required: false, options: [
+            { name: "location.city", type: "text", placeholder: "Los Angeles", label: "City", required: true },
+            { name: "location.state", type: "text", placeholder: "California", label: "State/Province", required: true },
+            { name: "location.country", type: "select", placeholder: "Select country", label: "Country", required: true, options: [
                 { value: "USA", label: "United States" },
                 { value: "UK", label: "United Kingdom" },
                 { value: "Canada", label: "Canada" },
@@ -41,7 +41,7 @@ const page = () => {
         fields: [
             { name: "social_media.instagram.username", type: "text", placeholder: "your_instagram_handle", label: "Instagram Username", required: true },
             { name: "social_media.instagram.link", type: "text", placeholder: "https://instagram.com/yourhandle", label: "Instagram Profile Link", required: false },
-            { name: "social_media.youtube.channel_url", type: "text", placeholder: "https://youtube.com/@yourchannel", label: "YouTube Channel URL", required: false },
+            { name: "social_media.youtube.channel_url", type: "text", placeholder: "https://youtube.com/@yourchannel", label: "YouTube Channel URL", required: true },
             { name: "social_media.tiktok.username", type: "text", placeholder: "your_tiktok_handle", label: "TikTok Username", required: false },
             { name: "social_media.facebook.profile_url", type: "text", placeholder: "https://facebook.com/yourprofile", label: "Facebook Profile URL", required: false },
             { name: "social_media.twitter.username", type: "text", placeholder: "your_twitter_handle", label: "Twitter Username", required: false },
@@ -52,7 +52,7 @@ const page = () => {
         description: "What type of content do you create?",
         submit: "Continue",
         fields: [
-            { name: "niches", type: "multiselect", placeholder: "Select your niches", label: "Content Niches", required: false, options: [
+            { name: "niches", type: "multiselect", placeholder: "Select your niches", label: "Content Niches", required: true, options: [
                 { value: "Fashion", label: "Fashion" },
                 { value: "Beauty", label: "Beauty" },
                 { value: "Lifestyle", label: "Lifestyle" },
@@ -107,25 +107,25 @@ const page = () => {
         fields: [
             { name: "availability.current_availability", type: "select", placeholder: "Current availability", label: "Current Availability", required: false, options: [
                 { value: "Available", label: "Available" },
-                { value: "Fully Booked", label: "Fully Booked" },
-                { value: "Limited Capacity", label: "Available with Limited Capacity" },
-                { value: "On Break", label: "On Break" }
+                { value: "FullyBooked", label: "Fully Booked" },
+                { value: "LimitedCapacity", label: "Available with Limited Capacity" },
+                { value: "OnBreak", label: "On Break" }
             ]},
-            { name: "availability.monthly_campaign_capacity", type: "number", placeholder: "5", label: "Monthly Campaign Capacity", required: false },
+            { name: "availability.monthly_campaign_capacity", type: "number", placeholder: "5", label: "Monthly Campaign Capacity", required: true },
             { name: "availability.preferred_campaign_types", type: "multiselect", placeholder: "Preferred campaign types", label: "Preferred Campaign Types", required: false, options: [
-                { value: "Product Reviews", label: "Product Reviews" },
-                { value: "Brand Ambassadorships", label: "Brand Ambassadorships" },
-                { value: "Sponsored Content", label: "Sponsored Content" },
-                { value: "Event Coverage", label: "Event Coverage" },
+                { value: "ProductReviews", label: "Product Reviews" },
+                { value: "BrandAmbassadorships", label: "Brand Ambassadorships" },
+                { value: "SponsoredContent", label: "Sponsored Content" },
+                { value: "EventCoverage", label: "Event Coverage" },
                 { value: "Giveaways", label: "Giveaways" },
-                { value: "Long-term Partnerships", label: "Long-term Partnerships" }
+                { value: "LongtermPartnerships", label: "Long-term Partnerships" }
             ]},
             { name: "availability.industries_work_with", type: "multiselect", placeholder: "Industries you work with", label: "Industries You Work With", required: false, options: [
                 { value: "Fashion", label: "Fashion" },
                 { value: "Beauty", label: "Beauty" },
                 { value: "Technology", label: "Technology" },
-                { value: "Health & Wellness", label: "Health & Wellness" },
-                { value: "Food & Beverage", label: "Food & Beverage" },
+                { value: "HealthWellness", label: "Health & Wellness" },
+                { value: "FoodBeverage", label: "Food & Beverage" },
                 { value: "Travel", label: "Travel" },
                 { value: "Automotive", label: "Automotive" },
                 { value: "Finance", label: "Finance" },
@@ -135,10 +135,10 @@ const page = () => {
             { name: "availability.industries_avoid", type: "multiselect", placeholder: "Industries you avoid", label: "Industries You Avoid", required: false, options: [
                 { value: "Tobacco", label: "Tobacco" },
                 { value: "Alcohol", label: "Alcohol" },
-                { value: "Fast Food", label: "Fast Food" },
+                { value: "FastFood", label: "Fast Food" },
                 { value: "Gambling", label: "Gambling" },
                 { value: "Political", label: "Political" },
-                { value: "Adult Content", label: "Adult Content" }
+                { value: "AdultContent", label: "Adult Content" }
             ]}
         ],
     }, {
@@ -146,7 +146,7 @@ const page = () => {
         description: "Complete your profile with additional information",
         submit: "Complete Registration",
         fields: [
-            { name: "profile_picture", type: "file", label: "Profile Picture", required: false, accept: "image/*" },
+            { name: "profile_picture", type: "file", label: "Profile Picture", required: true, accept: "image/*" },
             { name: "cover_photo", type: "file", label: "Cover Photo", required: false, accept: "image/*" },
             { name: "portfolio.media_kit", type: "file", label: "Media Kit (PDF)", required: false, accept: ".pdf" },
             { name: "notifications.email_preferences", type: "checkbox", label: "Enable email notifications", required: false },

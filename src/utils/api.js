@@ -2,7 +2,7 @@ import axios from 'axios';
 
 // Create axios instance with base configuration
 const api = axios.create({
-  baseURL: 'http://localhost:4000/api',
+  baseURL: 'https://api.phyo.ai/api',
   headers: {
     'Content-Type': 'application/json',
   },
@@ -268,33 +268,15 @@ export const brandAPI = {
 // Influencer API functions
 export const influencerAPI = {
   // Submit influencer registration
-  submitRegistration: async (influencerData, isFormData = false) => {
+ submitRegistration: async (influencerData, isFormData = false) => {
     try {
-      let data = influencerData;
-      let config = {};
-      if (isFormData) {
-        const formData = new FormData();
-        // Append all fields to FormData
-        for (const key in influencerData) {
-          if (influencerData.hasOwnProperty(key)) {
-            const value = influencerData[key];
-            if (value instanceof File) {
-              formData.append(key, value);
-            } else if (typeof value === 'object' && value !== null && !(value instanceof File)) {
-              formData.append(key, JSON.stringify(value));
-            } else if (value !== undefined && value !== null) {
-              formData.append(key, value);
-            }
-          }
+      const config = isFormData ? {
+        headers: {
+          'Content-Type': 'multipart/form-data',
         }
-        data = formData;
-        config = {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          }
-        };
-      }
-      const response = await api.post('/influencer-requests/submit', data, config);
+      } : {};
+      
+      const response = await api.post('/influencer-requests/submit', influencerData, config);
       return response.data;
     } catch (error) {
       throw error.response?.data || error.message;

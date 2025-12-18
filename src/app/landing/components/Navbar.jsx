@@ -276,12 +276,12 @@ const Navbar = () => {
                   </Link>
                 </>
               )}
-              <Link 
+              {/* <Link 
                 href="/brand/dashboard" 
                 className="border border-white text-white hover:bg-white hover:text-black font-medium px-4 py-2 rounded-full transition-colors text-sm lg:text-base"
               >
                 Dashboard
-              </Link>
+              </Link> */}
               <button
                 onClick={handleLogout}
                 className="bg-white text-black hover:bg-gray-200 font-medium px-4 py-2 rounded-full transition-colors text-sm lg:text-base"
@@ -392,7 +392,7 @@ const Navbar = () => {
                       </li>
                     </>
                   )}
-                  <li>
+                  {/* <li>
                     <Link
                       href="/brand/dashboard"
                       className="block border border-white text-white hover:bg-white hover:text-black font-medium transition-colors py-2 px-4 rounded-full text-base text-center"
@@ -400,7 +400,7 @@ const Navbar = () => {
                     >
                       Dashboard
                     </Link>
-                  </li>
+                  </li> */}
                   <li>
                     <button
                       onClick={() => {
