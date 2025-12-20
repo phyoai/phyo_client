@@ -13,7 +13,13 @@ api.interceptors.request.use(
   (config) => {
     // Get token from localStorage or cookies (only in browser)
     if (typeof window !== 'undefined') {
-      const token = localStorage.getItem('authToken') || getCookie('authToken');
+      let token = null;
+      // Use adminToken for admin routes, else use authToken
+      if (window.location.pathname.startsWith('/admin')) {
+        token = localStorage.getItem('adminToken');
+      } else {
+        token = localStorage.getItem('authToken') || getCookie('authToken');
+      }
       if (token) {
         config.headers.Authorization = `Bearer ${token}`;
       }
@@ -30,11 +36,16 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      // Handle unauthorized access
       localStorage.removeItem('authToken');
-      // Redirect to login page instead of brand signup
+      localStorage.removeItem('adminToken');
+      localStorage.removeItem('adminInfo');
       if (typeof window !== 'undefined') {
-        window.location.href = '/login';
+        // Redirect based on current path
+        if (window.location.pathname.startsWith('/admin')) {
+          window.location.href = '/admin/login';
+        } else {
+          window.location.href = '/login';
+        }
       }
     }
     return Promise.reject(error);
@@ -334,7 +345,7 @@ export const influencerAPI = {
     // Approve influencer request
     approveRequest: async (id, adminNotes = '') => {
       try {
-        const response = await api.post(`/influencer-requests/admin/requests/${id}/approve`, {
+        const response = await api.put(`/influencer-requests/admin/requests/${id}/approve`, {
           admin_notes: adminNotes
         });
         return response.data;
@@ -346,7 +357,7 @@ export const influencerAPI = {
     // Reject influencer request
     rejectRequest: async (id, adminNotes = '') => {
       try {
-        const response = await api.post(`/influencer-requests/admin/requests/${id}/reject`, {
+        const response = await api.put(`/influencer-requests/admin/requests/${id}/reject`, {
           admin_notes: adminNotes
         });
         return response.data;
@@ -365,6 +376,19 @@ export const influencerAPI = {
       }
     }
   }
+};
+
+// Admin API functions
+export const adminAPI = {
+  // Admin login
+  login: async (credentials) => {
+    try {
+      const response = await api.post('/admin/login', credentials);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error.message;
+    }
+  },
 };
 
 export default api;
