@@ -116,10 +116,31 @@ const Hero = () => {
 
   // Check authentication and restore previous search on mount
   React.useEffect(() => {
-    setIsAuthenticated(authUtils.isAuthenticated());
+    const checkAuth = async () => {
+      const hasToken = authUtils.isAuthenticated();
+      
+      if (hasToken) {
+        // Validate token by checking if it's still valid
+        const isValid = await authUtils.validateToken();
+        setIsAuthenticated(isValid);
+        
+        if (!isValid) {
+          // Token is invalid/expired, clear results and show login modal
+          setResults([]);
+          setPrompt("");
+          localStorage.removeItem('landing_search_results');
+          localStorage.removeItem('landing_search_prompt');
+          console.log('Token expired or invalid. User logged out.');
+        }
+      } else {
+        setIsAuthenticated(false);
+      }
+    };
     
-    // Restore previous search results from localStorage
-    if (typeof window !== 'undefined') {
+    checkAuth();
+    
+    // Restore previous search results from localStorage only if authenticated
+    if (typeof window !== 'undefined' && authUtils.isAuthenticated()) {
       try {
         const savedResults = localStorage.getItem('landing_search_results');
         const savedPrompt = localStorage.getItem('landing_search_prompt');
@@ -163,6 +184,18 @@ const Hero = () => {
       return;
     }
 
+    // Validate token before making the search
+    const isValid = await authUtils.validateToken();
+    if (!isValid) {
+      setIsAuthenticated(false);
+      setShowLoginModal(true);
+      setResults([]);
+      setPrompt("");
+      localStorage.removeItem('landing_search_results');
+      localStorage.removeItem('landing_search_prompt');
+      return;
+    }
+
     if (!prompt.trim()) return;
     
     setLoading(true);
@@ -194,8 +227,16 @@ const Hero = () => {
       }
     } catch (err) {
       console.error('Search error:', err);
+      
+      // Check if the error is about invalid/expired token
+      if (err.response?.status === 403 && err.response?.data?.message?.includes('Invalid or expired token')) {
+        setIsAuthenticated(false);
+        setShowLoginModal(true);
+        setError("Your session has expired. Please login again.");
+        authUtils.logout();
+      }
       // Check if the error response contains credit/upgrade information
-      if (err.upgradeRequired || err.message?.includes('free searches') || err.message?.includes('credits')) {
+      else if (err.upgradeRequired || err.message?.includes('free searches') || err.message?.includes('credits')) {
         setError(err.message || "No free searches remaining. Please upgrade your plan for more credits.");
       } else {
         setError(err.message || "Failed to fetch influencers. Please try again.");

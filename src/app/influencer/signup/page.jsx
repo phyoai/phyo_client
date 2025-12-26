@@ -18,8 +18,8 @@ const page = () => {
                 { value: "Other", label: "Other" },
                 { value: "Prefer not to say", label: "Prefer not to say" }
             ]},
-            { name: "location.city", type: "text", placeholder: "Los Angeles", label: "City", required: true },
-            { name: "location.state", type: "text", placeholder: "California", label: "State/Province", required: true },
+            { name: "location.city", type: "text", placeholder: "Mumbai", label: "City", required: true },
+            { name: "location.state", type: "text", placeholder: "Maharashtra", label: "State/Province", required: true },
             { name: "location.country", type: "select", placeholder: "Select country", label: "Country", required: true, options: [
                 { value: "USA", label: "United States" },
                 { value: "UK", label: "United Kingdom" },
@@ -40,12 +40,60 @@ const page = () => {
         submit: "Continue",
         fields: [
             { name: "social_media.instagram.username", type: "text", placeholder: "your_instagram_handle", label: "Instagram Username", required: true },
-            { name: "social_media.instagram.link", type: "text", placeholder: "https://instagram.com/yourhandle", label: "Instagram Profile Link", required: false },
-            { name: "social_media.youtube.channel_url", type: "text", placeholder: "https://youtube.com/@yourchannel", label: "YouTube Channel URL", required: true },
+            { 
+                name: "social_media.instagram.link", 
+                type: "text", 
+                placeholder: "https://instagram.com/yourhandle", 
+                label: "Instagram Profile Link", 
+                required: false,
+                validation: {
+                    pattern: {
+                        value: /^(https?:\/\/)?(www\.)?instagram\.com\/.+$/,
+                        message: "Please enter a valid Instagram URL"
+                    }
+                }
+            },
+            { 
+                name: "social_media.youtube.channel_url", 
+                type: "text", 
+                placeholder: "https://youtube.com/@yourchannel", 
+                label: "YouTube Channel URL", 
+                required: true,
+                validation: {
+                    pattern: {
+                        value: /^(https?:\/\/)?(www\.)?youtube\.com\/.+$/,
+                        message: "Please enter a valid YouTube URL"
+                    }
+                }
+            },
             { name: "social_media.tiktok.username", type: "text", placeholder: "your_tiktok_handle", label: "TikTok Username", required: false },
-            { name: "social_media.facebook.profile_url", type: "text", placeholder: "https://facebook.com/yourprofile", label: "Facebook Profile URL", required: false },
+            { 
+                name: "social_media.facebook.profile_url", 
+                type: "text", 
+                placeholder: "https://facebook.com/yourprofile", 
+                label: "Facebook Profile URL", 
+                required: false,
+                validation: {
+                    pattern: {
+                        value: /^(https?:\/\/)?(www\.)?(facebook|fb)\.com\/.+$/,
+                        message: "Please enter a valid Facebook URL"
+                    }
+                }
+            },
             { name: "social_media.twitter.username", type: "text", placeholder: "your_twitter_handle", label: "Twitter Username", required: false },
-            { name: "personal_website", type: "text", placeholder: "https://yourwebsite.com", label: "Personal Website", required: false }
+            { 
+                name: "personal_website", 
+                type: "text", 
+                placeholder: "https://yourwebsite.com", 
+                label: "Personal Website", 
+                required: false,
+                validation: {
+                    pattern: {
+                        value: /^(https?:\/\/)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)$/,
+                        message: "Please enter a valid website URL"
+                    }
+                }
+            }
         ],
     }, {
         title: "Content & Niches",
@@ -93,12 +141,12 @@ const page = () => {
         description: "Set your rates for different types of content",
         submit: "Continue",
         fields: [
-            { name: "rate_card.instagram_post", type: "number", placeholder: "5000", label: "Instagram Post (USD)", required: false },
-            { name: "rate_card.instagram_story", type: "number", placeholder: "2000", label: "Instagram Story (USD)", required: false },
-            { name: "rate_card.instagram_reel", type: "number", placeholder: "7500", label: "Instagram Reel (USD)", required: false },
-            { name: "rate_card.youtube_video", type: "number", placeholder: "15000", label: "YouTube Video (USD)", required: false },
-            { name: "rate_card.tiktok_video", type: "number", placeholder: "6000", label: "TikTok Video (USD)", required: false },
-            { name: "rate_card.blog_post", type: "number", placeholder: "3000", label: "Blog Post (USD)", required: false }
+            { name: "rate_card.instagram_post", type: "number", placeholder: "5000", label: "Instagram Post (INR)", required: false },
+            { name: "rate_card.instagram_story", type: "number", placeholder: "2000", label: "Instagram Story (INR)", required: false },
+            { name: "rate_card.instagram_reel", type: "number", placeholder: "7500", label: "Instagram Reel (INR)", required: false },
+            { name: "rate_card.youtube_video", type: "number", placeholder: "15000", label: "YouTube Video (INR)", required: false },
+            { name: "rate_card.tiktok_video", type: "number", placeholder: "6000", label: "TikTok Video (INR)", required: false },
+            { name: "rate_card.blog_post", type: "number", placeholder: "3000", label: "Blog Post (INR)", required: false }
         ],
     }, {
         title: "Availability & Preferences",

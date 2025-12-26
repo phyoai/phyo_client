@@ -26,7 +26,19 @@ export default function Page() {
         submit: "Continue",
         fields: [
             { name: "company_name", type: "text", placeholder: "Enter Your Company Name", label: "Company Name", required: true },
-            { name: "website_url", type: "text", placeholder: "https://yourcompany.com", label: "Website URL", required: true },
+            { 
+                name: "website_url", 
+                type: "text", 
+                placeholder: "https://yourcompany.com", 
+                label: "Website URL", 
+                required: true,
+                validation: {
+                    pattern: {
+                        value: /^(https?:\/\/)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)$/,
+                        message: "Please enter a valid website URL (e.g., https://yourcompany.com)"
+                    }
+                }
+            },
             { name: "industry", type: "select", placeholder: "Select your industry", label: "Industry", required: true, options: [
                 { value: "Technology", label: "Technology" },
                 { value: "Fashion", label: "Fashion & Beauty" },
@@ -64,8 +76,32 @@ export default function Page() {
         description: "Provide your business verification documents",
         submit: "Continue",
         fields: [
-            { name: "verification_documents.tax_id", type: "text", placeholder: "TAX123456789", label: "Tax ID", required: false },
-            { name: "verification_documents.company_registration_number", type: "text", placeholder: "REG987654321", label: "Company Registration Number", required: true },
+            { 
+                name: "verification_documents.tax_id", 
+                type: "text", 
+                placeholder: "GSTIN (e.g., 07ABCDE1234F2Z5)", 
+                label: "Tax ID / GSTIN", 
+                required: false,
+                validation: {
+                    pattern: {
+                        value: /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/,
+                        message: "Please enter a valid GSTIN (15 characters, e.g., 07ABCDE1234F2Z5)"
+                    }
+                }
+            },
+            { 
+                name: "verification_documents.company_registration_number", 
+                type: "text", 
+                placeholder: "CIN/Registration Number", 
+                label: "Company Registration Number", 
+                required: true,
+                validation: {
+                    minLength: {
+                        value: 15,
+                        message: "Company Registration Number should be at least 15 characters"
+                    }
+                }
+            },
             { name: "verification_documents.business_registration", type: "file", label: "Business Registration Certificate", required: false, accept: ".pdf,.doc,.docx" },
             { name: "verification_documents.authorization_letter", type: "file", label: "Authorization Letter", required: false, accept: ".pdf,.doc,.docx" }
         ],
@@ -76,10 +112,22 @@ export default function Page() {
         fields: [
             { name: "contact.first_name", type: "text", placeholder: "First Name", label: "First Name", required: true },
             { name: "contact.last_name", type: "text", placeholder: "Last Name", label: "Last Name", required: true },
-            { name: "contact.email", type: "email", placeholder: "Contact Email", label: "Contact Email", required: false },
-            { name: "contact.phone", type: "text", placeholder: "+1 (555) 123-4567", label: "Phone Number", required: false },
+            { name: "contact.email", type: "email", placeholder: "contact@yourcompany.com", label: "Contact Email", required: false },
+            { 
+                name: "contact.phone", 
+                type: "text", 
+                placeholder: "+91 98765 43210", 
+                label: "Phone Number", 
+                required: false,
+                validation: {
+                    pattern: {
+                        value: /^(\+91[\s]?)?[6-9]\d{4}[\s]?\d{5}$/,
+                        message: "Please enter a valid Indian phone number (e.g., +91 98765 43210)"
+                    }
+                }
+            },
             { name: "contact.job_title", type: "text", placeholder: "Marketing Manager", label: "Job Title", required: false },
-            { name: "location", type: "text", placeholder: "San Francisco", label: "City", required: true },
+            { name: "location", type: "text", placeholder: "Mumbai", label: "City", required: true },
             { name: "country", type: "select", placeholder: "Select country", label: "Country", required: true, options: [
                 { value: "USA", label: "United States" },
                 { value: "UK", label: "United Kingdom" },
@@ -96,12 +144,84 @@ export default function Page() {
         description: "Add your social media links and upload brand assets",
         submit: "Continue",
         fields: [
-            { name: "social_media.facebook", type: "text", placeholder: "https://facebook.com/yourcompany", label: "Facebook URL", required: false },
-            { name: "social_media.instagram", type: "text", placeholder: "https://instagram.com/yourcompany", label: "Instagram URL", required: false },
-            { name: "social_media.twitter", type: "text", placeholder: "https://twitter.com/yourcompany", label: "Twitter URL", required: false },
-            { name: "social_media.linkedin", type: "text", placeholder: "https://linkedin.com/company/yourcompany", label: "LinkedIn URL", required: false },
-            { name: "social_media.youtube", type: "text", placeholder: "https://youtube.com/yourcompany", label: "YouTube URL", required: false },
-            { name: "social_media.tiktok", type: "text", placeholder: "https://tiktok.com/@yourcompany", label: "TikTok URL", required: false },
+            { 
+                name: "social_media.facebook", 
+                type: "text", 
+                placeholder: "https://facebook.com/yourcompany", 
+                label: "Facebook URL", 
+                required: false,
+                validation: {
+                    pattern: {
+                        value: /^(https?:\/\/)?(www\.)?(facebook|fb)\.com\/.+$/,
+                        message: "Please enter a valid Facebook URL"
+                    }
+                }
+            },
+            { 
+                name: "social_media.instagram", 
+                type: "text", 
+                placeholder: "https://instagram.com/yourcompany", 
+                label: "Instagram URL", 
+                required: false,
+                validation: {
+                    pattern: {
+                        value: /^(https?:\/\/)?(www\.)?instagram\.com\/.+$/,
+                        message: "Please enter a valid Instagram URL"
+                    }
+                }
+            },
+            { 
+                name: "social_media.twitter", 
+                type: "text", 
+                placeholder: "https://twitter.com/yourcompany", 
+                label: "Twitter URL", 
+                required: false,
+                validation: {
+                    pattern: {
+                        value: /^(https?:\/\/)?(www\.)?(twitter|x)\.com\/.+$/,
+                        message: "Please enter a valid Twitter/X URL"
+                    }
+                }
+            },
+            { 
+                name: "social_media.linkedin", 
+                type: "text", 
+                placeholder: "https://linkedin.com/company/yourcompany", 
+                label: "LinkedIn URL", 
+                required: false,
+                validation: {
+                    pattern: {
+                        value: /^(https?:\/\/)?(www\.)?linkedin\.com\/(company|in)\/.+$/,
+                        message: "Please enter a valid LinkedIn URL"
+                    }
+                }
+            },
+            { 
+                name: "social_media.youtube", 
+                type: "text", 
+                placeholder: "https://youtube.com/yourcompany", 
+                label: "YouTube URL", 
+                required: false,
+                validation: {
+                    pattern: {
+                        value: /^(https?:\/\/)?(www\.)?youtube\.com\/.+$/,
+                        message: "Please enter a valid YouTube URL"
+                    }
+                }
+            },
+            { 
+                name: "social_media.tiktok", 
+                type: "text", 
+                placeholder: "https://tiktok.com/@yourcompany", 
+                label: "TikTok URL", 
+                required: false,
+                validation: {
+                    pattern: {
+                        value: /^(https?:\/\/)?(www\.)?tiktok\.com\/@.+$/,
+                        message: "Please enter a valid TikTok URL"
+                    }
+                }
+            },
             { name: "company_logo", type: "file", label: "Company Logo", required: true, accept: "image/*" },
             { name: "brand_images", type: "file", label: "Brand Images (up to 10)", required: false, accept: "image/*", multiple: true },
             { name: "brand_story", type: "textarea", placeholder: "Tell your brand story...", label: "Brand Story", required: false }

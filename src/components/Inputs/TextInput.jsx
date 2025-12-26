@@ -2,15 +2,44 @@ import React, { useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { Eye, EyeOff } from 'lucide-react';
 
-const TextInput = ({ name, label, placeholder, required = false, className = '', type = 'text' }) => {
-  const { register, formState: { errors } } = useFormContext();
+const TextInput = ({ name, label, placeholder, required = false, className = '', type = 'text', validation = {} }) => {
+  const { register, formState: { errors }, getFieldState } = useFormContext();
   const [showPassword, setShowPassword] = useState(false);
+  
+  // Helper function to get nested error
+  const getNestedError = (errors, path) => {
+    const keys = path.split('.');
+    let error = errors;
+    for (const key of keys) {
+      if (error && error[key]) {
+        error = error[key];
+      } else {
+        return null;
+      }
+    }
+    return error;
+  };
+  
+  // Get field state to check if it has been touched
+  const fieldState = getFieldState(name);
+  const hasError = getNestedError(errors, name);
   
   // Determine if this is a password field
   const isPasswordField = type === 'password';
   
   // Determine the input type based on password visibility
   const inputType = isPasswordField ? (showPassword ? 'text' : 'password') : type;
+  
+  // Build validation rules
+  const validationRules = {
+    required: required ? `${label} is required` : false,
+    ...validation
+  };
+  
+  // Debug log for validation
+  if (name.includes('verification_documents') || name === 'website_url') {
+    console.log('🔍 TextInput:', name, 'hasError:', hasError, 'errors:', errors);
+  }
   
   return (
     <div className="mb-4">
@@ -22,8 +51,12 @@ const TextInput = ({ name, label, placeholder, required = false, className = '',
           id={name}
           type={inputType}
           placeholder={placeholder}
-          className={`w-full px-3 py-2 border rounded-md ${errors[name] ? 'border-red-500' : 'border-gray-300'} ${className} ${isPasswordField ? 'pr-10' : ''}`}
-          {...register(name, { required: required ? `${label} is required` : false })}
+          className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 ${
+            hasError 
+              ? 'border-red-500 focus:ring-red-500' 
+              : 'border-gray-300 focus:ring-green-500 focus:border-green-500'
+          } ${className} ${isPasswordField ? 'pr-10' : ''}`}
+          {...register(name, validationRules)}
         />
         {isPasswordField && (
           <button
@@ -40,8 +73,8 @@ const TextInput = ({ name, label, placeholder, required = false, className = '',
           </button>
         )}
       </div>
-      {errors[name] && (
-        <p className="mt-1 text-sm text-red-500">{errors[name].message}</p>
+      {hasError && (
+        <p className="mt-1 text-sm text-red-500">{hasError.message}</p>
       )}
     </div>
   );

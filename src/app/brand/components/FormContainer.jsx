@@ -17,23 +17,8 @@ import TextAreaInput from "../../../components/Inputs/TextAreaInput";
 
 const FormContainer = ({ steps, theme = 'brand' }) => {
   const methods = useForm({ 
-    mode: "onBlur",
-    resolver: (values) => {
-      const errors = {};
-      
-      // Check if passwords match on the first step
-      if (values.password && values.confirmPassword && values.password !== values.confirmPassword) {
-        errors.confirmPassword = {
-          type: "manual",
-          message: "Passwords do not match"
-        };
-      }
-      
-      return {
-        values,
-        errors
-      };
-    }
+    mode: "onChange",
+    reValidateMode: "onChange"
   });
   const [currentStep, setCurrentStep] = useState(0);
   const [loading, setLoading] = useState(false);
@@ -463,14 +448,31 @@ const FormContainer = ({ steps, theme = 'brand' }) => {
     setError('');
 
     if (currentStep < steps.length - 1) {
+      // Trigger validation for all fields in current step
+      const currentStepFields = steps[currentStep].fields;
+      const fieldNames = currentStepFields.map(f => f.name);
+      
+      // Trigger validation for all current step fields
+      const isValid = await methods.trigger(fieldNames);
+      
+      console.log('🔍 Current Step:', currentStep);
+      console.log('📋 Validation Result:', isValid);
+      console.log('📋 Form Errors:', methods.formState.errors);
+      
+      if (!isValid) {
+        // Get first error message
+        const firstError = Object.values(methods.formState.errors)[0];
+        setError(firstError?.message || 'Please fix the errors before continuing');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        return;
+      }
+      
       // Get current form values from React Hook Form
       const formValues = methods.getValues();
       
-      console.log('🔍 Current Step:', currentStep);
       console.log('📋 All Form Values:', formValues);
       
       // Validate current step's required fields before proceeding
-      const currentStepFields = steps[currentStep].fields;
       const requiredFields = currentStepFields.filter(field => field.required);
       const missingFields = [];
 
@@ -511,6 +513,9 @@ const FormContainer = ({ steps, theme = 'brand' }) => {
           if (fieldValue.length === 0) {
             isEmpty = true;
           }
+        } else if (fieldValue instanceof File) {
+          // Single file
+          isEmpty = false;
         }
 
         if (isEmpty) {
@@ -518,6 +523,27 @@ const FormContainer = ({ steps, theme = 'brand' }) => {
           missingFields.push(field.label || field.name);
         } else {
           // console.log(`    ✅ Field "${field.name}" is VALID`);
+        }
+      }
+
+      // Also validate non-required fields with patterns (like URLs)
+      const fieldsWithValidation = currentStepFields.filter(field => field.validation && !field.required);
+      for (const field of fieldsWithValidation) {
+        let fieldValue = field.name.includes('.') 
+          ? field.name.split('.').reduce((obj, key) => obj?.[key], formValues)
+          : formValues[field.name];
+
+        // Only validate if field has a value
+        if (fieldValue && typeof fieldValue === 'string' && fieldValue.trim() !== '') {
+          // Check pattern validation
+          if (field.validation.pattern) {
+            const pattern = field.validation.pattern.value;
+            if (!pattern.test(fieldValue)) {
+              setError(field.validation.pattern.message || `Invalid format for ${field.label}`);
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+              return;
+            }
+          }
         }
       }
 
@@ -778,13 +804,13 @@ const FormContainer = ({ steps, theme = 'brand' }) => {
             </div>
             
             {/* Progress Text */}
-            <div className="mt-3 text-center text-sm text-gray-500">
+            {/* <div className="mt-3 text-center text-sm text-gray-500">
               {currentStep === 0 && "Let's get started with your company information"}
               {currentStep === 1 && "Please provide your verification documents"}
               {currentStep === 2 && "Add your contact details"}
               {currentStep === 3 && "Connect your social media and brand assets"}
               {currentStep === 4 && "Almost done! Choose your preferences"}
-            </div>
+            </div> */}
           </div>
         )}
       </div>

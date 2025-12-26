@@ -8,6 +8,22 @@ const Select = ({ name, label, options, placeholder = "Select...", required = fa
   const [isOpen, setIsOpen] = useState(false);
   const [highlightedIndex, setHighlightedIndex] = useState(0);
 
+  // Helper function to get nested error
+  const getNestedError = (errors, path) => {
+    const keys = path.split('.');
+    let error = errors;
+    for (const key of keys) {
+      if (error && error[key]) {
+        error = error[key];
+      } else {
+        return null;
+      }
+    }
+    return error;
+  };
+
+  const hasError = getNestedError(errors, name);
+
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (containerRef.current && !containerRef.current.contains(event.target)) {
@@ -77,7 +93,11 @@ const Select = ({ name, label, options, placeholder = "Select...", required = fa
               className="relative"
             >
               <div
-                className={`border px-3 py-2 rounded cursor-pointer bg-white flex justify-between items-center ${errors[name] ? 'border-red-500' : 'border-gray-300'}`}
+                className={`border px-3 py-2 rounded cursor-pointer bg-white flex justify-between items-center focus:outline-none focus:ring-2 ${
+                  hasError 
+                    ? 'border-red-500 focus:ring-red-500' 
+                    : 'border-gray-300 focus:ring-green-500 focus:border-green-500'
+                }`}
                 onClick={() => setIsOpen(prev => !prev)}
               >
                 {selectedOption?.label || <span className="text-gray-400">{placeholder}</span>}
@@ -105,8 +125,8 @@ const Select = ({ name, label, options, placeholder = "Select...", required = fa
         }}
       />
 
-      {errors[name] && (
-        <p className="mt-1 text-sm text-red-500">{errors[name].message}</p>
+      {hasError && (
+        <p className="mt-1 text-sm text-red-500">{hasError.message}</p>
       )}
     </div>
   );
