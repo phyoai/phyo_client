@@ -35,16 +35,30 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
+    // Handle 401 (Unauthorized) and 403 (Forbidden - Invalid/Expired Token)
+    const status = error.response?.status;
+    const errorMessage = error.response?.data?.message || '';
+    
+    // Check for authentication errors (401) or token expiry/invalid (403)
+    if (status === 401 || (status === 403 && (errorMessage.includes('Invalid or expired token') || errorMessage.includes('token')))) {
+      // Clear all auth data
       localStorage.removeItem('authToken');
       localStorage.removeItem('adminToken');
       localStorage.removeItem('adminInfo');
+      localStorage.removeItem('userInfo');
+      localStorage.removeItem('landing_search_results');
+      localStorage.removeItem('landing_search_prompt');
+      
       if (typeof window !== 'undefined') {
+        // Clear cookies
+        document.cookie = 'authToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+        
         // Redirect based on current path
         if (window.location.pathname.startsWith('/admin')) {
           window.location.href = '/admin/login';
-        } else {
-          window.location.href = '/login';
+        } else if (!window.location.pathname.includes('/login') && !window.location.pathname.includes('/register')) {
+          // Only redirect if not already on login/register page
+          window.location.href = '/login?expired=true';
         }
       }
     }
@@ -153,10 +167,31 @@ export const authUtils = {
     return localStorage.getItem('authToken') || getCookie('authToken');
   },
   
+  // Validate token by making a lightweight API call
+  validateToken: async () => {
+    if (typeof window === 'undefined') return false;
+    
+    const token = localStorage.getItem('authToken') || getCookie('authToken');
+    if (!token) return false;
+    
+    try {
+      // Make a lightweight API call to verify token
+      const response = await api.get('/auth/registration-status');
+      return response.status === 200;
+    } catch (error) {
+      // Token is invalid or expired
+      authUtils.logout();
+      return false;
+    }
+  },
+  
   // Logout user
   logout: () => {
     if (typeof window === 'undefined') return;
     localStorage.removeItem('authToken');
+    localStorage.removeItem('userInfo');
+    localStorage.removeItem('landing_search_results');
+    localStorage.removeItem('landing_search_prompt');
     document.cookie = 'authToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
   }
 };

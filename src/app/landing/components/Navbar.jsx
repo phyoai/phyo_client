@@ -23,10 +23,25 @@ const Navbar = () => {
   // Check authentication status on mount and when storage changes
   useEffect(() => {
     const checkAuth = async () => {
-      const authenticated = authUtils.isAuthenticated();
-      setIsAuthenticated(authenticated);
+      const hasToken = authUtils.isAuthenticated();
       
-      if (authenticated) {
+      if (hasToken) {
+        // Validate token
+        const isValid = await authUtils.validateToken();
+        setIsAuthenticated(isValid);
+        
+        if (!isValid) {
+          // Token is invalid/expired, clear everything
+          setUserType(null);
+          setRegistrationStatus({
+            brandRegistrationStatus: 'NONE',
+            influencerRegistrationStatus: 'NONE',
+            userType: null
+          });
+          console.log('Token expired or invalid in Navbar. User logged out.');
+          return;
+        }
+        
         const type = getUserType();
         setUserType(type);
         
@@ -38,8 +53,10 @@ const Navbar = () => {
           }
         } catch (error) {
           console.error('Error fetching registration status:', error);
+          // If this fails with 403, the interceptor will handle logout
         }
       } else {
+        setIsAuthenticated(false);
         setUserType(null);
         setRegistrationStatus({
           brandRegistrationStatus: 'NONE',

@@ -11,7 +11,7 @@ const MultiSelect = ({
   className = "",
   error 
 }) => {
-  const { register, watch, setValue } = useFormContext();
+  const { register, watch, setValue, formState: { errors } } = useFormContext();
   const rawSelected = watch(name);
   const selectedValues = Array.isArray(rawSelected)
     ? rawSelected
@@ -26,6 +26,22 @@ const MultiSelect = ({
         })()
       : [];
   const [isOpen, setIsOpen] = useState(false);
+
+  // Helper function to get nested error
+  const getNestedError = (errors, path) => {
+    const keys = path.split('.');
+    let error = errors;
+    for (const key of keys) {
+      if (error && error[key]) {
+        error = error[key];
+      } else {
+        return null;
+      }
+    }
+    return error;
+  };
+
+  const hasError = getNestedError(errors, name) || error;
 
   const handleToggleOption = (optionValue) => {
     const currentValues = Array.isArray(selectedValues) ? selectedValues : [];
@@ -50,7 +66,11 @@ const MultiSelect = ({
       
       <div className="relative">
         <div 
-          className="min-h-[45px] p-3 border border-gray-300 rounded-lg bg-white cursor-pointer"
+          className={`min-h-[45px] p-3 border rounded-lg bg-white cursor-pointer focus:outline-none focus:ring-2 ${
+            hasError
+              ? 'border-red-500 focus:ring-red-500'
+              : 'border-gray-300 focus:ring-green-500'
+          }`}
           onClick={() => setIsOpen(!isOpen)}
         >
           {selectedValues.length > 0 ? (
@@ -119,9 +139,9 @@ const MultiSelect = ({
         )}
       </div>
       
-      {error && (
+      {hasError && (
         <span className="text-sm text-red-500">
-          {error.message}
+          {hasError.message}
         </span>
       )}
       
