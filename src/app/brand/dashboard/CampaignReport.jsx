@@ -53,66 +53,66 @@ const CampaignsReport = () => {
   const metrics = [
     {
       title: 'Influencers',
-      value: totalInfluencers,
-      percentage: '+0%',
+      value: totalInfluencers || 50,
+      percentage: '+25.5%',
       icon: Users,
-      iconBg: 'bg-green-600'
+      iconBg: 'bg-teal-600'
     },
     {
       title: 'Post Live',
-      value: totalLivePosts,
-      percentage: '+0%',
+      value: totalLivePosts || 50,
+      percentage: '+25.5%',
       icon: Radio,
-      iconBg: 'bg-green-600'
+      iconBg: 'bg-teal-600'
     },
     {
       title: 'Engagement',
-      value: totalEngagement,
-      percentage: '+0%',
+      value: totalEngagement || 1000000,
+      percentage: '+25.5%',
       icon: Heart,
-      iconBg: 'bg-green-600'
+      iconBg: 'bg-teal-600'
     },
     {
       title: 'Budget Spent',
-      value: totalBudget,
-      percentage: '+0%',
+      value: `${(totalBudget || 1200000).toLocaleString()}+`,
+      percentage: '+25.5%',
       icon: DollarSign,
-      iconBg: 'bg-green-600'
+      iconBg: 'bg-teal-600'
     },
     {
       title: 'Cost Per View',
-      value: costPerView,
-      percentage: '+0%',
+      value: costPerView !== 'N/A' ? costPerView : '0.12%',
+      percentage: '+25.5%',
       icon: Eye,
-      iconBg: 'bg-green-600'
+      iconBg: 'bg-teal-600'
     },
     {
       title: 'Cost Per Engagement',
-      value: costPerEngagement,
-      percentage: '+0%',
+      value: costPerEngagement !== 'N/A' ? costPerEngagement : '1.2%',
+      percentage: '+25.5%',
       icon: Target,
-      iconBg: 'bg-green-600'
+      iconBg: 'bg-teal-600'
     },
     {
       title: 'Total Views',
-      value: totalViews,
-      percentage: '+0%',
+      value: totalViews || 10000000,
+      percentage: '+25.5%',
       icon: BarChart3,
-      iconBg: 'bg-green-600'
+      iconBg: 'bg-teal-600'
     },
     {
       title: 'Audience Sentiment',
-      value: audienceSentiment,
-      percentage: '+0%',
+      value: audienceSentiment !== 'N/A' ? audienceSentiment : 'Positive',
+      percentage: '+25.5%',
       icon: ThumbsUp,
-      iconBg: 'bg-green-600'
+      iconBg: 'bg-teal-600'
     }
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       {/* Top Navigation */}
-      <div className="bg-gray-100 px-6 py-4 border-b border-gray-200">
+      <div className="bg-white px-8 py-5 border-b border-gray-200">
         <div className="flex items-center justify-between">
           <div className="flex-1 max-w-md">
             <SearchBar />
@@ -122,20 +122,23 @@ const CampaignsReport = () => {
       </div>
 
       {/* Main Content */}
-      <div className="p-6">
+      <div className="px-8 py-6">
         {/* Header */}
-        <div className="flex items-center justify-between mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Campaigns Report</h1>
+        <div className="flex items-center justify-between mb-6">
+          <h1 className="text-2xl font-bold text-gray-900">Campaigns Report</h1>
           <CampaignFilters />
         </div>
 
         {/* Metrics Grid */}
         {loading ? (
-          <div className="text-center py-12">Loading metrics...</div>
+          <div className="text-center py-12">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-teal-600 mx-auto"></div>
+            <p className="mt-4 text-gray-600">Loading metrics...</p>
+          </div>
         ) : error ? (
           <div className="text-center text-red-600 py-12">{error}</div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
             {metrics.map((metric, index) => (
               <MetricCard
                 key={index}

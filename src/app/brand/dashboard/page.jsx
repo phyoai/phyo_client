@@ -17,7 +17,6 @@ function DashboardContent() {
       <EngagementSection/>
       <PostLiveAndTotalViewsSection/>
       <BudgetAndAudienceSection/>
-      hi vishnu
     </div>
   );
 }
