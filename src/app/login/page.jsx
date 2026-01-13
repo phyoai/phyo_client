@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '../context/AuthContext';
 import { GoogleLogin, GoogleOAuthProvider } from '@react-oauth/google';
+import { authUtils } from '../../utils/api';
 
 const formFields = [
     {
@@ -121,8 +122,8 @@ function LoginForm() {
             if (result.token) {
                 console.log('Google login successful'); // Debug log
                 
-                // Store the authentication token
-                localStorage.setItem('authToken', result.token);
+                // Store the authentication token in both localStorage and cookies
+                authUtils.setToken(result.token);
                 
                 // Store user data if provided
                 if (result.user) {
@@ -165,10 +166,10 @@ function LoginForm() {
             if (result.success || result.token || result.data?.token) {
                 console.log('Login successful'); // Debug log
                 
-                // Store the authentication token
+                // Store the authentication token in both localStorage and cookies
                 const token = result.token || result.data?.token;
                 if (token) {
-                    localStorage.setItem('authToken', token);
+                    authUtils.setToken(token);
                     localStorage.setItem('userEmail', data.email);
                 }
                 

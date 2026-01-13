@@ -80,6 +80,15 @@ const Navbar = () => {
     };
   }, [getUserType]);
 
+  const handleDashboardClick = () => {
+    // Check which type of user is approved and redirect accordingly
+    if (registrationStatus.brandRegistrationStatus === 'APPROVED') {
+      router.push('/brand/dashboard');
+    } else if (registrationStatus.influencerRegistrationStatus === 'APPROVED') {
+      router.push('/influencer/dashboard');
+    }
+  };
+
   const handleLogout = () => {
     authUtils.logout();
     setIsAuthenticated(false);
@@ -296,6 +305,7 @@ const Navbar = () => {
               
               {(registrationStatus.brandRegistrationStatus === 'APPROVED' || registrationStatus.influencerRegistrationStatus === 'APPROVED') && (
                 <button
+                  onClick={handleDashboardClick}
                   className="border border-white text-white hover:bg-white hover:text-black font-medium px-4 py-2 rounded-full transition-colors text-sm lg:text-base"
                 >
                   Dashboard
@@ -417,7 +427,10 @@ const Navbar = () => {
                     <li>
                       <button
                         className="block w-full border border-white text-white hover:bg-white hover:text-black font-medium transition-colors py-2 px-4 rounded-full text-base text-center"
-                        onClick={() => setIsMenuOpen(false)}
+                        onClick={() => {
+                          handleDashboardClick();
+                          setIsMenuOpen(false);
+                        }}
                       >
                         Dashboard
                       </button>

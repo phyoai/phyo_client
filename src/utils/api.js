@@ -76,6 +76,15 @@ function getCookie(name) {
   return null;
 }
 
+// Helper function to set cookie value
+function setCookie(name, value, days = 7) {
+  if (typeof document === 'undefined') return;
+  
+  const expires = new Date();
+  expires.setTime(expires.getTime() + days * 24 * 60 * 60 * 1000);
+  document.cookie = `${name}=${value};expires=${expires.toUTCString()};path=/;SameSite=Lax`;
+}
+
 // Campaign API functions
 export const campaignAPI = {
   // Create a new campaign
@@ -154,6 +163,13 @@ export const searchAPI = {
 
 // Auth utility functions
 export const authUtils = {
+  // Set authentication token in both localStorage and cookies
+  setToken: (token) => {
+    if (typeof window === 'undefined') return;
+    localStorage.setItem('authToken', token);
+    setCookie('authToken', token, 7); // Set cookie for 7 days
+  },
+  
   // Check if user is authenticated
   isAuthenticated: () => {
     if (typeof window === 'undefined') return false;

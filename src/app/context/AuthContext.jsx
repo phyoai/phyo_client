@@ -1,6 +1,7 @@
 'use client'
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { authUtils } from '../../utils/api';
 
 const AuthContext = createContext();
 
@@ -63,11 +64,8 @@ export const AuthProvider = ({ children }) => {
         setToken(authToken);
         setUser(data.user || data.data || { email, token: authToken });
         
-        // Store token in localStorage and cookie
-        if (typeof window !== 'undefined') {
-          localStorage.setItem('authToken', authToken);
-          document.cookie = `authToken=${authToken}; path=/; max-age=${60 * 60 * 24 * 7}`; // 7 days
-        }
+        // Store token in localStorage and cookie using authUtils
+        authUtils.setToken(authToken);
         
         return { success: true, data };
       } else {
@@ -96,11 +94,8 @@ export const AuthProvider = ({ children }) => {
         setToken(authToken);
         setUser(data.data || data.user || { email: userData.email, token: authToken });
         
-        // Store token in localStorage and cookie
-        if (typeof window !== 'undefined') {
-          localStorage.setItem('authToken', authToken);
-          document.cookie = `authToken=${authToken}; path=/; max-age=${60 * 60 * 24 * 7}`; // 7 days
-        }
+        // Store token in localStorage and cookie using authUtils
+        authUtils.setToken(authToken);
         
         return { success: true, data };
       } else {
