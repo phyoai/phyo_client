@@ -768,6 +768,9 @@ const AllCampaignsSection = () => {
               </div>
             </div>
 
+            {/* COMMENTED OUT: Static mock influencer suggestions 
+                AI will generate real suggestions when campaign is created */}
+            {/* 
             <div className="mt-8">
               <h3 className="text-lg font-semibold text-gray-900 mb-4">
                 Influencer Suggestions based on your Requirements
@@ -778,6 +781,7 @@ const AllCampaignsSection = () => {
                 ))}
               </div>
             </div>
+            */}
           </div>
         );
 
@@ -892,14 +896,17 @@ const AllCampaignsSection = () => {
       return;
     }
 
+    if (!formData.productImages || formData.productImages.length === 0) {
+      alert('Please upload at least one product image');
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
-      // Transform formData to match the API structure
+      // Transform formData to match the API structure (keep file objects for FormData)
       const transformedData = {
-        productImages: formData.productImages.length > 0
-          ? formData.productImages.map(img => img.url || img)
-          : ['https://example.com/placeholder.jpg'],
+        productImages: formData.productImages, // Keep file objects
         campaignName: formData.campaignName,
         campaignType: formData.campaignType,
         campaignBrief: formData.campaignBrief,
@@ -910,11 +917,11 @@ const AllCampaignsSection = () => {
           : [],
         compensation: {
           type: formData.compensation,
-          amount: formData.compensationAmount ? parseInt(formData.compensationAmount) : undefined,
+          amount: formData.compensationAmount ? parseInt(formData.compensationAmount) : 0,
           currency: formData.compensationCurrency,
           description: formData.compensationDetails
         },
-        budget: formData.budget ? parseInt(formData.budget) : undefined,
+        budget: formData.budget ? parseInt(formData.budget) : 0,
         timelines: {
           applicationDeadline: new Date(formData.applicationDeadline).toISOString(),
           campaignStartDate: new Date(formData.campaignStartDate).toISOString(),
@@ -934,7 +941,7 @@ const AllCampaignsSection = () => {
             max: parseInt(formData.ageRangeMax) || 65
           }
         },
-        numberOfLivePosts: formData.numberOfLivePosts ? parseInt(formData.numberOfLivePosts) : undefined,
+        numberOfLivePosts: formData.numberOfLivePosts ? parseInt(formData.numberOfLivePosts) : 0,
         reels: formData.reels,
         status: 'Draft'
       };
