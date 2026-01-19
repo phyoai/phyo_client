@@ -1,6 +1,6 @@
 'use client'
 import React, { useState } from 'react';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Tooltip } from 'recharts';
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Tooltip } from 'recharts';
 import { ChevronDown } from 'lucide-react';
 
 const PostTimelineChart = () => {
@@ -46,7 +46,8 @@ const PostTimelineChart = () => {
   };
 
   return (
-    <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
+    <div  className='bg-white p-6 rounded-3xl'>
+    <div className="bg-[#F3F2EB] rounded-3xl p-6 border border-gray-200 shadow-sm">
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <h3 className="text-xl font-semibold text-gray-900">Post Engagement Timeline</h3>
@@ -95,7 +96,7 @@ const PostTimelineChart = () => {
       {/* Chart */}
       <div className="h-80">
         <ResponsiveContainer width="100%" height="100%">
-          <LineChart
+          <AreaChart
             data={chartData}
             margin={{
               top: 20,
@@ -104,7 +105,13 @@ const PostTimelineChart = () => {
               bottom: 20,
             }}
           >
-            <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+            <defs>
+              <linearGradient id="colorPostView" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor="#166534" stopOpacity={0.3}/>
+                <stop offset="95%" stopColor="#166534" stopOpacity={0.05}/>
+              </linearGradient>
+            </defs>
+            <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" vertical={false} />
             <XAxis 
               dataKey="year" 
               axisLine={false}
@@ -120,30 +127,28 @@ const PostTimelineChart = () => {
             />
             <Tooltip content={<CustomTooltip />} />
             
-            {/* Post View Line */}
-            <Line
+            {/* Post View Area */}
+            <Area
               type="monotone"
               dataKey="postView"
               stroke="#166534"
               strokeWidth={3}
-              fill="#166534"
-              fillOpacity={0.1}
-              dot={{ fill: '#166534', strokeWidth: 2, r: 4 }}
-              activeDot={{ r: 6, stroke: '#166534', strokeWidth: 2 }}
+              fill="url(#colorPostView)"
+              dot={false}
+              activeDot={{ r: 6, stroke: '#166534', strokeWidth: 2, fill: '#166534' }}
             />
             
             {/* Post Engagement Line */}
-            <Line
+            <Area
               type="monotone"
               dataKey="postEngagement"
               stroke="#86efac"
               strokeWidth={3}
-              fill="#86efac"
-              fillOpacity={0.1}
-              dot={{ fill: '#86efac', strokeWidth: 2, r: 4 }}
-              activeDot={{ r: 6, stroke: '#86efac', strokeWidth: 2 }}
+              fill="transparent"
+              dot={false}
+              activeDot={{ r: 6, stroke: '#86efac', strokeWidth: 2, fill: '#86efac' }}
             />
-          </LineChart>
+          </AreaChart>
         </ResponsiveContainer>
       </div>
 
@@ -166,6 +171,7 @@ const PostTimelineChart = () => {
           </div>
         </div>
       </div>
+    </div>
     </div>
   );
 };

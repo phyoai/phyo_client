@@ -34,17 +34,17 @@ const EngagementSection = () => {
   };
 
   return (
-    <div className="bg-gray-50 py-8">
+    <div className="bg-[#F5F3EE] py-8">
       <div className="max-w-7xl mx-auto px-6">
         {/* Section Header */}
-        <div className="mb-8">
+        <div className="mb-4 rounded-3xl bg-white p-5">
           <h2 className="text-2xl font-bold text-gray-900">Engagement</h2>
         </div>
-
+<div className=' bg-white p-6 rounded-3xl'>
         {/* Main Content Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Total Engagement Card */}
-          <div className="bg-white rounded-lg p-6 border border-gray-200 shadow-sm">
+          <div className="bg-[#F3F2EB] rounded-3xl p-6 border border-gray-200 shadow-sm">
             {/* Header with Growth Indicator */}
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-medium text-gray-900">Total Engagement</h3>
@@ -117,7 +117,7 @@ const EngagementSection = () => {
           </div>
 
           {/* Daily Engagement Card */}
-          <div className="bg-white rounded-lg p-6 border border-gray-200 shadow-sm">
+          <div className="bg-[#F3F2EB] rounded-3xl p-6 border border-gray-200 shadow-sm">
             <h3 className="text-lg font-medium text-gray-900 mb-4">Daily Engagement</h3>
             
             {/* Main Metric */}
@@ -148,6 +148,7 @@ const EngagementSection = () => {
               </div>
             </div>
           </div>
+        </div>
         </div>
       </div>
     </div>

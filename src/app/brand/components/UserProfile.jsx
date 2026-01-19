@@ -23,22 +23,20 @@ const UserProfile = ({ user: propUser }) => {
     <div className="relative">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center space-x-3 bg-white rounded-xl px-4 py-2.5 border border-gray-200 hover:shadow-md transition-all"
+        className="flex items-center gap-4 bg-white rounded-2xl px-5 py-3 hover:shadow-sm transition-all border-0 shadow-sm"
       >
-        <div className="w-9 h-9 bg-gradient-to-br from-purple-400 to-pink-400 rounded-full flex items-center justify-center shadow-sm">
-          <span className="text-white text-sm font-semibold">
+        <div className="w-10 h-10 bg-gradient-to-br from-blue-400 to-blue-500 rounded-full flex items-center justify-center">
+          <span className="text-white text-base font-semibold">
             {displayName.charAt(0)?.toUpperCase()}
           </span>
         </div>
-        <div className="flex items-center space-x-2.5">
-          <span className="text-gray-900 font-semibold text-sm">
-            {displayName}
-          </span>
-          <span className="bg-teal-600 text-white text-xs font-semibold px-2.5 py-1 rounded-md">
-            {userType}
-          </span>
-        </div>
-        <ChevronDown className="h-4 w-4 text-gray-500" />
+        <span className="text-gray-900 font-semibold text-base">
+          {displayName}
+        </span>
+        <span className="bg-[#E3FFDE33] text-[#00674F] text-sm font-semibold px-3 py-1 rounded-lg">
+          {userType}
+        </span>
+        <ChevronDown className="h-5 w-5 text-gray-700 ml-2" />
       </button>
 
       {isOpen && (

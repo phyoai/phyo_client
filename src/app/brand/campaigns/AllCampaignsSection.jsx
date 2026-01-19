@@ -963,14 +963,14 @@ const AllCampaignsSection = () => {
   };
 
   return (
-    <div className="bg-gray-50 py-8">
+    <div className="bg-[#F3F2EB] py-8">
       <div className="max-w-7xl mx-auto px-6">
         {/* Main Header */}
         <div className="flex items-center justify-between mb-8">
           <h1 className="text-3xl font-bold text-gray-900">All Campaigns</h1>
           <button 
             onClick={() => setShowModal(true)}
-            className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-medium transition-colors"
+            className="bg-[#00674F] hover:scale-105 text-white px-6 py-3 rounded-lg font-medium transition-colors"
           >
             Create New Campaign
           </button>

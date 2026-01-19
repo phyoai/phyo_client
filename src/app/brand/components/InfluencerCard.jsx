@@ -12,7 +12,7 @@ const InfluencerCard = ({
   isVerified = true 
 }) => {
   return (
-    <div className="bg-white rounded-lg p-6 border border-gray-200 hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
+    <div className="bg-[#F3F2EB] rounded-3xl p-6 border border-gray-200 hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
       {/* Header with Avatar and Verification */}
       <div className="flex items-start space-x-4 mb-4">
         <div className="relative">
@@ -23,7 +23,7 @@ const InfluencerCard = ({
           />
           {isVerified && (
             <div className="absolute -top-1 -right-1">
-              <CheckCircle className="w-6 h-6 text-green-500 bg-white rounded-full" />
+              <CheckCircle className="w-6 h-6 text-[#00674F] bg-white rounded-full" />
             </div>
           )}
         </div>
@@ -69,10 +69,10 @@ const InfluencerCard = ({
 
       {/* Action Buttons */}
       <div className="flex space-x-3">
-        <button className="flex-1 bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition-colors text-sm font-medium">
+        <button className="flex-1 bg-[#00674F] text-white py-2 px-4 rounded-3xl  transition-colors text-sm font-medium ">
           View Profile
         </button>
-        <button className="flex-1 bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition-colors text-sm font-medium">
+        <button className="flex-1 bg-[#00674F] text-white py-2 px-4 rounded-3xl  transition-colors text-sm font-medium">
           Send Message
         </button>
       </div>
