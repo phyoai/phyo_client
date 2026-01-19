@@ -6,7 +6,7 @@ import TopInfluencersSection from '../components/TopInfluencersSection';
 
 const TopInfluencer = () => {
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="bg-[#F5F3EE]">
       <TopInfluencersSection />
     </div>
   );

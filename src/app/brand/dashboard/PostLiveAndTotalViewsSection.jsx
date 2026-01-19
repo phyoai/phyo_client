@@ -47,7 +47,7 @@ const PostLiveAndTotalViewsSection = () => {
   };
 
   return (
-    <div className="bg-gray-50 py-8">
+    <div className="bg-[#F5F3EE] py-8">
       <div className="max-w-7xl mx-auto px-6">
         {/* Section Headers */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">

@@ -3,7 +3,6 @@ import React, { useEffect, useState } from 'react';
 import SearchBar from '../../../components/SearchBar';
 import UserProfile from '../components/UserProfile';
 import MetricCard from '../components/MetricCard';
-import CampaignFilters from '../components/CampaignFilters';
 import {
   Users,
   Radio,
@@ -12,7 +11,9 @@ import {
   Eye,
   Target,
   BarChart3,
-  ThumbsUp
+  ThumbsUp,
+  ChevronDown,
+  Download
 } from 'lucide-react';
 import { campaignAPI, userAPI } from '../../../utils/api';
 
@@ -27,7 +28,6 @@ const CampaignsReport = () => {
       setLoading(true);
       setError(null);
       try {
-        // Fetch both campaigns and user profile
         const [campaignsResponse, userResponse] = await Promise.all([
           campaignAPI.getBrandCampaigns({ page: 1, limit: 100 }),
           userAPI.getUserProfile()
@@ -47,15 +47,11 @@ const CampaignsReport = () => {
   // Metrics calculation
   const totalInfluencers = campaigns.reduce((sum, c) => sum + (c.targetInfluencer?.numberOfInfluencers || 0), 0);
   const totalLivePosts = campaigns.reduce((sum, c) => sum + (c.numberOfLivePosts || 0), 0);
-  // Engagement and total views are not in the sample API, so fallback to 0
   const totalEngagement = 0;
   const totalBudget = campaigns.reduce((sum, c) => sum + (c.budget || c.compensation?.amount || 0), 0);
   const totalViews = 0;
-  // Cost per view/engagement fallback
-  const costPerView = totalViews > 0 ? (totalBudget / totalViews).toFixed(2) : 'N/A';
-  const costPerEngagement = totalEngagement > 0 ? (totalBudget / totalEngagement).toFixed(2) : 'N/A';
-  // Audience sentiment not in API
-  const audienceSentiment = 'N/A';
+  const costPerView = totalViews > 0 ? (totalBudget / totalViews).toFixed(2) : '0.12';
+  const costPerEngagement = totalEngagement > 0 ? (totalBudget / totalEngagement).toFixed(2) : '1.2';
 
   const metrics = [
     {
@@ -74,7 +70,7 @@ const CampaignsReport = () => {
     },
     {
       title: 'Engagement',
-      value: totalEngagement || 1000000,
+      value: totalEngagement > 0 ? totalEngagement.toLocaleString() : '1M+',
       percentage: '+25.5%',
       icon: Heart,
       iconBg: 'bg-teal-600'
@@ -88,28 +84,28 @@ const CampaignsReport = () => {
     },
     {
       title: 'Cost Per View',
-      value: costPerView !== 'N/A' ? costPerView : '0.12%',
+      value: `${costPerView}%`,
       percentage: '+25.5%',
       icon: Eye,
       iconBg: 'bg-teal-600'
     },
     {
       title: 'Cost Per Engagement',
-      value: costPerEngagement !== 'N/A' ? costPerEngagement : '1.2%',
+      value: `${costPerEngagement}%`,
       percentage: '+25.5%',
       icon: Target,
       iconBg: 'bg-teal-600'
     },
     {
       title: 'Total Views',
-      value: totalViews || 10000000,
+      value: totalViews > 0 ? totalViews.toLocaleString() : '10M+',
       percentage: '+25.5%',
       icon: BarChart3,
       iconBg: 'bg-teal-600'
     },
     {
       title: 'Audience Sentiment',
-      value: audienceSentiment !== 'N/A' ? audienceSentiment : 'Positive',
+      value: 'Positive',
       percentage: '+25.5%',
       icon: ThumbsUp,
       iconBg: 'bg-teal-600'
@@ -117,35 +113,59 @@ const CampaignsReport = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-white">
-      {/* Top Navigation */}
-      <div className="bg-white px-8 py-5 border-b border-gray-200">
+    <div className="min-h-screen bg-[#F3F2EB]">
+      {/* Top Navigation Bar */}
+      <div className="bg-[#F3F2EB] px-8 py-4  border-gray-200 sticky top-0 z-10">
         <div className="flex items-center justify-between">
-          <div className="flex-1 max-w-md">
-            <SearchBar />
+          <div className="flex-1 max-w-sm">
+            <SearchBar placeholder="Search influencer" />
           </div>
           <UserProfile user={user} />
         </div>
       </div>
 
       {/* Main Content */}
-      <div className="px-8 py-6">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl font-bold text-gray-900">Campaigns Report</h1>
-          <CampaignFilters />
+      <div className="px-8 py-2">
+        {/* Header Section */}
+        <div className="flex items-center justify-between mb-8 bg-white p-5 rounded-3xl">
+          <h1 className="text-3xl  font-semibold text-gray-900">Campaigns Report</h1>
+          
+          {/* Filters and Actions */}
+          <div className="flex items-center gap-4">
+            {/* LinkedIn Filter */}
+            <button className="flex items-center gap-2 px-4 py-2 bg-[#F3F2EB]  rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50">
+              <span className="text-blue-600">in</span> LinkedIn
+              <ChevronDown size={16} className="text-gray-500" />
+            </button>
+
+            {/* Lifetime Filter */}
+            <button className="flex items-center gap-2 px-4 py-2 bg-[#F3F2EB]  rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50">
+              Lifetime
+              <ChevronDown size={16} className="text-gray-500" />
+            </button>
+
+            {/* AI Campaign Analyser Button */}
+            <button className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-[#00B48A] to-[#00674F] text-white rounded-xl text-sm font-semibold hover:opacity-90 transition-all shadow-sm">
+              AI Campaign Analyser
+            </button>
+
+            {/* Download Button */}
+            <button className="flex items-center justify-center w-10 h-10 bg-[#00674F] text-white rounded-lg hover:bg-teal-600 transition-colors">
+              <Download size={18} />
+            </button>
+          </div>
         </div>
 
         {/* Metrics Grid */}
         {loading ? (
-          <div className="text-center py-12">
+          <div className="text-center py-16">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-teal-600 mx-auto"></div>
-            <p className="mt-4 text-gray-600">Loading metrics...</p>
+            <p className="mt-4 text-gray-600 font-medium">Loading metrics...</p>
           </div>
         ) : error ? (
-          <div className="text-center text-red-600 py-12">{error}</div>
+          <div className="text-center text-red-600 py-12 font-medium">{error}</div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 bg- p-6 rounded-2xl bg-white">
             {metrics.map((metric, index) => (
               <MetricCard
                 key={index}
@@ -164,6 +184,3 @@ const CampaignsReport = () => {
 };
 
 export default CampaignsReport;
-
-
-

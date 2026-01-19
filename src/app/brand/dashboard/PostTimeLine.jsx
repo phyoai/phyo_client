@@ -5,7 +5,7 @@ import PostTimelineSection from '../components/PostTimelineSection';
 
 const PostTimeline = () => {
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="bg-[#F5F3EE]">
       {/* Top Navigation */}
     
 
