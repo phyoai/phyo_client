@@ -3,14 +3,21 @@ import React, { useState } from 'react';
 import { ChevronDown } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 
-const UserProfile = () => {
+const UserProfile = ({ user: propUser }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const { user, logout } = useAuth();
+  const { user: contextUser, logout } = useAuth();
+  
+  // Use prop user if provided, otherwise fall back to context user
+  const user = propUser || contextUser;
 
   const handleLogout = () => {
     setIsOpen(false);
     logout();
   };
+
+  // Get user name or email
+  const displayName = user?.companyName || user?.name || user?.email?.split('@')[0] || 'User';
+  const userType = user?.type || 'Brand';
 
   return (
     <div className="relative">
@@ -20,15 +27,15 @@ const UserProfile = () => {
       >
         <div className="w-9 h-9 bg-gradient-to-br from-purple-400 to-pink-400 rounded-full flex items-center justify-center shadow-sm">
           <span className="text-white text-sm font-semibold">
-            {user?.name?.charAt(0)?.toUpperCase() || user?.email?.charAt(0)?.toUpperCase() || 'G'}
+            {displayName.charAt(0)?.toUpperCase()}
           </span>
         </div>
         <div className="flex items-center space-x-2.5">
           <span className="text-gray-900 font-semibold text-sm">
-            {user?.name || 'Garima Tewari'}
+            {displayName}
           </span>
           <span className="bg-teal-600 text-white text-xs font-semibold px-2.5 py-1 rounded-md">
-            Brand
+            {userType}
           </span>
         </div>
         <ChevronDown className="h-4 w-4 text-gray-500" />

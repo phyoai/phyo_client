@@ -85,12 +85,63 @@ function setCookie(name, value, days = 7) {
   document.cookie = `${name}=${value};expires=${expires.toUTCString()};path=/;SameSite=Lax`;
 }
 
+// User API functions
+export const userAPI = {
+  // Get user profile
+  getUserProfile: async () => {
+    try {
+      const response = await api.get('/users/profile');
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error.message;
+    }
+  },
+
+  // Update user profile
+  updateUserProfile: async (userData) => {
+    try {
+      const response = await api.patch('/users/profile', userData);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error.message;
+    }
+  }
+};
+
 // Campaign API functions
 export const campaignAPI = {
-  // Create a new campaign
+  // Create a new campaign (with file upload support)
   createCampaign: async (campaignData) => {
     try {
-      const response = await api.post('/campaigns', campaignData);
+      // Create FormData for file uploads
+      const formData = new FormData();
+      
+      // Handle product images (files)
+      if (campaignData.productImages && campaignData.productImages.length > 0) {
+        campaignData.productImages.forEach((img) => {
+          if (img.file) {
+            formData.append('productImages', img.file);
+          }
+        });
+      }
+      
+      // Append all other fields as JSON strings (for nested objects)
+      Object.keys(campaignData).forEach(key => {
+        if (key !== 'productImages') {
+          const value = campaignData[key];
+          if (typeof value === 'object') {
+            formData.append(key, JSON.stringify(value));
+          } else {
+            formData.append(key, value);
+          }
+        }
+      });
+      
+      const response = await api.post('/campaigns', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
       return response.data;
     } catch (error) {
       throw error.response?.data || error.message;

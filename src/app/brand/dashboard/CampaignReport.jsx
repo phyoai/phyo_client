@@ -14,27 +14,34 @@ import {
   BarChart3,
   ThumbsUp
 } from 'lucide-react';
-import { campaignAPI } from '../../../utils/api';
+import { campaignAPI, userAPI } from '../../../utils/api';
 
 const CampaignsReport = () => {
   const [campaigns, setCampaigns] = useState([]);
+  const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    const fetchCampaigns = async () => {
+    const fetchData = async () => {
       setLoading(true);
       setError(null);
       try {
-        const response = await campaignAPI.getCampaigns({ page: 1, limit: 100 });
-        setCampaigns(response.data || []);
+        // Fetch both campaigns and user profile
+        const [campaignsResponse, userResponse] = await Promise.all([
+          campaignAPI.getBrandCampaigns({ page: 1, limit: 100 }),
+          userAPI.getUserProfile()
+        ]);
+        setCampaigns(campaignsResponse.data || []);
+        setUser(userResponse.data || null);
       } catch (err) {
-        setError(err.message || 'Failed to fetch campaigns');
+        console.error('Error fetching data:', err);
+        setError(err.message || 'Failed to fetch data');
       } finally {
         setLoading(false);
       }
     };
-    fetchCampaigns();
+    fetchData();
   }, []);
 
   // Metrics calculation
@@ -117,7 +124,7 @@ const CampaignsReport = () => {
           <div className="flex-1 max-w-md">
             <SearchBar />
           </div>
-          <UserProfile />
+          <UserProfile user={user} />
         </div>
       </div>
 
