@@ -1,10 +1,18 @@
 'use client'
 import React, { useState, useRef } from 'react';
-import { ChevronLeft, ChevronRight, X, Upload, Calendar, Check, Users } from 'lucide-react';
+import { ChevronLeft, ChevronRight, X, Upload, Calendar, Check, Users, MoreVertical, Trash2, Edit } from 'lucide-react';
 import { campaignAPI } from '../../../utils/api';
 
 const AllCampaignsSection = () => {
   const [showModal, setShowModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showDetailModal, setShowDetailModal] = useState(false);
+  const [selectedCampaign, setSelectedCampaign] = useState(null);
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [isUpdating, setIsUpdating] = useState(false);
+  const [campaignToDelete, setCampaignToDelete] = useState(null);
+  const [isDeletingCampaign, setIsDeletingCampaign] = useState(false);
+  const [openMenuId, setOpenMenuId] = useState(null);
   const [currentStep, setCurrentStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [campaigns, setCampaigns] = useState([]);
@@ -178,6 +186,129 @@ const AllCampaignsSection = () => {
     }
   };
 
+  // Delete campaign handler
+  const handleDeleteCampaign = async () => {
+    if (!campaignToDelete) return;
+    
+    setIsDeletingCampaign(true);
+    try {
+      await campaignAPI.deleteCampaign(campaignToDelete._id);
+      
+      // Show success message
+      alert('Campaign deleted successfully!');
+      
+      // Close modal
+      setShowDeleteModal(false);
+      setCampaignToDelete(null);
+      
+      // Refresh campaigns list
+      fetchCampaigns(pagination.currentPage, pagination.itemsPerPage);
+      
+    } catch (error) {
+      console.error('Error deleting campaign:', error);
+      alert(`Failed to delete campaign: ${error.message || 'Unknown error'}`);
+    } finally {
+      setIsDeletingCampaign(false);
+    }
+  };
+
+  // Activate campaign (change from Draft to Active)
+  const handleActivateCampaign = async (campaignId) => {
+    try {
+      await campaignAPI.updateCampaign(campaignId, { status: 'Active' });
+      
+      alert('Campaign activated successfully!');
+      
+      // Refresh campaigns list
+      fetchCampaigns(pagination.currentPage, pagination.itemsPerPage);
+      
+    } catch (error) {
+      console.error('Error activating campaign:', error);
+      alert(`Failed to activate campaign: ${error.message || 'Unknown error'}`);
+    }
+  };
+
+  // Open campaign detail modal
+  const handleCampaignClick = async (campaign) => {
+    try {
+      // Fetch full campaign details
+      const response = await campaignAPI.getCampaignById(campaign._id);
+      setSelectedCampaign(response.data);
+      setShowDetailModal(true);
+      setIsEditMode(false);
+    } catch (error) {
+      console.error('Error fetching campaign details:', error);
+      alert('Failed to load campaign details');
+    }
+  };
+
+  // Enable edit mode
+  const handleEnableEdit = () => {
+    setIsEditMode(true);
+  };
+
+  // Cancel edit mode
+  const handleCancelEdit = () => {
+    setIsEditMode(false);
+    // Refresh campaign data to revert changes
+    if (selectedCampaign) {
+      handleCampaignClick({ _id: selectedCampaign._id });
+    }
+  };
+
+  // Update campaign field
+  const handleUpdateField = (field, value) => {
+    setSelectedCampaign(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  };
+
+  // Update nested field (for compensation, timelines, targetInfluencer)
+  const handleUpdateNestedField = (parentField, childField, value) => {
+    setSelectedCampaign(prev => ({
+      ...prev,
+      [parentField]: {
+        ...prev[parentField],
+        [childField]: value
+      }
+    }));
+  };
+
+  // Save campaign updates
+  const handleSaveUpdates = async () => {
+    if (!selectedCampaign) return;
+
+    setIsUpdating(true);
+    try {
+      // Prepare update data (only editable fields)
+      const updateData = {
+        campaignName: selectedCampaign.campaignName,
+        status: selectedCampaign.status,
+        compensation: selectedCampaign.compensation,
+        budget: selectedCampaign.budget,
+        deliverables: selectedCampaign.deliverables,
+      };
+
+      await campaignAPI.updateCampaign(selectedCampaign._id, updateData);
+      
+      alert('Campaign updated successfully!');
+      setIsEditMode(false);
+      
+      // Refresh campaigns list
+      fetchCampaigns(pagination.currentPage, pagination.itemsPerPage);
+      
+      // Refresh detail view
+      handleCampaignClick({ _id: selectedCampaign._id });
+      
+    } catch (error) {
+      console.error('Error updating campaign:', error);
+      alert(`Failed to update campaign: ${error.message || 'Unknown error'}`);
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
   const handleNextStep = () => {
     if (currentStep < 3) {
       setCurrentStep(currentStep + 1);
@@ -258,54 +389,189 @@ const AllCampaignsSection = () => {
     const campaignName = campaign.campaignName || 'Untitled Campaign';
     const status = campaign.status || 'Draft';
     const brandName = campaign.brandId?.companyName || 'Unknown Brand';
-    const budget = campaign.compensation?.amount 
-      ? `${campaign.compensation.currency || 'USD'} ${campaign.compensation.amount}`
+    const budget = campaign.budget 
+      ? `${campaign.compensation?.currency || 'INR'} ${campaign.budget}`
       : 'Not specified';
     const influencerCount = campaign.targetInfluencer?.numberOfInfluencers || 0;
     const applicantsCount = campaign.applicants?.length || 0;
     const selectedCount = campaign.selectedInfluencers?.length || 0;
+    const productImage = campaign.productImages?.[0] || null;
+    
+    const [imageError, setImageError] = React.useState(false);
+    const [imageLoading, setImageLoading] = React.useState(true);
+    
+    const menuRef = useRef(null);
+
+    // Close menu when clicking outside
+    React.useEffect(() => {
+      const handleClickOutside = (event) => {
+        if (menuRef.current && !menuRef.current.contains(event.target)) {
+          setOpenMenuId(null);
+        }
+      };
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
+
+    const handleDeleteClick = () => {
+      setCampaignToDelete(campaign);
+      setShowDeleteModal(true);
+      setOpenMenuId(null);
+    };
+
+    const handleActivateClick = () => {
+      handleActivateCampaign(campaign._id);
+      setOpenMenuId(null);
+    };
+
+    const handleDetailClick = () => {
+      handleCampaignClick(campaign);
+      setOpenMenuId(null);
+    };
 
     return (
-      <div className={`bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden hover:shadow-md transition-shadow ${campaign.isGrayed ? 'opacity-50' : ''}`}>
+      <div 
+        onClick={() => handleCampaignClick(campaign)}
+        className={`bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden hover:shadow-md transition-shadow relative cursor-pointer ${campaign.isGrayed ? 'opacity-50' : ''}`}
+      >
+        {/* Header with Status and Menu */}
         <div className="p-4 border-b border-gray-100">
           <div className="flex items-center justify-between mb-2">
             <span className="text-sm font-medium text-gray-900">{brandName}</span>
-            <span className={`text-xs px-2 py-1 rounded ${
-              status === 'Active' ? 'text-green-600 bg-green-50' :
-              status === 'Draft' ? 'text-gray-600 bg-gray-50' :
-              status === 'Completed' ? 'text-blue-600 bg-blue-50' :
-              'text-orange-600 bg-orange-50'
-            }`}>
-              {status}
-            </span>
-          </div>
-        </div>
-
-        <div className="p-4">
-          <div className="aspect-square bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg flex items-center justify-center mb-4">
-            <div className="w-32 h-40 bg-gray-800 rounded-t-lg relative">
-              <div className="w-full h-full bg-gray-800 rounded-t-lg relative">
-                <div className="absolute top-2 left-1/2 transform -translate-x-1/2 w-4 h-6 bg-blue-500 rounded-t"></div>
-                <div className="absolute top-8 left-1/2 transform -translate-x-1/2 w-20 h-20 bg-white rounded-lg flex items-center justify-center">
-                  <div className="text-xs text-gray-800 font-bold text-center">BRAND<br/>LOGO</div>
-                </div>
+            <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
+              <span className={`text-xs px-2 py-1 rounded ${
+                status === 'Active' ? 'text-green-600 bg-green-50' :
+                status === 'Draft' ? 'text-gray-600 bg-gray-50' :
+                status === 'Completed' ? 'text-blue-600 bg-blue-50' :
+                'text-orange-600 bg-orange-50'
+              }`}>
+                {status}
+              </span>
+              
+              {/* Three-dot Menu */}
+              <div className="relative" ref={menuRef}>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setOpenMenuId(openMenuId === campaign._id ? null : campaign._id);
+                  }}
+                  className="p-1 hover:bg-gray-100 rounded-full transition-colors"
+                >
+                  <MoreVertical className="w-4 h-4 text-gray-600" />
+                </button>
+                
+                {openMenuId === campaign._id && (
+                  <div className="absolute right-0 mt-2 w-40 bg-white rounded-lg shadow-lg border border-gray-200 z-10">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDetailClick();
+                      }}
+                      className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
+                    >
+                      <Edit className="w-4 h-4" />
+                      View/Edit Campaign
+                    </button>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDeleteClick();
+                      }}
+                      className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50 flex items-center gap-2"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                      Delete
+                    </button>
+                    {status !== 'Active' && (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleActivateClick();
+                        }}
+                        className="w-full px-4 py-2 text-left text-sm text-green-600 hover:bg-green-50 flex items-center gap-2"
+                      >
+                        <Check className="w-4 h-4" />
+                        Activate Campaign
+                      </button>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
           </div>
+        </div>
 
-          <div className="mb-3">
-            <span className="text-sm text-green-600 font-medium">Budget: {budget}</span>
+        {/* Campaign Visual */}
+        <div className="p-4">
+          <div className="aspect-square bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg flex items-center justify-center mb-4 overflow-hidden relative">
+            {productImage && !imageError ? (
+              <>
+                {imageLoading && (
+                  <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-blue-50 to-blue-100">
+                    <div className="flex flex-col items-center gap-3">
+                      <div className="animate-spin rounded-full h-10 w-10 border-3 border-green-600 border-t-transparent"></div>
+                      <p className="text-sm text-gray-600 font-medium">Loading image...</p>
+                    </div>
+                  </div>
+                )}
+                <img 
+                  src={productImage} 
+                  alt={campaignName}
+                  className={`w-full h-full object-cover transition-opacity duration-500 ${
+                    imageLoading ? 'opacity-0' : 'opacity-100'
+                  }`}
+                  onLoad={() => setImageLoading(false)}
+                  onError={(e) => {
+                    console.error('Image failed to load:', productImage);
+                    setImageError(true);
+                    setImageLoading(false);
+                  }}
+                  loading="lazy"
+                  crossOrigin="anonymous"
+                />
+              </>
+            ) : (
+              <div className="w-32 h-40 bg-gray-800 rounded-t-lg relative">
+                <div className="w-full h-full bg-gray-800 rounded-t-lg relative">
+                  <div className="absolute top-2 left-1/2 transform -translate-x-1/2 w-4 h-6 bg-blue-500 rounded-t"></div>
+                  <div className="absolute top-8 left-1/2 transform -translate-x-1/2 w-20 h-20 bg-white rounded-lg flex items-center justify-center">
+                    <div className="text-xs text-gray-800 font-bold text-center">BRAND<br/>LOGO</div>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
 
-          <h3 className="text-sm font-medium text-gray-900 mb-3">{campaignName}</h3>
+          {/* Campaign Info */}
+          <div className="space-y-2">
+            <h3 className="text-base font-semibold text-gray-900 line-clamp-2">{campaignName}</h3>
+            
+            <div className="flex items-center justify-between">
+              <span className="text-sm font-medium text-green-600">Budget: {budget}</span>
+              <span className="text-xs text-gray-500 capitalize">{campaign.campaignType}</span>
+            </div>
 
-          <div className="space-y-1 text-xs text-gray-600">
-            <div>Type: {campaign.campaignType}</div>
-            <div>Target Influencers: {influencerCount}</div>
-            <div>Applicants: {applicantsCount}</div>
-            <div>Selected: {selectedCount}</div>
+            <div className="pt-2 border-t border-gray-100">
+              <div className="grid grid-cols-3 gap-2 text-center">
+                <div>
+                  <div className="text-lg font-semibold text-gray-900">{influencerCount}</div>
+                  <div className="text-xs text-gray-500">Target</div>
+                </div>
+                <div>
+                  <div className="text-lg font-semibold text-blue-600">{applicantsCount}</div>
+                  <div className="text-xs text-gray-500">Applicants</div>
+                </div>
+                <div>
+                  <div className="text-lg font-semibold text-green-600">{selectedCount}</div>
+                  <div className="text-xs text-gray-500">Selected</div>
+                </div>
+              </div>
+            </div>
+
             {campaign.createdAt && (
-              <div>Created: {new Date(campaign.createdAt).toLocaleDateString()}</div>
+              <div className="text-xs text-gray-400 pt-2">
+                Created: {new Date(campaign.createdAt).toLocaleDateString()}
+              </div>
             )}
           </div>
         </div>
@@ -1116,6 +1382,347 @@ const AllCampaignsSection = () => {
                   {isSubmitting ? 'Creating...' : currentStep === 3 ? 'Launch Campaign' : 'Next'}
                 </button>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteModal && campaignToDelete && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-lg max-w-md w-full p-6">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">
+              Confirm Deletion
+            </h3>
+            <p className="text-sm text-gray-600 mb-6">
+              Are you sure you want to delete the campaign "<span className="font-medium">{campaignToDelete.campaignName}</span>"?
+            </p>
+
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={() => setShowDeleteModal(false)}
+                className="px-4 py-2 bg-gray-200 rounded-lg text-gray-700 hover:bg-gray-300"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleDeleteCampaign}
+                disabled={isDeletingCampaign}
+                className={`px-4 py-2 rounded-lg font-medium ${
+                  isDeletingCampaign 
+                    ? 'bg-red-400 text-white cursor-not-allowed' 
+                    : 'bg-red-600 hover:bg-red-700 text-white'
+                }`}
+              >
+                {isDeletingCampaign ? 'Deleting...' : 'Delete Campaign'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Campaign Detail/Edit Modal */}
+      {showDetailModal && selectedCampaign && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-hidden">
+            {/* Modal Header */}
+            <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <h2 className="text-2xl font-bold text-gray-900">Campaign Details</h2>
+                <span className={`text-xs px-3 py-1 rounded-full ${
+                  selectedCampaign.status === 'Active' ? 'text-green-600 bg-green-50' :
+                  selectedCampaign.status === 'Draft' ? 'text-gray-600 bg-gray-50' :
+                  selectedCampaign.status === 'Completed' ? 'text-blue-600 bg-blue-50' :
+                  'text-orange-600 bg-orange-50'
+                }`}>
+                  {selectedCampaign.status}
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                {!isEditMode && (
+                  <button
+                    onClick={handleEnableEdit}
+                    className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                    title="Edit Campaign"
+                  >
+                    <Edit className="w-5 h-5 text-gray-600" />
+                  </button>
+                )}
+                <button 
+                  onClick={() => {
+                    setShowDetailModal(false);
+                    setIsEditMode(false);
+                    setSelectedCampaign(null);
+                  }}
+                  className="text-gray-400 hover:text-gray-600"
+                >
+                  <X className="w-6 h-6" />
+                </button>
+              </div>
+            </div>
+
+            {/* Modal Content */}
+            <div className="px-6 py-6 max-h-[70vh] overflow-y-auto">
+              <div className="space-y-6">
+                {/* Product Images */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Product Images</label>
+                  <div className="grid grid-cols-4 gap-4">
+                    {selectedCampaign.productImages?.map((img, idx) => (
+                      <div key={idx} className="aspect-square bg-gray-200 rounded-lg overflow-hidden">
+                        <img src={img} alt={`Product ${idx + 1}`} className="w-full h-full object-cover" />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Campaign Name - EDITABLE */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Campaign Name {isEditMode && <span className="text-green-600">✎ Editable</span>}
+                  </label>
+                  {isEditMode ? (
+                    <input
+                      type="text"
+                      value={selectedCampaign.campaignName}
+                      onChange={(e) => handleUpdateField('campaignName', e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                    />
+                  ) : (
+                    <p className="text-gray-900">{selectedCampaign.campaignName}</p>
+                  )}
+                </div>
+
+                {/* Campaign Type - READ ONLY */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Campaign Type</label>
+                  <p className="text-gray-900 capitalize">{selectedCampaign.campaignType}</p>
+                </div>
+
+                {/* Campaign Brief - READ ONLY */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Campaign Brief</label>
+                  <p className="text-gray-900">{selectedCampaign.campaignBrief}</p>
+                </div>
+
+                {/* Status - EDITABLE */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Status {isEditMode && <span className="text-green-600">✎ Editable</span>}
+                  </label>
+                  {isEditMode ? (
+                    <select
+                      value={selectedCampaign.status}
+                      onChange={(e) => handleUpdateField('status', e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                    >
+                      <option value="Draft">Draft</option>
+                      <option value="Active">Active</option>
+                      <option value="Completed">Completed</option>
+                      <option value="Paused">Paused</option>
+                    </select>
+                  ) : (
+                    <p className="text-gray-900">{selectedCampaign.status}</p>
+                  )}
+                </div>
+
+                {/* Compensation - EDITABLE */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Compensation {isEditMode && <span className="text-green-600">✎ Editable</span>}
+                  </label>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-xs text-gray-600 mb-1">Type</label>
+                      {isEditMode ? (
+                        <select
+                          value={selectedCampaign.compensation.type}
+                          onChange={(e) => handleUpdateNestedField('compensation', 'type', e.target.value)}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                        >
+                          <option value="Monetary">Monetary</option>
+                          <option value="Barter/Gifting">Barter/Gifting</option>
+                          <option value="Affiliate/Commission">Affiliate/Commission</option>
+                        </select>
+                      ) : (
+                        <p className="text-gray-900">{selectedCampaign.compensation.type}</p>
+                      )}
+                    </div>
+                    <div>
+                      <label className="block text-xs text-gray-600 mb-1">Amount</label>
+                      {isEditMode ? (
+                        <input
+                          type="number"
+                          value={selectedCampaign.compensation.amount}
+                          onChange={(e) => handleUpdateNestedField('compensation', 'amount', parseInt(e.target.value))}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                        />
+                      ) : (
+                        <p className="text-gray-900">{selectedCampaign.compensation.currency} {selectedCampaign.compensation.amount}</p>
+                      )}
+                    </div>
+                    <div className="col-span-2">
+                      <label className="block text-xs text-gray-600 mb-1">Description</label>
+                      {isEditMode ? (
+                        <textarea
+                          value={selectedCampaign.compensation.description}
+                          onChange={(e) => handleUpdateNestedField('compensation', 'description', e.target.value)}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                          rows={2}
+                        />
+                      ) : (
+                        <p className="text-gray-900">{selectedCampaign.compensation.description}</p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Budget - EDITABLE */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Budget {isEditMode && <span className="text-green-600">✎ Editable</span>}
+                  </label>
+                  {isEditMode ? (
+                    <input
+                      type="number"
+                      value={selectedCampaign.budget}
+                      onChange={(e) => handleUpdateField('budget', parseInt(e.target.value))}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                    />
+                  ) : (
+                    <p className="text-gray-900">{selectedCampaign.compensation?.currency || 'INR'} {selectedCampaign.budget}</p>
+                  )}
+                </div>
+
+                {/* Deliverables - EDITABLE */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Deliverables {isEditMode && <span className="text-green-600">✎ Editable</span>}
+                  </label>
+                  {isEditMode ? (
+                    <textarea
+                      value={Array.isArray(selectedCampaign.deliverables) ? selectedCampaign.deliverables.join(', ') : selectedCampaign.deliverables}
+                      onChange={(e) => handleUpdateField('deliverables', e.target.value.split(',').map(d => d.trim()))}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                      rows={3}
+                      placeholder="Separate deliverables with commas"
+                    />
+                  ) : (
+                    <ul className="list-disc list-inside text-gray-900">
+                      {Array.isArray(selectedCampaign.deliverables) 
+                        ? selectedCampaign.deliverables.map((d, idx) => <li key={idx}>{d}</li>)
+                        : <li>{selectedCampaign.deliverables}</li>
+                      }
+                    </ul>
+                  )}
+                </div>
+
+                {/* Timelines - READ ONLY */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Timeline</label>
+                  <div className="grid grid-cols-3 gap-4 text-sm">
+                    <div>
+                      <p className="text-gray-600">Application Deadline</p>
+                      <p className="text-gray-900">{new Date(selectedCampaign.timelines.applicationDeadline).toLocaleDateString()}</p>
+                    </div>
+                    <div>
+                      <p className="text-gray-600">Campaign Start</p>
+                      <p className="text-gray-900">{new Date(selectedCampaign.timelines.campaignStartDate).toLocaleDateString()}</p>
+                    </div>
+                    <div>
+                      <p className="text-gray-600">Campaign End</p>
+                      <p className="text-gray-900">{new Date(selectedCampaign.timelines.campaignEndDate).toLocaleDateString()}</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Target Influencer - READ ONLY */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Target Influencer Criteria</label>
+                  <div className="bg-gray-50 p-4 rounded-lg space-y-2 text-sm">
+                    <p><span className="font-medium">Number of Influencers:</span> {selectedCampaign.targetInfluencer.numberOfInfluencers}</p>
+                    <p><span className="font-medium">Niche:</span> {selectedCampaign.targetInfluencer.targetNiche.join(', ')}</p>
+                    <p><span className="font-medium">Follower Range:</span> {selectedCampaign.targetInfluencer.followerCount.min.toLocaleString()} - {selectedCampaign.targetInfluencer.followerCount.max.toLocaleString()}</p>
+                    <p><span className="font-medium">Countries:</span> {selectedCampaign.targetInfluencer.countries.join(', ')}</p>
+                    <p><span className="font-medium">Gender:</span> {selectedCampaign.targetInfluencer.gender.join(', ')}</p>
+                    <p><span className="font-medium">Age Range:</span> {selectedCampaign.targetInfluencer.ageRange.min} - {selectedCampaign.targetInfluencer.ageRange.max}</p>
+                  </div>
+                </div>
+
+                {/* Number of Live Posts - READ ONLY */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Number of Live Posts</label>
+                  <p className="text-gray-900">{selectedCampaign.numberOfLivePosts}</p>
+                </div>
+
+                {/* Applicants & Selected Influencers */}
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Applicants</label>
+                    <p className="text-2xl font-bold text-blue-600">{selectedCampaign.applicants.length}</p>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Selected Influencers</label>
+                    <p className="text-2xl font-bold text-green-600">{selectedCampaign.selectedInfluencers.length}</p>
+                  </div>
+                </div>
+
+                {/* Suggested Influencers */}
+                {selectedCampaign.suggestedInfluencers && selectedCampaign.suggestedInfluencers.length > 0 && (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">AI Suggested Influencers</label>
+                    <div className="space-y-2">
+                      {selectedCampaign.suggestedInfluencers.map((influencer, idx) => (
+                        <div key={idx} className="bg-green-50 p-3 rounded-lg">
+                          <div className="flex items-center justify-between mb-1">
+                            <p className="font-medium text-gray-900">@{influencer.username}</p>
+                            <span className="text-xs bg-green-600 text-white px-2 py-1 rounded">
+                              {influencer.matchScore}% Match
+                            </span>
+                          </div>
+                          <p className="text-sm text-gray-600">{influencer.reason}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Modal Footer */}
+            <div className="px-6 py-4 border-t border-gray-200 flex items-center justify-between">
+              {isEditMode ? (
+                <>
+                  <button
+                    onClick={handleCancelEdit}
+                    disabled={isUpdating}
+                    className="px-4 py-2 bg-gray-200 rounded-lg text-gray-700 hover:bg-gray-300"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleSaveUpdates}
+                    disabled={isUpdating}
+                    className={`px-6 py-2 rounded-lg font-medium ${
+                      isUpdating 
+                        ? 'bg-gray-400 text-white cursor-not-allowed' 
+                        : 'bg-green-600 hover:bg-green-700 text-white'
+                    }`}
+                  >
+                    {isUpdating ? 'Saving...' : 'Save Changes'}
+                  </button>
+                </>
+              ) : (
+                <button
+                  onClick={() => {
+                    setShowDetailModal(false);
+                    setSelectedCampaign(null);
+                  }}
+                  className="ml-auto px-4 py-2 bg-gray-200 rounded-lg text-gray-700 hover:bg-gray-300"
+                >
+                  Close
+                </button>
+              )}
             </div>
           </div>
         </div>
