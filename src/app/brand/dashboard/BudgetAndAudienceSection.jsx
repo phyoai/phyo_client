@@ -87,9 +87,9 @@ const BudgetAndAudienceSection = () => {
     <div className="bg-[#F5F3EE] py-8">
       <div className="max-w-7xl mx-auto px-6">
         {/* Section Headers */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-          <h2 className="text-2xl font-bold text-gray-900">Budget Spent</h2>
-          <h2 className="text-2xl font-bold text-gray-900">Audience Sentiment</h2>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-4 ">
+          <h2 className="text-2xl font-bold text-gray-900 bg-white p-4 rounded-3xl">Budget Spent</h2>
+          <h2 className="text-2xl font-bold text-gray-900 bg-white p-4 rounded-3xl">Audience Sentiment</h2>
         </div>
 
         {loading ? (
@@ -100,8 +100,12 @@ const BudgetAndAudienceSection = () => {
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Money Spend Card */}
-            <div className="bg-white rounded-lg p-6 border border-gray-200 shadow-sm">
+
+            <div className=' bg-white rounded-3xl p-8'>
+            <div className="bg-[#F3F2EB]  p-6 border border-gray-200 shadow-sm rounded-3xl">
               {/* Header */}
+
+
               <div className="flex items-center justify-between mb-6">
                 <h3 className="text-lg font-medium text-gray-900">Money Spend</h3>
                 <div className="relative">
@@ -159,14 +163,18 @@ const BudgetAndAudienceSection = () => {
                 </ResponsiveContainer>
               </div>
             </div>
+</div>
+
 
             {/* Audience Sentiment Card */}
-            <div className="bg-white rounded-lg p-6 border border-gray-200 shadow-sm">
+
+            <div className=' bg-white rounded-3xl p-8'>
+            <div className="bg-[#F3F2EB]  p-6 border border-gray-200 shadow-sm rounded-3xl">
               {/* Header */}
               <div className="flex items-center justify-between mb-6">
                 <h3 className="text-lg font-medium text-gray-900">Employee Structure</h3>
-                <button className="text-gray-400 hover:text-gray-600">
-                  <MoreHorizontal className="h-5 w-5" />
+                <button className="text-white  bg-black p-1 rounded-lg">
+                  <MoreHorizontal className="h-5 w-5 rotate-90" />
                 </button>
               </div>
 
@@ -175,7 +183,7 @@ const BudgetAndAudienceSection = () => {
                 <div className="w-64 h-64 mx-auto">
                   <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
-                      <Pie
+                      <Pie  
                         data={sentimentData}
                         cx="50%"
                         cy="50%"
@@ -222,6 +230,8 @@ const BudgetAndAudienceSection = () => {
                 </div>
               </div>
             </div>
+
+</div>
           </div>
         )}
       </div>
