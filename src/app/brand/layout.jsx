@@ -23,9 +23,9 @@ export default function BrandLayout({ children }) {
   console.log('BrandLayout: Rendering layout with sidebar');
   
   return (
-    <div className="flex min-h-screen bg-[#F5F3EE]">
+    <div className="flex min-h-screen bg-[#FFFFFF]">
       <BrandSidebar />
-      <main className="flex-1 ml-64 bg-[#F3F2EB]">
+      <main className="flex-1 ml-20 bg-[#FFFFFF]">
         {children}
       </main>
     </div>
