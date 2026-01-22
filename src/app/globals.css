@@ -6,6 +6,16 @@ html, body {
 @tailwind components;
 @tailwind utilities;
 
+@layer utilities {
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+}
+
 :root {
     --light-grey: #F5F5F5;
     --grey: #A3AED0;
