@@ -1,9 +1,11 @@
 'use client'
 import React, { useState, useRef } from 'react';
-import { ChevronLeft, ChevronRight, X, Upload, Calendar, Check, Users, MoreVertical, Trash2, Edit } from 'lucide-react';
+import { ChevronLeft, ChevronRight, X, Upload, Calendar, Check, Users, MoreVertical, Trash2, Edit, Search, Heart, TrendingUp } from 'lucide-react';
 import { campaignAPI } from '../../../utils/api';
+import { useSidebar } from '../../context/SidebarContext';
 
 const AllCampaignsSection = () => {
+  const { setSidebarButtonAction, setSidebarButtonLabel } = useSidebar();
   const [showModal, setShowModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showDetailModal, setShowDetailModal] = useState(false);
@@ -17,6 +19,8 @@ const AllCampaignsSection = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [campaigns, setCampaigns] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [showAllCampaigns, setShowAllCampaigns] = useState(false);
+  const [showAllDrafts, setShowAllDrafts] = useState(false);
   const [pagination, setPagination] = useState({
     currentPage: 1,
     totalPages: 1,
@@ -173,6 +177,29 @@ const AllCampaignsSection = () => {
     fetchCampaigns();
   }, []);
 
+  // Helper function to get active campaigns
+  const getActiveCampaigns = () => {
+    return campaigns.filter(campaign => campaign.status === 'Active');
+  };
+
+  // Helper function to get draft campaigns
+  const getDraftCampaigns = () => {
+    return campaigns.filter(campaign => campaign.status === 'Draft');
+  };
+
+  // Register sidebar button action for campaigns tab
+  React.useEffect(() => {
+    // Set the button action to open the create campaign modal
+    setSidebarButtonAction(() => () => setShowModal(true));
+    setSidebarButtonLabel('Create Campaign');
+
+    // Cleanup: Remove the action when component unmounts
+    return () => {
+      setSidebarButtonAction(null);
+      setSidebarButtonLabel('Button');
+    };
+  }, [setSidebarButtonAction, setSidebarButtonLabel]);
+
   // Pagination handlers
   const handlePrevPage = () => {
     if (pagination.hasPrev) {
@@ -226,6 +253,12 @@ const AllCampaignsSection = () => {
       console.error('Error activating campaign:', error);
       alert(`Failed to activate campaign: ${error.message || 'Unknown error'}`);
     }
+  };
+
+  // Complete/Activate campaign from draft (with event handler for button click)
+  const handleCompleteCampaign = async (e, campaignId) => {
+    e.stopPropagation(); // Prevent triggering parent click handlers
+    await handleActivateCampaign(campaignId);
   };
 
   // Open campaign detail modal
@@ -1229,73 +1262,493 @@ const AllCampaignsSection = () => {
   };
 
   return (
-    <div className="bg-[#F3F2EB] py-8">
+    <div className="bg-[#FFFFFF] py-8">
       <div className="max-w-7xl mx-auto px-6">
         {/* Main Header */}
-        <div className="flex items-center justify-between mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">All Campaigns</h1>
-          <button 
-            onClick={() => setShowModal(true)}
-            className="bg-[#00674F] hover:scale-105 text-white px-6 py-3 rounded-lg font-medium transition-colors"
-          >
-            Create New Campaign
-          </button>
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center gap-3">
+            {(showAllCampaigns || showAllDrafts) && (
+              <button 
+                onClick={() => {
+                  setShowAllCampaigns(false);
+                  setShowAllDrafts(false);
+                }}
+                className="p-2 hover:bg-gray-100 rounded-lg"
+              >
+                <ChevronLeft className="w-5 h-5 text-gray-600" />
+              </button>
+            )}
+            <h1 className="text-2xl font-semibold text-gray-900">
+              {showAllCampaigns ? 'All Campaigns' : showAllDrafts ? 'All Draft Campaigns' : 'Campaigns'}
+            </h1>
+          </div>
+          <div className="flex items-center gap-4">
+            <button className="p-2 hover:bg-gray-100 rounded-lg">
+              <Search className="w-5 h-5 text-gray-600" />
+            </button>
+            <button className="p-2 hover:bg-gray-100 rounded-lg">
+              <MoreVertical className="w-5 h-5 text-gray-600" />
+            </button>
+          </div>
         </div>
 
-        {/* All Campaigns Section */}
-        <div className="mb-12">
-          <div className="flex items-center justify-between mb-6">
-            <div className="flex items-center space-x-2">
-              <h2 className="text-xl font-semibold text-gray-900">All Campaigns</h2>
-              <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+        {showAllCampaigns ? (
+          // All Campaigns Grid View
+          <div className="mb-8">
+            <div className="flex items-center justify-between mb-4">
+              <p className="text-sm text-gray-600">
+                Showing {campaigns.length} campaigns
+              </p>
             </div>
-            <div className="flex items-center space-x-2">
-              <span className="text-sm text-gray-600">
-                Page {pagination.currentPage} of {pagination.totalPages} ({pagination.totalItems} total)
-              </span>
-              <button 
-                onClick={handlePrevPage}
-                disabled={!pagination.hasPrev}
-                className={`p-2 rounded-full transition-colors ${
-                  pagination.hasPrev 
-                    ? 'bg-green-600 text-white hover:bg-green-700' 
-                    : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                }`}
-              >
-                <ChevronLeft className="h-4 w-4" />
-              </button>
-              <button 
-                onClick={handleNextPage}
-                disabled={!pagination.hasNext}
-                className={`p-2 rounded-full transition-colors ${
-                  pagination.hasNext 
-                    ? 'bg-green-600 text-white hover:bg-green-700' 
-                    : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                }`}
-              >
-                <ChevronRight className="h-4 w-4" />
-              </button>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {loading ? (
+                <div className="col-span-full text-center py-8">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600 mx-auto"></div>
+                  <p className="mt-2 text-gray-600">Loading campaigns...</p>
+                </div>
+              ) : campaigns.length > 0 ? (
+                campaigns.map((campaign) => (
+                  <div key={campaign._id} className="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-md transition-shadow">
+                    <div className="relative">
+                      {/* Eyebrow label */}
+                      <div className="absolute top-3 left-3 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full">
+                        <span className="text-xs text-gray-600">Eyebrow</span>
+                      </div>
+                      
+                      {/* Campaign image */}
+                      <div className="aspect-video bg-gradient-to-br from-green-700 to-green-900 relative overflow-hidden">
+                        {campaign.productImages && campaign.productImages.length > 0 ? (
+                          <img src={campaign.productImages[0]} alt={campaign.campaignName} className="w-full h-full object-cover" />
+                        ) : (
+                          <div className="absolute inset-0 flex items-center justify-center text-white">
+                            <div className="text-center p-6">
+                              <div className="text-2xl font-bold mb-2">WE CREATE</div>
+                              <div className="text-xl">SMILES, NOT ADS</div>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Header with avatar and badge */}
+                      <div className="absolute top-16 left-3 right-3 flex items-center justify-between">
+                        <div className="flex items-center gap-2 bg-white/90 backdrop-blur-sm px-3 py-2 rounded-full">
+                          <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white text-xs font-semibold">
+                            {campaign.campaignName?.substring(0, 2).toUpperCase() || 'AB'}
+                          </div>
+                          <div>
+                            <h3 className="text-sm font-semibold text-gray-900">{campaign.campaignName || 'Lenskart'}</h3>
+                            <p className="text-xs text-gray-500">3d ago</p>
+                          </div>
+                        </div>
+                        <div className="bg-yellow-400 p-2 rounded-full">
+                          <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                          </svg>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Action button */}
+                    <div className="p-3 flex justify-end">
+                      <button 
+                        onClick={() => handleCampaignClick(campaign)}
+                        className="text-gray-400 hover:text-gray-600"
+                      >
+                        <Heart className="w-5 h-5" />
+                      </button>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <div className="col-span-full text-center py-8">
+                  <p className="text-gray-600">No campaigns found. Create your first campaign!</p>
+                </div>
+              )}
             </div>
           </div>
+        ) : showAllDrafts ? (
+          // All Draft Campaigns Grid View
+          <div className="mb-8">
+            <div className="flex items-center justify-between mb-4">
+              <p className="text-sm text-gray-600">
+                Showing {getDraftCampaigns().length} draft campaigns
+              </p>
+            </div>
 
-          {/* Campaigns Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {loading ? (
+                <div className="col-span-full text-center py-8">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600 mx-auto"></div>
+                  <p className="mt-2 text-gray-600">Loading draft campaigns...</p>
+                </div>
+              ) : getDraftCampaigns().length > 0 ? (
+                getDraftCampaigns().map((draft) => (
+                  <div key={draft._id} className="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-md transition-shadow">
+                    <div className="relative">
+                      {/* Eyebrow label */}
+                      <div className="absolute top-3 left-3 bg-gray-400/90 backdrop-blur-sm px-3 py-1 rounded-full z-10">
+                        <span className="text-xs text-white font-medium">Draft</span>
+                      </div>
+                      
+                      {/* Image Section */}
+                      <div className="aspect-video bg-gradient-to-br from-gray-600 to-gray-800 relative overflow-hidden">
+                        {draft.productImages && draft.productImages.length > 0 ? (
+                          <img src={draft.productImages[0]} alt={draft.campaignName} className="w-full h-full object-cover" />
+                        ) : (
+                          <div className="absolute inset-0 flex items-center justify-center text-white">
+                            <div className="text-center p-6">
+                              <div className="text-2xl font-bold mb-2">DRAFT</div>
+                              <div className="text-xl">CAMPAIGN</div>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Campaign Info Overlay */}
+                      <div className="absolute top-16 left-3 right-3 flex items-center justify-between">
+                        <div className="flex items-center gap-2 bg-white/90 backdrop-blur-sm px-3 py-2 rounded-full">
+                          <div className="w-8 h-8 bg-gray-600 rounded-full flex items-center justify-center text-white text-xs font-semibold">
+                            {draft.campaignName?.substring(0, 2).toUpperCase() || 'DR'}
+                          </div>
+                          <div>
+                            <h3 className="text-sm font-semibold text-gray-900">{draft.campaignName || 'Draft Campaign'}</h3>
+                            <p className="text-xs text-gray-500">Draft</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Action Button */}
+                    <div className="p-3 flex gap-2">
+                      <button 
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleCampaignClick(draft);
+                        }}
+                        className="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium hover:bg-gray-50"
+                      >
+                        View Details
+                      </button>
+                      <button 
+                        onClick={(e) => handleCompleteCampaign(e, draft._id)}
+                        className="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg text-sm font-medium hover:bg-green-700"
+                      >
+                        Complete Campaign
+                      </button>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <div className="col-span-full text-center py-8">
+                  <p className="text-gray-600">No draft campaigns found.</p>
+                </div>
+              )}
+            </div>
+          </div>
+        ) : (
+          <>
+            {/* Recent Campaigns Section */}
+            <div className="mb-8">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-lg font-semibold text-gray-900">Recent Campaigns</h2>
+                <button 
+                  onClick={() => setShowAllCampaigns(true)}
+                  className="text-blue-600 text-sm font-medium hover:underline"
+                >
+                  view all &gt;
+                </button>
+              </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {loading ? (
               <div className="col-span-full text-center py-8">
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600 mx-auto"></div>
                 <p className="mt-2 text-gray-600">Loading campaigns...</p>
               </div>
-            ) : campaigns.length > 0 ? (
-              campaigns.map((campaign) => (
-                <CampaignCard key={campaign._id} campaign={campaign} />
+            ) : getActiveCampaigns().length > 0 ? (
+              getActiveCampaigns().slice(0, 3).map((campaign) => (
+                <div key={campaign._id} className="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-md transition-shadow cursor-pointer" onClick={() => handleCampaignClick(campaign)}>
+                  <div className="p-4 flex items-center justify-between border-b">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white font-semibold">
+                        {campaign.campaignName?.substring(0, 2).toUpperCase() || 'AB'}
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-gray-900">{campaign.campaignName || 'Lenskart'}</h3>
+                        <p className="text-xs text-gray-500">3d ago</p>
+                      </div>
+                    </div>
+                    <button className="text-gray-400 hover:text-gray-600">
+                      <Heart className="w-5 h-5" />
+                    </button>
+                  </div>
+                  <div className="aspect-video bg-gradient-to-br from-green-700 to-green-900 relative overflow-hidden">
+                    {campaign.productImages && campaign.productImages.length > 0 ? (
+                      <img src={campaign.productImages[0]} alt={campaign.campaignName} className="w-full h-full object-cover" />
+                    ) : (
+                      <div className="absolute inset-0 flex items-center justify-center text-white">
+                        <div className="text-center p-6">
+                          <div className="text-2xl font-bold mb-2">WE CREATE</div>
+                          <div className="text-xl">SMILES, NOT ADS</div>
+                          <div className="mt-4 text-sm opacity-80">Campaign Preview</div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
               ))
             ) : (
               <div className="col-span-full text-center py-8">
-                <p className="text-gray-600">No campaigns found. Create your first campaign!</p>
+                <p className="text-gray-600">No active campaigns found. Create your first campaign!</p>
               </div>
             )}
           </div>
         </div>
+
+        {/* New Applications Section */}
+        <div className="mb-8">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-semibold text-gray-900">New Applications</h2>
+            <button className="text-blue-600 text-sm font-medium hover:underline">
+              view all &gt;
+            </button>
+          </div>
+
+          <div className="space-y-3">
+            {mockInfluencers.slice(0, 5).map((influencer) => (
+              <div key={influencer.id} className="bg-white rounded-lg border border-gray-200 p-4 flex items-center justify-between hover:shadow-sm transition-shadow">
+                <div className="flex items-center gap-3 flex-1">
+                  <div className="w-12 h-12 bg-gradient-to-br from-pink-400 to-purple-500 rounded-full"></div>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="font-semibold text-gray-900">{influencer.name}</h3>
+                    <p className="text-sm text-gray-600 truncate">
+                      {influencer.tags ? influencer.tags.slice(0, 3).join(' • ') : 'Influencer description'}
+                    </p>
+                  </div>
+                </div>
+                <button className="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium hover:bg-gray-50 whitespace-nowrap">
+                  portfolio
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Audience Engagement Section */}
+        <div className="mb-8">
+          <h2 className="text-lg font-semibold text-gray-900 mb-4">Audience Engagement</h2>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Likes Chart */}
+            <div className="bg-gray-50 rounded-lg p-4">
+              <div className="flex items-start justify-between mb-4">
+                <div>
+                  <div className="text-2xl font-bold text-gray-900">9.2K Likes</div>
+                  <div className="text-sm text-green-600 flex items-center gap-1">
+                    <TrendingUp className="w-4 h-4" />
+                    24% vs last month
+                  </div>
+                </div>
+              </div>
+              <div className="h-48 relative">
+                {/* Simple area chart visualization */}
+                <svg viewBox="0 0 400 150" className="w-full h-full">
+                  <defs>
+                    <linearGradient id="likesGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                      <stop offset="0%" stopColor="#10b981" stopOpacity="0.3" />
+                      <stop offset="100%" stopColor="#10b981" stopOpacity="0.05" />
+                    </linearGradient>
+                  </defs>
+                  <path d="M 0,80 L 50,60 L 100,75 L 150,50 L 200,70 L 250,45 L 300,55 L 350,35 L 400,40 L 400,150 L 0,150 Z" fill="url(#likesGradient)" />
+                  <path d="M 0,80 L 50,60 L 100,75 L 150,50 L 200,70 L 250,45 L 300,55 L 350,35 L 400,40" stroke="#10b981" strokeWidth="2" fill="none" />
+                  <circle cx="250" cy="45" r="4" fill="#10b981" />
+                  <circle cx="150" cy="50" r="4" fill="white" stroke="#10b981" strokeWidth="2" />
+                </svg>
+              </div>
+              <div className="flex justify-between text-xs text-gray-500 mt-2">
+                <span>July</span>
+                <span>Aug</span>
+                <span>Sep</span>
+                <span>Oct</span>
+                <span>Nov</span>
+                <span>Dec</span>
+              </div>
+            </div>
+
+            {/* Saves Chart */}
+            <div className="bg-gray-50 rounded-lg p-4">
+              <div className="flex items-start justify-between mb-4">
+                <div>
+                  <div className="text-2xl font-bold text-gray-900">3.2K saves</div>
+                  <div className="text-sm text-green-600 flex items-center gap-1">
+                    <TrendingUp className="w-4 h-4" />
+                    24% vs last month
+                  </div>
+                </div>
+              </div>
+              <div className="h-48 flex items-end justify-between gap-2">
+                {[5200, 3800, 4500, 2800, 4200, 3500].map((value, idx) => (
+                  <div key={idx} className="flex-1 bg-green-600 rounded-t" style={{ height: `${(value / 8000) * 100}%` }}></div>
+                ))}
+              </div>
+              <div className="flex justify-between text-xs text-gray-500 mt-2">
+                <span>July</span>
+                <span>Aug</span>
+                <span>Sep</span>
+                <span>Oct</span>
+                <span>Nov</span>
+                <span>Dec</span>
+              </div>
+            </div>
+
+            {/* Views Chart */}
+            <div className="bg-gray-50 rounded-lg p-4">
+              <div className="flex items-start justify-between mb-4">
+                <div>
+                  <div className="text-2xl font-bold text-gray-900">14K Views</div>
+                  <div className="text-sm text-green-600 flex items-center gap-1">
+                    <TrendingUp className="w-4 h-4" />
+                    24% vs last month
+                  </div>
+                </div>
+              </div>
+              <div className="h-48 flex items-end justify-between gap-2">
+                {[6500, 3800, 4200, 2500, 3800, 3200].map((value, idx) => (
+                  <div key={idx} className="flex-1 bg-green-700 rounded-t" style={{ height: `${(value / 8000) * 100}%` }}></div>
+                ))}
+              </div>
+              <div className="flex justify-between text-xs text-gray-500 mt-2">
+                <span>July</span>
+                <span>Aug</span>
+                <span>Sep</span>
+                <span>Oct</span>
+                <span>Nov</span>
+                <span>Dec</span>
+                <span>Aug</span>
+                <span>Sep</span>
+                <span>Oct</span>
+                <span>Nov</span>            {/* Comments Chart */}
+    <span>Dec</span>
+  </div>
+</div>
+{/* Comments Chart */}
+<div className="bg-gray-50 rounded-lg p-4">
+              <div className="flex items-start justify-between mb-4">
+                <div>
+                </div>
+              </div>
+              <div className="h-48 relative">
+                <svg viewBox="0 0 400 150" className="w-full h-full">
+                  <defs>
+                    <linearGradient id="commentsGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                      <stop offset="0%" stopColor="#6b7280" stopOpacity="0.3" />
+                      <stop offset="100%" stopColor="#6b7280" stopOpacity="0.05" />
+                    </linearGradient>
+                  </defs>
+                  <path d="M 0,90 L 50,70 L 100,85 L 150,65 L 200,75 L 250,55 L 300,70 L 350,50 L 400,45 L 400,150 L 0,150 Z" fill="url(#commentsGradient)" />
+                  <path d="M 0,90 L 50,70 L 100,85 L 150,65 L 200,75 L 250,55 L 300,70 L 350,50 L 400,45" stroke="#6b7280" strokeWidth="2" fill="none" />
+                  <circle cx="250" cy="55" r="4" fill="white" stroke="#6b7280" strokeWidth="2" />
+                </svg>
+              </div>
+              <div className="flex justify-between text-xs text-gray-500 mt-2">
+                <span>July</span>
+                <span>Aug</span>
+                <span>Sep</span>
+                <span>Oct</span>
+                <span>Nov</span>
+                <span>Dec</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Spending Budget Section */}
+        <div className="mb-8">
+          <h2 className="text-lg font-semibold text-gray-900 mb-4">Spending Budget</h2>
+          
+          <div className="bg-gray-50 rounded-lg p-4">
+            <div className="flex items-start justify-between mb-4">
+              <div>
+                <div className="text-2xl font-bold text-gray-900">₹124,657.80</div>
+                <div className="text-sm text-green-600 flex items-center gap-1">
+                  <TrendingUp className="w-4 h-4" />
+                  24% vs last month
+                </div>
+              </div>
+            </div>
+            <div className="h-48 flex items-end justify-between gap-2">
+              {[5500, 5200, 3800, 5400, 3600, 2800, 3700, 3900].map((value, idx) => (
+                <div key={idx} className={`flex-1 ${idx % 2 === 0 ? 'bg-green-700' : 'bg-green-500'} rounded-t`} style={{ height: `${(value / 8000) * 100}%` }}></div>
+              ))}
+            </div>
+            <div className="flex justify-between text-xs text-gray-500 mt-2">
+              <span>July</span>
+              <span>Aug</span>
+              <span>Sep</span>
+              <span>Oct</span>
+              <span>Nov</span>
+              <span>Dec</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Draft Campaigns Section */}
+        <div className="mb-8">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-semibold text-gray-900">Draft Campaigns</h2>
+            <button 
+              onClick={() => setShowAllDrafts(true)}
+              className="text-blue-600 text-sm font-medium hover:underline"
+            >
+              view all &gt;
+            </button>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {loading ? (
+              <div className="col-span-full text-center py-8">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600 mx-auto"></div>
+                <p className="mt-2 text-gray-600">Loading draft campaigns...</p>
+              </div>
+            ) : getDraftCampaigns().length > 0 ? (
+              getDraftCampaigns().slice(0, 3).map((draft) => (
+                <div key={draft._id} className="bg-amber-50 rounded-lg overflow-hidden border border-gray-200 hover:shadow-md transition-shadow">
+                  <div className="aspect-video bg-gray-200 relative overflow-hidden cursor-pointer" onClick={() => handleCampaignClick(draft)}>
+                    {draft.productImages && draft.productImages.length > 0 ? (
+                      <img src={draft.productImages[0]} alt={draft.campaignName} className="w-full h-full object-cover" />
+                    ) : (
+                      <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-green-700 to-green-900 text-white">
+                        <div className="text-center p-6">
+                          <div className="text-2xl font-bold mb-2">WE CREATE</div>
+                          <div className="text-xl">SMILES, NOT ADS</div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                  <div className="p-4">
+                    <h3 className="font-semibold text-gray-900 mb-2">{draft.campaignName}</h3>
+                    <p className="text-sm text-gray-600 mb-4 line-clamp-2">
+                      {draft.campaignBrief || 'No description available'}
+                    </p>
+                    <button 
+                      onClick={(e) => handleCompleteCampaign(e, draft._id)}
+                      className="px-4 py-2 bg-green-600 text-white rounded-lg text-sm font-medium hover:bg-green-700 w-full"
+                    >
+                      Complete Campaign
+                    </button>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div className="col-span-full text-center py-8">
+                <p className="text-gray-600">No draft campaigns found.</p>
+              </div>
+            )}
+          </div>
+        </div>
+        </>
+        )}
       </div>
 
       {/* Modal */}

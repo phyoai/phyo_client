@@ -7,6 +7,8 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '../context/AuthContext';
 import { GoogleLogin, GoogleOAuthProvider } from '@react-oauth/google';
 import { authUtils } from '../../utils/api';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const formFields = [
     {
@@ -41,7 +43,6 @@ function LoginForm() {
     } = useForm();
 
     const [loading, setLoading] = useState(false);
-    const [error, setError] = useState('');
     const [showPassword, setShowPassword] = useState(false);
     const [googleLoading, setGoogleLoading] = useState(false);
     const router = useRouter();
@@ -60,6 +61,13 @@ function LoginForm() {
             router.push(redirect);
         }
     }, [isAuthenticated, router, searchParams]);
+
+    // Show success message for verified email
+    useEffect(() => {
+        if (verified) {
+            toast.success('Email verified successfully! Please sign in with your credentials.');
+        }
+    }, [verified]);
 
     const loginAPI = async (email, password) => {
         console.log('Attempting login for:', email); // Debug log
@@ -112,7 +120,6 @@ function LoginForm() {
 
     const handleGoogleSuccess = async (credentialResponse) => {
         setGoogleLoading(true);
-        setError('');
 
         try {
             console.log('Google credential received'); // Debug log
@@ -133,17 +140,19 @@ function LoginForm() {
                     }
                 }
                 
+                toast.success('Successfully signed in with Google!');
+                
                 // Redirect to dashboard or requested page
                 const redirect = searchParams.get('redirect') || '/';
-                router.push(redirect);
+                setTimeout(() => router.push(redirect), 1000);
                 
             } else {
                 console.log('Google login failed with result:', result); // Debug log
-                setError(result.message || 'Google login failed');
+                toast.error(result.message || 'Google login failed');
             }
         } catch (error) {
             console.error('Google login error:', error); // Debug log
-            setError(error.message || 'Failed to sign in with Google');
+            toast.error(error.message || 'Failed to sign in with Google');
         } finally {
             setGoogleLoading(false);
         }
@@ -151,12 +160,11 @@ function LoginForm() {
 
     const handleGoogleError = () => {
         console.error('Google Sign-In failed');
-        setError('Google Sign-In was unsuccessful. Please try again.');
+        toast.error('Google Sign-In was unsuccessful. Please try again.');
     };
 
     const onSubmit = async (data) => {
         setLoading(true);
-        setError('');
 
         try {
             console.log('Submitting login form'); // Debug log
@@ -178,17 +186,19 @@ function LoginForm() {
                     localStorage.setItem('userData', JSON.stringify(result.user || result.data.user));
                 }
                 
+                toast.success('Login successful! Welcome back!');
+                
                 // Redirect to dashboard or requested page
                 const redirect = searchParams.get('redirect') || '/';
-                router.push(redirect);
+                setTimeout(() => router.push(redirect), 1000);
                 
             } else {
                 console.log('Login failed with result:', result); // Debug log
-                setError(result.message || 'Login failed');
+                toast.error(result.message || 'Login failed');
             }
         } catch (error) {
             console.error('Login error:', error); // Debug log
-            setError(error.message || 'An unexpected error occurred');
+            toast.error(error.message || 'An unexpected error occurred');
         } finally {
             setLoading(false);
         }
@@ -233,25 +243,6 @@ function LoginForm() {
                             Login to your account
                         </p>
                     </div>
-
-                    {/* Success message for verified email */}
-                    {verified && (
-                        <div className="mb-4 p-3 bg-green-50 border border-green-200 text-green-700 rounded-lg text-sm">
-                            <div className="flex items-center">
-                                <span className="mr-2">✅</span>
-                                Email verified successfully! Please sign in with your credentials.
-                            </div>
-                        </div>
-                    )}
-
-                    {error && (
-                        <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm">
-                            <div className="flex items-center">
-                                <span className="mr-2">⚠️</span>
-                                {error}
-                            </div>
-                        </div>
-                    )}
 
                     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
                         {formFields.map((field) => (
@@ -393,6 +384,20 @@ function LoginForm() {
                     style={{ objectPosition: 'left bottom' }}
                 />
             </div>
+
+            {/* Toast Container */}
+            <ToastContainer
+                position="top-right"
+                autoClose={3000}
+                hideProgressBar={true}
+                newestOnTop={false}
+                closeOnClick
+                rtl={false}
+                pauseOnFocusLoss
+                draggable
+                pauseOnHover
+                theme="light"
+            />
         </div>
     );
 }

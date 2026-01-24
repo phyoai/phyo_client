@@ -3,9 +3,10 @@ import React, { useEffect, Suspense } from 'react';
 import { usePathname } from 'next/navigation';
 import BrandSidebar from '../../components/BrandSidebar';
 import ProtectedRoute from '../../components/ProtectedRoute';
+import { SidebarProvider, useSidebar } from '../context/SidebarContext';
 
-export default function BrandLayout({ children }) {
-  const pathname = usePathname();
+function BrandLayoutContent({ children, pathname }) {
+  const { isExpanded } = useSidebar();
   
   // Debug logging
   useEffect(() => {
@@ -25,10 +26,24 @@ export default function BrandLayout({ children }) {
   return (
     <div className="flex min-h-screen bg-[#FFFFFF]">
       <BrandSidebar />
-      <main className="flex-1 ml-20 bg-[#FFFFFF]">
+      <main className={`flex-1 bg-[#FFFFFF] transition-all duration-300 ease-in-out ${
+        isExpanded ? 'ml-80' : 'ml-20'
+      }`}>
         {children}
       </main>
     </div>
+  );
+}
+
+export default function BrandLayout({ children }) {
+  const pathname = usePathname();
+  
+  return (
+    <SidebarProvider>
+      <BrandLayoutContent pathname={pathname}>
+        {children}
+      </BrandLayoutContent>
+    </SidebarProvider>
   );
 } 
 
