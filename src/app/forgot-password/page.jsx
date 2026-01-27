@@ -1,6 +1,8 @@
 'use client'
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const ForgotPassword = () => {
   const [step, setStep] = useState(1); // 1: email, 2: verify code, 3: new password
@@ -9,8 +11,6 @@ const ForgotPassword = () => {
   const [newPassword, setNewPassword] = useState('');
   const [confirmNewPassword, setConfirmNewPassword] = useState('');
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
@@ -18,11 +18,10 @@ const ForgotPassword = () => {
 
   const sendForgotPasswordEmail = async () => {
     if (!email) {
-      setError('Please enter your email address');
+      toast.error('Please enter your email address');
       return;
     }
     setLoading(true);
-    setError('');
     try {
       const response = await fetch('https://api.phyo.ai/api/user/forgot-password', {
         method: 'POST',
@@ -31,12 +30,13 @@ const ForgotPassword = () => {
       });
       const result = await response.json();
       if (response.ok) {
+        toast.success('📧 Verification code sent to your email!');
         setStep(2);
       } else {
-        setError(result.message || 'Failed to send verification code');
+        toast.error(result.message || 'Failed to send verification code');
       }
     } catch {
-      setError('Network error. Please try again.');
+      toast.error('Network error. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -44,11 +44,10 @@ const ForgotPassword = () => {
 
   const verifyCode = async () => {
     if (!verificationCode) {
-      setError('Please enter the verification code');
+      toast.error('Please enter the verification code');
       return;
     }
     setLoading(true);
-    setError('');
     try {
       const response = await fetch('https://api.phyo.ai/api/user/verify-code', {
         method: 'POST',
@@ -57,12 +56,13 @@ const ForgotPassword = () => {
       });
       const result = await response.json();
       if (response.ok) {
+        toast.success('✅ Code verified successfully!');
         setStep(3);
       } else {
-        setError(result.message || 'Invalid verification code');
+        toast.error(result.message || 'Invalid verification code');
       }
     } catch {
-      setError('Network error. Please try again.');
+      toast.error('Network error. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -70,19 +70,18 @@ const ForgotPassword = () => {
 
   const resetPassword = async () => {
     if (!newPassword || !confirmNewPassword) {
-      setError('Please fill in all password fields');
+      toast.error('Please fill in all password fields');
       return;
     }
     if (newPassword !== confirmNewPassword) {
-      setError('Passwords do not match');
+      toast.error('Passwords do not match');
       return;
     }
     if (newPassword.length < 6) {
-      setError('Password must be at least 6 characters long');
+      toast.error('Password must be at least 6 characters long');
       return;
     }
     setLoading(true);
-    setError('');
     try {
       const response = await fetch('https://api.phyo.ai/api/user/reset-password', {
         method: 'POST',
@@ -91,15 +90,15 @@ const ForgotPassword = () => {
       });
       const result = await response.json();
       if (response.ok) {
-        setSuccess('Password reset successfully! Redirecting to login...');
+        toast.success('✅ Password reset successfully! Redirecting to login...');
         setTimeout(() => {
           router.replace('/login');
         }, 2000);
       } else {
-        setError(result.message || 'Failed to reset password');
+        toast.error(result.message || 'Failed to reset password');
       }
     } catch {
-      setError('Network error. Please try again.');
+      toast.error('Network error. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -145,9 +144,6 @@ const ForgotPassword = () => {
                   placeholder="jazleen@gmail.com"
                 />
               </div>
-              
-              {error && <div className="text-red-500 text-sm text-center">{error}</div>}
-              {success && <div className="text-green-600 text-sm text-center">{success}</div>}
               
               <div className="flex justify-center pt-2">
                 <button
@@ -200,9 +196,6 @@ const ForgotPassword = () => {
                   />
                 ))}
               </div>
-              
-              {error && <div className="text-red-500 text-sm text-center">{error}</div>}
-              {success && <div className="text-green-600 text-sm text-center">{success}</div>}
               
               <div className="flex justify-center pt-2">
                 <button
@@ -302,9 +295,6 @@ const ForgotPassword = () => {
                 </div>
               </div>
               
-              {error && <div className="text-red-500 text-sm text-center">{error}</div>}
-              {/* {success && <div className="text-green-600 text-sm text-center">{success}</div>} */}
-              
               <div className="flex justify-center pt-2">
                 <button
                   onClick={resetPassword}
@@ -328,6 +318,20 @@ const ForgotPassword = () => {
           style={{ objectPosition: 'left bottom' }}
         />
       </div>
+
+      {/* Toast Container */}
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+      />
     </div>
   );
 };

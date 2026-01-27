@@ -6,6 +6,8 @@ import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '../context/AuthContext';
 import { GoogleLogin, GoogleOAuthProvider } from '@react-oauth/google';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const formFields = [
     {
@@ -63,7 +65,6 @@ function SignupForm() {
     } = useForm();
 
     const [loading, setLoading] = useState(false);
-    const [error, setError] = useState('');
     const [showOTP, setShowOTP] = useState(false);
     const [otp, setOtp] = useState(['', '', '', '', '', '']);
     const [otpLoading, setOtpLoading] = useState(false);
@@ -158,7 +159,6 @@ function SignupForm() {
 
     const handleGoogleSuccess = async (credentialResponse) => {
         setGoogleLoading(true);
-        setError('');
 
         try {
             console.log('Google credential received'); // Debug log
@@ -179,17 +179,19 @@ function SignupForm() {
                     }
                 }
                 
+                toast.success('🎉 Successfully signed up with Google!');
+                
                 // Redirect to dashboard or requested page
                 const redirect = searchParams.get('redirect') || '/';
-                router.push(redirect);
+                setTimeout(() => router.push(redirect), 1000);
                 
             } else {
                 console.log('Google signup failed with result:', result); // Debug log
-                setError(result.message || 'Google signup failed');
+                toast.error(result.message || 'Google signup failed');
             }
         } catch (error) {
             console.error('Google signup error:', error); // Debug log
-            setError(error.message || 'Failed to sign up with Google');
+            toast.error(error.message || 'Failed to sign up with Google');
         } finally {
             setGoogleLoading(false);
         }
@@ -197,12 +199,11 @@ function SignupForm() {
 
     const handleGoogleError = () => {
         console.error('Google Sign-Up failed');
-        setError('Google Sign-Up was unsuccessful. Please try again.');
+        toast.error('Google Sign-Up was unsuccessful. Please try again.');
     };
 
     const onSubmit = async (data) => {
         setLoading(true);
-        setError('');
 
         try {
             const userData = {
@@ -217,17 +218,19 @@ function SignupForm() {
             // More flexible response handling
             if (result.success || result.message?.includes('OTP') || result.status === 'success' || result.data) {
                 console.log('OTP should be sent, showing OTP screen'); // Debug log
+                toast.success('📧 OTP sent to your email! Please check your inbox.');
                 setSignupData(userData);
                 setShowOTP(true);
             } else {
                 console.log('Unexpected response format:', result); // Debug log
                 // Still show OTP screen if we got a response (assuming OTP was sent)
+                toast.success('📧 OTP sent to your email! Please check your inbox.');
                 setSignupData(userData);
                 setShowOTP(true);
             }
         } catch (error) {
             console.error('Signup error:', error); // Debug log
-            setError(error.message || 'An unexpected error occurred');
+            toast.error(error.message || 'An unexpected error occurred');
         } finally {
             setLoading(false);
         }
@@ -249,12 +252,11 @@ function SignupForm() {
     const handleOTPSubmit = async () => {
         const otpCode = otp.join('');
         if (otpCode.length !== 6) {
-            setError('Please enter all 6 digits');
+            toast.error('Please enter all 6 digits');
             return;
         }
 
         setOtpLoading(true);
-        setError('');
 
         try {
             console.log('Attempting OTP verification...'); // Debug log
@@ -270,18 +272,16 @@ function SignupForm() {
                     localStorage.setItem('authToken', result.token);
                 }
                 
+                toast.success('✅ Email verified successfully! Redirecting to login...');
+                
                 // Small delay to show success, then redirect
                 setTimeout(() => {
                     router.push('/login?verified=true');
-                }, 1000);
-                
-                // Show success message
-                setError(''); // Clear any errors
-                // You could set a success state here if you want to show a success message
+                }, 1500);
                 
             } else {
                 console.log('OTP verification failed with result:', result); // Debug log
-                setError(result.message || 'OTP verification failed');
+                toast.error(result.message || 'OTP verification failed');
             }
         } catch (error) {
             console.error('OTP verification error:', error); // Debug log
@@ -289,11 +289,12 @@ function SignupForm() {
             // If the error message indicates success, still redirect
             if (error.message?.includes('verified') || error.message?.includes('success')) {
                 console.log('Error message indicates success, redirecting anyway...'); // Debug log
+                toast.success('✅ Email verified successfully! Redirecting to login...');
                 setTimeout(() => {
                     router.push('/login?verified=true');
-                }, 1000);
+                }, 1500);
             } else {
-                setError(error.message || 'OTP verification failed');
+                toast.error(error.message || 'OTP verification failed');
             }
         } finally {
             setOtpLoading(false);
@@ -335,12 +336,6 @@ function SignupForm() {
                             <span className="font-semibold text-[#00897B]">{signupData?.email}</span>
                         </p>
                     </div>
-
-                    {error && (
-                        <div className="mb-6 p-4 bg-red-50 border border-red-200 text-red-700 rounded-lg text-center">
-                            {error}
-                        </div>
-                    )}
 
                     <div className="flex justify-center space-x-3 mb-8">
                         {otp.map((digit, index) => (
@@ -415,15 +410,6 @@ function SignupForm() {
                             Enter your details to create your account
                         </p>
                     </div>
-
-                    {error && (
-                        <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm">
-                            <div className="flex items-center">
-                                <span className="mr-2">⚠️</span>
-                                {error}
-                            </div>
-                        </div>
-                    )}
 
                     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
                         {formFields.map((field) => (
@@ -556,6 +542,20 @@ function SignupForm() {
                     style={{ objectPosition: 'left bottom' }}
                 />
             </div>
+
+            {/* Toast Container */}
+            <ToastContainer
+                position="top-right"
+                autoClose={3000}
+                hideProgressBar={false}
+                newestOnTop={false}
+                closeOnClick
+                rtl={false}
+                pauseOnFocusLoss
+                draggable
+                pauseOnHover
+                theme="light"
+            />
         </div>
     );
 }

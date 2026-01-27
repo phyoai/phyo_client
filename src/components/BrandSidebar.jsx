@@ -3,19 +3,20 @@ import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '../app/context/AuthContext';
+import { useSidebar } from '../app/context/SidebarContext';
 import {
   Home,
   Mail,
   Calendar,
   User,
   Menu,
-  Edit3,
   Pencil
 } from 'lucide-react';
 
 const BrandSidebar = () => {
   const pathname = usePathname();
   const { logout } = useAuth();
+  const { isExpanded, setIsExpanded, sidebarButtonAction, sidebarButtonLabel } = useSidebar();
 
   const navItems = [
     { name: 'Home', href: '/brand/dashboard', icon: Home },
@@ -24,27 +25,47 @@ const BrandSidebar = () => {
     { name: 'Account', href: '/brand/account', icon: User },
   ];
 
-  // Commented out for now - not in current sidebar design
-  // const bottomNavItems = [
-  //   { name: 'Settings', href: '/brand/settings', icon: Settings },
-  //   { name: 'Help', href: '/brand/help', icon: HelpCircle },
-  //   { name: 'Logout Account', href: '/logout', icon: LogOut, isLogout: true },
-  // ];
+  const handleButtonClick = () => {
+    if (sidebarButtonAction) {
+      sidebarButtonAction();
+    }
+  };
 
   return (
-    <div className="h-screen w-20 bg-[#F0F0F0]  fixed left-0 top-0 flex flex-col items-center py-6">
+    <div className={`h-screen bg-[#F0F0F0] fixed left-0 top-0 flex flex-col transition-[width] duration-300 ease-in-out z-50 ${
+      isExpanded ? 'w-[280px] px-6 py-8' : 'w-20 px-4 py-6 items-center'
+    }`}>
       {/* Menu Icon at top */}
-      <button className="mb-8 p-2 text-gray-600 hover:text-gray-900 transition-colors">
+      <button 
+        onClick={() => setIsExpanded(!isExpanded)}
+        className={`text-gray-600 hover:text-gray-900 transition-colors ${
+          isExpanded ? 'self-start mb-6' : 'mb-8'
+        }`}
+      >
         <Menu className="h-6 w-6" />
       </button>
 
       {/* Edit/Create Button */}
-      <button className="mb-8 p-3 bg-[#63B898] hover:scale-105 text-black rounded-lg shadow-md transition-all">
-        <Pencil className="h-5 w-5  fill-black" />
-      </button>
+      <div className={isExpanded ? 'mb-6' : 'mb-8'}>
+        <button 
+          onClick={handleButtonClick}
+          disabled={!sidebarButtonAction}
+          className={`bg-[#63B898] hover:scale-105 text-black transition-transform flex items-center justify-center ${
+          isExpanded 
+            ? 'w-full rounded-[12px] py-3 px-4 gap-3 justify-start' 
+            : 'p-3 rounded-lg'
+        } ${!sidebarButtonAction ? 'opacity-50 cursor-not-allowed hover:scale-100' : ''}`}>
+          <Pencil className="h-5 w-5 stroke-black flex-shrink-0" strokeWidth={2} />
+          {isExpanded && (
+            <span className="text-[15px] font-semibold">
+              {sidebarButtonLabel}
+            </span>
+          )}
+        </button>
+      </div>
 
       {/* Main Navigation */}
-      <nav className="flex-1 flex flex-col items-center space-y-5">
+      <nav className={`flex-1 flex flex-col ${isExpanded ? 'space-y-2' : 'items-center space-y-6'}`}>
         {navItems.map((item) => {
           const Icon = item.icon;
           const isActive = pathname === item.href;
@@ -53,50 +74,54 @@ const BrandSidebar = () => {
             <Link
               key={item.name}
               href={item.href}
-              className="relative flex flex-col items-center group"
+              className={`relative flex items-center transition-all duration-300 ${
+                isExpanded 
+                  ? `gap-3 px-4 py-3 rounded-[20px] w-full ${
+                      isActive 
+                        ? 'bg-[#63B898] text-white' 
+                        : 'text-gray-700 hover:bg-gray-200'
+                    }` 
+                  : 'flex-col'
+              }`}
             >
-              <div className={`p-1 rounded-lg transition-all ${
-                isActive
-                  ? 'text-teal-600 bg-[#ECF6F2]'
-                  : 'text-gray-400 hover:text-gray-700'
-              }`}>
-                <Icon className="h-6 w-6" />
-                {/* {item.badge && (
-                  <span className="absolute -top-1 -right-1 bg-orange-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
-                    {item.badge}
+              {isExpanded ? (
+                <>
+                  <Icon className={`h-5 w-5 flex-shrink-0 ${
+                    isActive ? 'text-white' : 'text-gray-600'
+                  }`} strokeWidth={2} />
+                  <span className={`text-[15px] font-medium flex-1 ${
+                    isActive ? 'text-white' : 'text-gray-700'
+                  }`}>
+                    {item.name}
                   </span>
-                )} */}
-              </div>
-              <span className={`text-xs mt-1 font-medium ${
-                isActive ? 'text-[#379773]' : 'text-gray-500'
-              }`}>
-                {item.name}
-              </span>
+                  {item.badge && (
+                    <span className="bg-[#FF8A3D] text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center flex-shrink-0">
+                      {item.badge}
+                    </span>
+                  )}
+                </>
+              ) : (
+                <>
+                  <div className={`transition-all duration-300 ${
+                    isActive
+                      ? 'text-[#63B898]'
+                      : 'text-gray-400 hover:text-gray-700'
+                  }`}>
+                    <Icon className="h-6 w-6" strokeWidth={2} />
+                  </div>
+                  <span className={`text-xs mt-1.5 font-medium ${
+                    isActive ? 'text-[#63B898]' : 'text-gray-500'
+                  }`}>
+                    {item.name}
+                  </span>
+                </>
+              )}
             </Link>
           );
         })}
       </nav>
-
-      {/* Commented out sections for future use */}
-      {/* Get PRO Section - removed from minimal sidebar */}
-      {/* 
-      <div className="p-4 m-4 mb-6 bg-teal-50 rounded-2xl text-center border border-teal-100">
-        <h3 className="text-base font-bold text-gray-900 mb-1">
-          Get PRO!!
-        </h3>
-        <p className="text-xs text-gray-600 mb-4">
-          Upgrade now to unlock<br />premium features
-        </p>
-        <button className="w-full bg-teal-600 hover:bg-teal-700 text-white font-semibold py-2.5 px-4 rounded-lg transition-all shadow-sm hover:shadow-md">
-          Upgrade Now
-        </button>
-      </div>
-      */}
     </div>
   );
 };
 
 export default BrandSidebar;
-
-
-

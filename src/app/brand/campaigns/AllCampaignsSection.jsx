@@ -1,9 +1,11 @@
 'use client'
 import React, { useState, useRef } from 'react';
-import { ChevronLeft, ChevronRight, X, Upload, Calendar, Check, Users, MoreVertical, Trash2, Edit } from 'lucide-react';
+import { ChevronLeft, ChevronRight, X, Upload, Calendar, Check, Users, MoreVertical, Trash2, Edit, Search, Heart, TrendingUp } from 'lucide-react';
 import { campaignAPI } from '../../../utils/api';
+import { useSidebar } from '../../context/SidebarContext';
 
 const AllCampaignsSection = () => {
+  const { setSidebarButtonAction, setSidebarButtonLabel } = useSidebar();
   const [showModal, setShowModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showDetailModal, setShowDetailModal] = useState(false);
@@ -17,6 +19,8 @@ const AllCampaignsSection = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [campaigns, setCampaigns] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [showAllCampaigns, setShowAllCampaigns] = useState(false);
+  const [showAllDrafts, setShowAllDrafts] = useState(false);
   const [pagination, setPagination] = useState({
     currentPage: 1,
     totalPages: 1,
@@ -173,6 +177,29 @@ const AllCampaignsSection = () => {
     fetchCampaigns();
   }, []);
 
+  // Helper function to get active campaigns
+  const getActiveCampaigns = () => {
+    return campaigns.filter(campaign => campaign.status === 'Active');
+  };
+
+  // Helper function to get draft campaigns
+  const getDraftCampaigns = () => {
+    return campaigns.filter(campaign => campaign.status === 'Draft');
+  };
+
+  // Register sidebar button action for campaigns tab
+  React.useEffect(() => {
+    // Set the button action to open the create campaign modal
+    setSidebarButtonAction(() => () => setShowModal(true));
+    setSidebarButtonLabel('Create Campaign');
+
+    // Cleanup: Remove the action when component unmounts
+    return () => {
+      setSidebarButtonAction(null);
+      setSidebarButtonLabel('Button');
+    };
+  }, [setSidebarButtonAction, setSidebarButtonLabel]);
+
   // Pagination handlers
   const handlePrevPage = () => {
     if (pagination.hasPrev) {
@@ -226,6 +253,12 @@ const AllCampaignsSection = () => {
       console.error('Error activating campaign:', error);
       alert(`Failed to activate campaign: ${error.message || 'Unknown error'}`);
     }
+  };
+
+  // Complete/Activate campaign from draft (with event handler for button click)
+  const handleCompleteCampaign = async (e, campaignId) => {
+    e.stopPropagation(); // Prevent triggering parent click handlers
+    await handleActivateCampaign(campaignId);
   };
 
   // Open campaign detail modal
@@ -1229,73 +1262,712 @@ const AllCampaignsSection = () => {
   };
 
   return (
-    <div className="bg-[#F3F2EB] py-8">
-      <div className="max-w-7xl mx-auto px-6">
-        {/* Main Header */}
-        <div className="flex items-center justify-between mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">All Campaigns</h1>
-          <button 
-            onClick={() => setShowModal(true)}
-            className="bg-[#00674F] hover:scale-105 text-white px-6 py-3 rounded-lg font-medium transition-colors"
-          >
-            Create New Campaign
-          </button>
+    <div className="bg-white min-h-screen">
+      {/* Proper Container with Figma spacing - px-9 (36px from spec) */}
+      <div className=" mx-auto px-9">
+        {/* App Bar - Matching Figma design (px-1 py-2, 20px font) */}
+        <div className="flex items-center justify-between px-1 py-2">
+          {showAllCampaigns || showAllDrafts ? (
+            <>
+              <div className="flex items-center px-2 flex-1 min-w-0">
+                <button 
+                  onClick={() => {
+                    setShowAllCampaigns(false);
+                    setShowAllDrafts(false);
+                  }}
+                  className="p-3 hover:bg-gray-100 rounded-full transition-colors -ml-3 mr-1"
+                >
+                  <ChevronLeft className="w-6 h-6 text-gray-700" />
+                </button>
+                <h1 className="text-[20px] font-semibold text-gray-900 leading-7 tracking-tight">
+                  {showAllCampaigns ? 'Campaigns' : 'Draft Campaigns'}
+                </h1>
+              </div>
+              <div className="flex items-center gap-2">
+                <button className="p-3 hover:bg-gray-100 rounded-full transition-colors">
+                  <Search className="w-6 h-6 text-gray-700" />
+                </button>
+                <button className="p-3 hover:bg-gray-100 rounded-full transition-colors">
+                  <MoreVertical className="w-6 h-6 text-gray-700" />
+                </button>
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="flex items-center  flex-1 min-w-0">
+                <h1 className="text-[20px] font-semibold text-gray-900 leading-7 tracking-tight">Campaigns</h1>
+              </div>
+              <div className="flex items-center gap-2">
+                <button className="p-3 hover:bg-gray-100 rounded-full transition-colors">
+                  <Search className="w-6 h-6 text-gray-700" />
+                </button>
+                <button className="p-3 hover:bg-gray-100 rounded-full transition-colors">
+                  <MoreVertical className="w-6 h-6 text-gray-700" />
+                </button>
+              </div>
+            </>
+          )}
         </div>
 
-        {/* All Campaigns Section */}
-        <div className="mb-12">
-          <div className="flex items-center justify-between mb-6">
-            <div className="flex items-center space-x-2">
-              <h2 className="text-xl font-semibold text-gray-900">All Campaigns</h2>
-              <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+        {showAllCampaigns ? (
+          // All Campaigns Grid View - Updated to match Figma design
+          <div className="mb-8">
+            <div className="flex items-center justify-between mb-4">
+              <p className="text-sm text-gray-600">
+                Showing {campaigns.length} campaigns
+              </p>
             </div>
-            <div className="flex items-center space-x-2">
-              <span className="text-sm text-gray-600">
-                Page {pagination.currentPage} of {pagination.totalPages} ({pagination.totalItems} total)
-              </span>
-              <button 
-                onClick={handlePrevPage}
-                disabled={!pagination.hasPrev}
-                className={`p-2 rounded-full transition-colors ${
-                  pagination.hasPrev 
-                    ? 'bg-green-600 text-white hover:bg-green-700' 
-                    : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                }`}
-              >
-                <ChevronLeft className="h-4 w-4" />
-              </button>
-              <button 
-                onClick={handleNextPage}
-                disabled={!pagination.hasNext}
-                className={`p-2 rounded-full transition-colors ${
-                  pagination.hasNext 
-                    ? 'bg-green-600 text-white hover:bg-green-700' 
-                    : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                }`}
-              >
-                <ChevronRight className="h-4 w-4" />
-              </button>
+
+            <div className="flex flex-wrap gap-2">
+              {loading ? (
+                <div className="w-full text-center py-8">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600 mx-auto"></div>
+                  <p className="mt-2 text-gray-600">Loading campaigns...</p>
+                </div>
+              ) : campaigns.length > 0 ? (
+                campaigns.map((campaign) => (
+                  <div 
+                    key={campaign._id} 
+                    className="bg-gray-100 border-2 border-white rounded-xl overflow-hidden hover:shadow-lg transition-shadow flex-1 min-w-[300px] max-w-[400px] cursor-pointer"
+                    onClick={() => handleCampaignClick(campaign)}
+                  >
+                    {/* Eyebrow label at top */}
+                    <div className="px-4 pt-4">
+                      <span className="text-xs text-gray-500">
+                        {campaign.campaignType || 'Campaign'}
+                      </span>
+                    </div>
+
+                    {/* Content Frame with Avatar and Info */}
+                    <div className="flex gap-2 items-start px-4 py-3">
+                      {/* Leading Avatar */}
+                      <div className="flex items-center">
+                        <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center text-white font-semibold shrink-0">
+                          {campaign.campaignName?.substring(0, 2).toUpperCase() || 'AB'}
+                        </div>
+                      </div>
+
+                      {/* Content Leading */}
+                      <div className="flex-1 min-w-0">
+                        <h3 className="text-lg font-semibold text-gray-900 mb-1 truncate">
+                          {campaign.campaignName || 'Lenskart'}
+                        </h3>
+                        <p className="text-sm text-gray-600">
+                          {campaign.createdAt 
+                            ? new Date(campaign.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+                            : '3d ago'
+                          }
+                        </p>
+                      </div>
+
+                      {/* Trailing Icon Button */}
+                      <div className="flex items-center justify-center px-4">
+                        <button 
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            // Handle favorite toggle
+                          }}
+                          className="p-3 hover:bg-gray-200 rounded-full transition-colors"
+                        >
+                          <Heart className="w-6 h-6 text-gray-700" />
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Campaign Image */}
+                    <div className="h-[216px] bg-gradient-to-br from-green-700 to-green-900 relative overflow-hidden">
+                      {campaign.productImages && campaign.productImages.length > 0 ? (
+                        <img 
+                          src={campaign.productImages[0]} 
+                          alt={campaign.campaignName} 
+                          className="w-full h-full object-cover" 
+                        />
+                      ) : (
+                        <div className="absolute inset-0 flex items-center justify-center text-white">
+                          <div className="text-center p-6">
+                            <div className="text-2xl font-bold mb-2">WE CREATE</div>
+                            <div className="text-xl">SMILES, NOT ADS</div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <div className="w-full text-center py-8">
+                  <p className="text-gray-600">No campaigns found. Create your first campaign!</p>
+                </div>
+              )}
             </div>
           </div>
+        ) : showAllDrafts ? (
+          // All Draft Campaigns Grid View - Updated to match Figma design
+          <div className="mb-8">
+            <div className="flex items-center justify-between mb-4">
+              <p className="text-sm text-gray-600">
+                Showing {getDraftCampaigns().length} draft campaigns
+              </p>
+            </div>
 
-          {/* Campaigns Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
+            <div className="flex flex-wrap gap-2">
+              {loading ? (
+                <div className="w-full text-center py-8">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600 mx-auto"></div>
+                  <p className="mt-2 text-gray-600">Loading draft campaigns...</p>
+                </div>
+              ) : getDraftCampaigns().length > 0 ? (
+                getDraftCampaigns().map((draft) => (
+                  <div 
+                    key={draft._id} 
+                    className="bg-gray-100 border-2 border-white rounded-xl overflow-hidden hover:shadow-lg transition-shadow flex-1 min-w-[300px] max-w-[400px]"
+                  >
+                    {/* Eyebrow label at top */}
+                    <div className="px-4 pt-4">
+                      <span className="text-xs text-gray-500">
+                        Draft • {draft.campaignType || 'Campaign'}
+                      </span>
+                    </div>
+
+                    {/* Content Frame with Avatar and Info */}
+                    <div className="flex gap-2 items-start px-4 py-3">
+                      {/* Leading Avatar */}
+                      <div className="flex items-center">
+                        <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center text-white font-semibold shrink-0">
+                          {draft.campaignName?.substring(0, 2).toUpperCase() || 'AB'}
+                        </div>
+                      </div>
+
+                      {/* Content Leading */}
+                      <div className="flex-1 min-w-0">
+                        <h3 className="text-lg font-semibold text-gray-900 mb-1 truncate">
+                          {draft.campaignName || 'Draft Campaign'}
+                        </h3>
+                        <p className="text-sm text-gray-600">
+                          Draft
+                        </p>
+                      </div>
+
+                      {/* Trailing Icon Button */}
+                      <div className="flex items-center justify-center px-4">
+                        <button 
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleCampaignClick(draft);
+                          }}
+                          className="p-3 hover:bg-gray-200 rounded-full transition-colors"
+                        >
+                          <Heart className="w-6 h-6 text-gray-700" />
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Campaign Image */}
+                    <div className="h-[216px] bg-gradient-to-br from-gray-600 to-gray-800 relative overflow-hidden">
+                      {draft.productImages && draft.productImages.length > 0 ? (
+                        <img 
+                          src={draft.productImages[0]} 
+                          alt={draft.campaignName} 
+                          className="w-full h-full object-cover opacity-80" 
+                        />
+                      ) : (
+                        <div className="absolute inset-0 flex items-center justify-center text-white">
+                          <div className="text-center p-6">
+                            <div className="text-2xl font-bold mb-2">DRAFT</div>
+                            <div className="text-xl">CAMPAIGN</div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Action Buttons */}
+                    <div className="p-4 flex gap-2">
+                      <button 
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleCampaignClick(draft);
+                        }}
+                        className="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors"
+                      >
+                        View Details
+                      </button>
+                      <button 
+                        onClick={(e) => handleCompleteCampaign(e, draft._id)}
+                        className="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg text-sm font-medium hover:bg-green-700 transition-colors"
+                      >
+                        Complete Campaign
+                      </button>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <div className="w-full text-center py-8">
+                  <p className="text-gray-600">No draft campaigns found.</p>
+                </div>
+              )}
+            </div>
+          </div>
+        ) : (
+          <>
+            {/* Recent Campaigns Section - Matching Figma x=36, gap=58px from header */}
+            <div className="mb-10">
+              {/* Section Heading - Figma: pt-4 (16px), 18px font, view all link */}
+              <div className="flex items-center justify-between pt-4 mb-[14px]">
+                <h2 className="text-[18px] font-semibold text-gray-900 leading-[26px] tracking-tight">Recent Campaigns</h2>
+                <button 
+                  onClick={() => setShowAllCampaigns(true)}
+                  className="flex items-center pr-1"
+                >
+                  <span className="text-[16px] font-semibold text-blue-700 leading-6 tracking-[0.24px]">view all</span>
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" className="ml-[-4px]">
+                    <path d="M7.75 7.75L16.25 12L7.75 16.25" stroke="#0a48c5" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </button>
+              </div>
+
+              {/* Campaign Cards Grid - gap between cards as per Figma */}
+              <div className="flex gap-2 overflow-x-auto pb-2">
+                {loading ? (
+                  <div className="w-full text-center py-8">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600 mx-auto"></div>
+                    <p className="mt-2 text-gray-600">Loading campaigns...</p>
+                  </div>
+                ) : getActiveCampaigns().length > 0 ? (
+                  getActiveCampaigns().slice(0, 3).map((campaign) => (
+                    <div 
+                      key={campaign._id} 
+                      className="bg-gray-100 border-2 border-white rounded-xl overflow-hidden hover:shadow-lg transition-shadow flex-1 min-w-[300px] max-w-[365px] cursor-pointer"
+                      onClick={() => handleCampaignClick(campaign)}
+                    >
+                      {/* Content Frame - Figma: gap-4 (16px), py-4 (16px) */}
+                      <div className="flex gap-2 items-start p-4">
+                        {/* Leading Avatar - Figma: 48x48, pl-4 */}
+                        <div className="flex items-center shrink-0">
+                          <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center text-white text-[20px] font-semibold leading-7">
+                            {campaign.campaignName?.substring(0, 2).toUpperCase() || 'AB'}
+                          </div>
+                        </div>
+
+                        {/* Content Leading - Figma: flex-1, gap-2 */}
+                        <div className="flex-1 min-w-0 flex flex-col gap-2">
+                          <div className="px-4">
+                            <h3 className="text-[20px] font-semibold text-gray-900 leading-7 tracking-tight truncate">
+                              {campaign.campaignName || 'Lenskart'}
+                            </h3>
+                          </div>
+                          <div className="px-4">
+                            <p className="text-[16px] text-gray-600 leading-6 tracking-[0px]">
+                              {campaign.createdAt 
+                                ? new Date(campaign.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+                                : '3d ago'
+                              }
+                            </p>
+                          </div>
+                        </div>
+
+                        {/* Trailing Icon Button - Figma: 48x48, px-4 */}
+                        <div className="flex flex-col items-center justify-center px-4 h-[67px] w-[88px] shrink-0">
+                          <button 
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              // Handle favorite toggle
+                            }}
+                            className="p-3 hover:bg-gray-200 rounded-full transition-colors"
+                          >
+                            <Heart className="w-6 h-6 text-gray-700" />
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Campaign Image - Figma: h-216px */}
+                      <div className="h-[216px] bg-gradient-to-br from-green-700 to-green-900 relative overflow-hidden">
+                        {campaign.productImages && campaign.productImages.length > 0 ? (
+                          <img 
+                            src={campaign.productImages[0]} 
+                            alt={campaign.campaignName} 
+                            className="w-full h-full object-cover" 
+                          />
+                        ) : (
+                          <div className="absolute inset-0 flex items-center justify-center text-white">
+                            <div className="text-center p-6">
+                              <div className="text-2xl font-bold mb-2">WE CREATE</div>
+                              <div className="text-xl">SMILES, NOT ADS</div>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <div className="w-full text-center py-8">
+                    <p className="text-gray-600">No active campaigns found. Create your first campaign!</p>
+                  </div>
+                )}
+              </div>
+            </div>
+
+        {/* New Applications Section - Matching Figma List Item design */}
+        <div className="mb-10">
+          {/* Section Heading - Figma: pt-4, 18px font */}
+          <div className="flex items-center justify-between pt-4 mb-[14px]">
+            <h2 className="text-[18px] font-semibold text-gray-900 leading-[26px] tracking-tight">New Applications</h2>
+            <button className="flex items-center pr-1">
+              <span className="text-[16px] font-semibold text-blue-700 leading-6 tracking-[0.24px]">view all</span>
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" className="ml-[-4px]">
+                <path d="M7.75 7.75L16.25 12L7.75 16.25" stroke="#0a48c5" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </button>
+          </div>
+
+          {/* List Items - Figma: white background, full width */}
+          <div className="bg-white">
+            {mockInfluencers.slice(0, 5).map((influencer, index) => (
+              <div key={influencer.id} className="relative">
+                <div className="flex items-center">
+                  {/* Leading Avatar - Figma: px-4, py-1.5 (6px), 48x48 */}
+                  <div className="px-4 py-1.5">
+                    <div className="w-12 h-12 bg-gradient-to-br from-pink-400 to-purple-500 rounded-full"></div>
+                  </div>
+
+                  {/* Content - Figma: flex-1, pr-4, py-3 (12px) */}
+                  <div className="flex-1 min-w-0 pr-4 py-3">
+                    <h3 className="text-[16px] font-semibold text-gray-900 leading-6 tracking-[0.24px] mb-0.5">
+                      {influencer.name}
+                    </h3>
+                    <p className="text-[14px] text-gray-500 leading-5 tracking-[0px] truncate">
+                      {influencer.tags 
+                        ? influencer.tags.slice(0, 3).join(' • ') 
+                        : 'An innovative web developer skilled in HTML, CSS, and JavaScript. He thrives on solving complex problems and bringing ideas to life through code.'
+                      }
+                    </p>
+                  </div>
+
+                  {/* Trailing Button - Figma: px-4, py-3.5 (14px) */}
+                  <div className="px-4 py-3.5">
+                    <button className="px-4 py-2 border border-green-800 rounded-[24px] text-[14px] font-medium text-green-800 leading-5 tracking-[0.2px] hover:bg-gray-50 transition-colors">
+                      portfolio
+                    </button>
+                  </div>
+                </div>
+                
+                {/* Divider - Figma: 1px gray line */}
+                {index < mockInfluencers.slice(0, 5).length - 1 && (
+                  <div className="h-px bg-gray-200"></div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Audience Engagement Section - Updated to match Figma Graph Metrics */}
+        <div className="mb-10">
+          {/* Section Heading */}
+          <div className="flex items-center justify-between pt-4 mb-4">
+            <h2 className="text-lg font-semibold text-gray-900 tracking-tight">Audience Engagement</h2>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Likes Chart - Matching Figma Graph Metrics */}
+            <div className="bg-gray-100 border border-gray-200 rounded-xl p-2 flex flex-col gap-2">
+              {/* Header */}
+              <div className="flex gap-0.5 items-end">
+                <div className="flex-1 flex flex-col gap-0.5">
+                  <p className="text-base font-semibold text-gray-900 tracking-wide">9.2K Likes</p>
+                  <div className="flex items-center gap-1">
+                    <TrendingUp className="w-4 h-4 text-green-700" />
+                    <span className="text-xs font-medium text-green-700 tracking-wide">24%</span>
+                    <span className="text-xs font-medium text-gray-500 tracking-wide">vs</span>
+                    <span className="text-xs font-medium text-gray-500 tracking-wide">last month</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Graph Container */}
+              <div className="flex gap-2 items-start">
+                {/* Left Values */}
+                <div className="flex flex-col h-[226px] w-[22px] justify-between items-end text-xs text-gray-600 font-normal tracking-wide">
+                  <span>10K</span>
+                  <span>8K</span>
+                  <span>4K</span>
+                  <span>2K</span>
+                  <span>0</span>
+                </div>
+
+                {/* Graph Area */}
+                <div className="flex-1 h-[226px] relative overflow-hidden">
+                  {/* Simple line graph visualization */}
+                  <svg viewBox="0 0 400 226" className="w-full h-full" preserveAspectRatio="none">
+                    <defs>
+                      <linearGradient id="likesGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                        <stop offset="0%" stopColor="#10b981" stopOpacity="0.2" />
+                        <stop offset="100%" stopColor="#10b981" stopOpacity="0.05" />
+                      </linearGradient>
+                    </defs>
+                    {/* Area fill */}
+                    <path 
+                      d="M 0,120 L 66,100 L 133,115 L 200,85 L 267,105 L 334,70 L 400,80 L 400,226 L 0,226 Z" 
+                      fill="url(#likesGradient)" 
+                    />
+                    {/* Line */}
+                    <path 
+                      d="M 0,120 L 66,100 L 133,115 L 200,85 L 267,105 L 334,70 L 400,80" 
+                      stroke="#10b981" 
+                      strokeWidth="2" 
+                      fill="none" 
+                    />
+                    {/* Data points */}
+                    <circle cx="200" cy="85" r="4" fill="#43573b" />
+                    <circle cx="334" cy="70" r="4" fill="white" stroke="#43573b" strokeWidth="2" />
+                  </svg>
+                  {/* Tooltip */}
+                  <div className="absolute left-1/2 top-8 -translate-x-1/2 bg-green-800 text-white px-4 py-1 rounded text-xs font-medium tracking-wide">
+                    5.4k likes
+                  </div>
+                </div>
+              </div>
+
+              {/* Bottom Values */}
+              <div className="flex items-center justify-between pl-7 pr-5 text-xs text-gray-600 text-center font-normal tracking-wide">
+                <span className="w-[60px]">July</span>
+                <span className="w-[60px]">Aug</span>
+                <span className="w-[60px]">Sep</span>
+                <span className="w-[60px]">Oct</span>
+                <span className="w-[60px]">Nov</span>
+                <span className="w-[60px]">Dec</span>
+              </div>
+            </div>
+
+            {/* Saves Chart - Bar chart */}
+            <div className="bg-gray-100 border border-gray-200 rounded-xl p-2 flex flex-col gap-2">
+              <div className="flex gap-0.5 items-end">
+                <div className="flex-1 flex flex-col gap-0.5">
+                  <p className="text-base font-semibold text-gray-900 tracking-wide">3.2K saves</p>
+                  <div className="flex items-center gap-1">
+                    <TrendingUp className="w-4 h-4 text-green-700" />
+                    <span className="text-xs font-medium text-green-700 tracking-wide">24%</span>
+                    <span className="text-xs font-medium text-gray-500 tracking-wide">vs</span>
+                    <span className="text-xs font-medium text-gray-500 tracking-wide">last month</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex gap-2 items-start">
+                <div className="flex flex-col h-[226px] w-[22px] justify-between items-end text-xs text-gray-600 font-normal tracking-wide">
+                  <span>10K</span>
+                  <span>8K</span>
+                  <span>4K</span>
+                  <span>2K</span>
+                  <span>0</span>
+                </div>
+
+                <div className="flex-1 h-[226px] flex items-end justify-between gap-2 px-1">
+                  {[65, 47, 56, 35, 52, 43].map((value, idx) => (
+                    <div 
+                      key={idx} 
+                      className="flex-1 bg-green-600 rounded-t-sm" 
+                      style={{ height: `${value}%` }}
+                    ></div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between pl-7 pr-5 text-xs text-gray-600 text-center font-normal tracking-wide">
+                <span className="w-[60px]">July</span>
+                <span className="w-[60px]">Aug</span>
+                <span className="w-[60px]">Sep</span>
+                <span className="w-[60px]">Oct</span>
+                <span className="w-[60px]">Nov</span>
+                <span className="w-[60px]">Dec</span>
+              </div>
+            </div>
+
+            {/* Views Chart */}
+            <div className="bg-gray-100 border border-gray-200 rounded-xl p-2 flex flex-col gap-2">
+              <div className="flex gap-0.5 items-end">
+                <div className="flex-1 flex flex-col gap-0.5">
+                  <p className="text-base font-semibold text-gray-900 tracking-wide">14K Views</p>
+                  <div className="flex items-center gap-1">
+                    <TrendingUp className="w-4 h-4 text-green-700" />
+                    <span className="text-xs font-medium text-green-700 tracking-wide">24%</span>
+                    <span className="text-xs font-medium text-gray-500 tracking-wide">vs</span>
+                    <span className="text-xs font-medium text-gray-500 tracking-wide">last month</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex gap-2 items-start">
+                <div className="flex flex-col h-[226px] w-[22px] justify-between items-end text-xs text-gray-600 font-normal tracking-wide">
+                  <span>10K</span>
+                  <span>8K</span>
+                  <span>4K</span>
+                  <span>2K</span>
+                  <span>0</span>
+                </div>
+
+                <div className="flex-1 h-[226px] flex items-end justify-between gap-2 px-1">
+                  {[81, 47, 52, 31, 47, 40].map((value, idx) => (
+                    <div 
+                      key={idx} 
+                      className="flex-1 bg-green-700 rounded-t-sm" 
+                      style={{ height: `${value}%` }}
+                    ></div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between pl-7 pr-5 text-xs text-gray-600 text-center font-normal tracking-wide">
+                <span className="w-[60px]">July</span>
+                <span className="w-[60px]">Aug</span>
+                <span className="w-[60px]">Sep</span>
+                <span className="w-[60px]">Oct</span>
+                <span className="w-[60px]">Nov</span>
+                <span className="w-[60px]">Dec</span>
+              </div>
+            </div>
+
+            {/* Comments Chart */}
+            <div className="bg-gray-100 border border-gray-200 rounded-xl p-2 flex flex-col gap-2">
+              <div className="flex gap-0.5 items-end">
+                <div className="flex-1 flex flex-col gap-0.5">
+                  <p className="text-base font-semibold text-gray-900 tracking-wide">1.2K Comments</p>
+                  <div className="flex items-center gap-1">
+                    <TrendingUp className="w-4 h-4 text-green-700" />
+                    <span className="text-xs font-medium text-green-700 tracking-wide">18%</span>
+                    <span className="text-xs font-medium text-gray-500 tracking-wide">vs</span>
+                    <span className="text-xs font-medium text-gray-500 tracking-wide">last month</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex gap-2 items-start">
+                <div className="flex flex-col h-[226px] w-[22px] justify-between items-end text-xs text-gray-600 font-normal tracking-wide">
+                  <span>10K</span>
+                  <span>8K</span>
+                  <span>4K</span>
+                  <span>2K</span>
+                  <span>0</span>
+                </div>
+
+                <div className="flex-1 h-[226px] relative overflow-hidden">
+                  <svg viewBox="0 0 400 226" className="w-full h-full" preserveAspectRatio="none">
+                    <defs>
+                      <linearGradient id="commentsGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                        <stop offset="0%" stopColor="#6b7280" stopOpacity="0.2" />
+                        <stop offset="100%" stopColor="#6b7280" stopOpacity="0.05" />
+                      </linearGradient>
+                    </defs>
+                    <path 
+                      d="M 0,135 L 66,110 L 133,128 L 200,100 L 267,113 L 334,85 L 400,95 L 400,226 L 0,226 Z" 
+                      fill="url(#commentsGradient)" 
+                    />
+                    <path 
+                      d="M 0,135 L 66,110 L 133,128 L 200,100 L 267,113 L 334,85 L 400,95" 
+                      stroke="#6b7280" 
+                      strokeWidth="2" 
+                      fill="none" 
+                    />
+                    <circle cx="334" cy="85" r="4" fill="white" stroke="#6b7280" strokeWidth="2" />
+                  </svg>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between pl-7 pr-5 text-xs text-gray-600 text-center font-normal tracking-wide">
+                <span className="w-[60px]">July</span>
+                <span className="w-[60px]">Aug</span>
+                <span className="w-[60px]">Sep</span>
+                <span className="w-[60px]">Oct</span>
+                <span className="w-[60px]">Nov</span>
+                <span className="w-[60px]">Dec</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Spending Budget Section */}
+        <div className="mb-8">
+          <h2 className="text-lg font-semibold text-gray-900 mb-4">Spending Budget</h2>
+          
+          <div className="bg-gray-50 rounded-lg p-4">
+            <div className="flex items-start justify-between mb-4">
+              <div>
+                <div className="text-2xl font-bold text-gray-900">₹124,657.80</div>
+                <div className="text-sm text-green-600 flex items-center gap-1">
+                  <TrendingUp className="w-4 h-4" />
+                  24% vs last month
+                </div>
+              </div>
+            </div>
+            <div className="h-48 flex items-end justify-between gap-2">
+              {[5500, 5200, 3800, 5400, 3600, 2800, 3700, 3900].map((value, idx) => (
+                <div key={idx} className={`flex-1 ${idx % 2 === 0 ? 'bg-green-700' : 'bg-green-500'} rounded-t`} style={{ height: `${(value / 8000) * 100}%` }}></div>
+              ))}
+            </div>
+            <div className="flex justify-between text-xs text-gray-500 mt-2">
+              <span>July</span>
+              <span>Aug</span>
+              <span>Sep</span>
+              <span>Oct</span>
+              <span>Nov</span>
+              <span>Dec</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Draft Campaigns Section */}
+        <div className="mb-8">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-semibold text-gray-900">Draft Campaigns</h2>
+            <button 
+              onClick={() => setShowAllDrafts(true)}
+              className="text-blue-600 text-sm font-medium hover:underline"
+            >
+              view all &gt;
+            </button>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {loading ? (
               <div className="col-span-full text-center py-8">
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600 mx-auto"></div>
-                <p className="mt-2 text-gray-600">Loading campaigns...</p>
+                <p className="mt-2 text-gray-600">Loading draft campaigns...</p>
               </div>
-            ) : campaigns.length > 0 ? (
-              campaigns.map((campaign) => (
-                <CampaignCard key={campaign._id} campaign={campaign} />
+            ) : getDraftCampaigns().length > 0 ? (
+              getDraftCampaigns().slice(0, 3).map((draft) => (
+                <div key={draft._id} className="bg-amber-50 rounded-lg overflow-hidden border border-gray-200 hover:shadow-md transition-shadow">
+                  <div className="aspect-video bg-gray-200 relative overflow-hidden cursor-pointer" onClick={() => handleCampaignClick(draft)}>
+                    {draft.productImages && draft.productImages.length > 0 ? (
+                      <img src={draft.productImages[0]} alt={draft.campaignName} className="w-full h-full object-cover" />
+                    ) : (
+                      <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-green-700 to-green-900 text-white">
+                        <div className="text-center p-6">
+                          <div className="text-2xl font-bold mb-2">WE CREATE</div>
+                          <div className="text-xl">SMILES, NOT ADS</div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                  <div className="p-4">
+                    <h3 className="font-semibold text-gray-900 mb-2">{draft.campaignName}</h3>
+                    <p className="text-sm text-gray-600 mb-4 line-clamp-2">
+                      {draft.campaignBrief || 'No description available'}
+                    </p>
+                    <button 
+                      onClick={(e) => handleCompleteCampaign(e, draft._id)}
+                      className="px-4 py-2 bg-green-600 text-white rounded-lg text-sm font-medium hover:bg-green-700 w-full"
+                    >
+                      Complete Campaign
+                    </button>
+                  </div>
+                </div>
               ))
             ) : (
               <div className="col-span-full text-center py-8">
-                <p className="text-gray-600">No campaigns found. Create your first campaign!</p>
+                <p className="text-gray-600">No draft campaigns found.</p>
               </div>
             )}
           </div>
         </div>
+        </>
+        )}
       </div>
 
       {/* Modal */}
