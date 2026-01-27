@@ -1,6 +1,7 @@
 'use client'
 import React, { Suspense, useState } from 'react';
 import { Search, Bell, Heart, ChevronRight } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 // Commented out old components - will integrate with APIs later
 // import CampaignReport from './CampaignReport';
@@ -12,6 +13,7 @@ import { Search, Bell, Heart, ChevronRight } from 'lucide-react';
 // import BudgetAndAudienceSection from './BudgetAndAudienceSection'
 
 function DashboardContent() {
+  const router = useRouter();
   const [searchQuery, setSearchQuery] = useState('');
 
   // Mock data - will be replaced with API calls
@@ -49,8 +51,13 @@ function DashboardContent() {
 
           {/* Right Side - Notifications and Profile */}
           <div className="flex items-center gap-4">
-            <button className="p-2 hover:bg-gray-100 rounded-full transition-colors">
+            <button 
+              onClick={() => router.push('/brand/notifications')}
+              className="p-2 hover:bg-gray-100 rounded-full transition-colors relative"
+            >
               <Bell className="h-6 w-6 text-gray-600" />
+              {/* Optional: Add notification badge */}
+              <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
             </button>
             <div className="w-10 h-10 bg-teal-600 rounded-full flex items-center justify-center text-white font-semibold">
               P
