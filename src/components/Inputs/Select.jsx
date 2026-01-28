@@ -66,9 +66,9 @@ const Select = ({ name, label, options, placeholder = "Select...", required = fa
   };
 
   return (
-    <div className={`mb-4 ${className}`}>
+    <div className={`flex flex-col gap-2 ${className}`}>
       {label && (
-        <label className="block text-sm font-medium mb-1" htmlFor={name}>
+        <label className="text-sm font-medium text-[#242527]" htmlFor={name}>
           {label} {required && <span className="text-red-500">*</span>}
         </label>
       )}
@@ -93,25 +93,27 @@ const Select = ({ name, label, options, placeholder = "Select...", required = fa
               className="relative"
             >
               <div
-                className={`border px-3 py-2 rounded cursor-pointer bg-white flex justify-between items-center focus:outline-none focus:ring-2 ${
+                className={`bg-[#f0f0f0] border border-[#e6e6e6] px-4 py-2 rounded-lg cursor-pointer flex justify-between items-center text-sm focus:outline-none focus:ring-2 ${
                   hasError 
                     ? 'border-red-500 focus:ring-red-500' 
-                    : 'border-gray-300 focus:ring-green-500 focus:border-green-500'
+                    : 'focus:ring-[#43573b] focus:border-transparent'
                 }`}
                 onClick={() => setIsOpen(prev => !prev)}
               >
-                {selectedOption?.label || <span className="text-gray-400">{placeholder}</span>}
-                <ChevronDown />
+                <span className={selectedOption?.label ? 'text-gray-700' : 'text-gray-400'}>
+                  {selectedOption?.label || placeholder}
+                </span>
+                <ChevronDown className="w-5 h-5 text-gray-700" />
               </div>
 
               {isOpen && (
-                <ul className="absolute z-10 bg-white border mt-1 w-full rounded shadow max-h-60 overflow-y-auto">
+                <ul className="absolute z-10 bg-white border border-gray-200 mt-1 w-full rounded-lg shadow-lg max-h-60 overflow-y-auto">
                   {options.map((option, idx) => (
                     <li
                       key={option.value}
-                      className={`p-2 cursor-pointer text-[#979797] ${
-                        idx === highlightedIndex ? 'bg-[#C6F4BE66]' : ''
-                      }`}
+                      className={`px-4 py-2 cursor-pointer text-sm text-gray-700 hover:bg-[#f0f0f0] ${
+                        idx === highlightedIndex ? 'bg-[#f0f0f0]' : ''
+                      } ${field.value === option.value ? 'bg-[#eceeeb] font-medium' : ''}`}
                       onClick={() => handleOptionClick(option)}
                       onMouseEnter={() => setHighlightedIndex(idx)}
                     >

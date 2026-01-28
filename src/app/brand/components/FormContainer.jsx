@@ -573,32 +573,41 @@ const FormContainer = ({ steps, theme = 'brand' }) => {
     if (!registrationSuccess) return null;
 
     return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-        <div className="bg-white rounded-lg p-8 w-full max-w-md mx-4">
-          <div className="text-center">
-            <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-green-100 mb-4">
-              <svg className="h-8 w-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
-              </svg>
-            </div>
-            <h3 className="text-xl font-bold text-gray-900 mb-4">Registration Submitted!</h3>
-            <div className="text-gray-600 text-sm mb-6">
-              <p className="mb-2">{registrationMessage}</p>
-              <p className="text-green-600 font-medium">We'll review your application and get back to you via email within 24-48 hours.</p>
-            </div>
-            
-            <button
-              onClick={() => {
-                setRegistrationSuccess(false);
-                router.push('/');
-              }}
-              className={`w-full px-6 py-3 text-white rounded-lg font-semibold transition-colors duration-200 ${
-                theme === 'influencer' ? 'bg-green-600 hover:bg-green-700' : 'bg-green-600 hover:bg-green-700'
-              }`}
-            >
-              Back to Home
-            </button>
+      <div className="fixed inset-0 bg-white flex items-center justify-center z-50">
+        <div className="w-full max-w-[600px] mx-auto px-8 text-center">
+          {/* Success Image */}
+          <div className="mb-8">
+            <img 
+              src="/welcome.png" 
+              alt="Success" 
+              className="w-full max-w-[400px] h-auto mx-auto"
+            />
           </div>
+
+          {/* Success Message */}
+          <div className="space-y-4 mb-8">
+            <h2 className="text-2xl font-semibold text-[#242527]">
+              You have successfully registered your brand
+            </h2>
+            <p className="text-base text-[#505152]">
+              We will get back to you as soon as your request get's approved.
+            </p>
+            <p className="text-base text-[#505152]">
+              Once approved your login id and password will be provided by your registered email{' '}
+              <span className="font-bold">xyz@abc.com</span>
+            </p>
+          </div>
+
+          {/* Back to Home Button */}
+          <button
+            onClick={() => {
+              setRegistrationSuccess(false);
+              router.push('/');
+            }}
+            className="w-full max-w-[500px] mx-auto px-4 py-3 bg-[#43573b] text-white rounded-full font-semibold hover:bg-[#3a4a32] transition-colors duration-200"
+          >
+            Go back to home
+          </button>
         </div>
       </div>
     );
@@ -642,91 +651,107 @@ const FormContainer = ({ steps, theme = 'brand' }) => {
 
   return (
     <FormProvider {...methods}>
-      <div className="h-full flex flex-col overflow-hidden">
-        {/* Step Indicator */}
-        <div className="bg-gray-50 px-4 sm:px-6 py-4 border-b">
-          <div className="flex items-center justify-between mb-2">
-            <h1 className="text-lg sm:text-xl font-bold text-gray-800">
-              {steps.length > 1 ? 'Registration Process' : step.title}
-            </h1>
-            <div className="text-sm text-gray-600">
-              Step {currentStep + 1} of {steps.length}
-            </div>
+      <div className="h-screen flex flex-col bg-white">
+        {/* Fixed App Bar */}
+        <div className="bg-white flex items-center justify-between px-1 py-2 shrink-0 border-b border-gray-200">
+          {/* Back Button */}
+          <button
+            type="button"
+            onClick={() => {
+              if (currentStep > 0) {
+                setCurrentStep((prev) => prev - 1);
+              } else {
+                router.push('/');
+              }
+            }}
+            className="flex items-center justify-center w-12 h-12 rounded-full hover:bg-gray-100 transition-colors"
+          >
+            <svg className="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
+            </svg>
+          </button>
+
+          {/* Title */}
+          <div className="flex-1 px-2">
+            <h1 className="text-xl font-semibold text-gray-800">Brand Registration</h1>
           </div>
-          
-          {/* Progress Bar */}
-          <div className="w-full bg-gray-200 rounded-full h-2">
-            <div 
-              className={`h-2 rounded-full transition-all duration-300 ease-in-out ${
-                theme === 'influencer' ? 'bg-green-600' : 'bg-green-600'
-              }`}
-              style={{ width: `${((currentStep + 1) / steps.length) * 100}%` }}
-            ></div>
-          </div>
-          
-          {/* Step Indicators */}
-          <div className="flex justify-between mt-3 text-xs sm:text-sm">
-            {steps.map((stepItem, index) => (
-              <div 
-                key={index}
-                className={`flex flex-col items-center space-y-1 ${
-                  index === currentStep 
-                    ? theme === 'influencer' ? 'text-green-600' : 'text-green-600'
-                    : index < currentStep 
-                      ? theme === 'influencer' ? 'text-green-500' : 'text-green-500'
-                      : 'text-gray-400'
-                }`}
-              >
-                <div className={`
-                  w-6 h-6 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-xs font-bold
-                  ${index === currentStep 
-                    ? theme === 'influencer' ? 'bg-green-600 text-white' : 'bg-green-600 text-white'
-                    : index < currentStep 
-                      ? theme === 'influencer' 
-                        ? 'bg-green-100 text-green-600 border-2 border-green-600' 
-                        : 'bg-green-100 text-green-600 border-2 border-green-600'
-                      : 'bg-gray-200 text-gray-500'
-                  }
-                `}>
-                  {index < currentStep ? '✓' : index + 1}
+
+          {/* Menu Button */}
+          <button
+            type="button"
+            className="flex items-center justify-center w-12 h-12 rounded-full hover:bg-gray-100 transition-colors"
+          >
+            <svg className="w-6 h-6 text-gray-700" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z" />
+            </svg>
+          </button>
+        </div>
+
+        {/* Fixed Progress Steps */}
+        <div className="bg-white px-9 py-4 shrink-0">
+          <div className="max-w-4xl mx-auto px-10">
+            <div className="flex items-center justify-between">
+              {steps.map((stepItem, index) => (
+                <div key={index} className="flex flex-col items-center gap-2 relative flex-1">
+                  {/* Step Circle */}
+                  <div className="flex items-center w-full">
+                    {index > 0 && (
+                      <div className={`flex-1 h-0.5 ${index <= currentStep ? 'bg-[#43573b]' : 'bg-[#eceeeb]'}`} />
+                    )}
+                    <div
+                      className={`flex items-center justify-center w-9 h-9 rounded-full text-base font-semibold shrink-0 ${
+                        index < currentStep
+                          ? 'bg-[#43573b] text-white'
+                          : index === currentStep
+                          ? 'bg-[#43573b] text-white'
+                          : 'bg-[#eceeeb] text-gray-800'
+                      }`}
+                    >
+                      {index < currentStep ? (
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7" />
+                        </svg>
+                      ) : (
+                        index + 1
+                      )}
+                    </div>
+                    {index < steps.length - 1 && (
+                      <div className={`flex-1 h-0.5 ${index < currentStep ? 'bg-[#43573b]' : 'bg-[#eceeeb]'}`} />
+                    )}
+                  </div>
+                  {/* Step Label */}
+                  <div className="text-sm font-medium text-gray-800 text-center min-w-[130px]">
+                    {stepItem.title}
+                  </div>
                 </div>
-                <span className="hidden sm:block text-center max-w-20 leading-tight">
-                  {stepItem.title}
-                </span>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </div>
 
-        {/* Form Content */}
-        <div className="flex-1 overflow-y-auto">
-          <form onSubmit={methods.handleSubmit(onSubmit)} className="p-4 sm:p-6 space-y-6">
-            {/* Step Title and Description */}
-            <div className="text-center sm:text-left">
-              <h2 className="text-xl sm:text-2xl font-bold text-gray-800 mb-2">{step.title}</h2>
-              <p className="text-gray-600">{step.description}</p>
-            </div>
-
-            {error && (
-              <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
-                <div className="flex">
-                  <div className="text-red-600 text-sm">
-                    <strong>Error:</strong> {error}
+        {/* Scrollable Form Content */}
+        <div className="flex-1 overflow-y-auto overflow-x-hidden px-9 py-4">
+          <div className="max-w-4xl mx-auto px-40">
+            <form onSubmit={methods.handleSubmit(onSubmit)} className="space-y-6">
+              {error && (
+                <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
+                  <div className="flex">
+                    <div className="text-red-600 text-sm">
+                      <strong>Error:</strong> {error}
+                    </div>
                   </div>
                 </div>
-              </div>
-            )}
+              )}
 
-            {/* Show Success Modal for brand/influencer registration */}
-            {renderSuccessModal()}
+              {/* Show Success Modal for brand/influencer registration */}
+              {renderSuccessModal()}
 
-            {/* Show Already Submitted Modal */}
-            {renderAlreadySubmittedModal()}
+              {/* Show Already Submitted Modal */}
+              {renderAlreadySubmittedModal()}
 
-            {/* Form Fields */}
-            {!registrationSuccess && !alreadySubmitted && (
-              <div className="space-y-4 sm:space-y-6">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+              {/* Form Fields */}
+              {!registrationSuccess && !alreadySubmitted && (
+                <div className="space-y-6">
                   {step.fields.map((field, index) => {
                     const isFullWidth = field.type === 'textarea' || 
                                       field.name === 'company_description' || 
@@ -735,7 +760,7 @@ const FormContainer = ({ steps, theme = 'brand' }) => {
                                       field.name === 'billing_info.billing_address';
                     
                     return (
-                      <div key={field.name} className={isFullWidth ? 'sm:col-span-2' : ''}>
+                      <div key={field.name} className={isFullWidth ? 'w-full' : 'w-full'}>
                         {field.type === "text" && <TextInput {...field} />}
                         {field.type === "email" && <TextInput {...field} type="email" />}
                         {field.type === "password" && <TextInput {...field} type="password" />}
@@ -755,38 +780,31 @@ const FormContainer = ({ steps, theme = 'brand' }) => {
                     );
                   })}
                 </div>
-              </div>
-            )}
-          </form>
+              )}
+            </form>
+          </div>
         </div>
 
-        {/* Navigation Buttons */}
+        {/* Fixed Bottom Navigation Buttons */}
         {!registrationSuccess && !alreadySubmitted && (
-          <div className="border-t bg-gray-50 px-4 sm:px-6 py-4">
-            <div className="flex flex-col sm:flex-row justify-between gap-3">
-              <button
-                type="button"
-                onClick={() => setCurrentStep((prev) => prev - 1)}
-                disabled={currentStep === 0 || loading}
-                className={`
-                  px-6 py-3 rounded-lg font-semibold transition-colors duration-200
-                  ${currentStep === 0 || loading
-                    ? 'bg-gray-200 text-gray-400 cursor-not-allowed' 
-                    : 'bg-gray-200 hover:bg-gray-300 text-gray-700'
-                  }
-                `}
-              >
-                ← Back
-              </button>
-              
-              <div className="flex-1 sm:flex-initial">
+          <div className="bg-white px-9 py-4 shrink-0 border-t border-gray-200">
+            <div className="max-w-4xl mx-auto px-40">
+              <div className="flex gap-2">
+                {currentStep > 0 && (
+                  <button
+                    type="button"
+                    onClick={() => setCurrentStep((prev) => prev - 1)}
+                    disabled={loading}
+                    className="flex-1 px-4 py-2 rounded-full font-semibold transition-colors duration-200 border border-[#43573b] text-[#43573b] hover:bg-[#43573b] hover:text-white disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    Previous
+                  </button>
+                )}
                 <button 
                   type="submit" 
                   onClick={methods.handleSubmit(onSubmit)}
                   disabled={loading}
-                  className={`w-full sm:w-auto px-8 py-3 text-white rounded-lg font-semibold transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed ${
-                    theme === 'influencer' ? 'bg-green-600 hover:bg-green-700' : 'bg-green-600 hover:bg-green-700'
-                  }`}
+                  className={`flex-1 px-4 py-2 rounded-full font-semibold transition-colors duration-200 bg-[#43573b] text-white hover:bg-[#3a4a32] disabled:opacity-50 disabled:cursor-not-allowed ${currentStep === 0 ? 'w-full' : ''}`}
                 >
                   {loading ? (
                     <div className="flex items-center justify-center">
@@ -797,20 +815,11 @@ const FormContainer = ({ steps, theme = 'brand' }) => {
                       Processing...
                     </div>
                   ) : (
-                    currentStep === steps.length - 1 ? step.submit : `${step.submit} →`
+                    currentStep === steps.length - 1 ? step.submit : 'Continue'
                   )}
                 </button>
               </div>
             </div>
-            
-            {/* Progress Text */}
-            {/* <div className="mt-3 text-center text-sm text-gray-500">
-              {currentStep === 0 && "Let's get started with your company information"}
-              {currentStep === 1 && "Please provide your verification documents"}
-              {currentStep === 2 && "Add your contact details"}
-              {currentStep === 3 && "Connect your social media and brand assets"}
-              {currentStep === 4 && "Almost done! Choose your preferences"}
-            </div> */}
           </div>
         )}
       </div>

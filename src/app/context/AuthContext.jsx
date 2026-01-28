@@ -17,19 +17,19 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [token, setToken] = useState(null);
+  const [mounted, setMounted] = useState(false);
   const router = useRouter();
 
   // Check for existing token on mount
   useEffect(() => {
+    setMounted(true);
     const checkAuth = () => {
-      if (typeof window !== 'undefined') {
-        const storedToken = localStorage.getItem('authToken') || getCookie('authToken');
-        if (storedToken) {
-          setToken(storedToken);
-          // You can also verify the token with your backend here
-          // For now, we'll assume the token is valid
-          setUser({ token: storedToken }); // You can decode JWT or fetch user data
-        }
+      const storedToken = localStorage.getItem('authToken') || getCookie('authToken');
+      if (storedToken) {
+        setToken(storedToken);
+        // You can also verify the token with your backend here
+        // For now, we'll assume the token is valid
+        setUser({ token: storedToken }); // You can decode JWT or fetch user data
       }
       setLoading(false);
     };

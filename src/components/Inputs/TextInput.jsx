@@ -42,8 +42,8 @@ const TextInput = ({ name, label, placeholder, required = false, className = '',
   }
   
   return (
-    <div className="mb-4">
-      <label htmlFor={name} className="block text-sm font-medium mb-1">
+    <div className="flex flex-col gap-2">
+      <label htmlFor={name} className="text-sm font-medium text-[#242527]">
         {label} {required && label && <span className="text-red-500">*</span>}
       </label>
       <div className="relative">
@@ -51,10 +51,10 @@ const TextInput = ({ name, label, placeholder, required = false, className = '',
           id={name}
           type={inputType}
           placeholder={placeholder}
-          className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 ${
+          className={`w-full px-4 py-2 bg-[#f0f0f0] border border-[#e6e6e6] rounded-lg text-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#43573b] focus:border-transparent ${
             hasError 
               ? 'border-red-500 focus:ring-red-500' 
-              : 'border-gray-300 focus:ring-green-500 focus:border-green-500'
+              : ''
           } ${className} ${isPasswordField ? 'pr-10' : ''}`}
           {...register(name, validationRules)}
         />
