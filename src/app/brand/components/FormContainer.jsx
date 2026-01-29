@@ -4,6 +4,8 @@ import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '../../context/AuthContext';
 import { authAPI, brandAPI, influencerAPI } from '../../../utils/api';
+import Lottie from 'lottie-react';
+import businessDealAnimation from '../../../../public/assets/businessdeal.json';
 import TextInput from "../../../components/Inputs/TextInput";
 import Select from "../../../components/Inputs/Select";
 import FileInput from "../../../components/Inputs/FileInput";
@@ -568,48 +570,62 @@ const FormContainer = ({ steps, theme = 'brand' }) => {
 
   const step = steps[currentStep];
 
-  // Function to render success modal for brand/influencer registration
-  const renderSuccessModal = () => {
+  // Function to render success screen for brand/influencer registration
+  const renderSuccessScreen = () => {
     if (!registrationSuccess) return null;
 
     return (
-      <div className="fixed inset-0 bg-white flex items-center justify-center z-50">
-        <div className="w-full max-w-[600px] mx-auto px-8 text-center">
-          {/* Success Image */}
-          <div className="mb-8">
-            <img 
-              src="/welcome.png" 
-              alt="Success" 
-              className="w-full max-w-[400px] h-auto mx-auto"
-            />
-          </div>
+      <>
+        {/* Fixed Progress Steps for Success State */}
+     
 
-          {/* Success Message */}
-          <div className="space-y-4 mb-8">
-            <h2 className="text-2xl font-semibold text-[#242527]">
-              You have successfully registered your brand
-            </h2>
-            <p className="text-base text-[#505152]">
-              We will get back to you as soon as your request get's approved.
-            </p>
-            <p className="text-base text-[#505152]">
-              Once approved your login id and password will be provided by your registered email{' '}
-              <span className="font-bold">xyz@abc.com</span>
-            </p>
-          </div>
+        {/* Scrollable Success Content */}
+        <div className="flex-1 overflow-y-auto overflow-x-hidden px-9 py-4">
+          <div className="max-w-[90%] mx-auto px-40">
+            <div className="flex flex-col items-center gap-4">
+              {/* Success Animation */}
+              <div className="w-[518px] h-[355px] shrink-0">
+                <Lottie 
+                  animationData={businessDealAnimation}
+                  loop={true}
+                  autoplay={true}
+                  style={{ width: '100%', height: '100%' }}
+                />
+              </div>
 
-          {/* Back to Home Button */}
-          <button
-            onClick={() => {
-              setRegistrationSuccess(false);
-              router.push('/');
-            }}
-            className="w-full max-w-[500px] mx-auto px-4 py-3 bg-[#43573b] text-white rounded-full font-semibold hover:bg-[#3a4a32] transition-colors duration-200"
-          >
-            Go back to home
-          </button>
+              {/* Success Message */}
+              <div className="flex flex-col gap-4 items-center max-w-[500px] w-full text-center">
+                <h2 className="text-xl font-semibold text-[#242527] leading-7 tracking-[-0.14px] w-full">
+                  {theme === 'influencer' 
+                    ? 'You have successfully registered as an influencer'
+                    : 'You have successfully registered your brand'
+                  }
+                </h2>
+                <p className="text-base text-[#505152] leading-6 w-full">
+                  We will get back to you as soon as your request get's approved.
+                </p>
+                <p className="text-base text-[#505152] leading-6 w-full">
+                  Once approved your login id and password will be provided by your registered email{' '}
+                  <span className="font-bold">xyz@abc.com</span>
+                </p>
+              </div>
+
+              {/* Back to Home Button */}
+              <div className="max-w-[500px] w-full">
+                <button
+                  onClick={() => {
+                    setRegistrationSuccess(false);
+                    router.push('/');
+                  }}
+                  className="w-full px-4 py-2 bg-[#43573b] text-white rounded-full font-semibold hover:bg-[#3a4a32] transition-colors duration-200"
+                >
+                  Go back to home
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
+      </>
     );
   };
 
@@ -658,7 +674,9 @@ const FormContainer = ({ steps, theme = 'brand' }) => {
           <button
             type="button"
             onClick={() => {
-              if (currentStep > 0) {
+              if (registrationSuccess) {
+                router.push('/');
+              } else if (currentStep > 0) {
                 setCurrentStep((prev) => prev - 1);
               } else {
                 router.push('/');
@@ -673,7 +691,9 @@ const FormContainer = ({ steps, theme = 'brand' }) => {
 
           {/* Title */}
           <div className="flex-1 px-2">
-            <h1 className="text-xl font-semibold text-gray-800">Brand Registration</h1>
+            <h1 className="text-xl font-semibold text-gray-800">
+              {theme === 'influencer' ? 'Influencer Registration' : 'Brand Registration'}
+            </h1>
           </div>
 
           {/* Menu Button */}
@@ -687,141 +707,141 @@ const FormContainer = ({ steps, theme = 'brand' }) => {
           </button>
         </div>
 
-        {/* Fixed Progress Steps */}
-        <div className="bg-white px-9 py-4 shrink-0">
-          <div className="max-w-4xl mx-auto px-10">
-            <div className="flex items-center justify-between">
-              {steps.map((stepItem, index) => (
-                <div key={index} className="flex flex-col items-center gap-2 relative flex-1">
-                  {/* Step Circle */}
-                  <div className="flex items-center w-full">
-                    {index > 0 && (
-                      <div className={`flex-1 h-0.5 ${index <= currentStep ? 'bg-[#43573b]' : 'bg-[#eceeeb]'}`} />
-                    )}
-                    <div
-                      className={`flex items-center justify-center w-9 h-9 rounded-full text-base font-semibold shrink-0 ${
-                        index < currentStep
-                          ? 'bg-[#43573b] text-white'
-                          : index === currentStep
-                          ? 'bg-[#43573b] text-white'
-                          : 'bg-[#eceeeb] text-gray-800'
-                      }`}
-                    >
-                      {index < currentStep ? (
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7" />
-                        </svg>
-                      ) : (
-                        index + 1
-                      )}
-                    </div>
-                    {index < steps.length - 1 && (
-                      <div className={`flex-1 h-0.5 ${index < currentStep ? 'bg-[#43573b]' : 'bg-[#eceeeb]'}`} />
-                    )}
-                  </div>
-                  {/* Step Label */}
-                  <div className="text-sm font-medium text-gray-800 text-center min-w-[130px]">
-                    {stepItem.title}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
+        {/* Show Already Submitted Modal */}
+        {renderAlreadySubmittedModal()}
 
-        {/* Scrollable Form Content */}
-        <div className="flex-1 overflow-y-auto overflow-x-hidden px-9 py-4">
-          <div className="max-w-4xl mx-auto px-40">
-            <form onSubmit={methods.handleSubmit(onSubmit)} className="space-y-6">
-              {error && (
-                <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
-                  <div className="flex">
-                    <div className="text-red-600 text-sm">
-                      <strong>Error:</strong> {error}
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* Show Success Modal for brand/influencer registration */}
-              {renderSuccessModal()}
-
-              {/* Show Already Submitted Modal */}
-              {renderAlreadySubmittedModal()}
-
-              {/* Form Fields */}
-              {!registrationSuccess && !alreadySubmitted && (
-                <div className="space-y-6">
-                  {step.fields.map((field, index) => {
-                    const isFullWidth = field.type === 'textarea' || 
-                                      field.name === 'company_description' || 
-                                      field.name === 'brand_story' ||
-                                      field.name === 'bio' ||
-                                      field.name === 'billing_info.billing_address';
-                    
-                    return (
-                      <div key={field.name} className={isFullWidth ? 'w-full' : 'w-full'}>
-                        {field.type === "text" && <TextInput {...field} />}
-                        {field.type === "email" && <TextInput {...field} type="email" />}
-                        {field.type === "password" && <TextInput {...field} type="password" />}
-                        {field.type === "number" && <TextInput {...field} type="number" />}
-                        {field.type === "date" && <TextInput {...field} type="date" />}
-                        {field.type === "select" && <Select {...field} />}
-                        {field.type === "file" && <FileInput {...field} />}
-                        {field.type === "radio" && <RadioInput {...field} />}
-                        {field.type === "distribution" && <Distribution {...field} />}
-                        {field.type === "collaborationCharges" && <CollaborationCharges {...field} />}
-                        {field.type === "audienceLocation" && <AudienceLocation {...field} />}
-                        {field.type === "multiselect" && <MultiSelect {...field} />}
-                        {field.type === "checkbox" && <CheckboxInput {...field} />}
-                        {field.type === "textarea" && <TextAreaInput {...field} />}
-                        {!["text", "email", "password", "number", "date", "select", "file", "radio", "distribution", "collaborationCharges", "audienceLocation", "multiselect", "checkbox", "textarea"].includes(field.type) && <TextInput {...field} />}
+        {/* Conditional Rendering: Success Screen OR Normal Form Steps */}
+        {registrationSuccess ? (
+          renderSuccessScreen()
+        ) : !alreadySubmitted ? (
+          <>
+            {/* Fixed Progress Steps */}
+            <div className="bg-white px-9 py-4 shrink-0">
+              <div className="max-w-4xl mx-auto px-10">
+                <div className="flex items-center justify-between">
+                  {steps.map((stepItem, index) => (
+                    <div key={index} className="flex flex-col items-center gap-2 relative flex-1">
+                      {/* Step Circle */}
+                      <div className="flex items-center w-full">
+                        {index > 0 && (
+                          <div className={`flex-1 h-0.5 ${index <= currentStep ? 'bg-[#43573b]' : 'bg-[#eceeeb]'}`} />
+                        )}
+                        <div
+                          className={`flex items-center justify-center w-9 h-9 rounded-full text-base font-semibold shrink-0 ${
+                            index < currentStep
+                              ? 'bg-[#43573b] text-white'
+                              : index === currentStep
+                              ? 'bg-[#43573b] text-white'
+                              : 'bg-[#eceeeb] text-gray-800'
+                          }`}
+                        >
+                          {index < currentStep ? (
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7" />
+                            </svg>
+                          ) : (
+                            index + 1
+                          )}
+                        </div>
+                        {index < steps.length - 1 && (
+                          <div className={`flex-1 h-0.5 ${index < currentStep ? 'bg-[#43573b]' : 'bg-[#eceeeb]'}`} />
+                        )}
                       </div>
-                    );
-                  })}
-                </div>
-              )}
-            </form>
-          </div>
-        </div>
-
-        {/* Fixed Bottom Navigation Buttons */}
-        {!registrationSuccess && !alreadySubmitted && (
-          <div className="bg-white px-9 py-4 shrink-0 border-t border-gray-200">
-            <div className="max-w-4xl mx-auto px-40">
-              <div className="flex gap-2">
-                {currentStep > 0 && (
-                  <button
-                    type="button"
-                    onClick={() => setCurrentStep((prev) => prev - 1)}
-                    disabled={loading}
-                    className="flex-1 px-4 py-2 rounded-full font-semibold transition-colors duration-200 border border-[#43573b] text-[#43573b] hover:bg-[#43573b] hover:text-white disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    Previous
-                  </button>
-                )}
-                <button 
-                  type="submit" 
-                  onClick={methods.handleSubmit(onSubmit)}
-                  disabled={loading}
-                  className={`flex-1 px-4 py-2 rounded-full font-semibold transition-colors duration-200 bg-[#43573b] text-white hover:bg-[#3a4a32] disabled:opacity-50 disabled:cursor-not-allowed ${currentStep === 0 ? 'w-full' : ''}`}
-                >
-                  {loading ? (
-                    <div className="flex items-center justify-center">
-                      <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                      </svg>
-                      Processing...
+                      {/* Step Label */}
+                      <div className="text-sm font-medium text-gray-800 text-center min-w-[130px]">
+                        {stepItem.title}
+                      </div>
                     </div>
-                  ) : (
-                    currentStep === steps.length - 1 ? step.submit : 'Continue'
-                  )}
-                </button>
+                  ))}
+                </div>
               </div>
             </div>
-          </div>
-        )}
+
+            {/* Scrollable Form Content */}
+            <div className="flex-1 overflow-y-auto overflow-x-hidden px-9 py-4">
+              <div className="max-w-[90%] mx-auto px-40">
+                <form onSubmit={methods.handleSubmit(onSubmit)} className="space-y-6">
+                  {error && (
+                    <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
+                      <div className="flex">
+                        <div className="text-red-600 text-sm">
+                          <strong>Error:</strong> {error}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Form Fields */}
+                  <div className="space-y-6">
+                    {step.fields.map((field, index) => {
+                      const isFullWidth = field.type === 'textarea' || 
+                                        field.name === 'company_description' || 
+                                        field.name === 'brand_story' ||
+                                        field.name === 'bio' ||
+                                        field.name === 'billing_info.billing_address';
+                      
+                      return (
+                        <div key={field.name} className={isFullWidth ? 'w-full' : 'w-full'}>
+                          {field.type === "text" && <TextInput {...field} />}
+                          {field.type === "email" && <TextInput {...field} type="email" />}
+                          {field.type === "password" && <TextInput {...field} type="password" />}
+                          {field.type === "number" && <TextInput {...field} type="number" />}
+                          {field.type === "date" && <TextInput {...field} type="date" />}
+                          {field.type === "select" && <Select {...field} />}
+                          {field.type === "file" && <FileInput {...field} />}
+                          {field.type === "radio" && <RadioInput {...field} />}
+                          {field.type === "distribution" && <Distribution {...field} />}
+                          {field.type === "collaborationCharges" && <CollaborationCharges {...field} />}
+                          {field.type === "audienceLocation" && <AudienceLocation {...field} />}
+                          {field.type === "multiselect" && <MultiSelect {...field} />}
+                          {field.type === "checkbox" && <CheckboxInput {...field} />}
+                          {field.type === "textarea" && <TextAreaInput {...field} />}
+                          {!["text", "email", "password", "number", "date", "select", "file", "radio", "distribution", "collaborationCharges", "audienceLocation", "multiselect", "checkbox", "textarea"].includes(field.type) && <TextInput {...field} />}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </form>
+              </div>
+            </div>
+
+            {/* Fixed Bottom Navigation Buttons */}
+            <div className="bg-white px-9 py-4 shrink-0 border-t border-gray-200">
+              <div className="max-w-4xl mx-auto px-40">
+                <div className="flex gap-2">
+                  {currentStep > 0 && (
+                    <button
+                      type="button"
+                      onClick={() => setCurrentStep((prev) => prev - 1)}
+                      disabled={loading}
+                      className="flex-1 px-4 py-2 rounded-full font-semibold transition-colors duration-200 border border-[#43573b] text-[#43573b] hover:bg-[#43573b] hover:text-white disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      Previous
+                    </button>
+                  )}
+                  <button 
+                    type="submit" 
+                    onClick={methods.handleSubmit(onSubmit)}
+                    disabled={loading}
+                    className={`flex-1 px-4 py-2 rounded-full font-semibold transition-colors duration-200 bg-[#43573b] text-white hover:bg-[#3a4a32] disabled:opacity-50 disabled:cursor-not-allowed ${currentStep === 0 ? 'w-full' : ''}`}
+                  >
+                    {loading ? (
+                      <div className="flex items-center justify-center">
+                        <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        Processing...
+                      </div>
+                    ) : (
+                      currentStep === steps.length - 1 ? step.submit : 'Continue'
+                    )}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </>
+        ) : null}
       </div>
     </FormProvider>
   );
