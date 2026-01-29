@@ -1,6 +1,5 @@
 'use client'
 import FormContainer from '../../brand/components/FormContainer'
-import Image from 'next/image'
 import React, { Suspense } from 'react'
 
 const page = () => {
@@ -204,37 +203,15 @@ const page = () => {
     }];
     
     return (
-        <div className='min-h-screen bg-gradient-to-br from-green-50 to-green-100 flex'>
-            {/* Left side - Illustration (hidden on mobile) */}
-            <div className='hidden lg:flex lg:w-1/2 relative items-center justify-center p-8'>
-                <div className="relative">
-                    <Image 
-                        src="/welcome.png" 
-                        width={400} 
-                        height={500} 
-                        alt='influencer registration' 
-                        className='object-contain max-w-full max-h-[80vh]' 
-                    />
-                    <div className="absolute top-4 left-4 bg-white/80 backdrop-blur-sm rounded-lg p-4 max-w-sm">
-                        <h3 className="text-lg font-bold text-gray-800 mb-2">Join Our Creator Community</h3>
-                        <p className="text-gray-600 text-sm">
-                            Connect with top brands and monetize your influence with our AI-powered platform.
-                        </p>
+        <div className='min-h-screen bg-white flex items-center justify-center'>
+            <div className='w-full h-screen max-w-full overflow-hidden'>
+                <Suspense fallback={
+                    <div className="flex items-center justify-center h-full">
+                        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-green-600"></div>
                     </div>
-                </div>
-            </div>
-            
-            {/* Right side - Form */}
-            <div className='w-full lg:w-1/2 flex items-center justify-center p-4'>
-                <div className='bg-white rounded-2xl shadow-xl w-full max-w-4xl h-[90vh] max-h-[900px] overflow-hidden'>
-                    <Suspense fallback={
-                        <div className="flex items-center justify-center h-full">
-                            <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-green-600"></div>
-                        </div>
-                    }>
-                        <FormContainer steps={steps} theme="influencer" />
-                    </Suspense>
-                </div>
+                }>
+                    <FormContainer steps={steps} theme="influencer" />
+                </Suspense>
             </div>
         </div>
     )

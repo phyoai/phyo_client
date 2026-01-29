@@ -57,9 +57,9 @@ const FileInput = ({ name, label, required = false, className = '', accept = '',
     };
 
     return (
-        <div className="mb-4">
+        <div className="flex flex-col gap-2">
             {label && (
-                <label htmlFor={name} className="block text-sm font-medium mb-1">
+                <label htmlFor={name} className="text-sm font-medium text-[#242527]">
                     {label} {required && <span className="text-red-500">*</span>}
                 </label>
             )}
@@ -74,15 +74,28 @@ const FileInput = ({ name, label, required = false, className = '', accept = '',
             />
 
             <label htmlFor={name}>
-                <div className={`flex flex-col items-center justify-center border-2 border-dashed rounded-md p-4 cursor-pointer transition focus:outline-none focus:ring-2 ${
+                <div className={`flex flex-col items-center justify-center bg-[#f0f0f0] rounded-xl p-8 cursor-pointer transition min-h-[136px] ${
                     hasError 
-                        ? 'border-red-500 focus:ring-red-500' 
-                        : 'border-gray-300 hover:border-green-500 focus:ring-green-500'
+                        ? 'border-2 border-red-500' 
+                        : 'hover:bg-[#e6e6e6]'
                 }`}>
-                    {fileName ? <CircleCheck className="mb-1 text-green-600" /> : <CloudUpload className="mb-1 text-gray-400" />}
-                    <span className="text-sm text-gray-600">
-                        {fileName || 'Click to upload'}
-                    </span>
+                    {fileName ? (
+                        <>
+                            <CircleCheck className="mb-2 text-[#43573b] w-6 h-6" />
+                            <span className="text-sm text-gray-700 text-center">
+                                {fileName}
+                            </span>
+                        </>
+                    ) : (
+                        <>
+                            <span className="text-base text-gray-800 mb-2">
+                                Drag files here to upload..
+                            </span>
+                            <button type="button" className="mt-2 px-4 py-2 text-sm font-medium text-[#43573b] border border-[#43573b] rounded-full hover:bg-[#43573b] hover:text-white transition-colors">
+                                Browse Files
+                            </button>
+                        </>
+                    )}
                 </div>
             </label>
 

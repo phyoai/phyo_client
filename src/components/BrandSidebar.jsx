@@ -4,120 +4,169 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '../app/context/AuthContext';
 import { useSidebar } from '../app/context/SidebarContext';
-import {
-  Home,
-  Mail,
-  Calendar,
-  User,
-  Menu,
-  Pencil
-} from 'lucide-react';
+import {  
+  CalendarEventLine,
+  AccountCircleLine,
+  MenuFill, 
+  MenuUnfold4Line,
+  PencilFill, 
+  Home4Fill,
+  InboxLine,
+  Message3Fill
+} from '@phyoofficial/phyo-icon-library';
 
 const BrandSidebar = () => {
   const pathname = usePathname();
   const { logout } = useAuth();
   const { isExpanded, setIsExpanded, sidebarButtonAction, sidebarButtonLabel } = useSidebar();
+  const [mounted, setMounted] = React.useState(false);
+
+  React.useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const navItems = [
-    { name: 'Home', href: '/brand/dashboard', icon: Home },
-    { name: 'Inbox', href: '/brand/inbox', icon: Mail, badge: 3 },
-    { name: 'Campaigns', href: '/brand/campaigns', icon: Calendar },
-    { name: 'Account', href: '/brand/account', icon: User },
+    { name: 'Home', href: '/brand/dashboard', icon: Home4Fill },
+    { name: 'Inbox', href: '/brand/inbox', icon: InboxLine, badge: 3 },
+    { name: 'Campaigns', href: '/brand/campaigns', icon: CalendarEventLine },
+    { name: 'Account', href: '/brand/account', icon: AccountCircleLine },
   ];
 
   const handleButtonClick = () => {
     if (sidebarButtonAction) {
       sidebarButtonAction();
     }
+    // Add future actions for inbox page here if needed
   };
+
+  // Determine which icon to show based on current page
+  const getFabIcon = () => {
+    if (pathname === '/brand/inbox') {
+      return Message3Fill;
+    }
+    return PencilFill;
+  };
+
+  const FabIcon = getFabIcon();
+  
+  // Check if button should be enabled
+  const isButtonEnabled = sidebarButtonAction || pathname === '/brand/inbox';
+
+  // Prevent hydration mismatch by not rendering until mounted
+  if (!mounted) {
+    return (
+      <div className={`h-screen bg-[#F0F0F0] fixed left-0 top-0 flex flex-col transition-[width] duration-300 ease-in-out z-50 w-[96px] pt-[44px] pb-[56px]`}>
+        {/* Placeholder during SSR */}
+      </div>
+    );
+  }
 
   return (
     <div className={`h-screen bg-[#F0F0F0] fixed left-0 top-0 flex flex-col transition-[width] duration-300 ease-in-out z-50 ${
-      isExpanded ? 'w-[280px] px-6 py-8' : 'w-20 px-4 py-6 items-center'
+      isExpanded ? 'w-[220px] pt-[44px] pb-[56px] px-[20px]' : 'w-[96px] pt-[44px] pb-[56px]'
     }`}>
       {/* Menu Icon at top */}
-      <button 
-        onClick={() => setIsExpanded(!isExpanded)}
-        className={`text-gray-600 hover:text-gray-900 transition-colors ${
-          isExpanded ? 'self-start mb-6' : 'mb-8'
-        }`}
-      >
-        <Menu className="h-6 w-6" />
-      </button>
+      <div className={`flex flex-col ${isExpanded ? 'gap-[4px]' : 'gap-[4px] items-center'} mb-[36px]`}>
+        <button 
+          onClick={() => setIsExpanded(!isExpanded)}
+          className="flex items-center justify-center w-14 h-14 rounded-xl hover:bg-gray-200 transition-colors"
+        >
+          {isExpanded ? (
+            <MenuUnfold4Line width={24} height={24} fill="#242527" />
+          ) : (
+            <MenuFill width={24} height={24} fill="#242527" />
+          )}
+        </button>
 
-      {/* Edit/Create Button */}
-      <div className={isExpanded ? 'mb-6' : 'mb-8'}>
+        {/* FAB Button */}
         <button 
           onClick={handleButtonClick}
-          disabled={!sidebarButtonAction}
-          className={`bg-[#63B898] hover:scale-105 text-black transition-transform flex items-center justify-center ${
-          isExpanded 
-            ? 'w-full rounded-[12px] py-3 px-4 gap-3 justify-start' 
-            : 'p-3 rounded-lg'
-        } ${!sidebarButtonAction ? 'opacity-50 cursor-not-allowed hover:scale-100' : ''}`}>
-          <Pencil className="h-5 w-5 stroke-black flex-shrink-0" strokeWidth={2} />
+          disabled={!isButtonEnabled}
+          className={`flex items-center rounded-xl transition-colors justify-start ${
+            isExpanded 
+              ? 'w-[70%] h-14 px-4 gap-[6px] justify-center' 
+              : 'w-14 h-14 justify-center'
+          } ${
+            isButtonEnabled 
+              ? 'bg-[#43573B] hover:bg-[#3a4a33] cursor-pointer' 
+              : 'bg-[#43573B] opacity-50 cursor-not-allowed'
+          }`}
+        >
+          <FabIcon width={24} height={24} fill="white" color="white" style={{ color: 'white' }} className="flex-shrink-0" />
           {isExpanded && (
-            <span className="text-[15px] font-semibold">
-              {sidebarButtonLabel}
+            <span className="text-white text-base font-semibold tracking-[0.24px] leading-6">
+              {sidebarButtonLabel || 'Button'}
             </span>
           )}
         </button>
       </div>
 
       {/* Main Navigation */}
-      <nav className={`flex-1 flex flex-col ${isExpanded ? 'space-y-2' : 'items-center space-y-6'}`}>
+      <nav className={`flex flex-col gap-[4px]`}>
         {navItems.map((item) => {
           const Icon = item.icon;
           const isActive = pathname === item.href;
 
-          return (
-            <Link
-              key={item.name}
-              href={item.href}
-              className={`relative flex items-center transition-all duration-300 ${
-                isExpanded 
-                  ? `gap-3 px-4 py-3 rounded-[20px] w-full ${
-                      isActive 
-                        ? 'bg-[#63B898] text-white' 
-                        : 'text-gray-700 hover:bg-gray-200'
-                    }` 
-                  : 'flex-col'
-              }`}
-            >
-              {isExpanded ? (
-                <>
-                  <Icon className={`h-5 w-5 flex-shrink-0 ${
-                    isActive ? 'text-white' : 'text-gray-600'
-                  }`} strokeWidth={2} />
-                  <span className={`text-[15px] font-medium flex-1 ${
-                    isActive ? 'text-white' : 'text-gray-700'
+          if (isExpanded) {
+            // Expanded State
+            return (
+              <Link
+                key={item.name}
+                href={item.href}
+                className={`flex items-center gap-[4px] px-[12px] py-[6px] transition-colors ${
+                  isActive 
+                    ? 'bg-[#DAE3D1] rounded-[32px]' 
+                    : 'hover:bg-gray-200 rounded-[32px]'
+                }`}
+              >
+                <div className="flex items-center justify-center px-[4px] py-[8px] rounded-lg">
+                  <Icon 
+                    width={24}
+                    height={24}
+                    fill={isActive ? '#43573B' : '#808080'}
+                  />
+                </div>
+                <span className={`text-sm font-medium tracking-[0.2px] leading-5 ${
+                  isActive ? 'text-[#43573B]' : 'text-[#808080]'
+                }`}>
+                  {item.name}
+                </span>
+              </Link>
+            );
+          } else {
+            // Collapsed State
+            return (
+              <Link
+                key={item.name}
+                href={item.href}
+                className="flex flex-col gap-[4px] items-center py-[6px] w-full"
+              >
+                <div className="relative flex items-center justify-center">
+                  <div className={`p-[4px] rounded-lg h-[32px] flex items-center justify-center ${
+                    isActive ? 'bg-[#DAE3D1]' : ''
                   }`}>
-                    {item.name}
-                  </span>
-                  {item.badge && (
-                    <span className="bg-[#FF8A3D] text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center flex-shrink-0">
-                      {item.badge}
-                    </span>
-                  )}
-                </>
-              ) : (
-                <>
-                  <div className={`transition-all duration-300 ${
-                    isActive
-                      ? 'text-[#63B898]'
-                      : 'text-gray-400 hover:text-gray-700'
-                  }`}>
-                    <Icon className="h-6 w-6" strokeWidth={2} />
+                    <Icon 
+                      width={24}
+                      height={24}
+                      fill={isActive ? '#43573B' : '#808080'}
+                    />
                   </div>
-                  <span className={`text-xs mt-1.5 font-medium ${
-                    isActive ? 'text-[#63B898]' : 'text-gray-500'
-                  }`}>
-                    {item.name}
-                  </span>
-                </>
-              )}
-            </Link>
-          );
+                  {item.badge && (
+                    <div className="absolute -top-0.5 -right-0.5 bg-[#BF3709] rounded-full w-4 h-4 flex items-center justify-center">
+                      <span className="text-white text-[12px] font-medium leading-4 tracking-[0.16px]">
+                        {item.badge}
+                      </span>
+                    </div>
+                  )}
+                </div>
+                <span className={`text-sm font-medium tracking-[0.2px] leading-5 text-center ${
+                  isActive ? 'text-[#43573B]' : 'text-[#808080]'
+                }`}>
+                  {item.name}
+                </span>
+              </Link>
+            );
+          }
         })}
       </nav>
     </div>

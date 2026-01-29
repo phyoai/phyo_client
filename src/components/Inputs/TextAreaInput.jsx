@@ -34,7 +34,7 @@ const TextAreaInput = ({
   return (
     <div className={`flex flex-col gap-2 ${className}`}>
       {label && (
-        <label htmlFor={name} className="text-sm font-medium text-gray-700">
+        <label htmlFor={name} className="text-sm font-medium text-[#242527]">
           {label} {required && <span className="text-red-500">*</span>}
         </label>
       )}
@@ -51,10 +51,10 @@ const TextAreaInput = ({
         placeholder={placeholder}
         rows={rows}
         maxLength={maxLength}
-        className={`w-full p-3 border rounded-lg focus:outline-none focus:ring-2 resize-vertical min-h-[100px] ${
+        className={`w-full px-4 py-2 bg-[#f0f0f0] border border-[#e6e6e6] rounded-lg text-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 resize-vertical min-h-[150px] ${
           hasError
             ? 'border-red-500 focus:ring-red-500'
-            : 'border-gray-300 focus:ring-green-500 focus:border-green-500'
+            : 'focus:ring-[#43573b] focus:border-transparent'
         }`}
       />
       
