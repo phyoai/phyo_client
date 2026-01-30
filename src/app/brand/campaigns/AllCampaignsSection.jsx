@@ -191,8 +191,10 @@ const AllCampaignsSection = () => {
 
   // Register sidebar button action for campaigns tab
   React.useEffect(() => {
-    // Set the button action to open the create campaign modal
-    setSidebarButtonAction(() => () => setShowModal(true));
+    // Set the button action to navigate to create campaign page
+    setSidebarButtonAction(() => () => {
+      window.location.href = '/brand/campaigns/create-campaign';
+    });
     setSidebarButtonLabel('Create Campaign');
 
     // Cleanup: Remove the action when component unmounts

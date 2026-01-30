@@ -148,7 +148,7 @@ const page = () => {
             { name: "rate_card.blog_post", type: "number", placeholder: "3000", label: "Blog Post (INR)", required: false }
         ],
     }, {
-        title: "Availability & Preferences",
+        title: "Availability",
         description: "Set your availability and working preferences",
         submit: "Continue",
         fields: [
@@ -189,16 +189,23 @@ const page = () => {
             ]}
         ],
     }, {
-        title: "Final Details & Upload",
+        title: "Assets upload",
         description: "Complete your profile with additional information",
-        submit: "Complete Registration",
+        submit: "Continue",
         fields: [
             { name: "profile_picture", type: "file", label: "Profile Picture", required: true, accept: "image/*" },
             { name: "cover_photo", type: "file", label: "Cover Photo", required: false, accept: "image/*" },
-            { name: "portfolio.media_kit", type: "file", label: "Media Kit (PDF)", required: false, accept: ".pdf" },
-            { name: "notifications.email_preferences", type: "checkbox", label: "Enable email notifications", required: false },
-            { name: "notifications.push_notifications", type: "checkbox", label: "Enable push notifications", required: false },
-            { name: "notifications.campaign_recommendations", type: "checkbox", label: "Receive campaign recommendations", required: false }
+            { name: "portfolio.media_kit", type: "file", label: "Media Kit (PDF)", required: false, accept: ".pdf" }
+        ]
+    }, {
+        title: "Preferences",
+        description: "Set your notification preferences",
+        submit: "Complete Registration",
+        fields: [
+            { name: "notifications.sms_alerts", type: "toggle", label: "SMS Alerts", required: false, defaultValue: true },
+            { name: "notifications.email_preferences", type: "toggle", label: "Email Alerts", required: false, defaultValue: true },
+            { name: "notifications.push_notifications", type: "toggle", label: "Push Notifications", required: false, defaultValue: true },
+            { name: "notifications.campaign_recommendations", type: "toggle", label: "Campaign Recomendations", required: false, defaultValue: true }
         ]
     }];
     

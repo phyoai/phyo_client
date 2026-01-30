@@ -16,6 +16,7 @@ import AudienceLocation from "../../../components/Inputs/AudienceLocation";
 import MultiSelect from "../../../components/Inputs/MultiSelect";
 import CheckboxInput from "../../../components/Inputs/CheckboxInput";
 import TextAreaInput from "../../../components/Inputs/TextAreaInput";
+import ToggleInput from "../../../components/Inputs/ToggleInput";
 
 const FormContainer = ({ steps, theme = 'brand' }) => {
   const methods = useForm({ 
@@ -717,38 +718,53 @@ const FormContainer = ({ steps, theme = 'brand' }) => {
           <>
             {/* Fixed Progress Steps */}
             <div className="bg-white px-9 py-4 shrink-0">
-              <div className="max-w-4xl mx-auto px-10">
-                <div className="flex items-center justify-between">
+              <div className={`mx-auto ${theme === 'influencer' ? 'max-w-[80%] px-4' : 'max-w-4xl px-10'}`}>
+                {/* Step Circles and Labels */}
+                <div className="flex items-start justify-between relative">
                   {steps.map((stepItem, index) => (
-                    <div key={index} className="flex flex-col items-center gap-2 relative flex-1">
+                    <div key={index} className="flex flex-col items-center gap-2 flex-1 relative">
+                      {/* Connecting Line to Previous Step */}
+                      {index > 0 && (
+                        <div 
+                          className="absolute top-[18px] right-1/2 w-full h-[2px]"
+                          style={{
+                            backgroundColor: index <= currentStep ? '#43573b' : '#eceeeb',
+                            zIndex: 0
+                          }}
+                        />
+                      )}
+                      
+                      {/* Connecting Line to Next Step */}
+                      {index < steps.length - 1 && (
+                        <div 
+                          className="absolute top-[18px] left-1/2 w-full h-[2px]"
+                          style={{
+                            backgroundColor: index < currentStep ? '#43573b' : '#eceeeb',
+                            zIndex: 0
+                          }}
+                        />
+                      )}
+                      
                       {/* Step Circle */}
-                      <div className="flex items-center w-full">
-                        {index > 0 && (
-                          <div className={`flex-1 h-0.5 ${index <= currentStep ? 'bg-[#43573b]' : 'bg-[#eceeeb]'}`} />
-                        )}
-                        <div
-                          className={`flex items-center justify-center w-9 h-9 rounded-full text-base font-semibold shrink-0 ${
-                            index < currentStep
-                              ? 'bg-[#43573b] text-white'
-                              : index === currentStep
-                              ? 'bg-[#43573b] text-white'
-                              : 'bg-[#eceeeb] text-gray-800'
-                          }`}
-                        >
-                          {index < currentStep ? (
-                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7" />
-                            </svg>
-                          ) : (
-                            index + 1
-                          )}
-                        </div>
-                        {index < steps.length - 1 && (
-                          <div className={`flex-1 h-0.5 ${index < currentStep ? 'bg-[#43573b]' : 'bg-[#eceeeb]'}`} />
+                      <div 
+                        className="flex items-center justify-center w-9 h-9 rounded-full text-base font-semibold shrink-0 relative"
+                        style={{
+                          backgroundColor: index < currentStep || index === currentStep ? '#43573b' : '#eceeeb',
+                          color: index < currentStep || index === currentStep ? 'white' : '#1f2937',
+                          zIndex: 10
+                        }}
+                      >
+                        {index < currentStep ? (
+                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7" />
+                          </svg>
+                        ) : (
+                          index + 1
                         )}
                       </div>
+                      
                       {/* Step Label */}
-                      <div className="text-sm font-medium text-gray-800 text-center min-w-[130px]">
+                      <div className={`font-medium text-gray-800 text-center ${theme === 'influencer' ? 'text-xs leading-tight max-w-[120px]' : 'text-sm max-w-[140px]'}`}>
                         {stepItem.title}
                       </div>
                     </div>
@@ -795,8 +811,9 @@ const FormContainer = ({ steps, theme = 'brand' }) => {
                           {field.type === "audienceLocation" && <AudienceLocation {...field} />}
                           {field.type === "multiselect" && <MultiSelect {...field} />}
                           {field.type === "checkbox" && <CheckboxInput {...field} />}
+                          {field.type === "toggle" && <ToggleInput {...field} />}
                           {field.type === "textarea" && <TextAreaInput {...field} />}
-                          {!["text", "email", "password", "number", "date", "select", "file", "radio", "distribution", "collaborationCharges", "audienceLocation", "multiselect", "checkbox", "textarea"].includes(field.type) && <TextInput {...field} />}
+                          {!["text", "email", "password", "number", "date", "select", "file", "radio", "distribution", "collaborationCharges", "audienceLocation", "multiselect", "checkbox", "toggle", "textarea"].includes(field.type) && <TextInput {...field} />}
                         </div>
                       );
                     })}
@@ -807,7 +824,7 @@ const FormContainer = ({ steps, theme = 'brand' }) => {
 
             {/* Fixed Bottom Navigation Buttons */}
             <div className="bg-white px-9 py-4 shrink-0 border-t border-gray-200">
-              <div className="max-w-4xl mx-auto px-40">
+              <div className={`mx-auto ${theme === 'influencer' ? 'max-w-5xl px-4' : 'max-w-4xl px-40'}`}>
                 <div className="flex gap-2">
                   {currentStep > 0 && (
                     <button
