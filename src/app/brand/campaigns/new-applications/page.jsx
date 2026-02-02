@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { ArrowLeft, MoreVertical } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
+import RejectionModal from '@/components/RejectionModal';
 
 const applicationsData = [
   {
@@ -226,6 +227,7 @@ const NewApplicationsPage = () => {
   const router = useRouter();
   const [selectedApplication, setSelectedApplication] = useState(null);
   const [activeTab, setActiveTab] = useState('info');
+  const [showRejectionModal, setShowRejectionModal] = useState(false);
 
   const handleBack = () => {
     router.push('/brand/campaigns');
@@ -237,8 +239,15 @@ const NewApplicationsPage = () => {
   };
 
   const handleReject = () => {
-    // TODO: Implement reject logic
-    console.log('Reject application:', selectedApplication?.id);
+    setShowRejectionModal(true);
+  };
+
+  const handleRejectConfirm = (reason) => {
+    // TODO: Implement reject logic with reason
+    console.log('Reject application:', selectedApplication?.id, 'Reason:', reason);
+    setShowRejectionModal(false);
+    // You can add additional logic here like showing a success message
+    // or navigating away after rejection
   };
 
   const handleApprove = () => {
@@ -600,6 +609,14 @@ const NewApplicationsPage = () => {
           )}
         </div>
       </div>
+
+      {/* Rejection Modal */}
+      <RejectionModal
+        isOpen={showRejectionModal}
+        onClose={() => setShowRejectionModal(false)}
+        onConfirm={handleRejectConfirm}
+        creatorName={selectedApplication?.name}
+      />
     </div>
   );
 };
