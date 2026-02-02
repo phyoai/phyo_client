@@ -13,12 +13,13 @@ function BrandLayoutContent({ children, pathname }) {
     console.log('BrandLayout: pathname =', pathname);
   }, [pathname]);
   
-  // Don't show sidebar for signup, login, create-campaign, and new-applications pages
+  // Don't show sidebar for signup, login, create-campaign, new-applications, and influencer-search pages
   const isAuthPage = pathname === '/brand/signup' || pathname === '/brand/login';
   const isCreateCampaignPage = pathname === '/brand/campaigns/create-campaign';
   const isNewApplicationsPage = pathname === '/brand/campaigns/new-applications';
+  const isInfluencerSearchPage = pathname === '/brand/influencer-search';
   
-  if (isAuthPage || isCreateCampaignPage || isNewApplicationsPage) {
+  if (isAuthPage || isCreateCampaignPage || isNewApplicationsPage || isInfluencerSearchPage) {
     console.log('BrandLayout: Rendering page without sidebar');
     return <>{children}</>;
   }
