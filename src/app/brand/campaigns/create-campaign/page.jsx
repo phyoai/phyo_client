@@ -1,13 +1,14 @@
 'use client'
 import React, { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { ChevronLeft, ChevronRight, X, Upload, Calendar, Check, Users } from 'lucide-react';
+import { ArrowLeft, MoreVertical, X, Upload, Calendar, Check, Users } from 'lucide-react';
 import { campaignAPI } from '../../../../utils/api';
 
 const CreateCampaignPage = () => {
   const router = useRouter();
   const [currentStep, setCurrentStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [selectedCampaignTypes, setSelectedCampaignTypes] = useState(['Brand Awareness']);
   const [formData, setFormData] = useState({
     // Campaign Details
     campaignName: '',
@@ -25,6 +26,10 @@ const CreateCampaignPage = () => {
     budget: '',
     numberOfLivePosts: '',
     reels: [],
+    // Deliverables counts
+    instagramReels: 0,
+    instagramStories: 0,
+    instagramPosts: 0,
     // Target Influencer
     influencerCount: '',
     niche: '',
@@ -38,6 +43,17 @@ const CreateCampaignPage = () => {
 
   const fileInputRef = useRef(null);
   const [reelInput, setReelInput] = useState('');
+
+  const handleDeliverableChange = (type, delta) => {
+    setFormData(prev => {
+      const currentValue = prev[type] || 0;
+      const newValue = Math.max(0, currentValue + delta);
+      return {
+        ...prev,
+        [type]: newValue
+      };
+    });
+  };
 
   const handleInputChange = (field, value) => {
     setFormData(prev => ({
@@ -76,7 +92,7 @@ const CreateCampaignPage = () => {
   };
 
   const handleNextStep = () => {
-    if (currentStep < 3) {
+    if (currentStep < 7) {
       setCurrentStep(currentStep + 1);
     }
   };
@@ -91,50 +107,42 @@ const CreateCampaignPage = () => {
     router.push('/brand/campaigns');
   };
 
-  const getStepStatus = (step) => {
-    if (step < currentStep) return 'completed';
-    if (step === currentStep) return 'current';
-    return 'pending';
+  const handleBack = () => {
+    router.push('/brand/campaigns');
   };
 
-  const StepIndicator = ({ stepNumber, title, status }) => (
-    <div className="flex items-center">
-      <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium
-        ${status === 'completed' ? 'bg-green-600 text-white' : 
-          status === 'current' ? 'bg-green-600 text-white' : 'bg-gray-200 text-gray-400'}`}>
-        {status === 'completed' ? <Check className="w-4 h-4" /> : stepNumber}
-      </div>
-      <div className="ml-3">
-        <div className={`text-sm font-medium ${status === 'current' ? 'text-gray-900' : 'text-gray-500'}`}>
-          STEP {stepNumber}
-        </div>
-        <div className={`text-sm ${status === 'current' ? 'text-gray-900' : 'text-gray-500'}`}>
-          {title}
-        </div>
-        {status === 'current' && (
-          <div className="text-xs text-green-600 font-medium">In Progress</div>
-        )}
-        {status === 'completed' && (
-          <div className="text-xs text-green-600 font-medium">Completed</div>
-        )}
-        {status === 'pending' && (
-          <div className="text-xs text-gray-400">Pending</div>
-        )}
-      </div>
-    </div>
-  );
+  const handleToggleCampaignType = (type) => {
+    setSelectedCampaignTypes(prev => {
+      if (prev.includes(type)) {
+        return prev.filter(t => t !== type);
+      }
+      return [...prev, type];
+    });
+  };
 
   const renderStepContent = () => {
     switch (currentStep) {
-      case 1:
+      case 1: // Details Step
         return (
           <div className="space-y-6">
-            <h2 className="text-2xl font-bold text-gray-900 text-center">Campaign Details</h2>
-            
-            {/* Product Images Upload */}
+            {/* Campaign Name */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Add Images of Product for your Campaign
+              <label className="block text-sm font-medium text-[#242527] mb-2">
+                Campaign Name
+              </label>
+              <input
+                type="text"
+                value={formData.campaignName}
+                onChange={(e) => handleInputChange('campaignName', e.target.value)}
+                className="w-full px-4 py-2 bg-[#f0f0f0] border border-[#e6e6e6] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#43573b]"
+                placeholder="Enter campaign name"
+              />
+            </div>
+
+            {/* Product Images */}
+            <div>
+              <label className="block text-sm font-medium text-[#242527] mb-2">
+                Product Images
               </label>
               <input
                 type="file"
@@ -145,150 +153,224 @@ const CreateCampaignPage = () => {
                 onChange={handleImageChange}
               />
               <div
-                className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer"
+                className="bg-[#f0f0f0] rounded-xl h-[250px] flex flex-col items-center justify-center cursor-pointer hover:bg-[#e8e8e8] transition-colors"
                 onClick={() => fileInputRef.current && fileInputRef.current.click()}
               >
-                <Upload className="w-8 h-8 text-gray-400 mx-auto mb-2" />
-                <p className="text-sm text-blue-600 cursor-pointer hover:text-blue-700">
-                  Click here to upload or drop media here
+                <p className="text-base text-[#242527] mb-2">
+                  Drag files here to upload..
                 </p>
-              </div>
-              <div className="grid grid-cols-3 gap-4 mt-4">
-                {formData.productImages && formData.productImages.length > 0 ? (
-                  formData.productImages.map((img, idx) => (
-                    <div key={idx} className="aspect-square bg-gray-200 rounded-lg overflow-hidden flex items-center justify-center">
-                      <img src={img.url || img} alt={`Product ${idx + 1}`} className="object-cover w-full h-full" />
-                    </div>
-                  ))
-                ) : (
-                  Array.from({ length: 3 }).map((_, idx) => (
-                    <div key={idx} className="aspect-square bg-gray-200 rounded-lg"></div>
-                  ))
-                )}
-              </div>
-            </div>
-
-            {/* Budget */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Budget (USD)
-              </label>
-              <input
-                type="number"
-                value={formData.budget}
-                onChange={e => handleInputChange('budget', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
-                placeholder="500"
-                min="0"
-              />
-            </div>
-
-            {/* Number of Live Posts */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Number of Live Posts
-              </label>
-              <input
-                type="number"
-                value={formData.numberOfLivePosts}
-                onChange={e => handleInputChange('numberOfLivePosts', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
-                placeholder="2"
-                min="0"
-              />
-            </div>
-
-            {/* Reels URLs */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Reels (Add video URLs)
-              </label>
-              <div className="flex gap-2 mb-2">
-                <input
-                  type="url"
-                  value={reelInput}
-                  onChange={e => setReelInput(e.target.value)}
-                  className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
-                  placeholder="https://example.com/reel.mp4"
-                />
                 <button
                   type="button"
-                  onClick={handleAddReel}
-                  className="px-3 py-2 bg-green-600 text-white rounded-md hover:bg-green-700"
+                  className="px-4 py-2 border border-[#43573b] text-[#43573b] rounded-full text-sm font-medium hover:bg-[#43573b] hover:text-white transition-colors"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    fileInputRef.current && fileInputRef.current.click();
+                  }}
                 >
-                  Add
+                  Browse Files
                 </button>
               </div>
-              <ul className="space-y-1">
-                {formData.reels.map((url, idx) => (
-                  <li key={idx} className="flex items-center gap-2">
-                    <span className="truncate flex-1 text-xs text-gray-700">{url}</span>
-                    <button type="button" onClick={() => handleRemoveReel(idx)} className="text-red-500 text-xs">Remove</button>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            {/* Campaign Name */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Campaign Name
-              </label>
-              <input
-                type="text"
-                value={formData.campaignName}
-                onChange={(e) => handleInputChange('campaignName', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
-                placeholder="Name"
-              />
+              {formData.productImages && formData.productImages.length > 0 && (
+                <div className="grid grid-cols-4 gap-4 mt-4">
+                  {formData.productImages.map((img, idx) => (
+                    <div key={idx} className="aspect-square bg-gray-200 rounded-lg overflow-hidden">
+                      <img src={img.url || img} alt={`Product ${idx + 1}`} className="object-cover w-full h-full" />
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
 
             {/* Campaign Type */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-[#242527] mb-2">
                 Campaign Type
               </label>
-              <input
-                type="text"
-                value={formData.campaignType}
-                onChange={(e) => handleInputChange('campaignType', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
-                placeholder="Instagram/YouTube"
-              />
+              <div className="flex flex-wrap gap-2 py-2 overflow-x-auto">
+                {campaignTypeOptions.map((type, idx) => (
+                  <button
+                    key={idx}
+                    type="button"
+                    onClick={() => handleToggleCampaignType(type)}
+                    className={`px-3 py-1.5 rounded-lg text-sm font-medium flex items-center gap-2 transition-colors whitespace-nowrap ${
+                      selectedCampaignTypes.includes(type)
+                        ? 'bg-[#43573b] text-white'
+                        : 'bg-[#fbfcfa] border border-[#f4f6f1] text-[#242527] hover:bg-[#f4f6f1]'
+                    }`}
+                  >
+                    {type}
+                    {selectedCampaignTypes.includes(type) && (
+                      <X className="w-4 h-4" />
+                    )}
+                  </button>
+                ))}
+              </div>
             </div>
+          </div>
+        );
 
-            {/* Campaign Brief */}
+      case 2: // Campaign Brief Step
+        return (
+          <div className="space-y-6">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-[#242527] mb-2">
                 Campaign Brief
               </label>
               <textarea
                 value={formData.campaignBrief}
                 onChange={(e) => handleInputChange('campaignBrief', e.target.value)}
-                rows={8}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
-                placeholder="Enter campaign brief..."
+                rows={12}
+                className="w-full px-4 py-2 bg-[#f0f0f0] border border-[#e6e6e6] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#43573b]"
+                placeholder="Describe your campaign objectives, messaging, target audience, and key requirements..."
               />
             </div>
+          </div>
+        );
 
-            {/* Deliverables */}
+      case 3: // Deliverables Step
+        return (
+          <div className="space-y-4">
+            {/* Instagram Reels */}
+            <div className="bg-white flex items-center pl-4">
+              <div className="flex-1 flex items-center justify-center pr-4 py-3">
+                <p className="text-base font-semibold text-[#242527]">Instagram Reels</p>
+              </div>
+              <div className="flex items-center justify-center">
+                <div className="flex items-center px-2 py-4">
+                  <div className="flex items-center gap-3">
+                    <button
+                      type="button"
+                      onClick={() => handleDeliverableChange('instagramReels', -1)}
+                      className="flex items-center justify-center w-9 h-9 rounded-full hover:bg-gray-100 transition-colors"
+                    >
+                      <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                        <path d="M4.16667 10H15.8333" stroke="#242527" strokeWidth="1.66667" strokeLinecap="round"/>
+                      </svg>
+                    </button>
+                    <span className="text-xl font-semibold text-[#242527] w-6 text-center">
+                      {formData.instagramReels}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => handleDeliverableChange('instagramReels', 1)}
+                      className="flex items-center justify-center w-9 h-9 rounded-full hover:bg-gray-100 transition-colors"
+                    >
+                      <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                        <path d="M10 4.16667V15.8333M4.16667 10H15.8333" stroke="#242527" strokeWidth="1.66667" strokeLinecap="round"/>
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Instagram Stories */}
+            <div className="bg-white flex items-center pl-4">
+              <div className="flex-1 flex items-center justify-center pr-4 py-3">
+                <p className="text-base font-semibold text-[#242527]">Instagram Stories</p>
+              </div>
+              <div className="flex items-center justify-center">
+                <div className="flex items-center px-2 py-4">
+                  <div className="flex items-center gap-3">
+                    <button
+                      type="button"
+                      onClick={() => handleDeliverableChange('instagramStories', -1)}
+                      className="flex items-center justify-center w-9 h-9 rounded-full hover:bg-gray-100 transition-colors"
+                    >
+                      <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                        <path d="M4.16667 10H15.8333" stroke="#242527" strokeWidth="1.66667" strokeLinecap="round"/>
+                      </svg>
+                    </button>
+                    <span className="text-xl font-semibold text-[#242527] w-6 text-center">
+                      {formData.instagramStories}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => handleDeliverableChange('instagramStories', 1)}
+                      className="flex items-center justify-center w-9 h-9 rounded-full hover:bg-gray-100 transition-colors"
+                    >
+                      <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                        <path d="M10 4.16667V15.8333M4.16667 10H15.8333" stroke="#242527" strokeWidth="1.66667" strokeLinecap="round"/>
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Instagram Post */}
+            <div className="bg-white flex items-center pl-4">
+              <div className="flex-1 flex items-center justify-center pr-4 py-3">
+                <p className="text-base font-semibold text-[#242527]">Instagram Post</p>
+              </div>
+              <div className="flex items-center justify-center">
+                <div className="flex items-center px-2 py-4">
+                  <div className="flex items-center gap-3">
+                    <button
+                      type="button"
+                      onClick={() => handleDeliverableChange('instagramPosts', -1)}
+                      className="flex items-center justify-center w-9 h-9 rounded-full hover:bg-gray-100 transition-colors"
+                    >
+                      <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                        <path d="M4.16667 10H15.8333" stroke="#242527" strokeWidth="1.66667" strokeLinecap="round"/>
+                      </svg>
+                    </button>
+                    <span className="text-xl font-semibold text-[#242527] w-6 text-center">
+                      {formData.instagramPosts}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => handleDeliverableChange('instagramPosts', 1)}
+                      className="flex items-center justify-center w-9 h-9 rounded-full hover:bg-gray-100 transition-colors"
+                    >
+                      <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                        <path d="M10 4.16667V15.8333M4.16667 10H15.8333" stroke="#242527" strokeWidth="1.66667" strokeLinecap="round"/>
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Total Summary */}
+            <div className="flex items-center gap-2 px-4 py-6 text-base font-semibold text-[#333]">
+              <span>Total:</span>
+              <div className="flex items-center gap-1">
+                <span>{formData.instagramPosts}</span>
+                <span>Post,</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <span>{formData.instagramStories}</span>
+                <span>Stories,</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <span>{formData.instagramReels}</span>
+                <span>Reels</span>
+              </div>
+            </div>
+          </div>
+        );
+
+      case 4: // Budget Step
+        return (
+          <div className="space-y-6">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Deliverables
+              <label className="block text-sm font-medium text-[#242527] mb-2">
+                Campaign Budget (USD)
               </label>
-              <textarea
-                value={formData.deliverables}
-                onChange={(e) => handleInputChange('deliverables', e.target.value)}
-                rows={6}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
-                placeholder="Enter deliverables..."
+              <input
+                type="number"
+                value={formData.budget}
+                onChange={(e) => handleInputChange('budget', e.target.value)}
+                className="w-full px-4 py-2 bg-[#f0f0f0] border border-[#e6e6e6] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#43573b]"
+                placeholder="500"
+                min="0"
               />
             </div>
 
-            {/* Compensation */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-4">
-                Compensation
+              <label className="block text-sm font-medium text-[#242527] mb-4">
+                Compensation Type
               </label>
               <div className="space-y-3">
                 <label className="flex items-center">
@@ -300,7 +382,7 @@ const CreateCampaignPage = () => {
                     onChange={(e) => handleInputChange('compensation', e.target.value)}
                     className="mr-3"
                   />
-                  <span>Monetary</span>
+                  <span className="text-sm">Monetary</span>
                 </label>
                 <label className="flex items-center">
                   <input
@@ -311,7 +393,7 @@ const CreateCampaignPage = () => {
                     onChange={(e) => handleInputChange('compensation', e.target.value)}
                     className="mr-3"
                   />
-                  <span>Barter/Gifting</span>
+                  <span className="text-sm">Barter/Gifting</span>
                 </label>
                 <label className="flex items-center">
                   <input
@@ -322,19 +404,19 @@ const CreateCampaignPage = () => {
                     onChange={(e) => handleInputChange('compensation', e.target.value)}
                     className="mr-3"
                   />
-                  <span>Affiliate/Commission</span>
+                  <span className="text-sm">Affiliate/Commission</span>
                 </label>
               </div>
               
               {formData.compensation === 'Monetary' && (
-                <div className="grid grid-cols-2 gap-4 mt-3">
+                <div className="grid grid-cols-2 gap-4 mt-4">
                   <div>
                     <label className="block text-xs text-gray-500 mb-1">Amount</label>
                     <input
                       type="number"
                       value={formData.compensationAmount}
                       onChange={(e) => handleInputChange('compensationAmount', e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                      className="w-full px-4 py-2 bg-[#f0f0f0] border border-[#e6e6e6] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#43573b]"
                       placeholder="500"
                       min="0"
                     />
@@ -344,7 +426,7 @@ const CreateCampaignPage = () => {
                     <select
                       value={formData.compensationCurrency}
                       onChange={(e) => handleInputChange('compensationCurrency', e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                      className="w-full px-4 py-2 bg-[#f0f0f0] border border-[#e6e6e6] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#43573b]"
                     >
                       <option value="USD">USD</option>
                       <option value="EUR">EUR</option>
@@ -359,286 +441,337 @@ const CreateCampaignPage = () => {
                 value={formData.compensationDetails}
                 onChange={(e) => handleInputChange('compensationDetails', e.target.value)}
                 rows={4}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 mt-3"
+                className="w-full px-4 py-2 bg-[#f0f0f0] border border-[#e6e6e6] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#43573b] mt-3"
                 placeholder="Enter compensation details..."
               />
             </div>
+          </div>
+        );
 
-            {/* Timelines */}
+      case 5: // Timeline Step
+        return (
+          <div className="space-y-6">
             <div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-4 text-center">Timelines</h3>
-              
-              <div className="space-y-4">
+              <label className="block text-sm font-medium text-[#242527] mb-2">
+                Application Deadline
+              </label>
+              <input
+                type="date"
+                value={formData.applicationDeadline}
+                onChange={(e) => handleInputChange('applicationDeadline', e.target.value)}
+                className="w-full px-4 py-2 bg-[#f0f0f0] border border-[#e6e6e6] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#43573b]"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-[#242527] mb-2">
+                Campaign Start Date
+              </label>
+              <input
+                type="date"
+                value={formData.campaignStartDate}
+                onChange={(e) => handleInputChange('campaignStartDate', e.target.value)}
+                className="w-full px-4 py-2 bg-[#f0f0f0] border border-[#e6e6e6] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#43573b]"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-[#242527] mb-2">
+                Campaign End Date
+              </label>
+              <input
+                type="date"
+                value={formData.campaignEndDate}
+                onChange={(e) => handleInputChange('campaignEndDate', e.target.value)}
+                className="w-full px-4 py-2 bg-[#f0f0f0] border border-[#e6e6e6] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#43573b]"
+              />
+            </div>
+          </div>
+        );
+
+      case 6: // Influencer Target Step
+        return (
+          <div className="space-y-6">
+            <div>
+              <label className="block text-sm font-medium text-[#242527] mb-2">
+                How many influencers you want to hire
+              </label>
+              <input
+                type="number"
+                value={formData.influencerCount}
+                onChange={(e) => handleInputChange('influencerCount', e.target.value)}
+                className="w-full px-4 py-2 bg-[#f0f0f0] border border-[#e6e6e6] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#43573b]"
+                placeholder="4"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-[#242527] mb-2">
+                Target Niche
+              </label>
+              <select
+                value={formData.niche}
+                onChange={(e) => handleInputChange('niche', e.target.value)}
+                className="w-full px-4 py-2 bg-[#f0f0f0] border border-[#e6e6e6] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#43573b]"
+              >
+                <option value="">Select a niche</option>
+                <option value="Fashion">Fashion</option>
+                <option value="Beauty">Beauty</option>
+                <option value="Lifestyle">Lifestyle</option>
+                <option value="Fitness">Fitness</option>
+                <option value="Food">Food</option>
+                <option value="Travel">Travel</option>
+                <option value="Tech">Tech</option>
+                <option value="Gaming">Gaming</option>
+                <option value="Education">Education</option>
+                <option value="Business">Business</option>
+                <option value="Entertainment">Entertainment</option>
+                <option value="Health">Health</option>
+                <option value="Parenting">Parenting</option>
+                <option value="Pets">Pets</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-[#242527] mb-2">
+                Follower Count Range
+              </label>
+              <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Application Deadline
-                  </label>
+                  <label className="block text-xs text-gray-500 mb-1">Min</label>
                   <input
-                    type="date"
-                    value={formData.applicationDeadline}
-                    onChange={(e) => handleInputChange('applicationDeadline', e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                    type="number"
+                    value={formData.followerCountMin}
+                    onChange={(e) => handleInputChange('followerCountMin', e.target.value)}
+                    className="w-full px-4 py-2 bg-[#f0f0f0] border border-[#e6e6e6] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#43573b]"
+                    placeholder="1000"
                   />
                 </div>
-
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Campaign Start & End Date
-                  </label>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-xs text-gray-500 mb-1">Start</label>
-                      <input
-                        type="date"
-                        value={formData.campaignStartDate}
-                        onChange={(e) => handleInputChange('campaignStartDate', e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs text-gray-500 mb-1">End</label>
-                      <input
-                        type="date"
-                        value={formData.campaignEndDate}
-                        onChange={(e) => handleInputChange('campaignEndDate', e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
-                      />
-                    </div>
-                  </div>
+                  <label className="block text-xs text-gray-500 mb-1">Max</label>
+                  <input
+                    type="number"
+                    value={formData.followerCountMax}
+                    onChange={(e) => handleInputChange('followerCountMax', e.target.value)}
+                    className="w-full px-4 py-2 bg-[#f0f0f0] border border-[#e6e6e6] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#43573b]"
+                    placeholder="100000"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-[#242527] mb-2">
+                Countries
+              </label>
+              <input
+                type="text"
+                value={formData.countries}
+                onChange={(e) => handleInputChange('countries', e.target.value)}
+                className="w-full px-4 py-2 bg-[#f0f0f0] border border-[#e6e6e6] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#43573b]"
+                placeholder="India"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-[#242527] mb-2">
+                Gender
+              </label>
+              <select
+                value={formData.gender}
+                onChange={(e) => handleInputChange('gender', e.target.value)}
+                className="w-full px-4 py-2 bg-[#f0f0f0] border border-[#e6e6e6] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#43573b]"
+              >
+                <option value="">Select gender</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-[#242527] mb-2">
+                Age Range
+              </label>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs text-gray-500 mb-1">Min</label>
+                  <input
+                    type="number"
+                    value={formData.ageRangeMin}
+                    onChange={(e) => handleInputChange('ageRangeMin', e.target.value)}
+                    className="w-full px-4 py-2 bg-[#f0f0f0] border border-[#e6e6e6] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#43573b]"
+                    placeholder="18"
+                    min="13"
+                    max="100"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs text-gray-500 mb-1">Max</label>
+                  <input
+                    type="number"
+                    value={formData.ageRangeMax}
+                    onChange={(e) => handleInputChange('ageRangeMax', e.target.value)}
+                    className="w-full px-4 py-2 bg-[#f0f0f0] border border-[#e6e6e6] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#43573b]"
+                    placeholder="35"
+                    min="13"
+                    max="100"
+                  />
                 </div>
               </div>
             </div>
           </div>
         );
 
-      case 2:
+      case 7: // Review & Publish Step
         return (
           <div className="space-y-6">
-            <div className="text-center">
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">Let's set your targeting details</h2>
-              <p className="text-gray-600">
-                Provide some details on influencers you're looking to target. We'll collect campaign 
-                details like content requirements and product descriptions in the next step.
+            {/* Campaign Name */}
+            <div>
+              <h2 className="text-3xl font-bold text-[#242527] mb-2">
+                {formData.campaignName || 'Campaign Name'}
+              </h2>
+              
+              {/* Campaign Brief */}
+              <p className="text-base text-[#6b7280] leading-relaxed">
+                {formData.campaignBrief || 'No campaign brief provided'}
               </p>
             </div>
 
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  How many influencers you want to hire
-                </label>
-                <input
-                  type="number"
-                  value={formData.influencerCount}
-                  onChange={(e) => handleInputChange('influencerCount', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
-                  placeholder="4"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  What Niche you want to Target
-                </label>
-                <select
-                  value={formData.niche}
-                  onChange={(e) => handleInputChange('niche', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
-                >
-                  <option value="">Select a niche</option>
-                  <option value="Fashion">Fashion</option>
-                  <option value="Beauty">Beauty</option>
-                  <option value="Lifestyle">Lifestyle</option>
-                  <option value="Fitness">Fitness</option>
-                  <option value="Food">Food</option>
-                  <option value="Travel">Travel</option>
-                  <option value="Tech">Tech</option>
-                  <option value="Gaming">Gaming</option>
-                  <option value="Education">Education</option>
-                  <option value="Business">Business</option>
-                  <option value="Entertainment">Entertainment</option>
-                  <option value="Health">Health</option>
-                  <option value="Parenting">Parenting</option>
-                  <option value="Pets">Pets</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Follower Count Range
-                </label>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-xs text-gray-500 mb-1">Min</label>
-                    <input
-                      type="number"
-                      value={formData.followerCountMin}
-                      onChange={(e) => handleInputChange('followerCountMin', e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
-                      placeholder="1000"
+            {/* Product Images Carousel */}
+            {formData.productImages && formData.productImages.length > 0 && (
+              <div className="flex gap-3 overflow-x-auto pb-2">
+                {formData.productImages.slice(0, 3).map((img, idx) => (
+                  <div 
+                    key={idx} 
+                    className="flex-shrink-0 w-[240px] h-[200px] bg-gray-100 rounded-2xl overflow-hidden shadow-sm"
+                  >
+                    <img 
+                      src={img.url || img} 
+                      alt={`Product ${idx + 1}`} 
+                      className="w-full h-full object-cover"
                     />
                   </div>
-                  <div>
-                    <label className="block text-xs text-gray-500 mb-1">Max</label>
-                    <input
-                      type="number"
-                      value={formData.followerCountMax}
-                      onChange={(e) => handleInputChange('followerCountMax', e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
-                      placeholder="100000"
-                    />
+                ))}
+              </div>
+            )}
+
+            {/* Campaign Details Grid */}
+            <div className="grid grid-cols-1 gap-5">
+              {/* Campaign Goal */}
+              <div className="border-b border-gray-100 pb-4">
+                <h3 className="text-sm font-semibold text-[#242527] mb-2 uppercase tracking-wide">Campaign Goal</h3>
+                <p className="text-base text-[#6b7280]">
+                  {formData.campaignBrief 
+                    ? formData.campaignBrief.split('.')[0] + '.' 
+                    : 'Get creators to drive trial for our new product.'}
+                </p>
+              </div>
+
+              {/* Campaign Type */}
+              <div className="border-b border-gray-100 pb-4">
+                <h3 className="text-sm font-semibold text-[#242527] mb-3 uppercase tracking-wide">Campaign Type</h3>
+                <div className="flex flex-wrap gap-2">
+                  {selectedCampaignTypes.map((type, idx) => (
+                    <span
+                      key={idx}
+                      className="inline-flex items-center px-3 py-1.5 bg-[#f9fafb] border border-[#e5e7eb] rounded-lg text-sm font-medium text-[#374151]"
+                    >
+                      {type}
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              {/* Age Group */}
+              <div className="border-b border-gray-100 pb-4">
+                <h3 className="text-sm font-semibold text-[#242527] mb-3 uppercase tracking-wide">Age Group</h3>
+                <div className="flex items-center gap-6">
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-medium text-[#6b7280]">Min:</span>
+                    <span className="text-base font-semibold text-[#242527]">{formData.ageRangeMin || '18'}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-medium text-[#6b7280]">Max:</span>
+                    <span className="text-base font-semibold text-[#242527]">{formData.ageRangeMax || '35'}</span>
                   </div>
                 </div>
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Countries
-                </label>
-                <input
-                  type="text"
-                  value={formData.countries}
-                  onChange={(e) => handleInputChange('countries', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
-                  placeholder="India"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Gender
-                </label>
-                <select
-                  value={formData.gender}
-                  onChange={(e) => handleInputChange('gender', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
-                >
-                  <option value="">Select gender</option>
-                  <option value="Male">Male</option>
-                  <option value="Female">Female</option>
-                  <option value="Other">Other</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Age Range
-                </label>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-xs text-gray-500 mb-1">Min</label>
-                    <input
-                      type="number"
-                      value={formData.ageRangeMin}
-                      onChange={(e) => handleInputChange('ageRangeMin', e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
-                      placeholder="18"
-                      min="13"
-                      max="100"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs text-gray-500 mb-1">Max</label>
-                    <input
-                      type="number"
-                      value={formData.ageRangeMax}
-                      onChange={(e) => handleInputChange('ageRangeMax', e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
-                      placeholder="35"
-                      min="13"
-                      max="100"
-                    />
-                  </div>
+              {/* Deliverables */}
+              <div className="border-b border-gray-100 pb-4">
+                <h3 className="text-sm font-semibold text-[#242527] mb-3 uppercase tracking-wide">Deliverables</h3>
+                <div className="flex items-center gap-6">
+                  {formData.instagramStories > 0 && (
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-medium text-[#6b7280]">Stories:</span>
+                      <span className="text-base font-semibold text-[#242527]">{formData.instagramStories}</span>
+                    </div>
+                  )}
+                  {formData.instagramPosts > 0 && (
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-medium text-[#6b7280]">Posts:</span>
+                      <span className="text-base font-semibold text-[#242527]">{formData.instagramPosts}</span>
+                    </div>
+                  )}
+                  {formData.instagramReels > 0 && (
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-medium text-[#6b7280]">Reels:</span>
+                      <span className="text-base font-semibold text-[#242527]">{formData.instagramReels}</span>
+                    </div>
+                  )}
                 </div>
               </div>
-            </div>
-          </div>
-        );
 
-      case 3:
-        return (
-          <div className="space-y-6">
-            <h2 className="text-2xl font-bold text-gray-900 text-center mb-4">
-              This is how your Campaign will look to Influencers
-            </h2>
-            
-            <div className="bg-gray-50 rounded-lg p-6">
-              <div className="text-center mb-6">
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                  {formData.campaignName || 'Campaign Title'}
-                </h3>
-                <p className="text-sm text-gray-600">
-                  Launched {new Date().toLocaleDateString()}
-                </p>
-                <p className="text-sm text-gray-600">
-                  by {formData.brandName || 'Brand Name'}
-                </p>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  {/* Product Images Preview */}
-                  <div className="grid grid-cols-2 gap-2 mb-4">
-                    {formData.productImages && formData.productImages.length > 0 ? (
-                      formData.productImages.map((img, idx) => (
-                        <div key={idx} className="aspect-square bg-gray-200 rounded-lg overflow-hidden flex items-center justify-center">
-                          <img src={img.url || img} alt={`Product ${idx + 1}`} className="object-cover w-full h-full" />
-                        </div>
-                      ))
-                    ) : (
-                      Array.from({ length: 4 }).map((_, idx) => (
-                        <div key={idx} className="aspect-square bg-gray-200 rounded-lg"></div>
-                      ))
-                    )}
+              {/* Compensation */}
+              <div className="border-b border-gray-100 pb-4">
+                <h3 className="text-sm font-semibold text-[#242527] mb-3 uppercase tracking-wide">Compensation</h3>
+                <div className="flex items-center gap-8">
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-medium text-[#6b7280]">Amount:</span>
+                    <span className="text-base font-semibold text-[#242527]">
+                      {formData.compensationAmount 
+                        ? `₹${Number(formData.compensationAmount).toLocaleString('en-IN')}` 
+                        : '₹10,000'}
+                    </span>
                   </div>
-                  {/* Reels Preview */}
-                  <div className="mt-2">
-                    <h4 className="font-semibold text-gray-900 mb-1">Reels</h4>
-                    <ul className="space-y-1">
-                      {formData.reels && formData.reels.length > 0 ? (
-                        formData.reels.map((url, idx) => (
-                          <li key={idx} className="text-xs text-blue-700 truncate">{url}</li>
-                        ))
-                      ) : (
-                        <li className="text-xs text-gray-400">No reels added</li>
-                      )}
-                    </ul>
-                  </div>
-                </div>
-                <div>
-                  <h4 className="font-semibold text-gray-900 mb-2">Timelines and Qualifications</h4>
-                  <div className="space-y-2 text-sm text-gray-600">
-                    <p>Application Deadline: {formData.applicationDeadline || 'Not set'}</p>
-                    <p>Campaign Start: {formData.campaignStartDate || 'Not set'}</p>
-                    <p>Campaign End: {formData.campaignEndDate || 'Not set'}</p>
-                    <p>Budget: {formData.budget || 'Not set'}</p>
-                    <p>Number of Live Posts: {formData.numberOfLivePosts || 'Not set'}</p>
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-medium text-[#6b7280]">Type:</span>
+                    <span className="text-base font-semibold text-[#242527]">{formData.compensation || 'Paid'}</span>
                   </div>
                 </div>
               </div>
 
-              <div className="mt-6 p-4 bg-green-50 rounded-lg">
-                <h4 className="font-semibold text-gray-900 mb-2">Compensation</h4>
-                <p className="text-sm text-green-700 capitalize">
-                  {formData.compensation} campaign
-                </p>
-                <p className="text-sm text-gray-600 mt-1">
-                  {formData.compensationDetails || 'No compensation details provided'}
+              {/* Countries */}
+              <div className="border-b border-gray-100 pb-4">
+                <h3 className="text-sm font-semibold text-[#242527] mb-2 uppercase tracking-wide">Countries</h3>
+                <p className="text-base text-[#6b7280]">
+                  {formData.countries || 'India, USA, UK, France and 10 others.'}
                 </p>
               </div>
 
-              <div className="mt-6 p-4 bg-gray-100 rounded-lg">
-                <h4 className="font-semibold text-gray-900 mb-2">Campaign Brief</h4>
-                <p className="text-sm text-gray-700">
-                  {formData.campaignBrief || 'No campaign brief provided'}
-                </p>
-              </div>
-
-              <div className="mt-6 p-4 bg-gray-100 rounded-lg">
-                <h4 className="font-semibold text-gray-900 mb-2">Deliverables</h4>
-                <p className="text-sm text-gray-700">
-                  {formData.deliverables || 'No deliverables specified'}
-                </p>
+              {/* Interests/Niche */}
+              <div>
+                <h3 className="text-sm font-semibold text-[#242527] mb-3 uppercase tracking-wide">Interests/Niche</h3>
+                <div className="flex flex-wrap gap-2">
+                  {formData.niche ? (
+                    <span className="inline-flex items-center px-3 py-1.5 bg-[#f9fafb] border border-[#e5e7eb] rounded-lg text-sm font-medium text-[#374151]">
+                      {formData.niche}
+                    </span>
+                  ) : (
+                    <>
+                      <span className="inline-flex items-center px-3 py-1.5 bg-[#f9fafb] border border-[#e5e7eb] rounded-lg text-sm font-medium text-[#374151]">
+                        Life Style
+                      </span>
+                      <span className="inline-flex items-center px-3 py-1.5 bg-[#f9fafb] border border-[#e5e7eb] rounded-lg text-sm font-medium text-[#374151]">
+                        Fitness
+                      </span>
+                      <span className="inline-flex items-center px-3 py-1.5 bg-[#f9fafb] border border-[#e5e7eb] rounded-lg text-sm font-medium text-[#374151]">
+                        Health
+                      </span>
+                    </>
+                  )}
+                </div>
               </div>
             </div>
           </div>
@@ -651,39 +784,32 @@ const CreateCampaignPage = () => {
 
   const handleSubmit = async () => {
     // Basic validation
-    if (!formData.campaignName || !formData.campaignType || !formData.campaignBrief || !formData.deliverables) {
-      alert('Please fill in all required fields: Campaign Name, Campaign Type, Campaign Brief, and Deliverables');
-      return;
-    }
-
-    if (!formData.applicationDeadline || !formData.campaignStartDate || !formData.campaignEndDate) {
-      alert('Please set all timeline dates');
-      return;
-    }
-
-    if (!formData.influencerCount || !formData.niche) {
-      alert('Please fill in influencer targeting details');
-      return;
-    }
-
-    if (!formData.productImages || formData.productImages.length === 0) {
-      alert('Please upload at least one product image');
+    if (!formData.campaignName || !formData.campaignBrief) {
+      alert('Please fill in all required fields');
       return;
     }
 
     setIsSubmitting(true);
 
     try {
+      // Build deliverables array
+      const deliverables = [];
+      if (formData.instagramReels > 0) {
+        deliverables.push(`${formData.instagramReels} Instagram Reels`);
+      }
+      if (formData.instagramStories > 0) {
+        deliverables.push(`${formData.instagramStories} Instagram Stories`);
+      }
+      if (formData.instagramPosts > 0) {
+        deliverables.push(`${formData.instagramPosts} Instagram Posts`);
+      }
+
       const transformedData = {
         productImages: formData.productImages,
         campaignName: formData.campaignName,
-        campaignType: formData.campaignType,
+        campaignType: selectedCampaignTypes.join(', '),
         campaignBrief: formData.campaignBrief,
-        deliverables: formData.deliverables
-          ? Array.isArray(formData.deliverables)
-            ? formData.deliverables
-            : [formData.deliverables]
-          : [],
+        deliverables: deliverables.length > 0 ? deliverables : ['No deliverables specified'],
         compensation: {
           type: formData.compensation,
           amount: formData.compensationAmount ? parseInt(formData.compensationAmount) : 0,
@@ -692,9 +818,9 @@ const CreateCampaignPage = () => {
         },
         budget: formData.budget ? parseInt(formData.budget) : 0,
         timelines: {
-          applicationDeadline: new Date(formData.applicationDeadline).toISOString(),
-          campaignStartDate: new Date(formData.campaignStartDate).toISOString(),
-          campaignEndDate: new Date(formData.campaignEndDate).toISOString()
+          applicationDeadline: formData.applicationDeadline ? new Date(formData.applicationDeadline).toISOString() : new Date().toISOString(),
+          campaignStartDate: formData.campaignStartDate ? new Date(formData.campaignStartDate).toISOString() : new Date().toISOString(),
+          campaignEndDate: formData.campaignEndDate ? new Date(formData.campaignEndDate).toISOString() : new Date().toISOString()
         },
         targetInfluencer: {
           numberOfInfluencers: parseInt(formData.influencerCount) || 1,
@@ -728,61 +854,155 @@ const CreateCampaignPage = () => {
     }
   };
 
+  // Define the 7 steps based on Figma design
+  const steps = [
+    { number: 1, title: 'Details' },
+    { number: 2, title: 'Campaign Brief' },
+    { number: 3, title: 'Deliverables' },
+    { number: 4, title: 'Budget' },
+    { number: 5, title: 'Timeline' },
+    { number: 6, title: 'Influencer Target' },
+    { number: 7, title: 'Review & Publish' }
+  ];
+
+  const campaignTypeOptions = [
+    'Brand Awareness',
+    'Product Launch',
+    'Content Creation',
+    'Sales & Promotion',
+    'Event Coverage',
+    'UGC Generation',
+    'App Install',
+    'Other'
+  ];
+
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-lg w-full max-w-4xl max-h-[90vh] flex flex-col">
-        {/* Modal Header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-200">
-          <h1 className="text-xl font-semibold text-gray-900">Create Campaign</h1>
-          <button
-            onClick={handleClose}
-            className="text-gray-500 hover:text-gray-700 transition-colors"
-          >
-            <X className="w-6 h-6" />
-          </button>
-        </div>
+    <div className="bg-white h-screen flex flex-col overflow-hidden">
+      {/* Fixed App Bar */}
+      <div className="bg-white flex items-center justify-between px-4 py-2 shrink-0 border-b border-gray-100 sticky top-0 z-20">
+        {/* Back Button */}
+        <button
+          onClick={handleBack}
+          className="flex items-center justify-center w-12 h-12 rounded-full hover:bg-gray-100 transition-colors"
+        >
+          <ArrowLeft className="w-6 h-6 text-gray-700" />
+        </button>
 
-        {/* Step Indicators */}
-        <div className="flex justify-between items-center px-6 py-4 border-b border-gray-200">
-          <StepIndicator stepNumber={1} title="Campaign Details" status={getStepStatus(1)} />
-          <div className="flex-1 h-0.5 bg-gray-200 mx-4"></div>
-          <StepIndicator stepNumber={2} title="Target Influencer" status={getStepStatus(2)} />
-          <div className="flex-1 h-0.5 bg-gray-200 mx-4"></div>
-          <StepIndicator stepNumber={3} title="Review" status={getStepStatus(3)} />
-        </div>
+        {/* Title */}
+        <h1 className="text-xl font-semibold text-[#242527] flex-1 px-2">
+          New Campaign
+        </h1>
 
-        {/* Modal Content - Scrollable */}
-        <div className="flex-1 overflow-y-auto p-6">
+        {/* Menu Button */}
+        <button
+          type="button"
+          className="flex items-center justify-center w-12 h-12 rounded-full hover:bg-gray-100 transition-colors"
+        >
+          <MoreVertical className="w-6 h-6 text-gray-700" />
+        </button>
+      </div>
+
+      {/* Fixed Progress Steps */}
+      <div className="bg-white px-9 py-4 shrink-0 sticky top-[60px] z-10 border-b border-gray-50">
+        <div className="max-w-5xl mx-auto px-10">
+          <div className="flex items-start justify-between relative">
+            {steps.map((step, index) => (
+              <div key={index} className="flex flex-col items-center gap-2 flex-1 relative">
+                {/* Connecting Line to Previous Step */}
+                {index > 0 && (
+                  <div 
+                    className="absolute top-[18px] right-1/2 w-full h-[2px]"
+                    style={{
+                      backgroundColor: index <= currentStep - 1 ? '#43573b' : '#eceeeb',
+                      zIndex: 0
+                    }}
+                  />
+                )}
+                
+                {/* Connecting Line to Next Step */}
+                {index < steps.length - 1 && (
+                  <div 
+                    className="absolute top-[18px] left-1/2 w-full h-[2px]"
+                    style={{
+                      backgroundColor: index < currentStep - 1 ? '#43573b' : '#eceeeb',
+                      zIndex: 0
+                    }}
+                  />
+                )}
+                
+                {/* Step Circle */}
+                <div 
+                  className="flex items-center justify-center w-9 h-9 rounded-full text-base font-semibold shrink-0 relative"
+                  style={{
+                    backgroundColor: index < currentStep - 1 || index === currentStep - 1 ? '#43573b' : '#eceeeb',
+                    color: index < currentStep - 1 || index === currentStep - 1 ? 'white' : '#242527',
+                    zIndex: 10
+                  }}
+                >
+                  {step.number}
+                </div>
+                
+                {/* Step Label */}
+                <div className="text-sm font-medium text-[#242527] text-center max-w-[130px]">
+                  {step.title}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Scrollable Form Content */}
+      <div className="flex-1 overflow-y-auto px-9 py-6">
+        <div className="max-w-4xl mx-auto px-40">
           {renderStepContent()}
         </div>
+      </div>
 
-        {/* Modal Footer */}
-        <div className="flex justify-between items-center p-6 border-t border-gray-200">
-          <button
-            onClick={currentStep === 1 ? handleClose : handlePrevStep}
-            className="px-6 py-2 text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors flex items-center gap-2"
-          >
-            <ChevronLeft className="w-4 h-4" />
-            {currentStep === 1 ? 'Cancel' : 'Previous'}
-          </button>
-
-          {currentStep < 3 ? (
-            <button
-              onClick={handleNextStep}
-              className="px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors flex items-center gap-2"
-            >
-              Next
-              <ChevronRight className="w-4 h-4" />
-            </button>
-          ) : (
-            <button
-              onClick={handleSubmit}
-              disabled={isSubmitting}
-              className="px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {isSubmitting ? 'Creating...' : 'Create Campaign'}
-            </button>
-          )}
+      {/* Fixed Bottom Navigation */}
+      <div className="bg-white px-9 py-4 shrink-0 border-t border-gray-200 sticky bottom-0 z-20">
+        <div className="max-w-4xl mx-auto px-40">
+          <div className="flex gap-2">
+            {currentStep < 7 ? (
+              <>
+                <button
+                  type="button"
+                  onClick={handleBack}
+                  className="flex-1 px-6 py-3 rounded-full font-semibold text-[#43573b] border border-[#43573b] hover:bg-[#43573b] hover:text-white transition-colors"
+                >
+                  Save Draft
+                </button>
+                <button
+                  type="button"
+                  onClick={handleNextStep}
+                  className="flex-1 px-6 py-3 rounded-full font-semibold bg-[#43573b] text-white hover:bg-[#3a4a32] transition-colors"
+                >
+                  Continue
+                </button>
+              </>
+            ) : (
+              <>
+                <button
+                  type="button"
+                  onClick={handleBack}
+                  className="flex-1 px-6 py-3 rounded-full font-semibold text-[#43573b] border border-[#43573b] hover:bg-[#43573b] hover:text-white transition-colors"
+                >
+                  Save Draft
+                </button>
+                <button
+                  type="button"
+                  onClick={handleSubmit}
+                  disabled={isSubmitting}
+                  className="flex-1 px-6 py-3 rounded-full font-semibold bg-[#43573b] text-white hover:bg-[#3a4a32] transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                >
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                    <path d="M4 14V18C4 19.1046 4.89543 20 6 20H18C19.1046 20 20 19.1046 20 18V14M16 8L12 4M12 4L8 8M12 4V15" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                  {isSubmitting ? 'Publishing...' : 'Publish'}
+                </button>
+              </>
+            )}
+          </div>
         </div>
       </div>
     </div>
