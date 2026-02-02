@@ -13,11 +13,13 @@ function BrandLayoutContent({ children, pathname }) {
     console.log('BrandLayout: pathname =', pathname);
   }, [pathname]);
   
-  // Don't show sidebar for signup and login pages
+  // Don't show sidebar for signup, login, create-campaign, and new-applications pages
   const isAuthPage = pathname === '/brand/signup' || pathname === '/brand/login';
+  const isCreateCampaignPage = pathname === '/brand/campaigns/create-campaign';
+  const isNewApplicationsPage = pathname === '/brand/campaigns/new-applications';
   
-  if (isAuthPage) {
-    console.log('BrandLayout: Rendering auth page without sidebar');
+  if (isAuthPage || isCreateCampaignPage || isNewApplicationsPage) {
+    console.log('BrandLayout: Rendering page without sidebar');
     return <>{children}</>;
   }
   

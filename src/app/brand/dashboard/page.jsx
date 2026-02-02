@@ -95,7 +95,10 @@ function DashboardContent() {
         <div className="mb-8">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-xl font-semibold text-gray-900">Top Influencers</h2>
-            <button className="flex items-center text-teal-600 hover:text-teal-700 font-medium text-sm">
+            <button 
+              onClick={() => router.push('/brand/influencers')}
+              className="flex items-center text-teal-600 hover:text-teal-700 font-medium text-sm"
+            >
               view all
               <ChevronRight className="h-4 w-4 ml-1" />
             </button>

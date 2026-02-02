@@ -1,5 +1,6 @@
 'use client'
 import React, { useState, useRef } from 'react';
+import { useRouter } from 'next/navigation';
 import { ChevronLeft, ChevronRight, X, Upload, Calendar, Check, Users, MoreVertical, Trash2, Edit, Search, Heart, TrendingUp } from 'lucide-react';
 import { campaignAPI } from '../../../utils/api';
 import { useSidebar } from '../../context/SidebarContext';
@@ -7,6 +8,7 @@ import { AudienceEngagement } from '@/components/AudienceEngagementGraphs';
 import { SpendingBudget } from '@/components/SpendingBudgetGraph';
 
 const AllCampaignsSection = () => {
+  const router = useRouter();
   const { setSidebarButtonAction, setSidebarButtonLabel } = useSidebar();
   const [showModal, setShowModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -191,8 +193,10 @@ const AllCampaignsSection = () => {
 
   // Register sidebar button action for campaigns tab
   React.useEffect(() => {
-    // Set the button action to open the create campaign modal
-    setSidebarButtonAction(() => () => setShowModal(true));
+    // Set the button action to navigate to create campaign page
+    setSidebarButtonAction(() => () => {
+      window.location.href = '/brand/campaigns/create-campaign';
+    });
     setSidebarButtonLabel('Create Campaign');
 
     // Cleanup: Remove the action when component unmounts
@@ -1612,7 +1616,10 @@ const AllCampaignsSection = () => {
           {/* Section Heading - Figma: pt-4, 18px font */}
           <div className="flex items-center justify-between pt-4 mb-[14px]">
             <h2 className="text-[18px] font-semibold text-gray-900 leading-[26px] tracking-tight">New Applications</h2>
-            <button className="flex items-center pr-1">
+            <button 
+              onClick={() => router.push('/brand/campaigns/new-applications')}
+              className="flex items-center pr-1 hover:opacity-80 transition-opacity cursor-pointer"
+            >
               <span className="text-[16px] font-semibold text-blue-700 leading-6 tracking-[0.24px]">view all</span>
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" className="ml-[-4px]">
                 <path d="M7.75 7.75L16.25 12L7.75 16.25" stroke="#0a48c5" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
