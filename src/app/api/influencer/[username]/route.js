@@ -23,7 +23,7 @@ export async function GET(request, { params }) {
         },
       }
     );
-
+      
     if (!response.ok) {
       throw new Error('Failed to fetch influencer details');
     }

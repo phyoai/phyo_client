@@ -112,7 +112,7 @@ export default function BrandAccount() {
             <MenuItem 
               icon={List} 
               label="My Lists" 
-              onClick={() => console.log('My Lists')}
+              onClick={() => router.push('/brand/account/my-lists')}
             />
           </div>
         </div>
