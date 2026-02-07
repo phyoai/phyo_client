@@ -93,9 +93,48 @@ const BudgetAndAudienceSection = () => {
         </div>
 
         {loading ? (
-          <div className="text-center py-12">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto"></div>
-            <p className="mt-4 text-gray-600">Loading data...</p>
+          // Budget and Audience Skeleton
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Budget Spent Skeleton */}
+            <div className="bg-white rounded-3xl p-8">
+              <div className="bg-[#F3F2EB] p-6 border border-gray-200 shadow-sm rounded-3xl">
+                <div className="flex items-center justify-between mb-6">
+                  <div className="h-6 bg-gray-200 rounded w-32 animate-pulse"></div>
+                  <div className="h-9 w-32 bg-gray-200 rounded-lg animate-pulse"></div>
+                </div>
+                <div className="h-64 bg-gray-200 rounded-lg animate-pulse mb-4"></div>
+                <div className="space-y-3">
+                  {[1, 2, 3].map((i) => (
+                    <div key={i} className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <div className="w-3 h-3 bg-gray-200 rounded-full animate-pulse"></div>
+                        <div className="h-4 bg-gray-200 rounded w-24 animate-pulse"></div>
+                      </div>
+                      <div className="h-4 bg-gray-200 rounded w-16 animate-pulse"></div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Audience Sentiment Skeleton */}
+            <div className="bg-white rounded-3xl p-8">
+              <div className="bg-[#F3F2EB] p-6 border border-gray-200 shadow-sm rounded-3xl">
+                <div className="flex items-center justify-between mb-6">
+                  <div className="h-6 bg-gray-200 rounded w-40 animate-pulse"></div>
+                  <div className="h-9 w-32 bg-gray-200 rounded-lg animate-pulse"></div>
+                </div>
+                <div className="h-64 bg-gray-200 rounded-lg animate-pulse mb-4"></div>
+                <div className="grid grid-cols-3 gap-4">
+                  {[1, 2, 3].map((i) => (
+                    <div key={i} className="text-center">
+                      <div className="h-4 bg-gray-200 rounded w-16 mx-auto mb-1 animate-pulse"></div>
+                      <div className="h-6 bg-gray-200 rounded w-20 mx-auto animate-pulse"></div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
           </div>
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

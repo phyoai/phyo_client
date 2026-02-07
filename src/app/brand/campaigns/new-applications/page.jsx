@@ -1,9 +1,10 @@
 'use client'
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ArrowLeft, MoreVertical } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import RejectionModal from '@/components/RejectionModal';
+import NewApplicationsSkeleton from '@/components/NewApplicationsSkeleton';
 
 const applicationsData = [
   {
@@ -229,6 +230,17 @@ const NewApplicationsPage = () => {
   const [activeTab, setActiveTab] = useState('info');
   const [showRejectionModal, setShowRejectionModal] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Simulate data loading
+  useEffect(() => {
+    // Simulate API call or data fetching
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 1500); // 1.5 seconds loading time
+
+    return () => clearTimeout(timer);
+  }, []);
 
   const handleBack = () => {
     router.push('/brand/campaigns');
@@ -261,6 +273,11 @@ const NewApplicationsPage = () => {
     // Cover image (271px) + Profile section (~350px) = ~620px
     setIsScrolled(scrollTop > 550);
   };
+
+  // Show skeleton while loading
+  if (isLoading) {
+    return <NewApplicationsSkeleton />;
+  }
 
   return (
     <div className="bg-white h-screen flex flex-col overflow-hidden">

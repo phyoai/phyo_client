@@ -36,9 +36,16 @@ const BrandLogin = () => {
   if (authLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gray-50">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading...</p>
+        <div className="text-center max-w-md mx-auto">
+          {/* Logo Skeleton */}
+          <div className="w-32 h-32 bg-gray-200 rounded-full mx-auto mb-8 animate-pulse"></div>
+          {/* Form Skeleton */}
+          <div className="bg-white rounded-lg shadow-lg p-8 space-y-4">
+            <div className="h-8 bg-gray-200 rounded w-48 mx-auto mb-6 animate-pulse"></div>
+            <div className="h-12 bg-gray-200 rounded animate-pulse"></div>
+            <div className="h-12 bg-gray-200 rounded animate-pulse"></div>
+            <div className="h-12 bg-gray-200 rounded animate-pulse"></div>
+          </div>
         </div>
       </div>
     );

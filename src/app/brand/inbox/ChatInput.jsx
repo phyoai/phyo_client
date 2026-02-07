@@ -1,6 +1,7 @@
 'use client'
 import React, { useState, useRef } from 'react';
 import { Paperclip, Smile, Send } from 'lucide-react';
+import { SendPlane2Fill, SendPlaneFill } from '@phyoofficial/phyo-icon-library';
 
 const ChatInput = ({ onSendMessage, onFileSelect }) => {
   const [message, setMessage] = useState('');
@@ -105,7 +106,7 @@ const ChatInput = ({ onSendMessage, onFileSelect }) => {
           disabled={!message.trim()}
           className="bg-green-600 text-white p-3 rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
         >
-          <Send className="h-5 w-5" />
+          <SendPlane2Fill className="h-5 w-5" />
         </button>
       </form>
 
