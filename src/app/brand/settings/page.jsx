@@ -66,7 +66,30 @@ function BrandSettingsContent() {
 
 export default function BrandSettings() {
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense fallback={
+      <div className="w-full h-screen overflow-hidden flex flex-col">
+        {/* Header Skeleton */}
+        <div className="flex-shrink-0 bg-white border-b border-gray-100">
+          <div className="px-4 sm:px-6 lg:px-9 py-4 sm:py-5">
+            <div className="h-7 bg-gray-200 rounded w-32 animate-pulse"></div>
+          </div>
+        </div>
+        {/* Content Skeleton */}
+        <div className="flex-1 overflow-y-auto px-4 sm:px-6 lg:px-9 py-4 sm:py-6">
+          <div className="space-y-6">
+            {[1, 2, 3, 4].map((i) => (
+              <div key={i} className="bg-white rounded-lg p-6 border border-gray-200">
+                <div className="h-5 bg-gray-200 rounded w-40 mb-4 animate-pulse"></div>
+                <div className="space-y-3">
+                  <div className="h-4 bg-gray-200 rounded w-full animate-pulse"></div>
+                  <div className="h-4 bg-gray-200 rounded w-3/4 animate-pulse"></div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    }>
       <BrandSettingsContent />
     </Suspense>
   );

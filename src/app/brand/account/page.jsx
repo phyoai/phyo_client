@@ -54,8 +54,110 @@ export default function BrandAccount() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600"></div>
+      <div className="w-full h-screen overflow-hidden flex flex-col">
+        {/* Fixed App Bar Skeleton */}
+        <div className="flex-shrink-0 bg-white border-b border-gray-100">
+          <div className="px-4 sm:px-6 lg:px-9 py-4 sm:py-5">
+            <div className="h-7 bg-gray-200 rounded w-32 animate-pulse"></div>
+          </div>
+        </div>
+
+        {/* Scrollable Content Skeleton */}
+        <div className="flex-1 overflow-y-auto px-4 sm:px-6 lg:px-9 py-4 sm:py-6">
+          {/* Profile Header Skeleton */}
+          <div className="flex items-center gap-3 mb-6">
+            <div className="w-16 h-16 bg-gray-200 rounded-full animate-pulse"></div>
+            <div className="flex-1">
+              <div className="h-8 bg-gray-200 rounded w-40 mb-2 animate-pulse"></div>
+              <div className="h-5 bg-gray-200 rounded w-16 animate-pulse"></div>
+            </div>
+            <div className="h-8 w-16 bg-gray-200 rounded-full animate-pulse"></div>
+          </div>
+
+          {/* Profile Section Skeleton */}
+          <div className="mb-6">
+            <div className="h-5 bg-gray-200 rounded w-20 mb-2 animate-pulse"></div>
+            <div className="bg-[#f0f0f0] rounded-2xl p-2">
+              <div className="bg-white rounded-lg overflow-hidden">
+                {[1, 2].map((i, idx) => (
+                  <React.Fragment key={i}>
+                    <div className="px-6 py-5 flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="w-6 h-6 bg-gray-200 rounded animate-pulse"></div>
+                        <div className="h-4 bg-gray-200 rounded w-32 animate-pulse"></div>
+                      </div>
+                      <div className="w-6 h-6 bg-gray-200 rounded animate-pulse"></div>
+                    </div>
+                    {idx < 1 && <div className="border-t border-gray-200 mx-6 my-1"></div>}
+                  </React.Fragment>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Billings Section Skeleton */}
+          <div className="mb-6 pt-4">
+            <div className="h-5 bg-gray-200 rounded w-48 mb-2 animate-pulse"></div>
+            <div className="bg-[#f0f0f0] rounded-2xl p-2">
+              <div className="bg-white rounded-lg overflow-hidden">
+                {[1, 2, 3, 4].map((i, idx) => (
+                  <React.Fragment key={i}>
+                    <div className="px-6 py-5 flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="w-6 h-6 bg-gray-200 rounded animate-pulse"></div>
+                        <div className="h-4 bg-gray-200 rounded w-40 animate-pulse"></div>
+                      </div>
+                      <div className="w-6 h-6 bg-gray-200 rounded animate-pulse"></div>
+                    </div>
+                    {idx < 3 && <div className="border-t border-gray-200 mx-6 my-1"></div>}
+                  </React.Fragment>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Support Section Skeleton */}
+          <div className="mb-6 pt-4">
+            <div className="h-5 bg-gray-200 rounded w-24 mb-2 animate-pulse"></div>
+            <div className="bg-[#f0f0f0] rounded-2xl p-2">
+              <div className="bg-white rounded-lg overflow-hidden">
+                {[1, 2].map((i, idx) => (
+                  <React.Fragment key={i}>
+                    <div className="px-6 py-5 flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="w-6 h-6 bg-gray-200 rounded animate-pulse"></div>
+                        <div className="h-4 bg-gray-200 rounded w-28 animate-pulse"></div>
+                      </div>
+                      <div className="w-6 h-6 bg-gray-200 rounded animate-pulse"></div>
+                    </div>
+                    {idx < 1 && <div className="border-t border-gray-200 mx-6 my-1"></div>}
+                  </React.Fragment>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* App Settings Section Skeleton */}
+          <div className="mb-6 pt-4 pb-4">
+            <div className="h-5 bg-gray-200 rounded w-32 mb-2 animate-pulse"></div>
+            <div className="bg-[#f0f0f0] rounded-2xl p-2">
+              <div className="bg-white rounded-lg overflow-hidden">
+                {[1, 2, 3, 4, 5].map((i, idx) => (
+                  <React.Fragment key={i}>
+                    <div className="px-6 py-5 flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="w-6 h-6 bg-gray-200 rounded animate-pulse"></div>
+                        <div className="h-4 bg-gray-200 rounded w-36 animate-pulse"></div>
+                      </div>
+                      <div className="w-11 h-8 bg-gray-200 rounded-full animate-pulse"></div>
+                    </div>
+                    {idx < 4 && <div className="border-t border-gray-200 mx-6 my-1"></div>}
+                  </React.Fragment>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     );
   }
@@ -74,12 +176,18 @@ export default function BrandAccount() {
   );
 
   return (
-    <div className="w-full h-full overflow-y-auto">
-      <div className="w-full pt-4 px-[36px]">
-        <h1 className="text-xl font-semibold mb-4 text-[#242527]">Account</h1>
+    <div className="w-full h-screen overflow-hidden flex flex-col">
+      {/* Fixed App Bar */}
+      <div className="flex-shrink-0 bg-white border-b border-gray-100">
+        <div className="px-4 sm:px-6 lg:px-9 py-4 sm:py-5">
+          <h1 className="text-lg sm:text-xl font-semibold text-[#242527]">Account</h1>
+        </div>
+      </div>
 
+      {/* Scrollable Content */}
+      <div className="flex-1 overflow-y-auto px-4 sm:px-6 lg:px-9 py-4 sm:py-6">
         {/* Profile Header */}
-        <div className="flex items-center gap-3 mb-4">
+        <div className="flex items-center gap-3 mb-6">
         <div className="w-16 h-16 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center flex-shrink-0">
           <span className="text-2xl font-bold text-white">
             {getInitials(user?.brandName || user?.username || 'Jazzleen')}
@@ -103,17 +211,21 @@ export default function BrandAccount() {
       <div className="mb-6">
         <h3 className="text-base font-semibold text-[#242527] mb-2">Profile</h3>
         <div className="bg-[#f0f0f0] rounded-2xl p-2">
-          <div className="bg-white rounded-lg overflow-hidden divide-y divide-gray-100">
-            <MenuItem 
-              icon={User} 
-              label="Update Profile" 
-              onClick={() => console.log('Update Profile')}
-            />
-            <MenuItem 
-              icon={List} 
-              label="My Lists" 
-              onClick={() => router.push('/brand/account/my-lists')}
-            />
+          <div className="rounded-lg overflow-hidden space-y-2 bg-[#f0f0f0]">
+            <div className="bg-white">
+              <MenuItem 
+                icon={User} 
+                label="Update Profile" 
+                onClick={() => console.log('Update Profile')}
+              />
+            </div>
+            <div className="bg-white">
+              <MenuItem 
+                icon={List} 
+                label="My Lists" 
+                onClick={() => router.push('/brand/account/my-lists')}
+              />
+            </div>
           </div>
         </div>
       </div>
@@ -122,28 +234,36 @@ export default function BrandAccount() {
       <div className="mb-6 pt-4">
         <h3 className="text-base font-semibold text-[#242527] mb-2">Billings & Subscriptions</h3>
         <div className="bg-[#f0f0f0] rounded-2xl p-2">
-          <div className="bg-white rounded-lg overflow-hidden divide-y divide-gray-100">
-            <MenuItem 
-              icon={FileText} 
-              label="billing history" 
-              onClick={() => router.push('/brand/account/billing-history')}
-            />
-            <MenuItem 
-              icon={CreditCard} 
-              label="upgrade plan" 
-              onClick={() => router.push('/brand/account/upgrade-plan')}
-            />
-            <MenuItem 
-              icon={PauseCircle} 
-              label="pause subscription" 
-              onClick={() => console.log('Pause Subscription')}
-            />
-            <MenuItem 
-              icon={XCircle} 
-              label="cancel subscription" 
-              onClick={() => console.log('Cancel Subscription')}
-              textColor="text-[#bf3709]"
-            />
+          <div className="rounded-lg overflow-hidden   space-y-2 bg-[#f0f0f0]">
+            <div className="bg-white">
+              <MenuItem 
+                icon={FileText} 
+                label="billing history" 
+                onClick={() => router.push('/brand/account/billing-history')}
+              />
+            </div>
+            <div className="bg-white">
+              <MenuItem 
+                icon={CreditCard} 
+                label="upgrade plan" 
+                onClick={() => router.push('/brand/account/upgrade-plan')}
+              />
+            </div>
+            <div className="bg-white">
+              <MenuItem 
+                icon={PauseCircle} 
+                label="pause subscription" 
+                onClick={() => console.log('Pause Subscription')}
+              />
+            </div>
+            <div className="bg-white">
+              <MenuItem 
+                icon={XCircle} 
+                label="cancel subscription" 
+                onClick={() => console.log('Cancel Subscription')}
+                textColor="text-[#bf3709]"
+              />
+            </div>
           </div>
         </div>
       </div>
@@ -152,19 +272,23 @@ export default function BrandAccount() {
       <div className="mb-6 pt-4">
         <h3 className="text-base font-semibold text-[#242527] mb-2">Support</h3>
         <div className="bg-[#f0f0f0] rounded-2xl p-2">
-          <div className="bg-white rounded-lg overflow-hidden divide-y divide-gray-100">
-            <MenuItem 
-              icon={HelpCircle} 
-              label="Help & Support" 
-              onClick={() => router.push('/brand/account/help-support')}
-            />
-            <MenuItem 
-              icon={LogOut} 
-              label="Log out" 
-              onClick={handleLogout}
-              textColor="text-[#bf3709]"
-              showChevron={false}
-            />
+          <div className="rounded-lg overflow-hidden space-y-2 bg-[#f0f0f0]">
+            <div className="bg-white">
+              <MenuItem 
+                icon={HelpCircle} 
+                label="Help & Support" 
+                onClick={() => router.push('/brand/account/help-support')}
+              />
+            </div>
+            <div className="bg-white">
+              <MenuItem 
+                icon={LogOut} 
+                label="Log out" 
+                onClick={handleLogout}
+                textColor="text-[#bf3709]"
+                showChevron={false}
+              />
+            </div>
           </div>
         </div>
       </div>
@@ -173,48 +297,58 @@ export default function BrandAccount() {
       <div className="mb-6 pt-4 pb-4">
         <h3 className="text-base font-semibold text-[#242527] mb-2">App Settings</h3>
         <div className="bg-[#f0f0f0] rounded-2xl p-2">
-          <div className="bg-white rounded-lg overflow-hidden divide-y divide-gray-100">
-            <MenuItem 
-              icon={Moon} 
-              label="Dark theme" 
-              onClick={() => setDarkMode(!darkMode)}
-              rightElement={
-                <div className={`w-11 h-8 rounded-full transition-colors flex items-center px-1 ${darkMode ? 'bg-[#3d4f36]' : 'bg-gray-300'}`}>
-                  <div className={`w-6 h-6 bg-white rounded-full transition-transform ${darkMode ? 'translate-x-3' : 'translate-x-0'}`}></div>
+          <div className="rounded-lg overflow-hidden space-y-2 bg-[#f0f0f0]">
+            <div className="bg-white">
+              <MenuItem 
+                icon={Moon} 
+                label="Dark theme" 
+                onClick={() => setDarkMode(!darkMode)}
+                rightElement={
+                  <div className={`w-11 h-8 rounded-full transition-colors flex items-center px-1 ${darkMode ? 'bg-[#3d4f36]' : 'bg-gray-300'}`}>
+                    <div className={`w-6 h-6 bg-white rounded-full transition-transform ${darkMode ? 'translate-x-3' : 'translate-x-0'}`}></div>
+                  </div>
+                }
+              />
+            </div>
+            <div className="bg-white">
+              <MenuItem 
+                icon={Bell} 
+                label="Notifications & preferences" 
+                onClick={() => router.push('/brand/account/notifications-preferences')}
+              />
+            </div>
+            <div className="bg-white">
+              <button
+                onClick={() => console.log('App Language')}
+                className="w-full flex items-center justify-between px-6 py-5 bg-white"
+              >
+                <div className="flex items-center gap-3">
+                  <Globe className="w-6 h-6 text-[#43573b]" strokeWidth={1.5} />
+                  <div className="text-left">
+                    <div className="text-base font-semibold text-[#242527]">App Language</div>
+                    <div className="text-sm text-[#808080]">English (device's language)</div>
+                  </div>
                 </div>
-              }
-            />
-            <MenuItem 
-              icon={Bell} 
-              label="Notifications & preferences" 
-              onClick={() => router.push('/brand/account/notifications-preferences')}
-            />
-            <button
-              onClick={() => console.log('App Language')}
-              className="w-full flex items-center justify-between px-6 py-5 bg-white"
-            >
-              <div className="flex items-center gap-3">
-                <Globe className="w-6 h-6 text-[#43573b]" strokeWidth={1.5} />
-                <div className="text-left">
-                  <div className="text-base font-semibold text-[#242527]">App Language</div>
-                  <div className="text-sm text-[#808080]">English (device's language)</div>
+              </button>
+            </div>
+            <div className="bg-white">
+              <MenuItem 
+                icon={File} 
+                label="Terms and Privacy Policy" 
+                onClick={() => console.log('Terms and Privacy')}
+                showChevron={false}
+              />
+            </div>
+            <div className="bg-white">
+              <button
+                className="w-full flex items-center justify-between px-6 py-5 bg-white cursor-default"
+              >
+                <div className="flex items-center gap-3">
+                  <Info className="w-6 h-6 text-[#43573b]" strokeWidth={1.5} />
+                  <span className="text-base font-semibold text-[#242527]">App Version 0.0.1</span>
                 </div>
-              </div>
-            </button>
-            <MenuItem 
-              icon={File} 
-              label="Terms and Privacy Policy" 
-              onClick={() => console.log('Terms and Privacy')}
-              showChevron={false}
-            />
-            <button
-              className="w-full flex items-center justify-between px-6 py-5 bg-white cursor-default"
-            >
-              <div className="flex items-center gap-3">
-                <Info className="w-6 h-6 text-[#43573b]" strokeWidth={1.5} />
-                <span className="text-base font-semibold text-[#242527]">App Version 0.0.1</span>
-              </div>
-            </button>
+              </button>
+            </div>
           </div>
         </div>
       </div>

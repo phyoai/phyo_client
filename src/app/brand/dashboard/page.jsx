@@ -67,37 +67,42 @@ function DashboardContent() {
         }
       `}</style>
       
-      <div className={`min-h-screen bg-[#FFFFFF] text-black mb-3 transition-all duration-300 ${
+      <div className={`h-full bg-[#FFFFFF] text-black transition-all duration-300 ${
         isFadingOut ? 'fade-out-dashboard' : ''
       }`}>
-        {/* Header Section */}
-        <div className="bg-[#FFFFFF] px-8">
-          <div className="flex items-center justify-between mb-6 py-2">
-            {/* Welcome Section */}
-            <div >
-              <h1 className="text-2xl font-semibold text-gray-900">Welcome!</h1>
-              <p className="text-sm text-gray-600">Search & Discover popular creators</p>
-            </div>
+        {/* Sticky App Bar - Only Welcome header */}
+        <div className="sticky top-0 z-40 bg-[#FFFFFF] border-b border-gray-100">
+          <div className="px-4 sm:px-6 lg:px-8 py-3">
+            <div className="flex items-center justify-between">
+              {/* Welcome Section */}
+              <div>
+                <h1 className="text-xl sm:text-2xl font-semibold text-gray-900">Welcome!</h1>
+                <p className="text-xs sm:text-sm text-gray-600">Search & Discover popular creators</p>
+              </div>
 
-            {/* Right Side - Notifications and Profile */}
-            <div className="flex items-center gap-4">
-              <button 
-                onClick={() => router.push('/brand/notifications')}
-                className="p-2 hover:bg-gray-100 rounded-full transition-colors relative"
-              >
-                <Bell className="h-6 w-6 text-gray-600" />
-                <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
-              </button>
-              <div className="w-10 h-10 bg-teal-600 rounded-full flex items-center justify-center text-white font-semibold">
-                P
+              {/* Right Side - Notifications and Profile */}
+              <div className="flex items-center gap-2 sm:gap-4">
+                <button 
+                  onClick={() => router.push('/brand/notifications')}
+                  className="p-2 hover:bg-gray-100 rounded-full transition-colors relative"
+                >
+                  <Bell className="h-5 w-5 sm:h-6 sm:w-6 text-gray-600" />
+                  <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+                </button>
+                <div className="w-8 h-8 sm:w-10 sm:h-10 bg-teal-600 rounded-full flex items-center justify-center text-white font-semibold text-sm sm:text-base">
+                  P
+                </div>
               </div>
             </div>
           </div>
+        </div>
 
+        {/* Scrollable Content Section */}
+        <div className="px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
           {/* Search Bar - Clickable to activate search mode */}
-          <div className="flex justify-center mb-4">
+          <div className="flex justify-center mb-6 sm:mb-8">
             <div 
-              className="relative w-full max-w-[50%] cursor-pointer"
+              className="relative w-full max-w-full sm:max-w-[70%] md:max-w-[50%] cursor-pointer"
               onClick={handleSearchClick}
             >
               <Search className="absolute right-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-[#808080]" />
@@ -107,26 +112,24 @@ function DashboardContent() {
                 value={searchQuery}
                 onChange={(e) => e.preventDefault()}
                 onClick={handleSearchClick}
-                className="w-full pl-6 pr-4 py-3 bg-[#F0F0F0] rounded-full border border-gray-200 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent cursor-pointer"
+                className="w-full pl-6 pr-12 py-3 bg-[#F0F0F0] rounded-full border border-gray-200 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent cursor-pointer"
                 readOnly
               />
             </div>
           </div>
 
           {/* Search Suggestions */}
-          <div className="flex flex-col items-center gap-2 mb-8">
+          <div className="flex flex-col items-center gap-2 mb-8 sm:mb-12">
             {searchSuggestions.map((suggestion, index) => (
               <div
                 key={index}
-                className="bg-[#C5CBC2] text-gray-700 px-6 py-2.5 rounded-full text-sm cursor-pointer hover:bg-gray-400 transition-colors max-w-[600px] text-center"
+                className="bg-[#C5CBC2] text-gray-700 px-4 sm:px-6 py-2 sm:py-2.5 rounded-full text-xs sm:text-sm cursor-pointer hover:bg-gray-400 transition-colors max-w-full sm:max-w-[600px] text-center"
                 onClick={handleSearchClick}
               >
                 {suggestion}
               </div>
             ))}
           </div>
-
-          {/* Top Influencers Section */}
           <div className="mb-8">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-semibold text-gray-900">Top Influencers</h2>

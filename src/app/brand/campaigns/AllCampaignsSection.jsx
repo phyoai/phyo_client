@@ -1268,53 +1268,58 @@ const AllCampaignsSection = () => {
   };
 
   return (
-    <div className="bg-white min-h-screen">
-      {/* Proper Container with Figma spacing - px-9 (36px from spec) */}
-      <div className=" mx-auto px-9">
-        {/* App Bar - Matching Figma design (px-1 py-2, 20px font) */}
-        <div className="flex items-center justify-between px-1 py-2">
-          {showAllCampaigns || showAllDrafts ? (
-            <>
-              <div className="flex items-center px-2 flex-1 min-w-0">
-                <button 
-                  onClick={() => {
-                    setShowAllCampaigns(false);
-                    setShowAllDrafts(false);
-                  }}
-                  className="p-3 hover:bg-gray-100 rounded-full transition-colors -ml-3 mr-1"
-                >
-                  <ChevronLeft className="w-6 h-6 text-gray-700" />
-                </button>
-                <h1 className="text-[20px] font-semibold text-gray-900 leading-7 tracking-tight">
-                  {showAllCampaigns ? 'Campaigns' : 'Draft Campaigns'}
-                </h1>
-              </div>
-              <div className="flex items-center gap-2">
-                <button className="p-3 hover:bg-gray-100 rounded-full transition-colors">
-                  <Search className="w-6 h-6 text-gray-700" />
-                </button>
-                <button className="p-3 hover:bg-gray-100 rounded-full transition-colors">
-                  <MoreVertical className="w-6 h-6 text-gray-700" />
-                </button>
-              </div>
-            </>
-          ) : (
-            <>
-              <div className="flex items-center  flex-1 min-w-0">
-                <h1 className="text-[20px] font-semibold text-gray-900 leading-7 tracking-tight">Campaigns</h1>
-              </div>
-              <div className="flex items-center gap-2">
-                <button className="p-3 hover:bg-gray-100 rounded-full transition-colors">
-                  <Search className="w-6 h-6 text-gray-700" />
-                </button>
-                <button className="p-3 hover:bg-gray-100 rounded-full transition-colors">
-                  <MoreVertical className="w-6 h-6 text-gray-700" />
-                </button>
-              </div>
-            </>
-          )}
+    <div className="bg-white h-screen overflow-hidden flex flex-col">
+      {/* Fixed App Bar - Only header */}
+      <div className="flex-shrink-0 bg-white border-b border-gray-100">
+        <div className="px-4 sm:px-6 lg:px-9 py-3 sm:py-4">
+          {/* App Bar */}
+          <div className="flex items-center justify-between">
+            {showAllCampaigns || showAllDrafts ? (
+              <>
+                <div className="flex items-center flex-1 min-w-0">
+                  <button 
+                    onClick={() => {
+                      setShowAllCampaigns(false);
+                      setShowAllDrafts(false);
+                    }}
+                    className="p-2 hover:bg-gray-100 rounded-full transition-colors -ml-2 mr-1"
+                  >
+                    <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6 text-gray-700" />
+                  </button>
+                  <h1 className="text-lg sm:text-xl font-semibold text-gray-900 truncate">
+                    {showAllCampaigns ? 'Campaigns' : 'Draft Campaigns'}
+                  </h1>
+                </div>
+                <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
+                  <button className="p-2 hover:bg-gray-100 rounded-full transition-colors">
+                    <Search className="w-5 h-5 sm:w-6 sm:h-6 text-gray-700" />
+                  </button>
+                  <button className="p-2 hover:bg-gray-100 rounded-full transition-colors">
+                    <MoreVertical className="w-5 h-5 sm:w-6 sm:h-6 text-gray-700" />
+                  </button>
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="flex items-center flex-1 min-w-0">
+                  <h1 className="text-lg sm:text-xl font-semibold text-gray-900">Campaigns</h1>
+                </div>
+                <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
+                  <button className="p-2 hover:bg-gray-100 rounded-full transition-colors">
+                    <Search className="w-5 h-5 sm:w-6 sm:h-6 text-gray-700" />
+                  </button>
+                  <button className="p-2 hover:bg-gray-100 rounded-full transition-colors">
+                    <MoreVertical className="w-5 h-5 sm:w-6 sm:h-6 text-gray-700" />
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
         </div>
+      </div>
 
+      {/* Scrollable Content Section */}
+      <div className="flex-1 overflow-y-auto px-4 sm:px-6 lg:px-9 py-4 sm:py-6">
         {showAllCampaigns ? (
           // All Campaigns Grid View - Updated to match Figma design
           <div className="mb-8">
@@ -1326,10 +1331,24 @@ const AllCampaignsSection = () => {
 
             <div className="flex flex-wrap gap-2">
               {loading ? (
-                <div className="w-full text-center py-8">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600 mx-auto"></div>
-                  <p className="mt-2 text-gray-600">Loading campaigns...</p>
-                </div>
+                // Campaign Cards Skeleton
+                <>
+                  {[1, 2, 3].map((i) => (
+                    <div key={i} className="bg-gray-100 border-2 border-white rounded-xl overflow-hidden flex-1 min-w-[300px] max-w-[400px]">
+                      {/* Card Header Skeleton */}
+                      <div className="flex gap-2 items-start p-4">
+                        <div className="w-12 h-12 bg-gray-200 rounded-full animate-pulse"></div>
+                        <div className="flex-1">
+                          <div className="h-5 bg-gray-200 rounded w-3/4 mb-2 animate-pulse"></div>
+                          <div className="h-4 bg-gray-200 rounded w-1/2 animate-pulse"></div>
+                        </div>
+                        <div className="w-12 h-12 bg-gray-200 rounded-full animate-pulse"></div>
+                      </div>
+                      {/* Card Image Skeleton */}
+                      <div className="h-[216px] bg-gray-200 animate-pulse"></div>
+                    </div>
+                  ))}
+                </>
               ) : campaigns.length > 0 ? (
                 campaigns.map((campaign) => (
                   <div 
@@ -1417,10 +1436,29 @@ const AllCampaignsSection = () => {
 
             <div className="flex flex-wrap gap-2">
               {loading ? (
-                <div className="w-full text-center py-8">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600 mx-auto"></div>
-                  <p className="mt-2 text-gray-600">Loading draft campaigns...</p>
-                </div>
+                // Draft Campaign Cards Skeleton
+                <>
+                  {[1, 2, 3].map((i) => (
+                    <div key={i} className="bg-gray-100 border-2 border-white rounded-xl overflow-hidden flex-1 min-w-[300px] max-w-[400px]">
+                      {/* Card Header Skeleton */}
+                      <div className="flex gap-2 items-start p-4">
+                        <div className="w-12 h-12 bg-gray-200 rounded-full animate-pulse"></div>
+                        <div className="flex-1">
+                          <div className="h-5 bg-gray-200 rounded w-3/4 mb-2 animate-pulse"></div>
+                          <div className="h-4 bg-gray-200 rounded w-1/3 animate-pulse"></div>
+                        </div>
+                        <div className="w-12 h-12 bg-gray-200 rounded-full animate-pulse"></div>
+                      </div>
+                      {/* Card Image Skeleton */}
+                      <div className="h-[216px] bg-gray-200 animate-pulse"></div>
+                      {/* Action Buttons Skeleton */}
+                      <div className="p-4 flex gap-2">
+                        <div className="flex-1 h-10 bg-gray-200 rounded-lg animate-pulse"></div>
+                        <div className="flex-1 h-10 bg-gray-200 rounded-lg animate-pulse"></div>
+                      </div>
+                    </div>
+                  ))}
+                </>
               ) : getDraftCampaigns().length > 0 ? (
                 getDraftCampaigns().map((draft) => (
                   <div 
@@ -1520,7 +1558,7 @@ const AllCampaignsSection = () => {
               <div className="flex items-center justify-between pt-4 mb-[14px]">
                 <h2 className="text-[18px] font-semibold text-gray-900 leading-[26px] tracking-tight">Recent Campaigns</h2>
                 <button 
-                  onClick={() => setShowAllCampaigns(true)}
+                  onClick={() => router.push('/brand/campaigns/all-campaigns')}
                   className="flex items-center pr-1"
                 >
                   <span className="text-[16px] font-semibold text-blue-700 leading-6 tracking-[0.24px]">view all</span>
@@ -1533,10 +1571,28 @@ const AllCampaignsSection = () => {
               {/* Campaign Cards Grid - gap between cards as per Figma */}
               <div className="flex gap-2 overflow-x-auto pb-2">
                 {loading ? (
-                  <div className="w-full text-center py-8">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600 mx-auto"></div>
-                    <p className="mt-2 text-gray-600">Loading campaigns...</p>
-                  </div>
+                  // Recent Campaign Cards Skeleton
+                  <>
+                    {[1, 2, 3].map((i) => (
+                      <div key={i} className="bg-gray-100 border-2 border-white rounded-xl overflow-hidden flex-1 min-w-[300px] max-w-[365px]">
+                        {/* Card Header Skeleton */}
+                        <div className="flex gap-2 items-start p-4">
+                          <div className="w-12 h-12 bg-gray-200 rounded-full animate-pulse"></div>
+                          <div className="flex-1">
+                            <div className="px-4">
+                              <div className="h-5 bg-gray-200 rounded w-3/4 mb-2 animate-pulse"></div>
+                            </div>
+                            <div className="px-4">
+                              <div className="h-4 bg-gray-200 rounded w-1/2 animate-pulse"></div>
+                            </div>
+                          </div>
+                          <div className="w-12 h-12 bg-gray-200 rounded-full animate-pulse"></div>
+                        </div>
+                        {/* Card Image Skeleton */}
+                        <div className="h-[216px] bg-gray-200 animate-pulse"></div>
+                      </div>
+                    ))}
+                  </>
                 ) : getActiveCampaigns().length > 0 ? (
                   getActiveCampaigns().slice(0, 3).map((campaign) => (
                     <div 
@@ -1682,7 +1738,7 @@ const AllCampaignsSection = () => {
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold text-gray-900">Draft Campaigns</h2>
             <button 
-              onClick={() => setShowAllDrafts(true)}
+              onClick={() => router.push('/brand/campaigns/all-drafts')}
               className="text-blue-600 text-sm font-medium hover:underline"
             >
               view all &gt;
@@ -1691,10 +1747,20 @@ const AllCampaignsSection = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {loading ? (
-              <div className="col-span-full text-center py-8">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600 mx-auto"></div>
-                <p className="mt-2 text-gray-600">Loading draft campaigns...</p>
-              </div>
+              // Draft Campaign Cards Skeleton
+              <>
+                {[1, 2, 3].map((i) => (
+                  <div key={i} className="bg-amber-50 rounded-lg overflow-hidden border border-gray-200">
+                    <div className="aspect-video bg-gray-200 animate-pulse"></div>
+                    <div className="p-4">
+                      <div className="h-5 bg-gray-200 rounded w-3/4 mb-2 animate-pulse"></div>
+                      <div className="h-4 bg-gray-200 rounded w-full mb-1 animate-pulse"></div>
+                      <div className="h-4 bg-gray-200 rounded w-2/3 mb-4 animate-pulse"></div>
+                      <div className="h-10 bg-gray-200 rounded-lg animate-pulse"></div>
+                    </div>
+                  </div>
+                ))}
+              </>
             ) : getDraftCampaigns().length > 0 ? (
               getDraftCampaigns().slice(0, 3).map((draft) => (
                 <div key={draft._id} className="bg-amber-50 rounded-lg overflow-hidden border border-gray-200 hover:shadow-md transition-shadow">
