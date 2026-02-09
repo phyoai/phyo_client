@@ -12,6 +12,7 @@ export function middleware(request) {
         '/brand/signup',
         '/brand/login',
         '/login',
+        '/logout',
         '/influencer/signup'
     ];
 
@@ -27,6 +28,15 @@ export function middleware(request) {
         '/brand/help',
         '/brand/inbox',
         '/brand/settings',
+        '/user/dashboard',
+        '/user/campaigns',
+        '/user/account',
+        '/user/help',
+        '/user/inbox',
+        '/user/settings',
+        '/user/influencer-search',
+        '/user/influencers',
+        '/user/notifications',
         '/influencer',
         '/service-provider'
         // '/details' is now public
@@ -36,11 +46,11 @@ export function middleware(request) {
         pathname.startsWith(route)
     );
     
-    // If accessing a protected route without token, redirect to brand signup
+    // If accessing a protected route without token, redirect to login
     if (isProtectedRoute && !token) {
-        const signupUrl = new URL('/brand/signup', request.url);
-        signupUrl.searchParams.set('redirect', `${pathname}${search || ''}`);
-        return NextResponse.redirect(signupUrl);
+        const loginUrl = new URL('/login', request.url);
+        loginUrl.searchParams.set('redirect', `${pathname}${search || ''}`);
+        return NextResponse.redirect(loginUrl);
     }
     
     // If user is authenticated and trying to access brand signup, redirect to dashboard
@@ -54,6 +64,7 @@ export function middleware(request) {
 export const config = {
     matcher: [
         '/brand/:path*',
+        '/user/:path*',
         '/influencer/:path*',
         '/service-provider/:path*',
         '/details/:path*'

@@ -1,24 +1,28 @@
 'use client'
 import { useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { useRouter } from 'next/navigation';
 
 const LogoutPage = () => {
   const { logout } = useAuth();
-  const router = useRouter();
 
   useEffect(() => {
-    // Perform logout
+    // Perform logout (clears state and storage)
     logout();
-    // Redirect to home page
-    router.push('/');
-  }, [logout, router]);
+    
+    // Use a small delay to ensure storage is cleared
+    const timer = setTimeout(() => {
+      // Force a hard redirect to clear all state
+      window.location.href = '/login';
+    }, 100);
+
+    return () => clearTimeout(timer);
+  }, [logout]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center">
+    <div className="min-h-screen flex items-center justify-center bg-gray-50">
       <div className="text-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto mb-4"></div>
-        <p>Logging out...</p>
+        <p className="text-gray-700">Logging out...</p>
       </div>
     </div>
   );
