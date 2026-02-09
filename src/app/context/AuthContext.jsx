@@ -24,12 +24,26 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     setMounted(true);
     const checkAuth = () => {
+      if (typeof window === 'undefined') {
+        setLoading(false);
+        return;
+      }
+      
       const storedToken = localStorage.getItem('authToken') || getCookie('authToken');
-      if (storedToken) {
-        setToken(storedToken);
-        // You can also verify the token with your backend here
-        // For now, we'll assume the token is valid
-        setUser({ token: storedToken }); // You can decode JWT or fetch user data
+      const storedUserData = localStorage.getItem('userData');
+      
+      if (storedToken && storedUserData) {
+        try {
+          const userData = JSON.parse(storedUserData);
+          setToken(storedToken);
+          setUser(userData);
+        } catch (error) {
+          // If parsing fails, clear everything
+          console.error('Failed to parse user data:', error);
+          localStorage.removeItem('authToken');
+          localStorage.removeItem('userData');
+          document.cookie = 'authToken=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+        }
       }
       setLoading(false);
     };
@@ -58,20 +72,46 @@ export const AuthProvider = ({ children }) => {
       });
 
       const data = await response.json();
+      console.log('Login API Response:', data); // Debug log
 
       if (response.ok) {
         const authToken = data.token;
+        const userData = data.user || data.data || { email, token: authToken };
+        
         setToken(authToken);
-        setUser(data.user || data.data || { email, token: authToken });
+        setUser(userData);
         
-        // Store token in localStorage and cookie using authUtils
+        // Store token and user data in localStorage and cookie using authUtils
         authUtils.setToken(authToken);
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('userData', JSON.stringify(userData));
+        }
         
-        return { success: true, data };
+        // Determine redirect path based on user type and registration status
+        let redirectPath = '/';
+        
+        if (userData.type === 'USER') {
+          // Regular user - check if they need to complete registration
+          if (userData.brandRegistrationStatus === 'COMPLETED') {
+            redirectPath = '/brand/dashboard';
+          } else if (userData.influencerRegistrationStatus === 'COMPLETED') {
+            redirectPath = '/influencer/dashboard';
+          } else {
+            // User hasn't completed any registration
+            redirectPath = '/user/dashboard';
+          }
+        } else if (userData.type === 'BRAND') {
+          redirectPath = '/brand/dashboard';
+        } else if (userData.type === 'INFLUENCER') {
+          redirectPath = '/influencer/dashboard';
+        }
+        
+        return { success: true, data, redirectPath };
       } else {
         return { success: false, error: data.message || 'Login failed' };
       }
     } catch (error) {
+      console.error('Login error:', error);
       return { success: false, error: 'Network error' };
     }
   };
@@ -108,22 +148,19 @@ export const AuthProvider = ({ children }) => {
 
   // Logout function
   const logout = () => {
-    // Clear all auth state first
-    setUser(null);
-    setToken(null);
-    
     if (typeof window !== 'undefined') {
-      // Clear localStorage
+      // Clear localStorage first
       localStorage.removeItem('authToken');
       localStorage.removeItem('userData');
       localStorage.removeItem('userEmail');
       
       // Clear cookies
       document.cookie = 'authToken=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
-      
-      // Force a hard redirect to login page to clear any cached state
-      window.location.href = '/login';
     }
+    
+    // Clear all auth state after clearing storage
+    setUser(null);
+    setToken(null);
   };
 
   // Check if user is authenticated

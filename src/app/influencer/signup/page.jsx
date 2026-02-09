@@ -1,49 +1,87 @@
 'use client'
-import FormContainer from '../../brand/components/FormContainer'
+import Image from 'next/image'
 import React, { Suspense } from 'react'
+import FormContainer from '../components/FormContainer'
+import { useAuth } from '../../context/AuthContext';
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 
-const page = () => {
+export default function Page() {
+    const { isAuthenticated, isInfluencer, loading } = useAuth();
+    const router = useRouter();
+
+    useEffect(() => {
+      if (!loading && isAuthenticated() && isInfluencer()) {
+        router.replace('/influencer/dashboard');
+      }
+    }, [isAuthenticated, isInfluencer, loading, router]);
+
+    if (!loading && isAuthenticated() && isInfluencer()) {
+      return null; // Or a loader if you want
+    }
+
     const steps = [{
-        title: "Personal Information",
-        description: "Tell us about yourself",
+        title: "Brand Details",
+        description: "Tell us about your company",
         submit: "Continue",
         fields: [
-            { name: "full_name", type: "text", placeholder: "Your Full Name", label: "Full Name", required: true },
-            { name: "stage_name", type: "text", placeholder: "Your Stage/Creator Name", label: "Stage Name", required: true },
-            { name: "date_of_birth", type: "date", placeholder: "YYYY-MM-DD", label: "Date of Birth", required: true },
-            { name: "gender", type: "select", placeholder: "Select gender", label: "Gender", required: true, options: [
-                { value: "Male", label: "Male" },
-                { value: "Female", label: "Female" },
-                { value: "Other", label: "Other" },
-                { value: "Prefer not to say", label: "Prefer not to say" }
-            ]},
-            { name: "location.city", type: "text", placeholder: "Mumbai", label: "City", required: true },
-            { name: "location.state", type: "text", placeholder: "Maharashtra", label: "State/Province", required: true },
-            { name: "location.country", type: "select", placeholder: "Select country", label: "Country", required: true, options: [
-                { value: "USA", label: "United States" },
-                { value: "UK", label: "United Kingdom" },
-                { value: "Canada", label: "Canada" },
-                { value: "Australia", label: "Australia" },
-                { value: "India", label: "India" },
-                { value: "Germany", label: "Germany" },
-                { value: "France", label: "France" },
-                { value: "Brazil", label: "Brazil" },
-                { value: "Mexico", label: "Mexico" },
+            { name: "company_name", type: "text", placeholder: "Enter Your Company Name", label: "Company Name", required: true },
+            { 
+                name: "website_url", 
+                type: "text", 
+                placeholder: "https://yourcompany.com", 
+                label: "Website URL", 
+                required: true,
+                validation: {
+                    pattern: {
+                        value: /^(https?:\/\/)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)$/,
+                        message: "Please enter a valid website URL (e.g., https://yourcompany.com)"
+                    }
+                }
+            },
+            { name: "industry", type: "select", placeholder: "Select your industry", label: "Select Industry Type", required: true, options: [
+                { value: "Technology", label: "Technology" },
+                { value: "Fashion", label: "Fashion & Beauty" },
+                { value: "Food & Beverage", label: "Food & Beverage" },
+                { value: "Health & Fitness", label: "Health & Fitness" },
+                { value: "Travel & Tourism", label: "Travel & Tourism" },
+                { value: "Education", label: "Education" },
+                { value: "Finance", label: "Finance" },
+                { value: "Sports", label: "Sports" },
+                { value: "Entertainment", label: "Entertainment" },
+                { value: "Automotive", label: "Automotive" },
+                { value: "Real Estate", label: "Real Estate" },
+                { value: "E-commerce", label: "E-commerce" },
+                { value: "Gaming", label: "Gaming" },
                 { value: "Other", label: "Other" }
             ]},
-            { name: "bio", type: "textarea", placeholder: "Tell us about yourself and your content...", label: "Bio (max 500 characters)", required: false, maxLength: 500 }
+            { name: "company_type", type: "select", placeholder: "Select company type", label: "Select Company Type", required: true, options: [
+                { value: "Brand", label: "Brand" },
+                { value: "Agency", label: "Marketing Agency" },
+                { value: "Startup", label: "Startup" },
+                { value: "Enterprise", label: "Enterprise" },
+                { value: "SMB", label: "Small/Medium Business" }
+            ]},
+            { name: "company_size", type: "select", placeholder: "Select company size", label: "Select Company Size", required: false, options: [
+                { value: "1-10", label: "1-10 employees" },
+                { value: "11-50", label: "11-50 employees" },
+                { value: "51-200", label: "51-200 employees" },
+                { value: "201-1000", label: "201-1000 employees" },
+                { value: "1000+", label: "1000+ employees" }
+            ]},
+            { name: "location", type: "text", placeholder: "Mumbai", label: "Location", required: true },
+            { name: "company_description", type: "textarea", placeholder: "Briefly describe your company", label: "Company Description", required: false }
         ],
     }, {
-        title: "Social Media Presence",
-        description: "Connect your social media accounts",
+        title: "Brand Identity",
+        description: "Add your social media links and upload brand assets",
         submit: "Continue",
         fields: [
-            { name: "social_media.instagram.username", type: "text", placeholder: "your_instagram_handle", label: "Instagram Username", required: true },
             { 
-                name: "social_media.instagram.link", 
+                name: "social_media.instagram", 
                 type: "text", 
-                placeholder: "https://instagram.com/yourhandle", 
-                label: "Instagram Profile Link", 
+                placeholder: "https://instagram.com/yourcompany", 
+                label: "Instagram", 
                 required: false,
                 validation: {
                     pattern: {
@@ -53,162 +91,70 @@ const page = () => {
                 }
             },
             { 
-                name: "social_media.youtube.channel_url", 
+                name: "social_media.linkedin", 
                 type: "text", 
-                placeholder: "https://youtube.com/@yourchannel", 
-                label: "YouTube Channel URL", 
-                required: true,
-                validation: {
-                    pattern: {
-                        value: /^(https?:\/\/)?(www\.)?youtube\.com\/.+$/,
-                        message: "Please enter a valid YouTube URL"
-                    }
-                }
-            },
-            { name: "social_media.tiktok.username", type: "text", placeholder: "your_tiktok_handle", label: "TikTok Username", required: false },
-            { 
-                name: "social_media.facebook.profile_url", 
-                type: "text", 
-                placeholder: "https://facebook.com/yourprofile", 
-                label: "Facebook Profile URL", 
+                placeholder: "https://linkedin.com/company/yourcompany", 
+                label: "Linkedin", 
                 required: false,
                 validation: {
                     pattern: {
-                        value: /^(https?:\/\/)?(www\.)?(facebook|fb)\.com\/.+$/,
-                        message: "Please enter a valid Facebook URL"
+                        value: /^(https?:\/\/)?(www\.)?linkedin\.com\/(company|in)\/.+$/,
+                        message: "Please enter a valid LinkedIn URL"
                     }
                 }
             },
-            { name: "social_media.twitter.username", type: "text", placeholder: "your_twitter_handle", label: "Twitter Username", required: false },
             { 
-                name: "personal_website", 
+                name: "social_media.twitter", 
                 type: "text", 
-                placeholder: "https://yourwebsite.com", 
-                label: "Personal Website", 
+                placeholder: "https://twitter.com/yourcompany", 
+                label: "X (Twitter)", 
                 required: false,
                 validation: {
                     pattern: {
-                        value: /^(https?:\/\/)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)$/,
-                        message: "Please enter a valid website URL"
+                        value: /^(https?:\/\/)?(www\.)?(twitter|x)\.com\/.+$/,
+                        message: "Please enter a valid Twitter/X URL"
                     }
                 }
-            }
+            },
+            { name: "company_logo", type: "file", label: "Company Logo", required: true, accept: "image/*" },
+            { name: "brand_images", type: "file", label: "Brand Images (up to 10)", required: false, accept: "image/*", multiple: true },
+            { name: "brand_story", type: "textarea", placeholder: "Tell your brand story...", label: "Brand Story", required: false }
         ],
     }, {
-        title: "Content & Niches",
-        description: "What type of content do you create?",
-        submit: "Continue",
-        fields: [
-            { name: "niches", type: "multiselect", placeholder: "Select your niches", label: "Content Niches", required: true, options: [
-                { value: "Fashion", label: "Fashion" },
-                { value: "Beauty", label: "Beauty" },
-                { value: "Lifestyle", label: "Lifestyle" },
-                { value: "Travel", label: "Travel" },
-                { value: "Food", label: "Food" },
-                { value: "Fitness", label: "Fitness" },
-                { value: "Health", label: "Health" },
-                { value: "Technology", label: "Technology" },
-                { value: "Gaming", label: "Gaming" },
-                { value: "Music", label: "Music" },
-                { value: "Comedy", label: "Comedy" },
-                { value: "Education", label: "Education" },
-                { value: "Business", label: "Business" },
-                { value: "Finance", label: "Finance" },
-                { value: "Parenting", label: "Parenting" },
-                { value: "Home & Garden", label: "Home & Garden" },
-                { value: "Sports", label: "Sports" },
-                { value: "Art & Design", label: "Art & Design" },
-                { value: "Photography", label: "Photography" },
-                { value: "Sustainability", label: "Sustainability" }
-            ]},
-            { name: "languages_spoken", type: "multiselect", placeholder: "Select languages you speak", label: "Languages Spoken", required: false, options: [
-                { value: "English", label: "English" },
-                { value: "Spanish", label: "Spanish" },
-                { value: "French", label: "French" },
-                { value: "German", label: "German" },
-                { value: "Chinese", label: "Chinese" },
-                { value: "Japanese", label: "Japanese" },
-                { value: "Portuguese", label: "Portuguese" },
-                { value: "Hindi", label: "Hindi" },
-                { value: "Arabic", label: "Arabic" },
-                { value: "Russian", label: "Russian" }
-            ]},
-            { name: "portfolio.content_highlights", type: "textarea", placeholder: "Describe your content style, achievements, average engagement rates...", label: "Content Highlights", required: false }
-        ],
-    }, {
-        title: "Collaboration Charges",
-        description: "Set your rates for different types of content",
-        submit: "Continue",
-        fields: [
-            { name: "rate_card.instagram_post", type: "number", placeholder: "5000", label: "Instagram Post (INR)", required: false },
-            { name: "rate_card.instagram_story", type: "number", placeholder: "2000", label: "Instagram Story (INR)", required: false },
-            { name: "rate_card.instagram_reel", type: "number", placeholder: "7500", label: "Instagram Reel (INR)", required: false },
-            { name: "rate_card.youtube_video", type: "number", placeholder: "15000", label: "YouTube Video (INR)", required: false },
-            { name: "rate_card.tiktok_video", type: "number", placeholder: "6000", label: "TikTok Video (INR)", required: false },
-            { name: "rate_card.blog_post", type: "number", placeholder: "3000", label: "Blog Post (INR)", required: false }
-        ],
-    }, {
-        title: "Availability",
-        description: "Set your availability and working preferences",
-        submit: "Continue",
-        fields: [
-            { name: "availability.current_availability", type: "select", placeholder: "Current availability", label: "Current Availability", required: false, options: [
-                { value: "Available", label: "Available" },
-                { value: "FullyBooked", label: "Fully Booked" },
-                { value: "LimitedCapacity", label: "Available with Limited Capacity" },
-                { value: "OnBreak", label: "On Break" }
-            ]},
-            { name: "availability.monthly_campaign_capacity", type: "number", placeholder: "5", label: "Monthly Campaign Capacity", required: true },
-            { name: "availability.preferred_campaign_types", type: "multiselect", placeholder: "Preferred campaign types", label: "Preferred Campaign Types", required: false, options: [
-                { value: "ProductReviews", label: "Product Reviews" },
-                { value: "BrandAmbassadorships", label: "Brand Ambassadorships" },
-                { value: "SponsoredContent", label: "Sponsored Content" },
-                { value: "EventCoverage", label: "Event Coverage" },
-                { value: "Giveaways", label: "Giveaways" },
-                { value: "LongtermPartnerships", label: "Long-term Partnerships" }
-            ]},
-            { name: "availability.industries_work_with", type: "multiselect", placeholder: "Industries you work with", label: "Industries You Work With", required: false, options: [
-                { value: "Fashion", label: "Fashion" },
-                { value: "Beauty", label: "Beauty" },
-                { value: "Technology", label: "Technology" },
-                { value: "HealthWellness", label: "Health & Wellness" },
-                { value: "FoodBeverage", label: "Food & Beverage" },
-                { value: "Travel", label: "Travel" },
-                { value: "Automotive", label: "Automotive" },
-                { value: "Finance", label: "Finance" },
-                { value: "Gaming", label: "Gaming" },
-                { value: "Sports", label: "Sports" }
-            ]},
-            { name: "availability.industries_avoid", type: "multiselect", placeholder: "Industries you avoid", label: "Industries You Avoid", required: false, options: [
-                { value: "Tobacco", label: "Tobacco" },
-                { value: "Alcohol", label: "Alcohol" },
-                { value: "FastFood", label: "Fast Food" },
-                { value: "Gambling", label: "Gambling" },
-                { value: "Political", label: "Political" },
-                { value: "AdultContent", label: "Adult Content" }
-            ]}
-        ],
-    }, {
-        title: "Assets upload",
-        description: "Complete your profile with additional information",
-        submit: "Continue",
-        fields: [
-            { name: "profile_picture", type: "file", label: "Profile Picture", required: true, accept: "image/*" },
-            { name: "cover_photo", type: "file", label: "Cover Photo", required: false, accept: "image/*" },
-            { name: "portfolio.media_kit", type: "file", label: "Media Kit (PDF)", required: false, accept: ".pdf" }
-        ]
-    }, {
-        title: "Preferences",
-        description: "Set your notification preferences",
+        title: "Documents Upload",
+        description: "Provide your business verification documents",
         submit: "Complete Registration",
         fields: [
-            { name: "notifications.sms_alerts", type: "toggle", label: "SMS Alerts", required: false, defaultValue: true },
-            { name: "notifications.email_preferences", type: "toggle", label: "Email Alerts", required: false, defaultValue: true },
-            { name: "notifications.push_notifications", type: "toggle", label: "Push Notifications", required: false, defaultValue: true },
-            { name: "notifications.campaign_recommendations", type: "toggle", label: "Campaign Recomendations", required: false, defaultValue: true }
-        ]
-    }];
-    
+            { 
+                name: "verification_documents.tax_id", 
+                type: "text", 
+                placeholder: "07ABCDE1234F2Z5", 
+                label: "GST No.", 
+                required: false,
+                validation: {
+                    pattern: {
+                        value: /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/,
+                        message: "Please enter a valid GSTIN (15 characters, e.g., 07ABCDE1234F2Z5)"
+                    }
+                }
+            },
+            { 
+                name: "verification_documents.company_registration_number", 
+                type: "text", 
+                placeholder: "CIN/Registration Number", 
+                label: "Company Registration No.", 
+                required: true,
+                validation: {
+                    minLength: {
+                        value: 15,
+                        message: "Company Registration Number should be at least 15 characters"
+                    }
+                }
+            },
+            { name: "verification_documents.business_registration", type: "file", label: "Registration Certificate", required: false, accept: ".pdf,.doc,.docx" },
+            { name: "verification_documents.authorization_letter", type: "file", label: "Authorization Letter", required: false, accept: ".pdf,.doc,.docx" }
+        ],
+    }]
     return (
         <div className='min-h-screen bg-white flex items-center justify-center'>
             <div className='w-full h-screen max-w-full overflow-hidden'>
@@ -223,5 +169,3 @@ const page = () => {
         </div>
     )
 }
-
-export default page

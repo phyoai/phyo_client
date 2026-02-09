@@ -57,8 +57,42 @@ function LoginForm() {
     // Check if user is already authenticated
     useEffect(() => {
         if (isAuthenticated()) {
-            const redirect = searchParams.get('redirect') || '/';
-            router.push(redirect);
+            let redirect = searchParams.get('redirect');
+            if (!redirect) {
+                // Check user type from localStorage
+                const userDataStr = localStorage.getItem('userData');
+                if (userDataStr) {
+                    try {
+                        const userData = JSON.parse(userDataStr);
+                        if (userData.type === 'USER') {
+                            // Check registration status for regular users
+                            if (userData.brandRegistrationStatus === 'COMPLETED') {
+                                redirect = '/brand/dashboard';
+                            } else if (userData.influencerRegistrationStatus === 'COMPLETED') {
+                                redirect = '/influencer/dashboard';
+                            } else {
+                                redirect = '/user/dashboard';
+                            }
+                        } else if (userData.type === 'BRAND') {
+                            redirect = '/brand/dashboard';
+                        } else if (userData.type === 'INFLUENCER') {
+                            redirect = '/influencer/dashboard';
+                        } else {
+                            redirect = '/';
+                        }
+                    } catch (e) {
+                        redirect = '/';
+                    }
+                } else {
+                    redirect = '/';
+                }
+            }
+            
+            // Only redirect if we're not already on the login page with a redirect param
+            // This prevents infinite loops
+            if (redirect) {
+                router.push(redirect);
+            }
         }
     }, [isAuthenticated, router, searchParams]);
 
@@ -133,17 +167,39 @@ function LoginForm() {
                 authUtils.setToken(result.token);
                 
                 // Store user data if provided
-                if (result.user) {
-                    localStorage.setItem('userData', JSON.stringify(result.user));
-                    if (result.user.email) {
-                        localStorage.setItem('userEmail', result.user.email);
+                const userData = result.user;
+                if (userData) {
+                    localStorage.setItem('userData', JSON.stringify(userData));
+                    if (userData.email) {
+                        localStorage.setItem('userEmail', userData.email);
                     }
                 }
                 
                 toast.success('Successfully signed in with Google!');
                 
-                // Redirect to dashboard or requested page
-                const redirect = searchParams.get('redirect') || '/';
+                // Determine redirect based on user type and registration status
+                let redirect = searchParams.get('redirect');
+                if (!redirect) {
+                    const userType = userData?.type;
+                    
+                    if (userType === 'USER') {
+                        // Check registration status for regular users
+                        if (userData.brandRegistrationStatus === 'COMPLETED') {
+                            redirect = '/brand/dashboard';
+                        } else if (userData.influencerRegistrationStatus === 'COMPLETED') {
+                            redirect = '/influencer/dashboard';
+                        } else {
+                            // User hasn't completed any registration
+                            redirect = '/user/dashboard';
+                        }
+                    } else if (userType === 'BRAND') {
+                        redirect = '/brand/dashboard';
+                    } else if (userType === 'INFLUENCER') {
+                        redirect = '/influencer/dashboard';
+                    } else {
+                        redirect = '/';
+                    }
+                }
                 setTimeout(() => router.push(redirect), 1000);
                 
             } else {
@@ -182,14 +238,36 @@ function LoginForm() {
                 }
                 
                 // Store user data if provided
-                if (result.user || result.data?.user) {
-                    localStorage.setItem('userData', JSON.stringify(result.user || result.data.user));
+                const userData = result.user || result.data?.user;
+                if (userData) {
+                    localStorage.setItem('userData', JSON.stringify(userData));
                 }
                 
                 toast.success('Login successful! Welcome back!');
                 
-                // Redirect to dashboard or requested page
-                const redirect = searchParams.get('redirect') || '/';
+                // Determine redirect based on user type and registration status
+                let redirect = searchParams.get('redirect');
+                if (!redirect) {
+                    const userType = userData?.type;
+                    
+                    if (userType === 'USER') {
+                        // Check registration status for regular users
+                        if (userData.brandRegistrationStatus === 'COMPLETED') {
+                            redirect = '/brand/dashboard';
+                        } else if (userData.influencerRegistrationStatus === 'COMPLETED') {
+                            redirect = '/influencer/dashboard';
+                        } else {
+                            // User hasn't completed any registration
+                            redirect = '/user/dashboard';
+                        }
+                    } else if (userType === 'BRAND') {
+                        redirect = '/brand/dashboard';
+                    } else if (userType === 'INFLUENCER') {
+                        redirect = '/influencer/dashboard';
+                    } else {
+                        redirect = '/';
+                    }
+                }
                 setTimeout(() => router.push(redirect), 1000);
                 
             } else {
