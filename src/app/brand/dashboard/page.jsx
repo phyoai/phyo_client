@@ -3,6 +3,18 @@ import React, { Suspense, useState, useRef, useEffect } from 'react';
 import { Search, Bell, Heart, ChevronRight, ArrowLeft, Mic, MoreVertical } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
+// Dashboard Section Components
+import TrendingInfluencersSection from './sections/TrendingInfluencersSection';
+import ExploreBrandsSection from './sections/ExploreBrandsSection';
+import CampaignSection from './sections/CampaignSection';
+import InfluencerListSection from './sections/InfluencerListSection';
+import InlineConversionCard from './sections/InlineConversionCard';
+
+// Reusable Components
+import SectionHeading from '@/components/SectionHeading';
+import CampaignCard from '@/components/cards/CampaignCard';
+import InfluencerAvatar from '@/components/cards/InfluencerAvatar';
+
 // Commented out old components - will integrate with APIs later
 // import CampaignReport from './CampaignReport';
 // import TopInfluencer from './TopInfluencer';
@@ -37,14 +49,6 @@ function DashboardContent() {
     name: 'Swagdeep',
     avatar: '/dummyAvatar.jpg',
     color: ['bg-red-400', 'bg-teal-600', 'bg-yellow-500', 'bg-blue-500', 'bg-teal-700', 'bg-red-500', 'bg-blue-600', 'bg-teal-500', 'bg-yellow-600', 'bg-blue-400'][i % 10]
-  }));
-
-  const topCampaigns = Array(3).fill(null).map((_, i) => ({
-    id: i + 1,
-    brandName: 'Lenskart',
-    brandInitials: 'AB',
-    timeAgo: '3d ago',
-    bgColor: 'from-teal-800 to-teal-900'
   }));
 
   return (
@@ -130,88 +134,81 @@ function DashboardContent() {
               </div>
             ))}
           </div>
-          <div className="mb-8">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-semibold text-gray-900">Top Influencers</h2>
-              <button 
-                onClick={() => router.push('/brand/influencers')}
-                className="flex items-center text-teal-600 hover:text-teal-700 font-medium text-sm"
-              >
-                view all
-                <ChevronRight className="h-4 w-4 ml-1" />
-              </button>
-            </div>
+
+          {/* Influencers near you */}
+          <div className="mb-10">
+            <SectionHeading 
+              title="Influencers near you" 
+              onViewAll={() => router.push('/brand/influencers')}
+            />
 
             {/* Horizontal Scroll of Influencers */}
-            <div className="flex gap-6 overflow-x-auto pb-4 scrollbar-hide">
+            <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
               {topInfluencers.map((influencer) => (
-                <div key={influencer.id} className="flex flex-col items-center flex-shrink-0">
-                  <div className={`w-16 h-16 ${influencer.color} rounded-full flex items-center justify-center mb-2`}>
-                    <img 
-                      src={influencer.avatar} 
-                      alt={influencer.name}
-                      className="w-14 h-14 rounded-full object-cover"
-                    />
-                  </div>
-                  <span className="text-xs text-gray-700 font-medium">{influencer.name}</span>
-                </div>
+                <InfluencerAvatar
+                  key={influencer.id}
+                  name={influencer.name}
+                  avatar={influencer.avatar}
+                  bgColor={influencer.color}
+                  onClick={() => router.push(`/brand/influencer/${influencer.id}`)}
+                />
               ))}
             </div>
           </div>
 
           {/* Top Campaigns Section */}
-          <div>
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-semibold text-gray-900">Top Campaigns</h2>
-              <button className="flex items-center text-teal-600 hover:text-teal-700 font-medium text-sm">
-                view all
-                <ChevronRight className="h-4 w-4 ml-1" />
-              </button>
-            </div>
+          <CampaignSection 
+            title="Top Campaigns"
+            campaignsCount={3}
+          />
 
-            {/* Campaigns Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {topCampaigns.map((campaign) => (
-                <div key={campaign.id} className="bg-[#F0F0F0] rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow">
-                  {/* Campaign Header */}
-                  <div className="p-4 flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-white font-semibold text-sm">
-                        {campaign.brandInitials}
-                      </div>
-                      <div>
-                        <h3 className="font-semibold text-gray-900">{campaign.brandName}</h3>
-                        <p className="text-xs text-gray-500">{campaign.timeAgo}</p>
-                      </div>
-                    </div>
-                    <button className="p-2 hover:bg-gray-100 rounded-full transition-colors">
-                      <Heart className="h-5 w-5 text-gray-400" />
-                    </button>
-                  </div>
+          {/* Influencers near you */}
+          <InfluencerListSection 
+            title="Influencers near you"
+          />
 
-                  {/* Campaign Image */}
-                  <div className={`relative h-[60%] bg-gradient-to-br ${campaign.bgColor} p-6 flex items-center justify-center`}>
-                    {/* Decorative Elements */}
-                    <div className="absolute inset-0 opacity-20 ">
-                      <div className="absolute top-4 left-4 text-yellow-300 text-2xl">🎬</div>
-                      <div className="absolute top-6 right-6 text-yellow-300 text-xl">🚀</div>
-                      <div className="absolute bottom-6 left-6 text-yellow-300 text-2xl">☕</div>
-                      <div className="absolute bottom-8 right-8 text-yellow-300 text-xl">👁️</div>
-                      <div className="absolute top-1/2 left-1/4 text-white text-sm">★</div>
-                      <div className="absolute top-1/3 right-1/3 text-white text-sm">✦</div>
-                    </div>
-                    
-                    {/* Main Text */}
-                    <div className="relative z-10 text-center ">
-                      <h3 className="text-white text-3xl font-bold mb-2 leading-tight">
-                        WE CREATE<br />STORIES NOT ADS
-                      </h3>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
+          {/* Explore Brands Section */}
+          <ExploreBrandsSection />
+
+          {/* Campaigns Near you */}
+          <CampaignSection 
+            title="Campaigns Near you"
+            campaignsCount={2}
+          />
+
+          {/* Influencers near you */}
+          <InfluencerListSection 
+            title="Influencers near you"
+          />
+
+          {/* Conversion Card 1 */}
+          <InlineConversionCard />
+
+          {/* Lifestyle campaingns */}
+          <CampaignSection 
+            title="Lifestyle campaingns"
+            campaignsCount={3}
+          />
+
+          {/* Lifestyle creators */}
+          <InfluencerListSection 
+            title="Lifestyle creators"
+          />
+
+          {/* Conversion Card 2 */}
+          <InlineConversionCard 
+            eyebrow="PREMIUM ACCESS"
+            title="Boost your reach"
+            description="Upgrade to Influencer Pro or Brand Premium to unlock exclusive analytics and campaigns."
+            primaryButtonText="Get Pro"
+            secondaryButtonText="Learn more"
+          />
+
+          {/* Sports Campaigns */}
+          <CampaignSection 
+            title="Sports Campaigns"
+            campaignsCount={3}
+          />
         </div>
       </div>
 
