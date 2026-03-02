@@ -4,12 +4,12 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '../app/context/AuthContext';
 import { useSidebar } from '../app/context/SidebarContext';
-import {  
+import { useLanguage } from '../app/context/LanguageContext';
+import {
   CalendarEventLine,
   AccountCircleLine,
-  MenuFill, 
-  MenuUnfold4Line,
-  PencilFill, 
+  MenuFill,
+  PencilFill,
   Home4Fill,
   InboxLine,
   Message3Fill
@@ -18,6 +18,7 @@ import {
 const BrandSidebar = () => {
   const pathname = usePathname();
   const { logout } = useAuth();
+  const { t } = useLanguage();
   const { isExpanded, setIsExpanded, sidebarButtonAction, sidebarButtonLabel } = useSidebar();
   const [mounted, setMounted] = React.useState(false);
   const [indicatorStyle, setIndicatorStyle] = React.useState({ top: 0, height: 44 });
@@ -28,10 +29,10 @@ const BrandSidebar = () => {
   }, []);
 
   const navItems = [
-    { name: 'Home', href: '/brand/dashboard', icon: Home4Fill },
-    { name: 'Inbox', href: '/brand/inbox', icon: InboxLine, badge: 3 },
-    { name: 'Campaigns', href: '/brand/campaigns', icon: CalendarEventLine },
-    { name: 'Account', href: '/brand/account', icon: AccountCircleLine },
+    { name: t('home'), href: '/brand/dashboard', icon: Home4Fill },
+    { name: t('inbox'), href: '/brand/inbox', icon: InboxLine, badge: 3 },
+    { name: t('campaigns_nav'), href: '/brand/campaigns', icon: CalendarEventLine },
+    { name: t('account_nav'), href: '/brand/account', icon: AccountCircleLine },
   ];
 
   // Update indicator position when pathname or expansion state changes
@@ -76,28 +77,24 @@ const BrandSidebar = () => {
   // Prevent hydration mismatch by not rendering until mounted
   if (!mounted) {
     return (
-      <div className={`h-screen bg-[#F0F0F0] fixed left-0 top-0 flex flex-col transition-[width] duration-300 ease-in-out z-50 w-[96px] pt-[44px] pb-[56px]`}>
+      <div className={`h-screen bg-[#F0F0F0] dark:bg-[#1e1e1e] fixed left-0 top-0 flex flex-col transition-[width] duration-300 ease-in-out z-50 w-[96px] pt-[44px] pb-[56px]`}>
         {/* Placeholder during SSR */}
       </div>
     );
   }
 
   return (
-    <div className={`h-screen bg-[#F0F0F0] fixed left-0 top-0 flex flex-col transition-all duration-300 ease-in-out z-50 ${
+    <div className={`h-screen bg-[#F0F0F0] dark:bg-[#1e1e1e] fixed left-0 top-0 flex flex-col transition-all duration-300 ease-in-out z-50 ${
       isExpanded ? 'w-[220px] pt-[44px] pb-[56px] px-[20px]' : 'w-[96px] pt-[44px] pb-[56px]'
     }`}>
       {/* Menu Icon at top */}
       <div className={`flex flex-col gap-[4px] mb-[36px] transition-all duration-300 ease-in-out ${isExpanded ? '' : 'items-center'}`}>
-        <button 
+        <button
           onClick={() => setIsExpanded(!isExpanded)}
-          className="flex items-center justify-center w-14 h-14 rounded-xl hover:bg-gray-200 transition-all duration-200"
+          className="flex items-center justify-center w-14 h-14 rounded-xl hover:bg-gray-200 dark:hover:bg-gray-700 transition-all duration-200"
         >
           <div className="transition-transform duration-300">
-            {isExpanded ? (
-              <MenuUnfold4Line width={24} height={24} fill="#242527" />
-            ) : (
-              <MenuFill width={24} height={24} fill="#242527" />
-            )}
+            <MenuFill width={24} height={24} fill="#242527" className="dark:fill-gray-300" />
           </div>
         </button>
 
@@ -128,8 +125,8 @@ const BrandSidebar = () => {
       <nav className={`flex flex-col gap-[4px] relative`}>
         {/* Sliding Background Indicator - Expanded */}
         {isExpanded && (
-          <div 
-            className="absolute left-0 w-full bg-[#DAE3D1] rounded-[32px] transition-all duration-[350ms] ease-out pointer-events-none"
+          <div
+            className="absolute left-0 w-full bg-[#DAE3D1] dark:bg-[#3a4a33] rounded-[32px] transition-all duration-[350ms] ease-out pointer-events-none"
             style={{
               top: `${indicatorStyle.top}px`,
               height: `${indicatorStyle.height}px`,
@@ -149,19 +146,19 @@ const BrandSidebar = () => {
                 href={item.href}
                 ref={(el) => (navRefs.current[index] = el)}
                 className={`flex items-center gap-[4px] px-[12px] py-[6px] rounded-[32px] relative z-10 transition-colors duration-300 ${
-                  isActive ? '' : 'hover:bg-gray-200/50'
+                  isActive ? '' : 'hover:bg-gray-200/50 dark:hover:bg-gray-700/50'
                 }`}
               >
                 <div className="flex items-center justify-center px-[4px] py-[8px] rounded-lg">
-                  <Icon 
+                  <Icon
                     width={24}
                     height={24}
                     fill={isActive ? '#43573B' : '#808080'}
-                    className="transition-all duration-300"
+                    className={`transition-all duration-300 ${isActive ? 'dark:fill-green-400' : 'dark:fill-gray-400'}`}
                   />
                 </div>
                 <span className={`text-sm font-medium tracking-[0.2px] leading-5 whitespace-nowrap transition-all duration-300 ${
-                  isActive ? 'text-[#43573B]' : 'text-[#808080]'
+                  isActive ? 'text-[#43573B] dark:text-green-400' : 'text-[#808080] dark:text-gray-400'
                 } ${isExpanded ? 'opacity-100 max-w-[200px]' : 'opacity-0 max-w-0 overflow-hidden'}`}>
                   {item.name}
                 </span>
@@ -178,15 +175,15 @@ const BrandSidebar = () => {
                 <div className="relative flex items-center justify-center">
                   <div className={`p-[4px] rounded-lg h-[32px] flex items-center justify-center relative overflow-hidden`}>
                     {/* Sliding background for collapsed state */}
-                    <div className={`absolute inset-0 bg-[#DAE3D1] rounded-lg transition-all duration-[350ms] ease-out ${
+                    <div className={`absolute inset-0 bg-[#DAE3D1] dark:bg-[#3a4a33] rounded-lg transition-all duration-[350ms] ease-out ${
                       isActive ? 'opacity-100 scale-100' : 'opacity-0 scale-90'
                     }`} />
-                    
-                    <Icon 
+
+                    <Icon
                       width={24}
                       height={24}
                       fill={isActive ? '#43573B' : '#808080'}
-                      className="transition-all duration-300 relative z-10"
+                      className={`transition-all duration-300 relative z-10 ${isActive ? 'dark:fill-green-400' : 'dark:fill-gray-400'}`}
                     />
                   </div>
                   {item.badge && (
@@ -198,7 +195,7 @@ const BrandSidebar = () => {
                   )}
                 </div>
                 <span className={`text-sm font-medium tracking-[0.2px] leading-5 text-center transition-all duration-300 ${
-                  isActive ? 'text-[#43573B]' : 'text-[#808080]'
+                  isActive ? 'text-[#43573B] dark:text-green-400' : 'text-[#808080] dark:text-gray-400'
                 }`}>
                   {item.name}
                 </span>

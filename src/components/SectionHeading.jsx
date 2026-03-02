@@ -1,16 +1,19 @@
+'use client';
 import React from 'react';
 import { ChevronRight } from 'lucide-react';
+import { useLanguage } from '@/app/context/LanguageContext';
 
 /**
  * Reusable Section Heading Component
  * Used across dashboard for consistent section headers with optional view all button
  */
-export default function SectionHeading({ 
-  title, 
-  eyebrow, 
+export default function SectionHeading({
+  title,
+  eyebrow,
   showViewAll = true,
-  onViewAll 
+  onViewAll
 }) {
+  const { t } = useLanguage();
   return (
     <div className="flex items-center justify-between mb-4">
       <div>
@@ -26,7 +29,7 @@ export default function SectionHeading({
           onClick={onViewAll}
           className="flex items-center text-blue-600 hover:text-blue-700 font-medium text-sm transition-colors"
         >
-          view all
+          {t('view_all')}
           <ChevronRight className="h-4 w-4 ml-0.5" />
         </button>
       )}

@@ -625,57 +625,33 @@ const CreateCampaignPage = () => {
 
       case 7: // Review & Publish Step
         return (
-          <div className="space-y-6">
-            {/* Campaign Name */}
-            <div>
-              <h2 className="text-3xl font-bold text-[#242527] mb-2">
-                {formData.campaignName || 'Campaign Name'}
-              </h2>
-              
-              {/* Campaign Brief */}
+          <div className="space-y-5 pb-8">
+            {/* Campaign Brief */}
+            <div className="bg-[#f9fafb] rounded-xl p-6">
+              <h2 className="text-lg font-semibold text-[#242527] mb-2">Campaign Brief</h2>
               <p className="text-base text-[#6b7280] leading-relaxed">
-                {formData.campaignBrief || 'No campaign brief provided'}
+                {formData.campaignBrief || 'Engage influencers to promote our latest beverage and encourage their followers to try it out. Let\'s create buzz and excitement around this new drink!'}
               </p>
             </div>
 
-            {/* Product Images Carousel */}
-            {formData.productImages && formData.productImages.length > 0 && (
-              <div className="flex gap-3 overflow-x-auto pb-2">
-                {formData.productImages.slice(0, 3).map((img, idx) => (
-                  <div 
-                    key={idx} 
-                    className="flex-shrink-0 w-[240px] h-[200px] bg-gray-100 rounded-2xl overflow-hidden shadow-sm"
-                  >
-                    <img 
-                      src={img.url || img} 
-                      alt={`Product ${idx + 1}`} 
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                ))}
-              </div>
-            )}
-
-            {/* Campaign Details Grid */}
-            <div className="grid grid-cols-1 gap-5">
-              {/* Campaign Goal */}
-              <div className="border-b border-gray-100 pb-4">
-                <h3 className="text-sm font-semibold text-[#242527] mb-2 uppercase tracking-wide">Campaign Goal</h3>
-                <p className="text-base text-[#6b7280]">
-                  {formData.campaignBrief 
-                    ? formData.campaignBrief.split('.')[0] + '.' 
-                    : 'Get creators to drive trial for our new product.'}
+            {/* Main Campaign Details */}
+            <div className="bg-[#f9fafb] rounded-xl p-6 space-y-5">
+              {/* Goal */}
+              <div className="pb-5 border-b border-gray-200">
+                <h3 className="text-xs font-semibold text-[#9ca3af] uppercase tracking-wide mb-2">Goal</h3>
+                <p className="text-base text-[#242527] font-medium">
+                  {formData.campaignBrief?.split('.')[0] || 'Drive awareness and engagement for our new summer fashion collection'}
                 </p>
               </div>
 
               {/* Campaign Type */}
-              <div className="border-b border-gray-100 pb-4">
-                <h3 className="text-sm font-semibold text-[#242527] mb-3 uppercase tracking-wide">Campaign Type</h3>
+              <div className="pb-5 border-b border-gray-200">
+                <h3 className="text-xs font-semibold text-[#9ca3af] uppercase tracking-wide mb-3">Campaign Type</h3>
                 <div className="flex flex-wrap gap-2">
                   {selectedCampaignTypes.map((type, idx) => (
                     <span
                       key={idx}
-                      className="inline-flex items-center px-3 py-1.5 bg-[#f9fafb] border border-[#e5e7eb] rounded-lg text-sm font-medium text-[#374151]"
+                      className="px-3 py-1.5 bg-[#d4edda] border border-[#c3e6cb] rounded-full text-xs font-medium text-[#155724]"
                     >
                       {type}
                     </span>
@@ -683,96 +659,254 @@ const CreateCampaignPage = () => {
                 </div>
               </div>
 
-              {/* Age Group */}
-              <div className="border-b border-gray-100 pb-4">
-                <h3 className="text-sm font-semibold text-[#242527] mb-3 uppercase tracking-wide">Age Group</h3>
-                <div className="flex items-center gap-6">
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm font-medium text-[#6b7280]">Min:</span>
-                    <span className="text-base font-semibold text-[#242527]">{formData.ageRangeMin || '18'}</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm font-medium text-[#6b7280]">Max:</span>
-                    <span className="text-base font-semibold text-[#242527]">{formData.ageRangeMax || '35'}</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Deliverables */}
-              <div className="border-b border-gray-100 pb-4">
-                <h3 className="text-sm font-semibold text-[#242527] mb-3 uppercase tracking-wide">Deliverables</h3>
-                <div className="flex items-center gap-6">
-                  {formData.instagramStories > 0 && (
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm font-medium text-[#6b7280]">Stories:</span>
-                      <span className="text-base font-semibold text-[#242527]">{formData.instagramStories}</span>
-                    </div>
-                  )}
-                  {formData.instagramPosts > 0 && (
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm font-medium text-[#6b7280]">Posts:</span>
-                      <span className="text-base font-semibold text-[#242527]">{formData.instagramPosts}</span>
-                    </div>
-                  )}
-                  {formData.instagramReels > 0 && (
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm font-medium text-[#6b7280]">Reels:</span>
-                      <span className="text-base font-semibold text-[#242527]">{formData.instagramReels}</span>
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {/* Compensation */}
-              <div className="border-b border-gray-100 pb-4">
-                <h3 className="text-sm font-semibold text-[#242527] mb-3 uppercase tracking-wide">Compensation</h3>
-                <div className="flex items-center gap-8">
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm font-medium text-[#6b7280]">Amount:</span>
-                    <span className="text-base font-semibold text-[#242527]">
-                      {formData.compensationAmount 
-                        ? `₹${Number(formData.compensationAmount).toLocaleString('en-IN')}` 
-                        : '₹10,000'}
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm font-medium text-[#6b7280]">Type:</span>
-                    <span className="text-base font-semibold text-[#242527]">{formData.compensation || 'Paid'}</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Countries */}
-              <div className="border-b border-gray-100 pb-4">
-                <h3 className="text-sm font-semibold text-[#242527] mb-2 uppercase tracking-wide">Countries</h3>
-                <p className="text-base text-[#6b7280]">
-                  {formData.countries || 'India, USA, UK, France and 10 others.'}
+              {/* Target Countries */}
+              <div className="pb-5 border-b border-gray-200">
+                <h3 className="text-xs font-semibold text-[#9ca3af] uppercase tracking-wide mb-2">Target Countries</h3>
+                <p className="text-base text-[#242527] font-medium">
+                  {formData.countries || 'United States, Canada, United Kingdom'}
                 </p>
               </div>
 
-              {/* Interests/Niche */}
+              {/* Campaign Period */}
               <div>
-                <h3 className="text-sm font-semibold text-[#242527] mb-3 uppercase tracking-wide">Interests/Niche</h3>
-                <div className="flex flex-wrap gap-2">
-                  {formData.niche ? (
-                    <span className="inline-flex items-center px-3 py-1.5 bg-[#f9fafb] border border-[#e5e7eb] rounded-lg text-sm font-medium text-[#374151]">
-                      {formData.niche}
-                    </span>
-                  ) : (
-                    <>
-                      <span className="inline-flex items-center px-3 py-1.5 bg-[#f9fafb] border border-[#e5e7eb] rounded-lg text-sm font-medium text-[#374151]">
-                        Life Style
-                      </span>
-                      <span className="inline-flex items-center px-3 py-1.5 bg-[#f9fafb] border border-[#e5e7eb] rounded-lg text-sm font-medium text-[#374151]">
-                        Fitness
-                      </span>
-                      <span className="inline-flex items-center px-3 py-1.5 bg-[#f9fafb] border border-[#e5e7eb] rounded-lg text-sm font-medium text-[#374151]">
-                        Health
-                      </span>
-                    </>
-                  )}
+                <h3 className="text-xs font-semibold text-[#9ca3af] uppercase tracking-wide mb-3">Campaign Period</h3>
+                <div className="flex items-center gap-3 text-base text-[#242527] font-medium">
+                  <Calendar size={18} className="text-gray-400" />
+                  <span>{formData.campaignStartDate ? new Date(formData.campaignStartDate).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) : 'June 1, 2026'}</span>
+                  <span className="text-gray-400">→</span>
+                  <span>{formData.campaignEndDate ? new Date(formData.campaignEndDate).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) : 'June 30, 2026'}</span>
                 </div>
               </div>
+            </div>
+
+            {/* Influencer Targeting */}
+            <div className="bg-[#f9fafb] rounded-xl p-6">
+              <h3 className="text-lg font-semibold text-[#242527] mb-5">Influencer Targeting</h3>
+
+              <div className="flex justify-between items-start">
+                <div className="space-y-5 flex-1">
+                  {/* Influencers */}
+                  <div>
+                    <div className="flex items-center gap-2 mb-1">
+                      <Users size={16} className="text-gray-400" />
+                      <span className="text-sm font-medium text-[#6b7280]">Influencers</span>
+                    </div>
+                    <p className="text-base text-[#242527] font-medium">
+                      {formData.influencerCount || '15'}
+                    </p>
+                  </div>
+
+                  {/* Follower Range */}
+                  <div>
+                    <span className="text-sm font-medium text-[#6b7280]">Follower Range</span>
+                    <p className="text-base text-[#242527] font-medium mt-1">
+                      {formData.followerCountMin ? `${(parseInt(formData.followerCountMin)/1000).toFixed(0)}K` : '10K'} – {formData.followerCountMax ? `${(parseInt(formData.followerCountMax)/1000).toFixed(0)}K` : '100K'}
+                    </p>
+                  </div>
+
+                  {/* Age Range */}
+                  <div>
+                    <span className="text-sm font-medium text-[#6b7280]">Age Range</span>
+                    <p className="text-base text-[#242527] font-medium mt-1">
+                      {formData.ageRangeMin || '18'} – {formData.ageRangeMax || '35'} years
+                    </p>
+                  </div>
+
+                  {/* Interests */}
+                  <div>
+                    <span className="text-sm font-medium text-[#6b7280]">Interests</span>
+                    <div className="flex flex-wrap gap-2 mt-2">
+                      {formData.niche ? (
+                        <span className="px-3 py-1 bg-[#d4edda] border border-[#c3e6cb] rounded-full text-xs font-medium text-[#155724]">
+                          {formData.niche}
+                        </span>
+                      ) : (
+                        <>
+                          <span className="px-3 py-1 bg-[#d4edda] border border-[#c3e6cb] rounded-full text-xs font-medium text-[#155724]">Fashion</span>
+                          <span className="px-3 py-1 bg-[#d4edda] border border-[#c3e6cb] rounded-full text-xs font-medium text-[#155724]">Lifestyle</span>
+                          <span className="px-3 py-1 bg-[#d4edda] border border-[#c3e6cb] rounded-full text-xs font-medium text-[#155724]">Beauty</span>
+                          <span className="px-3 py-1 bg-[#d4edda] border border-[#c3e6cb] rounded-full text-xs font-medium text-[#155724]">Travel</span>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Right side - Large number */}
+                <div className="text-right ml-8">
+                  <span className="text-5xl font-bold text-[#242527]">
+                    {formData.influencerCount || '15'}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Product Media */}
+            {formData.productImages && formData.productImages.length > 0 && (
+              <div className="bg-[#f9fafb] rounded-xl p-6">
+                <h3 className="text-lg font-semibold text-[#242527] mb-4">Product Media</h3>
+                <div className="grid grid-cols-4 gap-4">
+                  {formData.productImages.map((img, idx) => (
+                    <div key={idx} className="aspect-square bg-gray-300 rounded-lg overflow-hidden">
+                      <img src={img.url || img} alt={`Product ${idx + 1}`} className="w-full h-full object-cover" />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Timeline */}
+            <div className="bg-[#f9fafb] rounded-xl p-6">
+              <h3 className="text-lg font-semibold text-[#242527] mb-5">Timeline</h3>
+              <div className="relative pl-8">
+                {/* Vertical Line - extends full height */}
+                <div className="absolute left-3 top-0 bottom-0 w-1 bg-gray-300"></div>
+
+                <div className="space-y-6">
+                  {/* Brief Created */}
+                  <div className="flex gap-4 relative">
+                    <div className="absolute -left-8 top-1 w-6 h-6 bg-[#43573b] rounded-full border-4 border-[#f9fafb] flex items-center justify-center"></div>
+                    <div className="pt-0.5">
+                      <p className="text-sm font-semibold text-[#242527]">Brief Created</p>
+                      <p className="text-xs text-[#6b7280]">
+                        {new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Influencer Approval */}
+                  <div className="flex gap-4 relative">
+                    <div className="absolute -left-8 top-1 w-6 h-6 bg-[#43573b] rounded-full border-4 border-[#f9fafb] flex items-center justify-center"></div>
+                    <div className="pt-0.5">
+                      <p className="text-sm font-semibold text-[#242527]">Influencer Approval</p>
+                      <p className="text-xs text-[#6b7280]">
+                        {formData.applicationDeadline ? new Date(formData.applicationDeadline).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : 'May 25'}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Campaign Live */}
+                  <div className="flex gap-4 relative">
+                    <div className="absolute -left-8 top-1 w-6 h-6 bg-blue-500 rounded-full border-4 border-[#f9fafb] flex items-center justify-center"></div>
+                    <div className="pt-0.5">
+                      <p className="text-sm font-semibold text-blue-600">Campaign Live</p>
+                      <p className="text-xs text-[#6b7280]">
+                        {formData.campaignStartDate ? new Date(formData.campaignStartDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : 'June 1'}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Campaign End */}
+                  <div className="flex gap-4 relative">
+                    <div className="absolute -left-8 top-1 w-6 h-6 bg-gray-300 rounded-full border-4 border-[#f9fafb] flex items-center justify-center"></div>
+                    <div className="pt-0.5">
+                      <p className="text-sm font-semibold text-[#242527]">Campaign End</p>
+                      <p className="text-xs text-[#6b7280]">
+                        {formData.campaignEndDate ? new Date(formData.campaignEndDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : 'June 30'}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Deliverables */}
+            <div className="bg-[#f9fafb] rounded-xl p-6">
+              <h3 className="text-lg font-semibold text-[#242527] mb-6">Deliverables</h3>
+              <div className="space-y-5">
+                {formData.instagramStories > 0 && (
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 bg-white rounded-lg flex items-center justify-center border border-gray-300">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#43573b" strokeWidth="2">
+                          <rect x="3" y="3" width="18" height="18" rx="2"/>
+                          <path d="M12 8v8"/>
+                          <path d="M8 12h8"/>
+                        </svg>
+                      </div>
+                      <div>
+                        <p className="text-base font-semibold text-[#242527]">Instagram Story</p>
+                        <p className="text-xs text-[#6b7280]">UTC • Duration 15 Secs</p>
+                      </div>
+                    </div>
+                    <div className="w-10 h-10 bg-[#43573b] text-white rounded-full flex items-center justify-center font-bold text-sm">
+                      {formData.instagramStories}
+                    </div>
+                  </div>
+                )}
+
+                {formData.instagramReels > 0 && (
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 bg-white rounded-lg flex items-center justify-center border border-gray-300">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#43573b" strokeWidth="2">
+                          <path d="M6 4h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/>
+                          <polygon points="10 8 16 12 10 16 10 8"/>
+                        </svg>
+                      </div>
+                      <div>
+                        <p className="text-base font-semibold text-[#242527]">Instagram Reel</p>
+                        <p className="text-xs text-[#6b7280]">UTC • Duration 30-60 Secs</p>
+                      </div>
+                    </div>
+                    <div className="w-10 h-10 bg-[#43573b] text-white rounded-full flex items-center justify-center font-bold text-sm">
+                      {formData.instagramReels}
+                    </div>
+                  </div>
+                )}
+
+                {formData.instagramPosts > 0 && (
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 bg-white rounded-lg flex items-center justify-center border border-gray-300">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#43573b" strokeWidth="2">
+                          <rect x="3" y="3" width="18" height="18" rx="2"/>
+                          <circle cx="8.5" cy="8.5" r="1.5"/>
+                          <path d="M21 15l-5-5L5 21"/>
+                        </svg>
+                      </div>
+                      <div>
+                        <p className="text-base font-semibold text-[#242527]">Instagram Post</p>
+                        <p className="text-xs text-[#6b7280]">UTC • Image/Video</p>
+                      </div>
+                    </div>
+                    <div className="w-10 h-10 bg-[#43573b] text-white rounded-full flex items-center justify-center font-bold text-sm">
+                      {formData.instagramPosts}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Budget & Compensation */}
+            <div className="bg-[#f9fafb] rounded-xl p-6">
+              <h3 className="text-lg font-semibold text-[#242527] mb-4">Budget & Compensation</h3>
+              <div className="space-y-4">
+                <div>
+                  <p className="text-xs font-semibold text-[#6b7280] uppercase tracking-wide mb-1">Total Budget</p>
+                  <div className="flex items-end justify-between">
+                    <p className="text-2xl font-bold text-[#242527]">
+                      ${parseInt(formData.budget || '50000').toLocaleString()}
+                    </p>
+                    <p className="text-xs text-[#6b7280]">64%</p>
+                  </div>
+                </div>
+                <div className="w-full bg-gray-300 rounded-full h-2">
+                  <div className="bg-[#43573b] h-2 rounded-full" style={{ width: '64%' }}></div>
+                </div>
+                <div className="pt-2">
+                  <p className="text-xs text-[#6b7280]">${parseInt(formData.budget ? formData.budget * 0.64 : 32000).toLocaleString()} used</p>
+                </div>
+              </div>
+
+              {formData.compensation && (
+                <div className="mt-4 pt-4 border-t border-gray-200">
+                  <p className="text-xs font-semibold text-[#6b7280] uppercase tracking-wide mb-1">Compensation Model</p>
+                  <p className="text-sm text-[#242527] font-medium">
+                    {formData.compensation}
+                  </p>
+                </div>
+              )}
             </div>
           </div>
         );

@@ -2,6 +2,7 @@
 import React, { Suspense, useState, useRef, useEffect } from 'react';
 import { Search, Bell, Heart, ChevronRight, ArrowLeft, Mic, MoreVertical } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { useLanguage } from '@/app/context/LanguageContext';
 
 // Dashboard Section Components
 import TrendingInfluencersSection from './sections/TrendingInfluencersSection';
@@ -26,6 +27,7 @@ import InfluencerAvatar from '@/components/cards/InfluencerAvatar';
 
 function DashboardContent() {
   const router = useRouter();
+  const { t } = useLanguage();
   const [searchQuery, setSearchQuery] = useState('');
   const [isFadingOut, setIsFadingOut] = useState(false);
 
@@ -39,9 +41,9 @@ function DashboardContent() {
 
   // Mock data - will be replaced with API calls
   const searchSuggestions = [
-    "Discover lifestyle influencers who align with your brand values and can effectively p...",
-    "Discover lifestyle influencers who align with your brand values and can effe...",
-    "Discover lifestyle influencers who align with your brand values and..."
+    t('search_suggestion_1'),
+    t('search_suggestion_2'),
+    t('search_suggestion_3'),
   ];
 
   const topInfluencers = Array(10).fill(null).map((_, i) => ({
@@ -71,17 +73,17 @@ function DashboardContent() {
         }
       `}</style>
       
-      <div className={`h-full bg-[#FFFFFF] text-black transition-all duration-300 ${
+      <div className={`h-full bg-[#FFFFFF] dark:bg-[#121212] text-black dark:text-white transition-all duration-300 ${
         isFadingOut ? 'fade-out-dashboard' : ''
       }`}>
         {/* Sticky App Bar - Only Welcome header */}
-        <div className="sticky top-0 z-40 bg-[#FFFFFF] border-b border-gray-100">
+        <div className="sticky top-0 z-40 bg-[#FFFFFF] dark:bg-[#1e1e1e] border-b border-gray-100 dark:border-gray-700">
           <div className="px-4 sm:px-6 lg:px-8 py-3">
             <div className="flex items-center justify-between">
               {/* Welcome Section */}
               <div>
-                <h1 className="text-xl sm:text-2xl font-semibold text-gray-900">Welcome!</h1>
-                <p className="text-xs sm:text-sm text-gray-600">Search & Discover popular creators</p>
+                <h1 className="text-xl sm:text-2xl font-semibold text-gray-900 dark:text-white">{t('welcome')}</h1>
+                <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">{t('search_discover')}</p>
               </div>
 
               {/* Right Side - Notifications and Profile */}
@@ -112,11 +114,11 @@ function DashboardContent() {
               <Search className="absolute right-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-[#808080]" />
               <input
                 type="text"
-                placeholder="Search"
+                placeholder={t('search')}
                 value={searchQuery}
                 onChange={(e) => e.preventDefault()}
                 onClick={handleSearchClick}
-                className="w-full pl-6 pr-12 py-3 bg-[#F0F0F0] rounded-full border border-gray-200 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent cursor-pointer"
+                className="w-full pl-6 pr-12 py-3 bg-[#F0F0F0] dark:bg-[#2a2a2a] rounded-full border border-gray-200 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent cursor-pointer dark:text-white dark:placeholder-gray-400"
                 readOnly
               />
             </div>
@@ -127,7 +129,7 @@ function DashboardContent() {
             {searchSuggestions.map((suggestion, index) => (
               <div
                 key={index}
-                className="bg-[#C5CBC2] text-gray-700 px-4 sm:px-6 py-2 sm:py-2.5 rounded-full text-xs sm:text-sm cursor-pointer hover:bg-gray-400 transition-colors max-w-full sm:max-w-[600px] text-center"
+                className="bg-[#C5CBC2] dark:bg-[#3a3a3a] text-gray-700 dark:text-gray-300 px-4 sm:px-6 py-2 sm:py-2.5 rounded-full text-xs sm:text-sm cursor-pointer hover:bg-gray-400 dark:hover:bg-[#4a4a4a] transition-colors max-w-full sm:max-w-[600px] text-center"
                 onClick={handleSearchClick}
               >
                 {suggestion}
@@ -137,8 +139,8 @@ function DashboardContent() {
 
           {/* Influencers near you */}
           <div className="mb-10">
-            <SectionHeading 
-              title="Influencers near you" 
+            <SectionHeading
+              title={t('influencers_near_you')}
               onViewAll={() => router.push('/brand/influencers')}
             />
 
@@ -157,56 +159,53 @@ function DashboardContent() {
           </div>
 
           {/* Top Campaigns Section */}
-          <CampaignSection 
-            title="Top Campaigns"
+          <CampaignSection
+            title={t('top_campaigns')}
             campaignsCount={3}
           />
 
-          {/* Influencers near you */}
-          <InfluencerListSection 
-            title="Influencers near you"
+          <InfluencerListSection
+            title={t('influencers_near_you')}
           />
 
-          {/* Explore Brands Section */}
           <ExploreBrandsSection />
 
-          {/* Campaigns Near you */}
-          <CampaignSection 
-            title="Campaigns Near you"
+          <CampaignSection
+            title={t('campaigns_near_you')}
             campaignsCount={2}
           />
 
-          {/* Influencers near you */}
-          <InfluencerListSection 
-            title="Influencers near you"
+          <InfluencerListSection
+            title={t('influencers_near_you')}
           />
 
-          {/* Conversion Card 1 */}
-          <InlineConversionCard />
+          <InlineConversionCard
+            eyebrow={t('premium_access')}
+            title={t('boost_your_reach')}
+            description={t('upgrade_description')}
+            primaryButtonText={t('get_pro')}
+            secondaryButtonText={t('learn_more')}
+          />
 
-          {/* Lifestyle campaingns */}
-          <CampaignSection 
-            title="Lifestyle campaingns"
+          <CampaignSection
+            title={t('lifestyle_campaigns')}
             campaignsCount={3}
           />
 
-          {/* Lifestyle creators */}
-          <InfluencerListSection 
-            title="Lifestyle creators"
+          <InfluencerListSection
+            title={t('lifestyle_creators')}
           />
 
-          {/* Conversion Card 2 */}
-          <InlineConversionCard 
-            eyebrow="PREMIUM ACCESS"
-            title="Boost your reach"
-            description="Upgrade to Influencer Pro or Brand Premium to unlock exclusive analytics and campaigns."
-            primaryButtonText="Get Pro"
-            secondaryButtonText="Learn more"
+          <InlineConversionCard
+            eyebrow={t('premium_access')}
+            title={t('boost_your_reach')}
+            description={t('upgrade_description')}
+            primaryButtonText={t('get_pro')}
+            secondaryButtonText={t('learn_more')}
           />
 
-          {/* Sports Campaigns */}
-          <CampaignSection 
-            title="Sports Campaigns"
+          <CampaignSection
+            title={t('sports_campaigns')}
             campaignsCount={3}
           />
         </div>

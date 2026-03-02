@@ -33,9 +33,9 @@ function BrandLayoutContent({ children, pathname }) {
   console.log('BrandLayout: Rendering layout with sidebar');
   
   return (
-    <div className="flex min-h-screen bg-[#FFFFFF]">
+    <div className="flex min-h-screen bg-[#FFFFFF] dark:bg-[#121212]">
       <BrandSidebar />
-      <main className={`flex-1 bg-[#FFFFFF] transition-all duration-300 ease-in-out ${
+      <main className={`flex-1 bg-[#FFFFFF] dark:bg-[#121212] transition-all duration-300 ease-in-out ${
         isExpanded ? 'ml-[220px]' : 'ml-[96px]'
       } h-screen overflow-y-auto`}>
         {children}
