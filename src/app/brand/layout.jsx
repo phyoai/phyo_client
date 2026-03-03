@@ -24,8 +24,15 @@ function BrandLayoutContent({ children, pathname }) {
   const isNotificationsPage = pathname === '/brand/notifications';
   // Hide sidebar for all account sub-pages (but not the main account page)
   const isAccountSubPage = pathname.startsWith('/brand/account/');
+  // Hide sidebar for dynamic campaign details page only
+const isCampaignDetailsPage =
+  pathname.startsWith('/brand/campaigns/') &&
+  !pathname.includes('/create-campaign') &&
+  !pathname.includes('/new-applications') &&
+  !pathname.includes('/all-campaigns') &&
+  !pathname.includes('/all-drafts');
   
-  if (isAuthPage || isCreateCampaignPage || isNewApplicationsPage || isAllCampaignsPage || isAllDraftsPage || isInfluencerSearchPage || isInfluencersPage || isNotificationsPage || isAccountSubPage) {
+  if (isAuthPage || isCreateCampaignPage || isNewApplicationsPage || isAllCampaignsPage || isAllDraftsPage || isInfluencerSearchPage || isInfluencersPage || isNotificationsPage || isAccountSubPage || isCampaignDetailsPage) {
     console.log('BrandLayout: Rendering page without sidebar');
     return <>{children}</>;
   }
