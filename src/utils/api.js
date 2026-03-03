@@ -381,6 +381,16 @@ export const brandAPI = {
 
 // Influencer API functions
 export const influencerAPI = {
+  // Get list of influencers
+  getInfluencers: async (params = {}) => {
+    try {
+      const response = await api.get('/influencers', { params });
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error.message;
+    }
+  },
+
   // Submit influencer registration
  submitRegistration: async (influencerData, isFormData = false) => {
     try {
@@ -389,7 +399,7 @@ export const influencerAPI = {
           'Content-Type': 'multipart/form-data',
         }
       } : {};
-      
+
       const response = await api.post('/influencer-requests/submit', influencerData, config);
       return response.data;
     } catch (error) {

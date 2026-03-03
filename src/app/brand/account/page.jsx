@@ -2,13 +2,17 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { brandAPI } from '@/utils/api';
+import { userAPI } from '@/utils/api';
 import { useTheme } from '@/app/context/ThemeContext';
 import { useLanguage } from '@/app/context/LanguageContext';
 import {
   AccountCircleFill,
   ListUnordered, FileList3Line, WalletLine, PassExpiredLine, PaletteLine, Notification2Line, FileTextLine, CloseCircleLine, QuestionLine, LogoutBoxRLine, GlobalLine, InformationLine, ArrowDropRightLine,
-  LockLine, PhoneLine, GroupLine, GridLine, ImageLine, MapPinLine, AddCircleLine, ArrowLeftLine, CheckLine
+  LockLine, PhoneLine, GroupLine, GridLine, ImageLine, MapPinLine, AddCircleLine, ArrowLeftLine,
+  UserCommunityLine,
+  DashboardLine,
+  MultiImageLine,
+  AddLargeFill
 } from '@phyoofficial/phyo-icon-library';
 
 export default function BrandAccount() {
@@ -28,6 +32,7 @@ export default function BrandAccount() {
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const [showPauseModal, setShowPauseModal] = useState(false);
   const [showCancelModal, setShowCancelModal] = useState(false);
+  const [mobileView, setMobileView] = useState('list');
   const { darkMode, toggleDarkMode } = useTheme();
   const { t, language, changeLanguage, currentLanguage, languages } = useLanguage();
 
@@ -35,16 +40,20 @@ export default function BrandAccount() {
     fetchUserProfile();
   }, []);
 
+
   const fetchUserProfile = async () => {
     try {
-      const response = await brandAPI.getProfile();
-      setUser(response.user || response);
+      const response = await userAPI.getUserProfile();
+      // Extract user data from response.data or response.user or response itself
+      const userData = response.data || response.user || response;
+      setUser(userData);
     } catch (error) {
       console.error('Error fetching user profile:', error);
     } finally {
       setLoading(false);
     }
   };
+console.log('User profile data:', user);
 
   const getInitials = (name) => {
     if (!name) return 'J';
@@ -75,6 +84,7 @@ export default function BrandAccount() {
 
   const switchEditTab = (tab) => {
     setActiveEditTab(tab);
+    setMobileView('panel');
     setOtpValue('');
     setShowOTPModal(false);
     setOtpSentSuccess(false);
@@ -88,19 +98,26 @@ export default function BrandAccount() {
         setEditFormData({ email: user?.email || '' });
         break;
       case 'phone':
-        setEditFormData({ phone: user?.phone || '', mobileNumber: user?.mobileNumber || '' });
+        setEditFormData({
+          // first_name: user?.contact?.first_name || '',
+          // last_name: user?.contact?.last_name || '',
+          mobileNumber: user?.mobileNumber || ''
+        });
         break;
       case 'bio':
-        setEditFormData({ bio: user?.bio || '' });
+        setEditFormData({
+          subtitle: user?.subtitle || '',
+          bio: user?.bio || 'A confident, expressive personality with a bright turban and bold sunglasses. Swagdeep brings a sense of style and individuality—perfect for moments that need a touch of flair.'
+        });
         break;
       case 'socials':
         setEditFormData({
-          instagram: user?.socialLinks?.instagram || '',
-          facebook: user?.socialLinks?.facebook || '',
-          linkedin: user?.socialLinks?.linkedin || '',
-          twitter: user?.socialLinks?.twitter || '',
-          youtube: user?.socialLinks?.youtube || '',
-          personalSite: user?.socialLinks?.website || ''
+          instagram: user?.social_media?.instagram || '',
+          facebook: user?.social_media?.facebook || '',
+          linkedin: user?.social_media?.linkedin || '',
+          twitter: user?.social_media?.twitter || '',
+          youtube: user?.social_media?.youtube || '',
+          personalSite: user?.social_media?.tiktok || ''
         });
         break;
       case 'categories':
@@ -108,7 +125,7 @@ export default function BrandAccount() {
         break;
       case 'location':
         setEditFormData({
-          city: (user?.location || '').split(',')[0] || '',
+          city: user?.location || '',
           country: user?.country || ''
         });
         break;
@@ -124,6 +141,7 @@ export default function BrandAccount() {
     setEditingSection(null);
     setEditFormData({});
     setActiveEditTab(null);
+    setMobileView('list');
     setShowOTPModal(false);
     setOtpValue('');
     setOtpSentSuccess(false);
@@ -188,7 +206,7 @@ export default function BrandAccount() {
       const field = otpType === 'email'
         ? { email: editFormData.email }
         : { mobileNumber: editFormData.mobileNumber };
-      await brandAPI.updateProfile(field);
+      await userAPI.updateUserProfile(field);
       await fetchUserProfile();
       setShowOTPModal(false);
       setOtpValue('');
@@ -205,18 +223,30 @@ export default function BrandAccount() {
     try {
       let payload = {};
       switch (activeEditTab) {
+        case 'phone':
+          payload = {
+            contact: {
+              first_name: editFormData.first_name,
+              last_name: editFormData.last_name
+            },
+            mobileNumber: editFormData.mobileNumber
+          };
+          break;
         case 'bio':
-          payload = { bio: editFormData.bio };
+          payload = {
+            subtitle: editFormData.subtitle,
+            bio: editFormData.bio
+          };
           break;
         case 'socials':
           payload = {
-            socialLinks: {
+            social_media: {
               instagram: editFormData.instagram,
               facebook: editFormData.facebook,
               linkedin: editFormData.linkedin,
               twitter: editFormData.twitter,
               youtube: editFormData.youtube,
-              website: editFormData.personalSite,
+              tiktok: editFormData.personalSite,
             }
           };
           break;
@@ -232,7 +262,7 @@ export default function BrandAccount() {
         default:
           break;
       }
-      await brandAPI.updateProfile(payload);
+      await userAPI.updateUserProfile(payload);
       await fetchUserProfile();
       setActiveEditTab(null);
     } catch (err) {
@@ -249,7 +279,7 @@ export default function BrandAccount() {
     }
     setIsSaving(true);
     try {
-      await brandAPI.updateProfile({
+      await userAPI.updateUserProfile({
         currentPassword: editFormData.currentPassword,
         newPassword: editFormData.newPassword,
       });
@@ -283,7 +313,7 @@ export default function BrandAccount() {
     try {
       const formData = new FormData();
       brandImageFiles.forEach(({ file }) => formData.append('brand_images', file));
-      await brandAPI.updateProfile(formData, true);
+      await userAPI.updateUserProfile(formData, true);
       await fetchUserProfile();
       setBrandImageFiles([]);
       setActiveEditTab(null);
@@ -301,7 +331,7 @@ export default function BrandAccount() {
     try {
       const formData = new FormData();
       formData.append('company_logo', file);
-      await brandAPI.updateProfile(formData, true);
+      await userAPI.updateUserProfile(formData, true);
       await fetchUserProfile();
     } catch (err) {
       console.error('Avatar upload error:', err);
@@ -350,11 +380,8 @@ export default function BrandAccount() {
     );
   }
 
-  const MenuItem = ({ icon: Icon, label, onClick, rightElement, textColor = "text-[#43573b] dark:text-green-400", showChevron = true }) => (
-    <button
-      onClick={onClick}
-      className="w-full flex items-center justify-between px-6 py-5 bg-white dark:bg-[#1e1e1e]"
-    >
+  const MenuItem = ({ icon: Icon, label, rightElement, textColor = "text-[#43573b] dark:text-green-400", showChevron = true }) => (
+    <div className="w-full flex items-center justify-between px-6 py-5">
       <div className="flex items-center gap-3">
         <Icon className={`w-6 h-6 ${textColor}`} strokeWidth={1.5} />
         <div className="text-left">
@@ -367,7 +394,7 @@ export default function BrandAccount() {
       {showChevron && (
         <ArrowDropRightLine width={24} height={24} className="text-gray-400 dark:text-gray-500" />
       )}
-    </button>
+    </div>
   );
 
   const CATEGORY_OPTIONS = [
@@ -376,17 +403,20 @@ export default function BrandAccount() {
   ];
 
   const RightPanelDefault = () => (
-    <div className="flex-1 flex items-center justify-center">
+    <div className="flex-1 flex flex-col items-center justify-center gap-0 bg-[#ebebeb] dark:bg-[#1a1a1a]">
       <img
         src="/assets/phyo_logo_new.svg"
         alt="Phyo"
-        className="w-32 h-32 opacity-10 dark:opacity-5"
+        className="w-full max-w-[23rem] h-[8rem] object-contain"
       />
+      <p className="text-base font-medium text-[#999999] dark:text-gray-800 leading-none -mt-8">
+        A PyroMedia Product
+      </p>
     </div>
   );
 
   const RightPanelEmail = () => (
-    <div className="flex flex-col h-full p-6">
+    <div className="flex flex-col h-full p-6 bg-white dark:bg-[#1e1e1e]">
       <h3 className="text-base font-semibold text-[#242527] dark:text-white mb-4">Email</h3>
       <div className="flex-1">
         <input
@@ -408,40 +438,63 @@ export default function BrandAccount() {
   );
 
   const RightPanelPhone = () => (
-    <div className="flex flex-col h-full p-6">
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-base font-semibold text-[#242527] dark:text-white">Mobile Number</h3>
-        <span className="text-xs text-[#808080]">
-          {String(editFormData.mobileNumber || '').length}/10
-        </span>
-      </div>
-      <div className="flex-1">
-        <input
-          type="tel"
-          maxLength={10}
-          value={editFormData.mobileNumber || ''}
-          onChange={e => handleFormChange('mobileNumber', e.target.value)}
-          className="w-full px-4 py-3 bg-[#f0f0f0] border border-[#e6e6e6] rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#43573b] dark:bg-[#2a2a2a] dark:border-gray-600 dark:text-white"
-          placeholder="9876543210"
-        />
+    <div className="flex flex-col h-full p-6 bg-white dark:bg-[#1e1e1e]">
+      <h3 className="text-base font-semibold text-[#242527] dark:text-white mb-4">Contact Information</h3>
+      <div className="flex-1 space-y-4">
+        <div>
+          <label className="block text-xs font-semibold text-[#808080] mb-2">First Name</label>
+          <input
+            type="text"
+            value={editFormData.first_name || ''}
+            onChange={e => handleFormChange('first_name', e.target.value)}
+            className="w-full px-4 py-3 bg-[#f0f0f0] border border-[#e6e6e6] rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#43573b] dark:bg-[#2a2a2a] dark:border-gray-600 dark:text-white"
+            placeholder="First name"
+          />
+        </div>
+        <div>
+          <label className="block text-xs font-semibold text-[#808080] mb-2">Last Name</label>
+          <input
+            type="text"
+            value={editFormData.last_name || ''}
+            onChange={e => handleFormChange('last_name', e.target.value)}
+            className="w-full px-4 py-3 bg-[#f0f0f0] border border-[#e6e6e6] rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#43573b] dark:bg-[#2a2a2a] dark:border-gray-600 dark:text-white"
+            placeholder="Last name"
+          />
+        </div>
+        <div>
+          <div className="flex items-center justify-between mb-2">
+            <label className="block text-xs font-semibold text-[#808080]">Mobile Number</label>
+            <span className="text-xs text-[#808080]">
+              {String(editFormData.mobileNumber || '').length}/10
+            </span>
+          </div>
+          <input
+            type="tel"
+            maxLength={10}
+            value={editFormData.mobileNumber || ''}
+            onChange={e => handleFormChange('mobileNumber', e.target.value)}
+            className="w-full px-4 py-3 bg-[#f0f0f0] border border-[#e6e6e6] rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#43573b] dark:bg-[#2a2a2a] dark:border-gray-600 dark:text-white"
+            placeholder="9876543210"
+          />
+        </div>
       </div>
       <button
-        onClick={() => handleSendOTP('phone')}
-        disabled={isSaving || String(editFormData.mobileNumber || '').length < 10}
-        className="bg-[#43573b] text-white rounded-full py-3 w-full font-semibold disabled:opacity-50"
+        onClick={handleSaveSection}
+        disabled={isSaving}
+        className="mt-4 bg-[#43573b] text-white rounded-full py-3 w-full font-semibold disabled:opacity-50"
       >
-        {isSaving ? 'Sending…' : 'Get OTP'}
+        {isSaving ? 'Saving…' : 'Save'}
       </button>
     </div>
   );
 
   const RightPanelBio = () => (
-    <div className="flex flex-col h-full p-6">
+    <div className="flex flex-col h-full p-6 bg-white dark:bg-[#1e1e1e]">
       <h3 className="text-base font-semibold text-[#242527] dark:text-white mb-4">Bio</h3>
       <div className="flex-1">
         <textarea
           rows={8}
-          value={editFormData.bio || ''}
+          value={editFormData.bio || 'A confident, expressive personality with a bright turban and bold sunglasses. Swagdeep brings a sense of style and individuality—perfect for moments that need a touch of flair.'}
           onChange={e => handleFormChange('bio', e.target.value)}
           className="w-full px-4 py-3 bg-[#f0f0f0] border border-[#e6e6e6] rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#43573b] resize-none dark:bg-[#2a2a2a] dark:border-gray-600 dark:text-white"
           placeholder="Tell us about your brand…"
@@ -467,7 +520,7 @@ export default function BrandAccount() {
       { key: 'personalSite', label: 'Personal', placeholder: 'https://yourwebsite.com' },
     ];
     return (
-      <div className="flex flex-col h-full p-6">
+      <div className="flex flex-col h-full p-6 bg-white dark:bg-[#1e1e1e]">
         <h3 className="text-base font-semibold text-[#242527] dark:text-white mb-4">Socials</h3>
         <div className="flex-1 space-y-4">
           {socialFields.map(({ key, label, placeholder }) => (
@@ -494,84 +547,34 @@ export default function BrandAccount() {
     );
   };
 
-  const RightPanelCategories = () => {
-    const [showDropdown, setShowDropdown] = React.useState(false);
-    const selected = editFormData.categories || [];
-    const toggle = (cat) => {
-      const next = selected.includes(cat)
-        ? selected.filter(c => c !== cat)
-        : [...selected, cat];
-      handleFormChange('categories', next);
-    };
-    const selectAll = () => handleFormChange('categories', CATEGORY_OPTIONS);
-    const clearAll = () => handleFormChange('categories', []);
+const RightPanelCategories = () => {
+  const [isCollapsed, setIsCollapsed] = React.useState(false);
+  const selected = editFormData.categories || [];
 
-    return (
-      <div className="flex flex-col h-full p-6">
-        <h3 className="text-base font-semibold text-[#242527] dark:text-white mb-4">Categories</h3>
+  const toggle = (cat) => {
+    const next = selected.includes(cat)
+      ? selected.filter(c => c !== cat)
+      : [...selected, cat];
+    handleFormChange('categories', next);
+  };
 
-        {/* Dropdown Button */}
-        <div className="relative mb-4">
-          <button
-            onClick={() => setShowDropdown(!showDropdown)}
-            className="w-full px-4 py-3 bg-[#f0f0f0] border border-[#e6e6e6] rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#43573b] dark:bg-[#2a2a2a] dark:border-gray-600 dark:text-white text-left flex items-center justify-between"
-          >
-            <span className="text-[#242527] dark:text-white">
-              {selected.length === 0 ? 'Select categories...' : `${selected.length} selected`}
-            </span>
-            <svg className={`w-5 h-5 text-[#808080] transition-transform ${showDropdown ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
-            </svg>
-          </button>
+  return (
+    <div className="flex flex-col h-full p-6 bg-white dark:bg-[#1e1e1e]">
+      {/* Header with title and toggle button */}
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="text-base font-semibold text-[#242527] dark:text-white">
+          Categories
+        </h3>
+        
+      </div>
 
-          {/* Dropdown Menu */}
-          {showDropdown && (
-            <div className="absolute top-full left-0 right-0 mt-1 bg-white dark:bg-[#1e1e1e] border border-[#e6e6e6] dark:border-gray-600 rounded-xl shadow-lg z-10 max-h-64 overflow-y-auto">
-              {/* Select All / Clear All */}
-              <div className="border-b border-[#e6e6e6] dark:border-gray-600 p-3 flex gap-2 sticky top-0 bg-white dark:bg-[#1e1e1e]">
-                <button
-                  onClick={selectAll}
-                  disabled={selected.length === CATEGORY_OPTIONS.length}
-                  className="flex-1 text-xs font-semibold text-[#43573b] dark:text-green-400 hover:underline disabled:opacity-50"
-                >
-                  Select All
-                </button>
-                <span className="text-[#808080]">•</span>
-                <button
-                  onClick={clearAll}
-                  disabled={selected.length === 0}
-                  className="flex-1 text-xs font-semibold text-[#43573b] dark:text-green-400 hover:underline disabled:opacity-50"
-                >
-                  Clear All
-                </button>
-              </div>
-
-              {/* Options */}
-              {CATEGORY_OPTIONS.map(cat => {
-                const isSelected = selected.includes(cat);
-                return (
-                  <button
-                    key={cat}
-                    onClick={() => toggle(cat)}
-                    className={`w-full px-4 py-3 text-left text-sm font-medium transition-colors flex items-center justify-between hover:bg-[#f0f0f0] dark:hover:bg-[#2a2a2a]
-                      ${isSelected
-                        ? 'bg-[#f0f0f0] dark:bg-[#2a2a2a] text-[#43573b] dark:text-green-400'
-                        : 'text-[#242527] dark:text-white'
-                      }`}
-                  >
-                    <span>{cat}</span>
-                    {isSelected && <CheckLine className="w-4 h-4" />}
-                  </button>
-                );
-              })}
-            </div>
-          )}
-        </div>
-
-        {/* Selected Tags Display */}
-        {selected.length > 0 && (
-          <div className="flex-1 flex flex-wrap gap-2 mb-4 p-3 bg-[#f0f0f0] dark:bg-[#2a2a2a] rounded-xl overflow-y-auto">
-            {selected.map(cat => (
+      {/* Selected Categories Display (Always Visible) */}
+      <div className="mb-4 p-3 bg-[#f0f0f0] dark:bg-[#2a2a2a] rounded-xl min-h-12 flex flex-wrap gap-2 items-center justify-between">
+        <div className="flex flex-wrap gap-2 items-start flex-1">
+          {selected.length === 0 ? (
+            <span className="text-sm text-[#999999] dark:text-gray-500">Select categories...</span>
+          ) : (
+            selected.map(cat => (
               <div
                 key={cat}
                 className="flex items-center gap-2 px-3 py-1 bg-[#43573b] text-white rounded-full text-xs font-medium"
@@ -579,37 +582,87 @@ export default function BrandAccount() {
                 {cat}
                 <button
                   onClick={() => toggle(cat)}
-                  className="hover:opacity-80 transition-opacity"
+                  className="hover:opacity-80 transition-opacity font-bold"
                 >
-                  ✕
+                  ×
                 </button>
               </div>
-            ))}
-          </div>
-        )}
-
+            ))
+          )}
+        </div>
         <button
-          onClick={handleSaveSection}
-          disabled={isSaving || selected.length === 0}
-          className="mt-auto bg-[#43573b] text-white rounded-full py-3 w-full font-semibold disabled:opacity-50 transition-colors"
+          onClick={() => setIsCollapsed(!isCollapsed)}
+          className="p-1 text-[#666] dark:text-gray-400 hover:text-[#43573b] dark:hover:text-green-400 transition-colors"
+          aria-label={isCollapsed ? 'Expand' : 'Collapse'}
         >
-          {isSaving ? 'Saving…' : `Save (${selected.length})`}
+          {isCollapsed ? (
+            // Down arrow (collapsed → expand to show)
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+            </svg>
+          ) : (
+            // Up arrow (expanded → collapse to hide)
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
+            </svg>
+          )}
         </button>
       </div>
-    );
-  };
+
+      {/* Collapsible Category List */}
+      {!isCollapsed && (
+        <>
+          {/* Category List with Checkboxes */}
+          <div className="flex-1 overflow-y-auto border border-[#e6e6e6] dark:border-gray-600 rounded-xl bg-white dark:bg-[#2a2a2a] pb-4">
+            {CATEGORY_OPTIONS.map(cat => {
+              const isSelected = selected.includes(cat);
+              return (
+                <div
+                  key={cat}
+                  onClick={() => toggle(cat)}
+                  className={`w-full px-4 py-3 text-left text-sm font-medium transition-colors flex items-center justify-between cursor-pointer border-b border-[#e6e6e6] dark:border-gray-700 hover:bg-[#f0f0f0] dark:hover:bg-[#1e1e1e]
+                    ${isSelected
+                      ? 'bg-[#f0f0f0] dark:bg-[#1e1e1e] text-[#43573b] dark:text-green-400'
+                      : 'text-[#242527] dark:text-white'
+                    }`}
+                >
+                  <span>{cat}</span>
+                  <input
+                    type="checkbox"
+                    checked={isSelected}
+                    onChange={() => {}}
+                    className="w-4 h-4 cursor-pointer"
+                  />
+                </div>
+              );
+            })}
+          </div>
+        </>
+      )}
+
+      {/* Save Button (always visible at bottom) */}
+      <button
+        onClick={handleSaveSection}
+        disabled={isSaving || selected.length === 0}
+        className="mt-auto bg-[#43573b] text-white rounded-full py-3 w-full font-semibold disabled:opacity-50 transition-colors"
+      >
+        {isSaving ? 'Saving…' : `Save (${selected.length})`}
+      </button>
+    </div>
+  );
+};
 
   const RightPanelBrandImages = () => (
-    <div className="flex flex-col h-full p-6">
+    <div className="flex flex-col h-full p-6 bg-white dark:bg-[#1e1e1e]">
       <h3 className="text-base font-semibold text-[#242527] dark:text-white mb-4">Brand Images</h3>
       <div className="flex-1">
-        <div className="flex gap-3 overflow-x-auto pb-2">
+        <div className="flex gap-4 overflow-x-auto pb-2">
           <label
             htmlFor="brand-image-upload"
-            className="w-20 h-20 flex-shrink-0 rounded-xl bg-[#f0f0f0] border-2 border-dashed border-[#e6e6e6]
+            className="w-32 h-32 flex-shrink-0 bg-[#f0f0f0]
                        flex items-center justify-center cursor-pointer hover:border-[#43573b] transition-colors dark:bg-[#2a2a2a] dark:border-gray-600"
           >
-            <AddCircleLine className="w-8 h-8 text-[#808080]" />
+            <AddLargeFill className="w-10 h-10 text-[#808080]" />
           </label>
           <input
             id="brand-image-upload"
@@ -621,19 +674,19 @@ export default function BrandAccount() {
           />
 
           {brandImageFiles.map((item, idx) => (
-            <div key={idx} className="relative w-20 h-20 flex-shrink-0 rounded-xl overflow-hidden">
+            <div key={idx} className="relative w-32 h-32 flex-shrink-0  overflow-hidden">
               <img src={item.preview} alt="" className="w-full h-full object-cover" />
               <button
                 onClick={() => handleRemoveBrandImage(idx)}
-                className="absolute top-1 right-1 w-5 h-5 bg-black/50 rounded-full flex items-center justify-center text-white text-xs"
+                className="absolute top-2 right-2 w-6 h-6 flex items-center justify-center text-black text-sm font-bold hover:bg-black/10"
               >
-                x
+                ×
               </button>
             </div>
           ))}
 
           {(user?.brand_images || []).map((url, idx) => (
-            <div key={`existing-${idx}`} className="w-20 h-20 flex-shrink-0 rounded-xl overflow-hidden">
+            <div key={`existing-${idx}`} className="w-32 h-32 flex-shrink-0 overflow-hidden">
               <img src={url} alt="" className="w-full h-full object-cover" />
             </div>
           ))}
@@ -650,7 +703,7 @@ export default function BrandAccount() {
   );
 
   const RightPanelLocation = () => (
-    <div className="flex flex-col h-full p-6">
+    <div className="flex flex-col h-full p-6 bg-white dark:bg-[#1e1e1e]">
       <h3 className="text-base font-semibold text-[#242527] dark:text-white mb-4">Location</h3>
       <div className="flex-1 space-y-4">
         <div>
@@ -685,7 +738,7 @@ export default function BrandAccount() {
   );
 
   const RightPanelPassword = () => (
-    <div className="flex flex-col h-full p-6">
+    <div className="flex flex-col h-full p-6 bg-white dark:bg-[#1e1e1e]">
       <h3 className="text-base font-semibold text-[#242527] dark:text-white mb-4">Password</h3>
       <div className="flex-1 space-y-4">
         <div>
@@ -799,7 +852,7 @@ export default function BrandAccount() {
               }
             </p>
 
-            <div className="flex justify-center gap-2 mb-6">
+            <div className="flex justify-center gap-1 sm:gap-2 mb-6">
               {[0,1,2,3,4,5].map(index => (
                 <input
                   key={index}
@@ -824,7 +877,7 @@ export default function BrandAccount() {
                       document.getElementById(`edit-otp-${index - 1}`)?.focus();
                     }
                   }}
-                  className="w-11 h-11 text-center text-lg font-semibold bg-[#f0f0f0]
+                  className="w-9 h-9 sm:w-11 sm:h-11 text-center text-lg font-semibold bg-[#f0f0f0]
                              border-[3px] border-[#e6e6e6] rounded-lg
                              focus:outline-none focus:ring-2 focus:ring-[#43573b] focus:bg-white
                              text-[#242527] dark:bg-[#2a2a2a] dark:border-gray-600 dark:text-white"
@@ -872,96 +925,102 @@ export default function BrandAccount() {
       {/* Scrollable Content */}
       <div className="flex-1 overflow-y-auto px-4 sm:px-6 lg:px-9 py-4 sm:py-6 dark:bg-[#121212]">
         {/* Profile Header */}
-        <div className="flex items-center gap-3 mb-6">
-          <div className="w-16 h-16 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center flex-shrink-0">
-            <span className="text-2xl font-bold text-white">
-              {getInitials(user?.brandName || user?.username || 'Jazzleen')}
+        <div className="flex items-center gap-4 mb-8">
+          <div className="w-14 h-14 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center flex-shrink-0 shadow-sm">
+            <span className="text-xl font-bold text-white">
+              {getInitials(user?.companyName || user?.contact?.first_name || user?.email || '')}
             </span>
           </div>
           <div className="flex-1">
-            <h2 className="text-2xl font-semibold text-[#242527] dark:text-white">
-              {user?.brandName || user?.username || 'Jazzleen'}
+            <h2 className="text-xl font-semibold text-[#242527] dark:text-white mb-1 truncate">
+              {user?.contact?.first_name || user?.agencyName || user?.name || 'User'}
             </h2>
-            <span className="inline-block mt-1 px-1.5 py-0.5 text-xs font-medium text-[#242527] dark:text-gray-300 bg-[#e6e6e6] dark:bg-[#3a3a3a] rounded border border-[#4d4d4d] dark:border-gray-600">
-              Free
+            <span className="inline-flex items-center px-2 py-1 text-xs font-medium text-[#666] dark:text-gray-400 bg-[#f0f0f0] dark:bg-[#2a2a2a] rounded-md">
+              {user?.plan || user?.subscription || 'Free'}
             </span>
           </div>
-          <div className="flex items-center gap-1 bg-[#242527] text-white px-3 py-1 rounded-full border border-[#fab70c]">
-            <span className="text-yellow-400 text-sm">
-              <img src="/assets/phyo_coin.svg" alt="Phyo coin" />
-            </span>
-            <span className="text-base font-semibold">3/3</span>
+          <div className="flex items-center gap-1.5 bg-black dark:bg-[#1a1a1a] text-white px-3 py-1.5 rounded-full">
+            <img src="/assets/phyo_coin.svg" alt="Phyo coin" className="w-4 h-4" />
+            <span className="text-sm font-semibold">3/3</span>
           </div>
         </div>
 
         {/* Menu Section */}
         <div className="mb-6">
-          <div className="bg-[#f0f0f0] dark:bg-[#2a2a2a] rounded-2xl p-1">
-            <div className="rounded-lg overflow-hidden bg-[#f0f0f0] dark:bg-[#2a2a2a] divide-y divide-gray-300 dark:divide-gray-700">
-              <div className="bg-white dark:bg-[#1e1e1e]">
-                <MenuItem icon={AccountCircleFill} label={t('update_profile')} onClick={() => setEditingSection('profile-editor')} />
-              </div>
-              <div className="bg-white dark:bg-[#1e1e1e]">
-                <MenuItem icon={ListUnordered} label={t('my_lists')} onClick={() => router.push('/brand/account/my-lists')} />
-              </div>
-              <div className="bg-white dark:bg-[#1e1e1e]">
-                <MenuItem icon={FileList3Line} label={t('transactions')} onClick={() => router.push('/brand/account/billing-history')} />
-              </div>
-              <div className="bg-white dark:bg-[#1e1e1e]">
-                <MenuItem icon={WalletLine} label={t('upgrade_plan')} onClick={() => router.push('/brand/account/upgrade-plan')} />
-              </div>
-              <div className="bg-white dark:bg-[#1e1e1e]">
-                <MenuItem icon={PassExpiredLine} label={t('pause_subscription')} onClick={() => setShowPauseModal(true)} />
-              </div>
-              <div className="bg-white dark:bg-[#1e1e1e]">
-                <MenuItem icon={CloseCircleLine} label={t('cancel_subscription')} onClick={() => setShowCancelModal(true)} textColor="text-[#bf3709]" />
-              </div>
-              <div className="bg-white dark:bg-[#1e1e1e]">
-                <MenuItem
-                  icon={PaletteLine}
-                  label={t('dark_theme')}
-                  onClick={toggleDarkMode}
-                  rightElement={
-                    <div className={`w-11 h-8 rounded-full transition-colors flex items-center px-1 ${darkMode ? 'bg-[#3d4f36]' : 'bg-gray-300'}`}>
-                      <div className={`w-6 h-6 bg-white rounded-full transition-transform ${darkMode ? 'translate-x-3' : 'translate-x-0'}`}></div>
-                    </div>
-                  }
-                  textColor="text-[#242527] dark:text-gray-200"
-                  showChevron={false}
-                />
-              </div>
-              <div className="bg-white dark:bg-[#1e1e1e]">
-                <MenuItem icon={Notification2Line} label={t('notifications_preferences')} onClick={() => router.push('/brand/account/notifications-preferences')} />
-              </div>
-              <div className="bg-white dark:bg-[#1e1e1e]">
-                <MenuItem
-                  icon={GlobalLine}
-                  onClick={() => setShowLanguageModal(true)}
-                  textColor="text-[#242527] dark:text-gray-200"
-                  showChevron={false}
-                  label={
-                    <div className="flex flex-col text-left">
-                      <span>{t('app_language')}</span>
-                      <span className="text-sm text-[#808080] dark:text-gray-400">
-                        {currentLanguage.nativeName}
-                      </span>
-                    </div>
-                  }
-                />
-              </div>
-              <div className="bg-white dark:bg-[#1e1e1e]">
-                <MenuItem icon={QuestionLine} label={t('help_support')} onClick={() => router.push('/brand/account/help-support')} />
-              </div>
-              <div className="bg-white dark:bg-[#1e1e1e]">
-                <MenuItem icon={FileTextLine} label={t('terms_privacy')} onClick={() => router.push('/privacy-policy')} showChevron={false} />
-              </div>
-              <div className="bg-white dark:bg-[#1e1e1e]">
-                <MenuItem icon={InformationLine} label={t('app_version')} showChevron={false} />
-              </div>
-              <div className="bg-white dark:bg-[#1e1e1e]">
-                <MenuItem icon={LogoutBoxRLine} label={t('log_out')} onClick={handleLogout} textColor="text-[#bf3709]" showChevron={false} />
-              </div>
-            </div>
+          <div className="bg-white dark:bg-[#1e1e1e] rounded-2xl overflow-hidden border border-[#e6e6e6] dark:border-gray-700">
+            <button className="w-full" onClick={() => setEditingSection('profile-editor')}>
+              <MenuItem icon={AccountCircleFill} label={t('update_profile')} />
+              <div className="h-px bg-[#e6e6e6] dark:bg-gray-700 mx-4"></div>
+            </button>
+            <button className="w-full" onClick={() => router.push('/brand/account/my-lists')}>
+              <MenuItem icon={ListUnordered} label={t('my_lists')} />
+              <div className="h-px bg-[#e6e6e6] dark:bg-gray-700 mx-4"></div>
+            </button>
+            <button className="w-full" onClick={() => router.push('/brand/account/billing-history')}>
+              <MenuItem icon={FileList3Line} label={t('transactions')} />
+              <div className="h-px bg-[#e6e6e6] dark:bg-gray-700 mx-4"></div>
+            </button>
+            <button className="w-full" onClick={() => router.push('/brand/account/upgrade-plan')}>
+              <MenuItem icon={WalletLine} label={t('upgrade_plan')} />
+              <div className="h-px bg-[#e6e6e6] dark:bg-gray-700 mx-4"></div>
+            </button>
+            <button className="w-full" onClick={() => setShowPauseModal(true)}>
+              <MenuItem icon={PassExpiredLine} label={t('pause_subscription')} />
+              <div className="h-px bg-[#e6e6e6] dark:bg-gray-700 mx-4"></div>
+            </button>
+            <button className="w-full" onClick={() => setShowCancelModal(true)}>
+              <MenuItem icon={CloseCircleLine} label={t('cancel_subscription')} textColor="text-[#bf3709]" />
+              <div className="h-px bg-[#e6e6e6] dark:bg-gray-700 mx-4"></div>
+            </button>
+            <button className="w-full" onClick={toggleDarkMode}>
+              <MenuItem
+                icon={PaletteLine}
+                label={t('dark_theme')}
+                rightElement={
+                  <div className={`w-11 h-8 rounded-full transition-colors flex items-center px-1 ${darkMode ? 'bg-[#3d4f36]' : 'bg-gray-300'}`}>
+                    <div className={`w-6 h-6 bg-white rounded-full transition-transform ${darkMode ? 'translate-x-3' : 'translate-x-0'}`}></div>
+                  </div>
+                }
+                textColor="text-[#242527] dark:text-gray-200"
+                showChevron={false}
+              />
+              <div className="h-px bg-[#e6e6e6] dark:bg-gray-700 mx-4"></div>
+            </button>
+            <button className="w-full" onClick={() => router.push('/brand/account/notifications-preferences')}>
+              <MenuItem icon={Notification2Line} label={t('notifications_preferences')} />
+              <div className="h-px bg-[#e6e6e6] dark:bg-gray-700 mx-4"></div>
+            </button>
+            <button className="w-full" onClick={() => setShowLanguageModal(true)}>
+              <MenuItem
+                icon={GlobalLine}
+                textColor="text-[#242527] dark:text-gray-200"
+                showChevron={false}
+                label={
+                  <div className="flex flex-col text-left">
+                    <span>{t('app_language')}</span>
+                    <span className="text-sm text-[#808080] dark:text-gray-400">
+                      {currentLanguage.nativeName}
+                    </span>
+                  </div>
+                }
+              />
+              <div className="h-px bg-[#e6e6e6] dark:bg-gray-700 mx-4"></div>
+            </button>
+            <button className="w-full" onClick={() => router.push('/brand/account/help-support')}>
+              <MenuItem icon={QuestionLine} label={t('help_support')} />
+              <div className="h-px bg-[#e6e6e6] dark:bg-gray-700 mx-4"></div>
+            </button>
+            <button className="w-full" onClick={() => router.push('/privacy-policy')}>
+              <MenuItem icon={FileTextLine} label={t('terms_privacy')} showChevron={false} />
+              <div className="h-px bg-[#e6e6e6] dark:bg-gray-700 mx-4"></div>
+            </button>
+            <button className="w-full" onClick={() => {}}>
+              <MenuItem icon={InformationLine} label={t('app_version')} showChevron={false} />
+              <div className="h-px bg-[#e6e6e6] dark:bg-gray-700 mx-4"></div>
+            </button>
+            <button className="w-full" onClick={handleLogout}>
+              <MenuItem icon={LogoutBoxRLine} label={t('log_out')} textColor="text-[#bf3709]" showChevron={false} />
+            </button>
           </div>
         </div>
       </div>
@@ -1023,42 +1082,45 @@ export default function BrandAccount() {
       {editingSection === 'profile-editor' && (
         <div className="fixed inset-0 z-50 bg-white dark:bg-[#121212] flex flex-col">
           {/* Modal Header */}
-          <div className="flex-shrink-0 flex items-center px-4 py-4 border-b border-gray-100 dark:border-gray-700 bg-white dark:bg-[#1e1e1e]">
+          <div className="flex-shrink-0 flex items-center px-6 py-4 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-[#1e1e1e]">
             <button
               onClick={closeEditSection}
-              className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+              className="flex items-center justify-center hover:opacity-70 transition-opacity mr-3"
             >
               <ArrowLeftLine className="w-6 h-6 text-[#242527] dark:text-white" />
             </button>
-            <h2 className="ml-3 text-lg font-semibold text-[#242527] dark:text-white">
-              Edit Profile
+            <h2 className="text-xl font-semibold text-[#242527] dark:text-white">
+              Profile
             </h2>
           </div>
 
           {/* Two-column body */}
           <div className="flex flex-1 overflow-hidden">
             {/* LEFT COLUMN - Sticky sidebar */}
-            <div className="w-[35%] flex-shrink-0 border-r border-gray-100 dark:border-gray-700 overflow-y-auto bg-white dark:bg-[#1e1e1e]">
+            <div className={`${mobileView === 'panel' ? 'hidden' : 'flex flex-col'} md:flex md:flex-col w-full md:w-72 lg:w-80 flex-shrink-0 border-r border-gray-200 dark:border-gray-700 overflow-y-auto bg-white dark:bg-[#1e1e1e]`}>
               {/* Avatar */}
-              <div className="flex flex-col items-center py-6 px-4">
+              <div className="flex flex-col items-center py-8 px-6">
                 <div className="relative">
-                  <div className="w-20 h-20 rounded-full bg-[#f7c5c5] flex items-center justify-center">
+                  <div className="w-28 h-28 rounded-full bg-gradient-to-br from-red-400 to-red-500 flex items-center justify-center overflow-hidden">
                     {user?.company_logo ? (
                       <img
                         src={user.company_logo}
-                        alt="Brand Logo"
+                        alt={user?.companyName || user?.agencyName || user?.name || 'Logo'}
                         className="w-full h-full rounded-full object-cover"
+                        onError={(e) => {
+                          e.target.style.display = 'none';
+                          e.target.nextSibling.style.display = 'flex';
+                        }}
                       />
-                    ) : (
-                      <span className="text-3xl font-bold text-[#bf3709]">
-                        {getInitials(user?.brandName || user?.username || 'B')}
-                      </span>
-                    )}
+                    ) : null}
+                    <span className="text-4xl font-bold text-white" style={{display: user?.company_logo ? 'none' : 'flex', alignItems: 'center', justifyContent: 'center', width: '100%', height: '100%'}}>
+                      {getInitials(user?.companyName || user?.agencyName || user?.name || 'J')}
+                    </span>
                   </div>
                 </div>
                 <label
                   htmlFor="avatar-upload"
-                  className="mt-2 text-sm font-semibold text-[#43573b] dark:text-green-400 cursor-pointer hover:underline"
+                  className="mt-3 text-base font-semibold text-[#242527] dark:text-white cursor-pointer hover:opacity-70 transition-opacity"
                 >
                   Edit
                 </label>
@@ -1072,21 +1134,21 @@ export default function BrandAccount() {
               </div>
 
               {/* Menu items */}
-              <nav className="pb-6">
+              <nav className="px-6 pb-8 space-y-0">
                 {[
                   {
                     tab: 'email',
                     icon: LockLine,
                     label: 'Email',
-                    subtitle: user?.email ? user.email.slice(0, 3) + '***' + user.email.slice(user.email.indexOf('@')) : '',
+                    subtitle: user?.email ? user.email.slice(0, 3) + '***' + user.email.slice(user.email.indexOf('@')) : 'abc@gmail.com',
                   },
                   {
                     tab: 'phone',
                     icon: PhoneLine,
-                    label: 'Phone',
-                    subtitle: user?.mobileNumber
-                      ? '+91 ******' + String(user.mobileNumber).slice(-4)
-                      : '',
+                    label: 'Contact',
+                    subtitle: user?.contact?.mobileNumber && user?.contact?.mobileNumber.length >= 10
+                      ? '+91 ******' + user.contact.mobileNumber.slice(-4)
+                      : 'Add contact info',
                   },
                   {
                     tab: 'bio',
@@ -1094,34 +1156,34 @@ export default function BrandAccount() {
                     label: 'Bio',
                     subtitle: user?.bio
                       ? user.bio.slice(0, 30) + (user.bio.length > 30 ? '…' : '')
-                      : '',
+                      : 'Add your bio',
                   },
                   {
                     tab: 'socials',
-                    icon: GroupLine,
+                    icon: UserCommunityLine,
                     label: 'Socials',
                     subtitle: [
-                      user?.socialLinks?.instagram && 'Instagram',
-                      user?.socialLinks?.linkedin && 'Linkedin',
-                    ].filter(Boolean).join(', '),
+                      user?.social_media?.instagram && 'Instagram',
+                      user?.social_media?.linkedin && 'Linkedin',
+                    ].filter(Boolean).join(', ') || 'Add social links',
                   },
                   {
                     tab: 'categories',
-                    icon: GridLine,
+                    icon: DashboardLine,
                     label: 'Categories',
-                    subtitle: (user?.categories || []).slice(0, 2).join(', '),
+                    subtitle: (user?.categories || []).slice(0, 2).join(', ') || 'Add categories',
                   },
                   {
                     tab: 'brandImages',
-                    icon: ImageLine,
+                    icon: MultiImageLine,
                     label: 'Brand Images',
-                    subtitle: 'Brand images',
+                    subtitle: `${(user?.brand_images || []).length} images`,
                   },
                   {
                     tab: 'location',
                     icon: MapPinLine,
                     label: 'Location',
-                    subtitle: [user?.location, user?.country].filter(Boolean).join(', '),
+                    subtitle: [user?.location, user?.country].filter(Boolean).join(', ') || 'Add location',
                   },
                   {
                     tab: 'password',
@@ -1130,33 +1192,45 @@ export default function BrandAccount() {
                     subtitle: '',
                   },
                 ].map(({ tab, icon: Icon, label, subtitle }) => (
-                  <button
-                    key={tab}
-                    onClick={() => switchEditTab(tab)}
-                    className={`w-full flex items-center gap-3 px-4 py-3 text-left transition-colors
-                      ${activeEditTab === tab
-                        ? 'bg-[#f0f0f0] dark:bg-[#2a2a2a]'
-                        : 'hover:bg-gray-50 dark:hover:bg-[#252525]'
-                      }`}
-                  >
-                    <Icon className="w-5 h-5 text-[#43573b] dark:text-green-400 flex-shrink-0" />
-                    <div className="flex-1 min-w-0">
-                      <div className="text-sm font-semibold text-[#242527] dark:text-white">
-                        {label}
-                      </div>
-                      {subtitle && (
-                        <div className="text-xs text-[#808080] dark:text-gray-400 truncate">
-                          {subtitle}
+                  <div key={tab}>
+                    <button
+                      onClick={() => switchEditTab(tab)}
+                      className={`w-full flex items-center gap-4 py-4 text-left transition-colors rounded-lg
+                        ${activeEditTab === tab
+                          ? 'bg-gray-100 dark:bg-[#252525]'
+                          : 'hover:bg-gray-50 dark:hover:bg-[#252525]'
+                        }`}
+                    >
+                      <Icon className="w-5 h-5 text-[#242527] dark:text-gray-300 flex-shrink-0" />
+                      <div className="flex-1 min-w-0">
+                        <div className="text-base font-medium text-[#242527] dark:text-white">
+                          {label}
                         </div>
-                      )}
-                    </div>
-                  </button>
+                        {subtitle && (
+                          <div className="text-xs text-[#999999] dark:text-gray-400 truncate">
+                            {subtitle}
+                          </div>
+                        )}
+                      </div>
+                    </button>
+                    {tab !== 'password' && <div className=""></div>}
+                  </div>
                 ))}
               </nav>
             </div>
 
             {/* RIGHT COLUMN */}
-            <div className="flex-1 overflow-y-auto bg-[#f7f7f7] dark:bg-[#181818] flex flex-col">
+            <div className={`${mobileView === 'list' ? 'hidden' : 'flex flex-col'} md:flex md:flex-col flex-1 overflow-y-auto bg-white dark:bg-[#1e1e1e]`}>
+              {/* Mobile back button */}
+              {mobileView === 'panel' && activeEditTab && (
+                <button
+                  onClick={() => { setMobileView('list'); setActiveEditTab(null); }}
+                  className="md:hidden flex items-center gap-2 px-6 py-4 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-[#1e1e1e]"
+                >
+                  <ArrowLeftLine className="w-5 h-5 text-[#242527] dark:text-white" />
+                  <span className="text-base font-medium text-[#242527] dark:text-white">Back</span>
+                </button>
+              )}
               {!activeEditTab && <RightPanelDefault />}
               {activeEditTab === 'email' && <RightPanelEmail />}
               {activeEditTab === 'phone' && <RightPanelPhone />}

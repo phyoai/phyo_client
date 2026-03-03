@@ -1,8 +1,8 @@
 'use client'
 import React, { useState, useRef, useEffect } from 'react';
-import { Search, ArrowLeft, Mic, MoreVertical, MessageSquare, UserPlus, Info } from 'lucide-react';
+import { Search, ArrowLeft, Mic, MoreVertical, MessageSquare, UserPlus, Info, Play } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { BookmarkLine } from '@phyoofficial/phyo-icon-library';
+import { BookmarkLine, InstagramFill, InstagramLine, Message3Line, TwitterXLine, UserAddLine, YoutubeFill, FacebookFill, FacebookCircleFill } from '@phyoofficial/phyo-icon-library';
 
 export default function InfluencerSearch() {
   const router = useRouter();
@@ -468,14 +468,19 @@ export default function InfluencerSearch() {
           </div>
         ) : (
           /* Search Results Container */
-          <div className="flex gap-4 px-9 h-[calc(100vh-96px)]">
+          <div className="flex gap-2 sm:gap-4 px-3 sm:px-6 lg:px-9 h-[calc(100vh-96px)]">
             {/* Left Column - Results List */}
-            <div className="flex flex-col gap-2 overflow-y-auto w-[604px] shrink-0 pr-2">
+            <div className="flex flex-col gap-2 overflow-y-auto w-full lg:w-[604px] shrink-0 pr-2">
               {/* Influencer Card 1 */}
-              <InfluencerCard 
+              <InfluencerCard
                 name="Campaign Chacha"
-                followers="22.4k followers"
+                bio="Lifestyle & Entertainment"
                 avatarColor="#016fff"
+                socials={[
+                  { icon: <YoutubeFill size={16} />, count: '22.5k', bgColor: 'bg-[#43573b]' },
+                  { icon: <InstagramFill size={16} />, count: '22.5k', bgColor: 'bg-[#43573b]' },
+                  { icon: <TwitterXLine size={16} />, count: '22.5k', bgColor: 'bg-gray-600' }
+                ]}
                 onClick={() => handleInfluencerClick({
                   id: 1,
                   name: "Dadi Cool",
@@ -492,10 +497,15 @@ export default function InfluencerSearch() {
               />
               
               {/* Influencer Card 2 */}
-              <InfluencerCard 
+              <InfluencerCard
                 name="Campaign Chacha"
-                followers="22.4k followers"
+                bio="Creator & Influencer"
                 avatarColor="#016fff"
+                socials={[
+                  { icon: <YoutubeFill size={16} />, count: '22.5k', bgColor: 'bg-[#43573b]' },
+                  { icon: <InstagramFill size={16} />, count: '22.5k', bgColor: 'bg-[#43573b]' },
+                  { icon: <TwitterXLine size={16} />, count: '22.5k', bgColor: 'bg-gray-600' }
+                ]}
                 onClick={() => handleInfluencerClick({
                   id: 2,
                   name: "Dadi Cool",
@@ -512,10 +522,15 @@ export default function InfluencerSearch() {
               />
               
               {/* Influencer Card 3 */}
-              <InfluencerCard 
+              <InfluencerCard
                 name="Campaign Chacha"
-                followers="22.4k followers"
+                bio="Digital Content Creator"
                 avatarColor="#016fff"
+                socials={[
+                  { icon: <YoutubeFill size={16} />, count: '22.5k', bgColor: 'bg-[#43573b]' },
+                  { icon: <InstagramFill size={16} />, count: '22.5k', bgColor: 'bg-[#43573b]' },
+                  { icon: <TwitterXLine size={16} />, count: '22.5k', bgColor: 'bg-gray-600' }
+                ]}
                 onClick={() => handleInfluencerClick({
                   id: 3,
                   name: "Dadi Cool",
@@ -546,19 +561,19 @@ export default function InfluencerSearch() {
             </div>
 
             {/* Right Column - Influencer Profile or Empty State */}
-            <div className="flex-1 m-1 shadow-[0_0_20px_rgba(0,0,0,0.1)] rounded-lg">
+            <div className="hidden lg:flex lg:flex-1 lg:m-1 lg:shadow-[0_0_20px_rgba(0,0,0,0.1)] lg:rounded-lg min-w-0 overflow-hidden">
               {selectedInfluencer ? (
                 <InfluencerProfile influencer={selectedInfluencer} />
               ) : (
-                <div className="w-full h-full bg-[#F0F0F0] rounded-lg flex flex-col items-center justify-center p-8">
-                  <div className="w-[286px] h-[74px] mb-1">
-                    <img 
+                <div className="w-full h-full bg-[#F0F0F0] rounded-lg flex flex-col items-center justify-center p-4 sm:p-6 lg:p-8">
+                  <div className="w-[200px] h-[52px] sm:w-[250px] sm:h-[64px] lg:w-[286px] lg:h-[74px] mb-1">
+                    <img
                       src="/assets/phyo_logo_new.svg"
                       alt="Phyo Logo"
                       className="w-full h-full object-contain"
                     />
                   </div>
-                  <p className="text-[#808080] text-lg font-semibold">
+                  <p className="text-[#808080] text-base sm:text-lg font-semibold text-center">
                     A PyroMedia Product
                   </p>
                 </div>
@@ -572,53 +587,66 @@ export default function InfluencerSearch() {
 }
 
 // Influencer Card Component
-function InfluencerCard({ name, followers, avatarColor, onClick }) {
+function InfluencerCard({ name, bio, avatarColor, socials, onClick }) {
   return (
-    <div 
+    <div
       onClick={onClick}
-      className="bg-[#F0F0F0] border-2 border-white rounded-xl py-4 m-1 flex flex-col gap-2 max-w[50%] cursor-pointer  hover:scale-[1.01] transition-transform duration-200"
+      className="bg-white border border-gray-200 rounded-3xl p-6 m-1 flex flex-col gap-4 cursor-pointer hover:shadow-lg transition-shadow duration-200"
     >
-      {/* Profile Section */}
-      <div className="flex items-start px-4 gap-4">
+      {/* Profile Header */}
+      <div className="flex items-start gap-4">
         {/* Avatar */}
-        <div 
-          className="w-16 h-16 rounded-full shrink-0"
+        <div
+          className="w-20 h-20 rounded-full shrink-0"
           style={{ backgroundColor: avatarColor }}
-        >
-          {/* Avatar placeholder - you can add actual avatar images here */}
-        </div>
-        
-        {/* Name and Followers */}
-        <div className="flex-1 flex flex-col gap-2 pb-2">
-          <h3 className="text-xl font-semibold text-[#242527] leading-7">
+        />
+
+        {/* Name and Bio */}
+        <div className="flex-1 flex flex-col gap-2">
+          <h3 className="text-2xl font-bold text-[#242527]">
             {name}
           </h3>
-          <p className="text-base text-[#333]">
-            {followers}
+          <p className="text-sm text-[#666]">
+            {bio}
           </p>
+      {/* Social Stats */}
+      {socials && (
+        <div className="flex gap-4">
+          {socials?.map((social, index) => (
+            <div key={index} className="flex items-center gap-2">
+              <div className={`w-7 h-7 rounded flex items-center justify-center text-black text-xs font-bold`}>
+                {social.icon}
+              </div>
+              <span className="text-sm font-medium text-[#242527]">{social.count}</span>
+            </div>
+          ))}
+        </div>
+      )}
         </div>
       </div>
+
       
+
       {/* Action Buttons */}
-      <div className="flex gap-2 px-4 justify-center">
-        <button 
+      <div className="flex gap-3 justify-center">
+        <button
           onClick={(e) => {
             e.stopPropagation();
             // Handle send message
           }}
-          className="flex items-center gap-1 px-4 py-2 border border-[#43573b] rounded-full text-[#43573b] text-sm font-medium hover:bg-[#f5f8f1] transition-colors"
+          className="flex items-center gap-2 px-6 py-2 border border-[#333] rounded-full text-[#333] text-sm font-medium hover:bg-gray-50 transition-colors"
         >
-          <MessageSquare className="h-5 w-5" />
-          send message
+          <Message3Line className="h-5 w-5" />
+          message
         </button>
-        <button 
+        <button
           onClick={(e) => {
             e.stopPropagation();
             // Handle invite
           }}
-          className="flex items-center gap-1 px-4 py-2 border border-[#43573b] rounded-full text-[#43573b] text-sm font-medium hover:bg-[#f5f8f1] transition-colors"
+          className="flex items-center gap-2 px-6 py-2 border border-[#333] rounded-full text-[#333] text-sm font-medium hover:bg-gray-50 transition-colors"
         >
-          <UserPlus className="h-5 w-5" />
+          <UserAddLine className="h-5 w-5" />
           invite
         </button>
       </div>
@@ -679,10 +707,10 @@ function InfluencerProfile({ influencer }) {
   return (
     <div className="w-full h-full relative rounded-lg overflow-y-auto">
       {/* Yellow Background - Sticky at top */}
-      <div className="sticky top-0 bg-yellow-400 h-[400px] z-0">
+      <div className="sticky top-0 bg-yellow-400 h-[200px] sm:h-[250px] md:h-[300px] lg:h-[350px] z-0">
         {/* Profile Image - Centered */}
-        <div className="absolute inset-0 flex items-center justify-center pt-8">
-          <div className="w-64 h-64 rounded-full overflow-hidden shadow-lg">
+        <div className="absolute inset-0 flex items-center justify-center pt-2 sm:pt-4 md:pt-6 lg:pt-8">
+          <div className="w-32 h-32 sm:w-40 sm:h-40 md:w-48 md:h-48 lg:w-56 lg:h-56 rounded-full overflow-hidden shadow-lg">
             {/* Placeholder for profile image */}
             <div className="w-full h-full bg-gradient-to-br from-orange-300 to-red-400"></div>
           </div>
@@ -841,41 +869,34 @@ function InfluencerProfile({ influencer }) {
       )}
 
       {/* Profile Content - White card that scrolls over yellow background */}
-      <div className="relative bg-white rounded-t-3xl -mt-8 z-10 shadow-lg">
-        <div className="px-4 py-6 pb-28">
+      <div className="relative bg-white rounded-t-3xl -mt-3 sm:-mt-4 md:-mt-6 lg:-mt-8 z-10 shadow-lg">
+        <div className="px-3 sm:px-4 md:px-5 lg:px-6 py-3 sm:py-4 md:py-5 lg:py-6 pb-24 sm:pb-28">
           {/* Username and Name */}
-          <div className="mb-6">
-            <p className="text-[#808080] text-base font-semibold leading-6 tracking-[0.24px] mb-1">{influencer.username}</p>
-            <h2 className="text-[#242527] text-4xl font-bold leading-[48px] tracking-[-0.32px]">{influencer.name}</h2>
+          <div className="mb-4 sm:mb-6">
+            <p className="text-[#808080] text-sm sm:text-base font-semibold leading-6 tracking-[0.24px] mb-1">{influencer.username}</p>
+            <h2 className="text-[#242527] text-2xl sm:text-3xl md:text-4xl font-bold leading-[32px] sm:leading-[40px] md:leading-[48px] tracking-[-0.32px]">{influencer.name}</h2>
           </div>
 
           {/* Stats Badges */}
-          <div className="flex gap-2 mb-6">
-            <div className="bg-[#0b4fd9] border border-[#0a48c5] px-1.5 py-1 rounded flex items-center gap-1">
-              <svg className="w-5 h-5" viewBox="0 0 20 20" fill="none">
-                <path d="M10 2.5C10 2.5 3.75 5 3.75 10V15C3.75 15.663 4.01339 16.2989 4.48223 16.7678C4.95107 17.2366 5.58696 17.5 6.25 17.5H10M10 2.5V17.5M10 2.5C10 2.5 16.25 5 16.25 10V15C16.25 15.663 15.9866 16.2989 15.5178 16.7678C15.0489 17.2366 14.413 17.5 13.75 17.5H10M10 17.5V2.5" stroke="#b3c8f3" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
-              <span className="text-[#b3c8f3] text-base font-semibold leading-6 tracking-[0.24px]">{influencer.followers}</span>
+          <div className="flex gap-2 mb-4 sm:mb-6 flex-wrap">
+            <div className="bg-[#0b4fd9] hover:bg-[#0a45bf] px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg flex items-center gap-2 transition-colors">
+              <FacebookCircleFill className="w-5 h-5 text-white" />
+              <span className="text-white text-sm sm:text-base font-semibold leading-6 tracking-[0.24px]">{influencer.followers}</span>
             </div>
-            <div className="bg-[#0b4fd9] border border-[#0a48c5] px-1.5 py-1 rounded flex items-center gap-1">
-              <svg className="w-5 h-5" viewBox="0 0 20 20" fill="none">
-                <path d="M10 10C11.3807 10 12.5 8.88071 12.5 7.5C12.5 6.11929 11.3807 5 10 5C8.61929 5 7.5 6.11929 7.5 7.5C7.5 8.88071 8.61929 10 10 10ZM10 10C7.5 10 5 11.25 5 13.75V15H15V13.75C15 11.25 12.5 10 10 10Z" stroke="#b3c8f3" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
-              <span className="text-[#b3c8f3] text-base font-semibold leading-6 tracking-[0.24px]">{influencer.following}</span>
+            <div className="bg-[#0b4fd9] hover:bg-[#0a45bf] px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg flex items-center gap-2 transition-colors">
+              <InstagramFill className="w-5 h-5 text-white" />
+              <span className="text-white text-sm sm:text-base font-semibold leading-6 tracking-[0.24px]">{influencer.following}</span>
             </div>
-            <div className="bg-[#0b4fd9] border border-[#0a48c5] px-1.5 py-1 rounded flex items-center gap-1">
-              <svg className="w-5 h-5" viewBox="0 0 20 20" fill="none">
-                <rect x="3.75" y="5" width="12.5" height="10" rx="1" stroke="#b3c8f3" strokeWidth="1.5"/>
-                <path d="M3.75 8.75H16.25" stroke="#b3c8f3" strokeWidth="1.5"/>
-              </svg>
-              <span className="text-[#b3c8f3] text-base font-semibold leading-6 tracking-[0.24px]">{influencer.posts}</span>
+            <div className="bg-[#0b4fd9] hover:bg-[#0a45bf] px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg flex items-center gap-2 transition-colors">
+              <YoutubeFill className="w-5 h-5 text-white" />
+              <span className="text-white text-sm sm:text-base font-semibold leading-6 tracking-[0.24px]">{influencer.posts}</span>
             </div>
           </div>
 
           {/* Location and Age */}
-          <div className="flex gap-5 mb-6">
+          <div className="grid grid-cols-2 sm:flex sm:gap-5 gap-3 mb-4 sm:mb-6">
             <div className="flex-1">
-              <p className="text-[#242527] text-xl font-semibold leading-7 tracking-[-0.14px] mb-1">Location</p>
+              <p className="text-[#242527] text-base sm:text-xl font-semibold leading-7 tracking-[-0.14px] mb-1">Location</p>
               <div className="flex items-center gap-1">
                 <svg className="w-4 h-4" viewBox="0 0 16 16" fill="none">
                   <path d="M8 8.66667C8.73638 8.66667 9.33333 8.06971 9.33333 7.33333C9.33333 6.59695 8.73638 6 8 6C7.26362 6 6.66667 6.59695 6.66667 7.33333C6.66667 8.06971 7.26362 8.66667 8 8.66667Z" fill="#ff4f4f"/>
@@ -885,27 +906,27 @@ function InfluencerProfile({ influencer }) {
               </div>
             </div>
             <div className="flex-1">
-              <p className="text-[#242527] text-xl font-semibold leading-7 tracking-[-0.14px] mb-1">Age</p>
-              <span className="text-[#808080] text-base leading-6">{influencer.age}</span>
+              <p className="text-[#242527] text-base sm:text-xl font-semibold leading-7 tracking-[-0.14px] mb-1">Age</p>
+              <span className="text-[#808080] text-sm sm:text-base leading-6">{influencer.age}</span>
             </div>
           </div>
 
           {/* About Section */}
-          <div className="mb-6">
-            <h3 className="text-[#242527] text-xl font-semibold leading-7 tracking-[-0.14px] mb-1">About</h3>
-            <p className="text-[#808080] text-base leading-6 text-justify">
+          <div className="mb-4 sm:mb-6">
+            <h3 className="text-[#242527] text-base sm:text-xl font-semibold leading-7 tracking-[-0.14px] mb-1">About</h3>
+            <p className="text-[#808080] text-sm sm:text-base leading-6 text-justify">
               {influencer.about}
             </p>
           </div>
 
           {/* Interactions Section */}
-          <div className="mb-6">
-            <h3 className="text-[#242527] text-xl font-semibold leading-7 tracking-[-0.14px] mb-3">Interactions</h3>
+          <div className="mb-4 sm:mb-6">
+            <h3 className="text-[#242527] text-base sm:text-xl font-semibold leading-7 tracking-[-0.14px] mb-3">Interactions</h3>
             
             {/* Likes and Views Graphs */}
-            <div className="flex gap-3 overflow-x-auto mb-6">
+            <div className="flex gap-2 sm:gap-3 overflow-x-auto mb-4 sm:mb-6">
               {/* Likes Graph */}
-              <div className="bg-white border-[0.5px] border-[#e6e6e6] rounded-xl p-2 min-w-[380px] flex-shrink-0">
+              <div className="bg-white border-[0.5px] border-[#e6e6e6] rounded-xl p-2 min-w-[280px] sm:min-w-[320px] lg:min-w-[340px] flex-shrink-0">
                 <div className="mb-2">
                   <p className="text-[#242527] text-base font-semibold leading-6 tracking-[0.24px]">{influencer.likes} Likes</p>
                   <div className="flex items-center gap-1 text-xs">
@@ -946,7 +967,7 @@ function InfluencerProfile({ influencer }) {
               </div>
 
               {/* Views Graph */}
-              <div className="bg-white border-[0.5px] border-[#e6e6e6] rounded-xl p-2 min-w-[380px] flex-shrink-0">
+              <div className="bg-white border-[0.5px] border-[#e6e6e6] rounded-xl p-2 min-w-[280px] sm:min-w-[320px] lg:min-w-[340px] flex-shrink-0">
                 <div className="mb-2">
                   <p className="text-[#242527] text-base font-semibold leading-6 tracking-[0.24px]">{influencer.views} views</p>
                   <div className="flex items-center gap-1 text-xs">
@@ -989,8 +1010,8 @@ function InfluencerProfile({ influencer }) {
           </div>
 
           {/* Audience Insights */}
-          <div className="mb-6">
-            <h3 className="text-[#242527] text-xl font-semibold leading-7 tracking-[-0.14px] mb-3">Audience Insights</h3>
+          <div className="mb-4 sm:mb-6">
+            <h3 className="text-[#242527] text-base sm:text-xl font-semibold leading-7 tracking-[-0.14px] mb-3">Audience Insights</h3>
             
             {/* Age Group */}
             <div className="bg-white border-[0.5px] border-[#e6e6e6] rounded-xl p-2 mb-3">
@@ -1128,12 +1149,12 @@ function InfluencerProfile({ influencer }) {
           </div>
 
           {/* Similar Influencers */}
-          <div className="mb-6">
-            <h3 className="text-[#242527] text-xl font-semibold leading-7 tracking-[-0.14px] mb-3">Similar Influencers</h3>
-            
-            <div className="flex gap-3 overflow-x-auto pb-2">
+          <div className="mb-4 sm:mb-6">
+            <h3 className="text-[#242527] text-base sm:text-xl font-semibold leading-7 tracking-[-0.14px] mb-3">Similar Influencers</h3>
+
+            <div className="flex gap-2 sm:gap-3 overflow-x-auto pb-2">
               {/* Similar Influencer Card 1 */}
-              <div className="bg-[#f0f0f0] border-2 border-white rounded-xl overflow-hidden min-w-[375px] flex-shrink-0">
+              <div className="bg-[#f0f0f0] border-2 border-white rounded-xl overflow-hidden min-w-[240px] sm:min-w-[300px] lg:min-w-[340px] flex-shrink-0">
                 <p className="text-[#808080] text-xs px-4 pt-2">Health & Lifestyle</p>
                 <div className="aspect-[375/216] bg-gradient-to-br from-orange-200 to-pink-200"></div>
                 <div className="px-4 pb-4 pt-2 flex items-center gap-2">
@@ -1146,7 +1167,7 @@ function InfluencerProfile({ influencer }) {
               </div>
               
               {/* Similar Influencer Card 2 */}
-              <div className="bg-[#f0f0f0] border-2 border-white rounded-xl overflow-hidden min-w-[375px] flex-shrink-0">
+              <div className="bg-[#f0f0f0] border-2 border-white rounded-xl overflow-hidden min-w-[240px] sm:min-w-[300px] lg:min-w-[340px] flex-shrink-0">
                 <p className="text-[#808080] text-xs px-4 pt-2">Health & Lifestyle</p>
                 <div className="aspect-[375/216] bg-gradient-to-br from-blue-200 to-purple-200"></div>
                 <div className="px-4 pb-4 pt-2 flex items-center gap-2">
@@ -1171,15 +1192,17 @@ function InfluencerProfile({ influencer }) {
       </div>
 
       {/* Bottom Action Buttons - Sticky at bottom */}
-      <div className="sticky bottom-0 bg-white border-t border-gray-200 px-4 py-4 z-20 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)]">
-        <div className="flex gap-3">
-          <button className="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-[#dae3d1] rounded-full text-[#43573b] text-base font-semibold hover:bg-[#c9d9ba] transition-colors tracking-[0.24px]">
-            <UserPlus className="h-6 w-6" />
-            Invite
+      <div className="sticky bottom-0 bg-white border-t border-gray-200 px-2 sm:px-3 md:px-4 py-2 sm:py-3 z-20 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)]">
+        <div className="flex gap-1 sm:gap-2 md:gap-3">
+          <button className="flex-1 flex items-center justify-center gap-0.5 sm:gap-1 md:gap-2 px-3 sm:px-4 md:px-6 py-2 sm:py-2 md:py-3 bg-[#dae3d1] rounded-full text-[#43573b] text-xs sm:text-sm md:text-base font-semibold hover:bg-[#c9d9ba] transition-colors tracking-[0.24px]">
+            <UserPlus className="h-3 w-3 sm:h-4 sm:w-4 md:h-5 md:w-5" />
+            <span className="hidden md:inline">Invite</span>
+            <span className="md:hidden">Invite</span>
           </button>
-          <button className="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-[#43573b] rounded-full text-white text-base font-semibold hover:bg-[#374829] transition-colors tracking-[0.24px]">
-            <MessageSquare className="h-6 w-6" />
-            Send Message
+          <button className="flex-1 flex items-center justify-center gap-0.5 sm:gap-1 md:gap-2 px-3 sm:px-4 md:px-6 py-2 sm:py-2 md:py-3 bg-[#43573b] rounded-full text-white text-xs sm:text-sm md:text-base font-semibold hover:bg-[#374829] transition-colors tracking-[0.24px]">
+            <MessageSquare className="h-3 w-3 sm:h-4 sm:w-4 md:h-5 md:w-5" />
+            <span className="hidden md:inline">Send Message</span>
+            <span className="md:hidden">Message</span>
           </button>
         </div>
       </div>

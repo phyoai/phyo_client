@@ -44,7 +44,7 @@ export default function InlineConversionCard({
         {/* Action Buttons */}
         <div className="flex flex-wrap gap-3">
           <button 
-            onClick={() => router.push('/brand/get-started')}
+            onClick={() => router.push('/brand/account/upgrade-plan')}
             className="px-5 py-2 bg-white text-gray-900 rounded-full font-semibold hover:bg-gray-100 transition-colors text-sm"
           >
             {primaryButtonText}
