@@ -744,10 +744,15 @@ const CreateCampaignPage = () => {
             {/* Product Media */}
             {formData.productImages && formData.productImages.length > 0 && (
               <div className="bg-[#f9fafb] rounded-xl p-6">
-                <h3 className="text-lg font-semibold text-[#242527] mb-4">Product Media</h3>
-                <div className="grid grid-cols-4 gap-4">
+                <div className="flex justify-between items-center mb-4">
+                  <h3 className="text-lg font-semibold text-[#242527] m-0">Product Media</h3>
+                  <div className="w-7 h-7 bg-[#43573b] text-white rounded-full flex items-center justify-center text-xs font-bold">
+                    {formData.productImages.length}
+                  </div>
+                </div>
+                <div className="grid grid-cols-8 gap-3">
                   {formData.productImages.map((img, idx) => (
-                    <div key={idx} className="aspect-square bg-gray-300 rounded-lg overflow-hidden">
+                    <div key={idx} className="aspect-square bg-gray-300 rounded-lg overflow-hidden border border-gray-200">
                       <img src={img.url || img} alt={`Product ${idx + 1}`} className="w-full h-full object-cover" />
                     </div>
                   ))}
@@ -881,30 +886,28 @@ const CreateCampaignPage = () => {
             {/* Budget & Compensation */}
             <div className="bg-[#f9fafb] rounded-xl p-6">
               <h3 className="text-lg font-semibold text-[#242527] mb-4">Budget & Compensation</h3>
-              <div className="space-y-4">
-                <div>
-                  <p className="text-xs font-semibold text-[#6b7280] uppercase tracking-wide mb-1">Total Budget</p>
-                  <div className="flex items-end justify-between">
-                    <p className="text-2xl font-bold text-[#242527]">
-                      ${parseInt(formData.budget || '50000').toLocaleString()}
-                    </p>
-                    <p className="text-xs text-[#6b7280]">64%</p>
-                  </div>
+
+              {/* Budget Section */}
+              <div className="space-y-3 mb-4">
+                <div className="flex items-center justify-between">
+                  <p className="text-xs font-semibold text-[#6b7280] uppercase tracking-wide">Total Budget</p>
+                  <span className="text-xs text-[#6b7280]">{Math.round((parseInt(formData.budget || 50000) * 0.64 / parseInt(formData.budget || 50000)) * 100)}%</span>
                 </div>
+                <p className="text-2xl font-bold text-[#242527] m-0">
+                  ${parseInt(formData.budget || '50000').toLocaleString()}
+                </p>
                 <div className="w-full bg-gray-300 rounded-full h-2">
                   <div className="bg-[#43573b] h-2 rounded-full" style={{ width: '64%' }}></div>
                 </div>
-                <div className="pt-2">
-                  <p className="text-xs text-[#6b7280]">${parseInt(formData.budget ? formData.budget * 0.64 : 32000).toLocaleString()} used</p>
-                </div>
+                <p className="text-xs text-[#6b7280] m-0">${parseInt(formData.budget ? formData.budget * 0.64 : 32000).toLocaleString()} used</p>
               </div>
 
               {formData.compensation && (
-                <div className="mt-4 pt-4 border-t border-gray-200">
-                  <p className="text-xs font-semibold text-[#6b7280] uppercase tracking-wide mb-1">Compensation Model</p>
-                  <p className="text-sm text-[#242527] font-medium">
+                <div className="pt-3 border-t border-gray-200">
+                  <p className="text-xs font-semibold text-[#6b7280] uppercase tracking-wide mb-2">Compensation Model</p>
+                  <span className="inline-block px-3 py-1.5 bg-[#d4edda] border border-[#c3e6cb] rounded-full text-xs font-medium text-[#155724]">
                     {formData.compensation}
-                  </p>
+                  </span>
                 </div>
               )}
             </div>

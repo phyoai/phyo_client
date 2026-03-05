@@ -10,9 +10,10 @@ export default function InfluencerSearch() {
   const [isSearching, setIsSearching] = useState(false);
   const [showResults, setShowResults] = useState(false);
   const [selectedInfluencer, setSelectedInfluencer] = useState(null);
+  const [invitedInfluencers, setInvitedInfluencers] = useState(new Set());
   const searchInputRef = useRef(null);
   const topBarMoreMenuRef = useRef(null);
-  
+
   // Modal states
   const [showTopBarMoreMenu, setShowTopBarMoreMenu] = useState(false);
   const [showVoiceModal, setShowVoiceModal] = useState(false);
@@ -150,6 +151,11 @@ export default function InfluencerSearch() {
   // Handle influencer card click
   const handleInfluencerClick = (influencer) => {
     setSelectedInfluencer(influencer);
+  };
+
+  // Handle invite influencer
+  const handleInviteInfluencer = (influencerId) => {
+    setInvitedInfluencers(new Set([...invitedInfluencers, influencerId]));
   };
 
   // Handle voice search
@@ -299,7 +305,7 @@ export default function InfluencerSearch() {
 
       <div className="min-h-screen bg-white">
         {/* Top Bar with centered search */}
-        <div className="bg-white px-6 py-3 flex items-center gap-4 search-fade-in">
+        <div className="relative z-40 bg-white px-6 py-3 flex items-center gap-4 search-fade-in">
           {/* Back Button - Fixed width */}
           <button 
             onClick={handleBackClick}
@@ -444,24 +450,24 @@ export default function InfluencerSearch() {
               }`}
             >
               {/* Mascot Image */}
-              <div className="mb-6">
-                <img 
-                  src="http://localhost:3845/assets/82b9f2b6ee13b45763ef3c3a3ffc5b2b30b247c4.png" 
-                  alt="Searching"
-                  className="w-[187px] h-[279px] object-contain"
-                  onError={(e) => {
-                    e.target.style.display = 'none';
-                    e.target.nextElementSibling.style.display = 'flex';
-                  }}
-                />
+              <div className="mb-6 relative">
+                
                 {/* Fallback mascot */}
                 <div className="w-[187px] h-[279px] hidden items-center justify-center">
                   <Search className="w-24 h-24 text-teal-600 animate-pulse" />
                 </div>
               </div>
-              
+              <img
+                  src="/assets/searching_look.svg"
+                  alt="Searching"
+                  className="w-[187px] h-[279px] object-contain relative z-10"
+                  onError={(e) => {
+                    e.target.style.display = 'none';
+                    e.target.nextElementSibling.style.display = 'flex';
+                  }}
+                />
               {/* Finding Results Text */}
-              <p className="text-[#808080] text-sm font-medium">
+              <p className="text-[#808080] text-sm font-medium leading-[20px] tracking-[0.2px] whitespace-nowrap">
                 finding results...
               </p>
             </div>
@@ -481,6 +487,24 @@ export default function InfluencerSearch() {
                   { icon: <InstagramFill size={16} />, count: '22.5k', bgColor: 'bg-[#43573b]' },
                   { icon: <TwitterXLine size={16} />, count: '22.5k', bgColor: 'bg-gray-600' }
                 ]}
+                influencerData={{
+                  id: 1,
+                  name: "Dadi Cool",
+                  username: "@dadi_cool",
+                  followers: "22.4k",
+                  following: "2.1k",
+                  posts: "145",
+                  location: "Delhi, India",
+                  age: "34",
+                  about: "A calm, composed elder figure with soft curls and a thoughtful demeanor. Protocol represents wisdom and acts as a grounding presence. Ideal for adding a mature balance to the set.",
+                  likes: "9.2K",
+                  views: "9.2K"
+                }}
+                isInvited={invitedInfluencers.has(1)}
+                onInvite={() => handleInviteInfluencer(1)}
+                onMessage={(data) => {
+                  router.push(`/brand/chat/${data.id}?name=${encodeURIComponent(data.name)}`);
+                }}
                 onClick={() => handleInfluencerClick({
                   id: 1,
                   name: "Dadi Cool",
@@ -506,6 +530,24 @@ export default function InfluencerSearch() {
                   { icon: <InstagramFill size={16} />, count: '22.5k', bgColor: 'bg-[#43573b]' },
                   { icon: <TwitterXLine size={16} />, count: '22.5k', bgColor: 'bg-gray-600' }
                 ]}
+                influencerData={{
+                  id: 2,
+                  name: "Dadi Cool",
+                  username: "@dadi_cool",
+                  followers: "22.4k",
+                  following: "2.1k",
+                  posts: "145",
+                  location: "Delhi, India",
+                  age: "34",
+                  about: "A calm, composed elder figure with soft curls and a thoughtful demeanor. Protocol represents wisdom and acts as a grounding presence. Ideal for adding a mature balance to the set.",
+                  likes: "9.2K",
+                  views: "9.2K"
+                }}
+                isInvited={invitedInfluencers.has(2)}
+                onInvite={() => handleInviteInfluencer(2)}
+                onMessage={(data) => {
+                  router.push(`/brand/chat/${data.id}?name=${encodeURIComponent(data.name)}`);
+                }}
                 onClick={() => handleInfluencerClick({
                   id: 2,
                   name: "Dadi Cool",
@@ -531,6 +573,24 @@ export default function InfluencerSearch() {
                   { icon: <InstagramFill size={16} />, count: '22.5k', bgColor: 'bg-[#43573b]' },
                   { icon: <TwitterXLine size={16} />, count: '22.5k', bgColor: 'bg-gray-600' }
                 ]}
+                influencerData={{
+                  id: 3,
+                  name: "Dadi Cool",
+                  username: "@dadi_cool",
+                  followers: "22.4k",
+                  following: "2.1k",
+                  posts: "145",
+                  location: "Delhi, India",
+                  age: "34",
+                  about: "A calm, composed elder figure with soft curls and a thoughtful demeanor. Protocol represents wisdom and acts as a grounding presence. Ideal for adding a mature balance to the set.",
+                  likes: "9.2K",
+                  views: "9.2K"
+                }}
+                isInvited={invitedInfluencers.has(3)}
+                onInvite={() => handleInviteInfluencer(3)}
+                onMessage={(data) => {
+                  router.push(`/brand/chat/${data.id}?name=${encodeURIComponent(data.name)}`);
+                }}
                 onClick={() => handleInfluencerClick({
                   id: 3,
                   name: "Dadi Cool",
@@ -563,7 +623,7 @@ export default function InfluencerSearch() {
             {/* Right Column - Influencer Profile or Empty State */}
             <div className="hidden lg:flex lg:flex-1 lg:m-1 lg:shadow-[0_0_20px_rgba(0,0,0,0.1)] lg:rounded-lg min-w-0 overflow-hidden">
               {selectedInfluencer ? (
-                <InfluencerProfile influencer={selectedInfluencer} />
+                <InfluencerProfile influencer={selectedInfluencer} isInvited={invitedInfluencers.has(selectedInfluencer.id)} onInvite={() => handleInviteInfluencer(selectedInfluencer.id)} />
               ) : (
                 <div className="w-full h-full bg-[#F0F0F0] rounded-lg flex flex-col items-center justify-center p-4 sm:p-6 lg:p-8">
                   <div className="w-[200px] h-[52px] sm:w-[250px] sm:h-[64px] lg:w-[286px] lg:h-[74px] mb-1">
@@ -587,80 +647,128 @@ export default function InfluencerSearch() {
 }
 
 // Influencer Card Component
-function InfluencerCard({ name, bio, avatarColor, socials, onClick }) {
-  return (
-    <div
-      onClick={onClick}
-      className="bg-white border border-gray-200 rounded-3xl p-6 m-1 flex flex-col gap-4 cursor-pointer hover:shadow-lg transition-shadow duration-200"
-    >
-      {/* Profile Header */}
-      <div className="flex items-start gap-4">
-        {/* Avatar */}
-        <div
-          className="w-20 h-20 rounded-full shrink-0"
-          style={{ backgroundColor: avatarColor }}
-        />
+function InfluencerCard({ name, bio, avatarColor, socials, onClick, onMessage, influencerData, isInvited, onInvite }) {
+  const [showToast, setShowToast] = useState(false);
 
-        {/* Name and Bio */}
-        <div className="flex-1 flex flex-col gap-2">
-          <h3 className="text-2xl font-bold text-[#242527]">
-            {name}
-          </h3>
-          <p className="text-sm text-[#666]">
-            {bio}
-          </p>
-      {/* Social Stats */}
-      {socials && (
-        <div className="flex gap-4">
-          {socials?.map((social, index) => (
-            <div key={index} className="flex items-center gap-2">
-              <div className={`w-7 h-7 rounded flex items-center justify-center text-black text-xs font-bold`}>
-                {social.icon}
-              </div>
-              <span className="text-sm font-medium text-[#242527]">{social.count}</span>
-            </div>
-          ))}
+  const handleInvite = (e) => {
+    e.stopPropagation();
+    onInvite();
+    setShowToast(true);
+
+    // Hide toast after 3 seconds
+    setTimeout(() => {
+      setShowToast(false);
+    }, 3000);
+  };
+
+  return (
+    <>
+      {/* Toast Notification - Fixed positioning */}
+      {showToast && (
+        <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-[9999] flex justify-center">
+          <div className="bg-gray-800 text-white px-6 py-3 rounded-lg shadow-lg">
+            <span>Invite sent</span>
+          </div>
         </div>
       )}
+
+      <div className="relative">
+
+      <div
+        onClick={onClick}
+        className="bg-white border border-gray-200 rounded-3xl p-6 m-1 flex flex-col gap-4 cursor-pointer hover:shadow-lg transition-shadow duration-200"
+      >
+        {/* Profile Header */}
+        <div className="flex items-start gap-4">
+          {/* Avatar */}
+          <div
+            className="w-20 h-20 rounded-full shrink-0"
+            style={{ backgroundColor: avatarColor }}
+          />
+
+          {/* Name and Bio */}
+          <div className="flex-1 flex flex-col gap-2">
+            <h3 className="text-2xl font-bold text-[#242527]">
+              {name}
+            </h3>
+            <p className="text-sm text-[#666]">
+              {bio}
+            </p>
+
+            {/* Social Stats */}
+            {socials && (
+              <div className="flex gap-4">
+                {socials?.map((social, index) => (
+                  <div key={index} className="flex items-center gap-2">
+                    <div className={`w-7 h-7 rounded flex items-center justify-center text-black text-xs font-bold`}>
+                      {social.icon}
+                    </div>
+                    <span className="text-sm font-medium text-[#242527]">{social.count}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Action Buttons */}
+        <div className="flex gap-3 justify-center">
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onMessage && onMessage(influencerData);
+            }}
+            className="flex items-center gap-2 px-6 py-2 border border-[#333] rounded-full text-[#333] text-sm font-medium hover:bg-gray-50 transition-colors"
+          >
+            <Message3Line className="h-5 w-5" />
+            message
+          </button>
+          <button
+            onClick={handleInvite}
+            className={`flex items-center gap-2 px-6 py-2 border rounded-full text-sm font-medium transition-colors ${
+              isInvited
+                ? 'border-green-500 bg-green-50 text-green-700'
+                : 'border-[#333] text-[#333] hover:bg-gray-50'
+            }`}
+          >
+            {isInvited ? (
+              <>
+                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/>
+                </svg>
+                invited
+              </>
+            ) : (
+              <>
+                <UserAddLine className="h-5 w-5" />
+                invite
+              </>
+            )}
+          </button>
         </div>
       </div>
-
-      
-
-      {/* Action Buttons */}
-      <div className="flex gap-3 justify-center">
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            // Handle send message
-          }}
-          className="flex items-center gap-2 px-6 py-2 border border-[#333] rounded-full text-[#333] text-sm font-medium hover:bg-gray-50 transition-colors"
-        >
-          <Message3Line className="h-5 w-5" />
-          message
-        </button>
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            // Handle invite
-          }}
-          className="flex items-center gap-2 px-6 py-2 border border-[#333] rounded-full text-[#333] text-sm font-medium hover:bg-gray-50 transition-colors"
-        >
-          <UserAddLine className="h-5 w-5" />
-          invite
-        </button>
-      </div>
     </div>
+    </>
   );
 }
 
 // Influencer Profile Component (Right Side Panel)
-function InfluencerProfile({ influencer }) {
+function InfluencerProfile({ influencer, isInvited, onInvite }) {
+  const router = useRouter();
   const [showMoreMenu, setShowMoreMenu] = useState(false);
   const [showSaveModal, setShowSaveModal] = useState(false);
   const [showNewListModal, setShowNewListModal] = useState(false);
   const [newListName, setNewListName] = useState('');
+  const [showToast, setShowToast] = useState(false);
   const moreMenuRef = useRef(null);
+
+  const handleInvite = () => {
+    onInvite();
+    setShowToast(true);
+    setTimeout(() => {
+      setShowToast(false);
+    }, 3000);
+  };
   
   // Sample lists data
   const [savedLists, setSavedLists] = useState([
@@ -705,7 +813,17 @@ function InfluencerProfile({ influencer }) {
   };
 
   return (
-    <div className="w-full h-full relative rounded-lg overflow-y-auto">
+    <>
+      {/* Toast Notification */}
+      {showToast && (
+        <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-[9999] flex justify-center">
+          <div className="bg-gray-800 text-white px-6 py-3 rounded-lg shadow-lg">
+            <span>Invite sent</span>
+          </div>
+        </div>
+      )}
+
+      <div className="w-full h-full relative rounded-lg overflow-y-auto">
       {/* Yellow Background - Sticky at top */}
       <div className="sticky top-0 bg-yellow-400 h-[200px] sm:h-[250px] md:h-[300px] lg:h-[350px] z-0">
         {/* Profile Image - Centered */}
@@ -1194,12 +1312,34 @@ function InfluencerProfile({ influencer }) {
       {/* Bottom Action Buttons - Sticky at bottom */}
       <div className="sticky bottom-0 bg-white border-t border-gray-200 px-2 sm:px-3 md:px-4 py-2 sm:py-3 z-20 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)]">
         <div className="flex gap-1 sm:gap-2 md:gap-3">
-          <button className="flex-1 flex items-center justify-center gap-0.5 sm:gap-1 md:gap-2 px-3 sm:px-4 md:px-6 py-2 sm:py-2 md:py-3 bg-[#dae3d1] rounded-full text-[#43573b] text-xs sm:text-sm md:text-base font-semibold hover:bg-[#c9d9ba] transition-colors tracking-[0.24px]">
-            <UserPlus className="h-3 w-3 sm:h-4 sm:w-4 md:h-5 md:w-5" />
-            <span className="hidden md:inline">Invite</span>
-            <span className="md:hidden">Invite</span>
+          <button
+            onClick={handleInvite}
+            className={`flex-1 flex items-center justify-center gap-0.5 sm:gap-1 md:gap-2 px-3 sm:px-4 md:px-6 py-2 sm:py-2 md:py-3 rounded-full text-xs sm:text-sm md:text-base font-semibold transition-colors tracking-[0.24px] ${
+              isInvited
+                ? 'bg-green-100 text-green-700 hover:bg-green-200'
+                : 'bg-[#dae3d1] text-[#43573b] hover:bg-[#c9d9ba]'
+            }`}
+          >
+            {isInvited ? (
+              <>
+                <svg className="h-3 w-3 sm:h-4 sm:w-4 md:h-5 md:w-5" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/>
+                </svg>
+                <span className="hidden md:inline">Invited</span>
+                <span className="md:hidden">Invited</span>
+              </>
+            ) : (
+              <>
+                <UserPlus className="h-3 w-3 sm:h-4 sm:w-4 md:h-5 md:w-5" />
+                <span className="hidden md:inline">Invite</span>
+                <span className="md:hidden">Invite</span>
+              </>
+            )}
           </button>
-          <button className="flex-1 flex items-center justify-center gap-0.5 sm:gap-1 md:gap-2 px-3 sm:px-4 md:px-6 py-2 sm:py-2 md:py-3 bg-[#43573b] rounded-full text-white text-xs sm:text-sm md:text-base font-semibold hover:bg-[#374829] transition-colors tracking-[0.24px]">
+          <button
+            onClick={() => router.push(`/brand/chat/${influencer.id}?name=${encodeURIComponent(influencer.name)}`)}
+            className="flex-1 flex items-center justify-center gap-0.5 sm:gap-1 md:gap-2 px-3 sm:px-4 md:px-6 py-2 sm:py-2 md:py-3 bg-[#43573b] rounded-full text-white text-xs sm:text-sm md:text-base font-semibold hover:bg-[#374829] transition-colors tracking-[0.24px]"
+          >
             <MessageSquare className="h-3 w-3 sm:h-4 sm:w-4 md:h-5 md:w-5" />
             <span className="hidden md:inline">Send Message</span>
             <span className="md:hidden">Message</span>
@@ -1207,5 +1347,7 @@ function InfluencerProfile({ influencer }) {
         </div>
       </div>
     </div>
+    </>
   );
 }
+
