@@ -15,8 +15,18 @@ import {
   Message3Fill
 } from '@phyoofficial/phyo-icon-library';
 
+// Helper function to extract role from pathname
+const getRoleFromPathname = (pathname) => {
+  if (pathname.startsWith('/user/')) return 'user';
+  if (pathname.startsWith('/brand/')) return 'brand';
+  if (pathname.startsWith('/influencer/')) return 'influencer';
+  return 'user'; // Default
+};
+
 const UserSidebar = () => {
   const pathname = usePathname();
+  const role = getRoleFromPathname(pathname);
+  
   const { logout } = useAuth();
   const { isExpanded, setIsExpanded, sidebarButtonAction, sidebarButtonLabel } = useSidebar();
   const [mounted, setMounted] = React.useState(false);
@@ -27,11 +37,12 @@ const UserSidebar = () => {
     setMounted(true);
   }, []);
 
+  // Generate nav items dynamically based on role
   const navItems = [
-    { name: 'Home', href: '/user/dashboard', icon: Home4Fill },
-    { name: 'Inbox', href: '/user/inbox', icon: InboxLine, badge: 3 },
-    { name: 'Campaigns', href: '/user/campaigns', icon: CalendarEventLine },
-    { name: 'Account', href: '/user/account', icon: AccountCircleLine },
+    { name: 'Home', href: `/${role}/dashboard`, icon: Home4Fill },
+    { name: 'Inbox', href: `/${role}/inbox`, icon: InboxLine, badge: 3 },
+    { name: 'Campaigns', href: `/${role}/campaigns`, icon: CalendarEventLine },
+    { name: 'Account', href: `/${role}/account`, icon: AccountCircleLine },
   ];
 
   // Update indicator position when pathname or expansion state changes
@@ -57,27 +68,22 @@ const UserSidebar = () => {
     if (sidebarButtonAction) {
       sidebarButtonAction();
     }
-    // Add future actions for inbox page here if needed
   };
 
   // Determine which icon to show based on current page
   const getFabIcon = () => {
-    if (pathname === '/user/inbox') {
+    if (pathname === `/${role}/inbox`) {
       return Message3Fill;
     }
     return PencilFill;
   };
 
   const FabIcon = getFabIcon();
-  
-  // Check if button should be enabled
-  const isButtonEnabled = sidebarButtonAction || pathname === '/user/inbox';
+  const isButtonEnabled = sidebarButtonAction || pathname === `/${role}/inbox`;
 
-  // Prevent hydration mismatch by not rendering until mounted
   if (!mounted) {
     return (
       <div className={`h-screen bg-[#F0F0F0] fixed left-0 top-0 flex flex-col transition-[width] duration-300 ease-in-out z-50 w-[96px] pt-[44px] pb-[56px]`}>
-        {/* Placeholder during SSR */}
       </div>
     );
   }
@@ -86,7 +92,6 @@ const UserSidebar = () => {
     <div className={`h-screen bg-[#F0F0F0] fixed left-0 top-0 flex flex-col transition-all duration-300 ease-in-out z-50 ${
       isExpanded ? 'w-[220px] pt-[44px] pb-[56px] px-[20px]' : 'w-[96px] pt-[44px] pb-[56px]'
     }`}>
-      {/* Menu Icon at top */}
       <div className={`flex flex-col gap-[4px] mb-[36px] transition-all duration-300 ease-in-out ${isExpanded ? '' : 'items-center'}`}>
         <button 
           onClick={() => setIsExpanded(!isExpanded)}
@@ -101,7 +106,6 @@ const UserSidebar = () => {
           </div>
         </button>
 
-        {/* FAB Button */}
         <button 
           onClick={handleButtonClick}
           disabled={!isButtonEnabled}
@@ -124,9 +128,7 @@ const UserSidebar = () => {
         </button>
       </div>
 
-      {/* Main Navigation */}
       <nav className={`flex flex-col gap-[4px] relative`}>
-        {/* Sliding Background Indicator - Expanded */}
         {isExpanded && (
           <div 
             className="absolute left-0 w-full bg-[#DAE3D1] rounded-[32px] transition-all duration-[350ms] ease-out pointer-events-none"
@@ -139,69 +141,42 @@ const UserSidebar = () => {
         
         {navItems.map((item, index) => {
           const Icon = item.icon;
-          const isActive = pathname === item.href;
+          const isActive = pathname === item.href || pathname.startsWith(item.href + '/');
 
           if (isExpanded) {
-            // Expanded State
             return (
               <Link
                 key={item.name}
                 href={item.href}
                 ref={(el) => (navRefs.current[index] = el)}
-                className={`flex items-center gap-[4px] px-[12px] py-[6px] rounded-[32px] relative z-10 transition-colors duration-300 ${
-                  isActive ? '' : 'hover:bg-gray-200/50'
-                }`}
+                className="relative z-10 flex items-center gap-[12px] px-[16px] py-[12px] rounded-[32px] no-underline transition-colors duration-300"
               >
-                <div className="flex items-center justify-center px-[4px] py-[8px] rounded-lg">
-                  <Icon 
-                    width={24}
-                    height={24}
-                    fill={isActive ? '#43573B' : '#808080'}
-                    className="transition-all duration-300"
-                  />
-                </div>
-                <span className={`text-sm font-medium tracking-[0.2px] leading-5 whitespace-nowrap transition-all duration-300 ${
-                  isActive ? 'text-[#43573B]' : 'text-[#808080]'
-                } ${isExpanded ? 'opacity-100 max-w-[200px]' : 'opacity-0 max-w-0 overflow-hidden'}`}>
+                <Icon width={24} height={24} fill={isActive ? '#43573B' : '#A0A0A0'} color={isActive ? '#43573B' : '#A0A0A0'} />
+                <span className={`text-base font-semibold leading-6 transition-colors duration-300 ${isActive ? 'text-[#43573B]' : 'text-[#A0A0A0]'}`}>
                   {item.name}
                 </span>
+                {item.badge && isActive && (
+                  <span className="ml-auto bg-[#43573B] text-white text-xs font-semibold px-2 py-1 rounded-full">
+                    {item.badge}
+                  </span>
+                )}
               </Link>
             );
           } else {
-            // Collapsed State
             return (
               <Link
                 key={item.name}
                 href={item.href}
-                className="flex flex-col gap-[4px] items-center py-[6px] w-full group"
+                ref={(el) => (navRefs.current[index] = el)}
+                className="relative z-10 flex items-center justify-center w-14 h-14 rounded-[32px] no-underline transition-colors duration-300"
+                title={item.name}
               >
-                <div className="relative flex items-center justify-center">
-                  <div className={`p-[4px] rounded-lg h-[32px] flex items-center justify-center relative overflow-hidden`}>
-                    {/* Sliding background for collapsed state */}
-                    <div className={`absolute inset-0 bg-[#DAE3D1] rounded-lg transition-all duration-[350ms] ease-out ${
-                      isActive ? 'opacity-100 scale-100' : 'opacity-0 scale-90'
-                    }`} />
-                    
-                    <Icon 
-                      width={24}
-                      height={24}
-                      fill={isActive ? '#43573B' : '#808080'}
-                      className="transition-all duration-300 relative z-10"
-                    />
-                  </div>
-                  {item.badge && (
-                    <div className="absolute -top-0.5 -right-0.5 bg-[#BF3709] rounded-full w-4 h-4 flex items-center justify-center animate-pulse z-20">
-                      <span className="text-white text-[12px] font-medium leading-4 tracking-[0.16px]">
-                        {item.badge}
-                      </span>
-                    </div>
-                  )}
-                </div>
-                <span className={`text-sm font-medium tracking-[0.2px] leading-5 text-center transition-all duration-300 ${
-                  isActive ? 'text-[#43573B]' : 'text-[#808080]'
-                }`}>
-                  {item.name}
-                </span>
+                <Icon width={24} height={24} fill={isActive ? '#43573B' : '#A0A0A0'} color={isActive ? '#43573B' : '#A0A0A0'} />
+                {item.badge && isActive && (
+                  <span className="absolute top-0 right-0 bg-[#43573B] text-white text-xs font-semibold w-6 h-6 rounded-full flex items-center justify-center">
+                    {item.badge}
+                  </span>
+                )}
               </Link>
             );
           }

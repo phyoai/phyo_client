@@ -10,6 +10,8 @@ export default function MyLists() {
   const [selectionMode, setSelectionMode] = useState(false);
   const [selectedItems, setSelectedItems] = useState([]);
   const [activeChip, setActiveChip] = useState('All');
+  const [showNewListModal, setShowNewListModal] = useState(false);
+  const [newListName, setNewListName] = useState('');
   
   // Mock data - Replace with actual API call
   const [lists, setLists] = useState([
@@ -95,8 +97,32 @@ export default function MyLists() {
   };
 
   const handleCreateNewList = () => {
-    console.log('Create new list');
-    // Add create list logic here
+    setShowNewListModal(true);
+  };
+
+  const handleCreateList = () => {
+    if (newListName.trim()) {
+      // Add new list to the lists
+      const newList = {
+        id: Math.max(...lists.map(l => l.id), 0) + 1,
+        name: newListName,
+        description: 'New list',
+        avatar: '/dummyAvatar.jpg',
+        list: newListName
+      };
+      setLists([...lists, newList]);
+
+      // Update chips to include new list
+      if (!chips.includes(newListName)) {
+        chips.push(newListName);
+      }
+
+      // Reset and close modal
+      setNewListName('');
+      setShowNewListModal(false);
+      setSelectionMode(false);
+      setSelectedItems([]);
+    }
   };
 
   // Empty state
@@ -153,7 +179,13 @@ export default function MyLists() {
               <Trash2 className="w-6 h-6 text-[#242527]" strokeWidth={1.5} />
             </button>
           )}
-          <button className="flex items-center justify-center w-12 h-12 rounded-3xl hover:bg-gray-100 transition-colors">
+          <button
+            onClick={() => {
+              setSelectionMode(true);
+              setSelectedItems([]);
+            }}
+            className="flex items-center justify-center w-12 h-12 rounded-3xl hover:bg-gray-100 transition-colors"
+          >
             <MoreVertical className="w-6 h-6 text-[#242527]" strokeWidth={1.5} />
           </button>
         </div>
@@ -302,6 +334,52 @@ export default function MyLists() {
           )}
         </div>
       </div>
+
+      {/* New List Modal */}
+      {showNewListModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-3xl w-[400px] max-w-[90%] shadow-2xl overflow-hidden">
+            {/* Header */}
+            <div className="px-6 py-6 border-b border-gray-100">
+              <h2 className="text-xl font-semibold text-[#242527] text-center">
+                New List
+              </h2>
+            </div>
+
+            {/* Content */}
+            <div className="px-6 py-6">
+              <input
+                type="text"
+                placeholder="New list"
+                value={newListName}
+                onChange={(e) => setNewListName(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleCreateList()}
+                className="w-full px-4 py-3 bg-gray-100 border border-gray-200 rounded-lg text-[#242527] placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#43573B]"
+                autoFocus
+              />
+            </div>
+
+            {/* Actions */}
+            <div className="px-6 py-4 border-t border-gray-100 flex gap-3 justify-center">
+              <button
+                onClick={() => {
+                  setShowNewListModal(false);
+                  setNewListName('');
+                }}
+                className="px-6 py-3 border border-gray-400 text-[#242527] rounded-full font-semibold hover:bg-gray-50 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleCreateList}
+                className="px-6 py-3 bg-[#43573B] hover:bg-[#3d4f36] text-white rounded-full font-semibold transition-colors"
+              >
+                Create
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

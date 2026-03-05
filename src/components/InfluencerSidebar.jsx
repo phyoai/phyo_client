@@ -26,6 +26,7 @@ const InfluencerSidebar = () => {
     { name: 'Deals', href: '/influencer/deals', icon: Handshake },
     { name: 'Earnings', href: '/influencer/earnings', icon: Wallet },
     { name: 'Profile Management', href: '/influencer/profile-management', icon: UserCircle },
+    { name: 'Account', href: `/${role}/account`, icon: UserCircle },
     { name: 'Settings', href: '/influencer/settings', icon: Settings },
   ];
 

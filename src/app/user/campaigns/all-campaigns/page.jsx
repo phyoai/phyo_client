@@ -46,7 +46,8 @@ export default function AllCampaigns() {
   };
 
   const handleCampaignClick = (campaign) => {
-    console.log('Campaign clicked:', campaign);
+    // console.log('Campaign clicked:', campaign);
+    router.push(`/user/campaigns/${campaign._id}`);
     // Navigate to campaign details or handle as needed
   };
 

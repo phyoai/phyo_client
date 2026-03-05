@@ -23,8 +23,15 @@ function UserLayoutContent({ children, pathname }) {
   const isNotificationsPage = pathname === '/user/notifications';
   // Hide sidebar for all account sub-pages (but not the main account page)
   const isAccountSubPage = pathname.startsWith('/user/account/');
+  // Hide sidebar for dynamic campaign details page only
+const isCampaignDetailsPage =
+  pathname.startsWith('/user/campaigns/') &&
+  !pathname.includes('/create-campaign') &&
+  !pathname.includes('/new-applications') &&
+  !pathname.includes('/all-campaigns') &&
+  !pathname.includes('/all-drafts');
   
-  if (isCreateCampaignPage || isNewApplicationsPage || isAllCampaignsPage || isAllDraftsPage || isInfluencerSearchPage || isInfluencersPage || isNotificationsPage || isAccountSubPage) {
+  if (isCreateCampaignPage || isNewApplicationsPage || isAllCampaignsPage || isAllDraftsPage || isInfluencerSearchPage || isInfluencersPage || isNotificationsPage || isAccountSubPage || isCampaignDetailsPage) {
     console.log('UserLayout: Rendering page without sidebar');
     return <>{children}</>;
   }

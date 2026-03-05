@@ -21,7 +21,7 @@ function DashboardContent() {
   const handleSearchClick = () => {
     setIsFadingOut(true);
     setTimeout(() => {
-      router.push('/brand/influencer-search');
+      router.push('/influencer/influencer-search');
     }, 300);
   };
 
@@ -145,7 +145,7 @@ function DashboardContent() {
             {/* Horizontal Scroll of Influencers */}
             <div className="flex gap-6 overflow-x-auto pb-4 scrollbar-hide">
               {topInfluencers.map((influencer) => (
-                <div key={influencer.id} className="flex flex-col items-center flex-shrink-0">
+                <div key={influencer.id} className="flex flex-col items-center flex-shrink-0 cursor-pointer" onClick={() => router.push(`/influencer/influencers/${influencer.id}`)}>
                   <div className={`w-16 h-16 ${influencer.color} rounded-full flex items-center justify-center mb-2`}>
                     <img 
                       src={influencer.avatar} 

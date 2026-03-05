@@ -269,18 +269,9 @@ const AllCampaignsSection = () => {
 
   // Open campaign detail modal
   const handleCampaignClick = async (campaign) => {
-    try {
-      // Fetch full campaign details
-      const response = await campaignAPI.getCampaignById(campaign._id);
-      setSelectedCampaign(response.data);
-      setShowDetailModal(true);
-      setIsEditMode(false);
-    } catch (error) {
-      console.error('Error fetching campaign details:', error);
-      alert('Failed to load campaign details');
-    }
+    // Navigate to campaign detail page instead of showing modal
+    router.push(`/user/campaigns/${campaign._id}`);
   };
-
   // Enable edit mode
   const handleEnableEdit = () => {
     setIsEditMode(true);
@@ -1931,7 +1922,7 @@ const AllCampaignsSection = () => {
             {/* Modal Header */}
             <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <h2 className="text-2xl font-bold text-gray-900">Campaign Details</h2>
+                <h2 className="text-2xl font-bold text-gray-900">Campaign Detailss</h2>
                 <span className={`text-xs px-3 py-1 rounded-full ${
                   selectedCampaign.status === 'Active' ? 'text-green-600 bg-green-50' :
                   selectedCampaign.status === 'Draft' ? 'text-gray-600 bg-gray-50' :
