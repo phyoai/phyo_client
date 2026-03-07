@@ -2,7 +2,7 @@
 'use client'
 import React, { useState, useEffect } from 'react';
 import { BarChart, Bar, ResponsiveContainer, XAxis, YAxis, Tooltip, PieChart, Pie, Cell } from 'recharts';
-import { ChevronDown, MoreHorizontal, Plus, Minus } from 'lucide-react';
+import { ArrowDownLine, MoreLine, AddLine, SubtractLine } from '@phyoofficial/phyo-icon-library';
 import { campaignAPI } from '../../../utils/api';
 
 const BudgetAndAudienceSection = () => {
@@ -88,15 +88,15 @@ const BudgetAndAudienceSection = () => {
       <div className="max-w-7xl mx-auto px-6">
         {/* Section Headers */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-4 ">
-          <h2 className="text-2xl font-bold text-gray-900 bg-white p-4 rounded-3xl">Budget Spent</h2>
-          <h2 className="text-2xl font-bold text-gray-900 bg-white p-4 rounded-3xl">Audience Sentiment</h2>
+          <h2 className="text-2xl font-bold text-gray-900 bg-neutral-base p-4 rounded-3xl">Budget Spent</h2>
+          <h2 className="text-2xl font-bold text-gray-900 bg-neutral-base p-4 rounded-3xl">Audience Sentiment</h2>
         </div>
 
         {loading ? (
           // Budget and Audience Skeleton
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Budget Spent Skeleton */}
-            <div className="bg-white rounded-3xl p-8">
+            <div className="bg-neutral-base rounded-3xl p-8">
               <div className="bg-[#F3F2EB] p-6 border border-gray-200 shadow-sm rounded-3xl">
                 <div className="flex items-center justify-between mb-6">
                   <div className="h-6 bg-gray-200 rounded w-32 animate-pulse"></div>
@@ -118,7 +118,7 @@ const BudgetAndAudienceSection = () => {
             </div>
 
             {/* Audience Sentiment Skeleton */}
-            <div className="bg-white rounded-3xl p-8">
+            <div className="bg-neutral-base rounded-3xl p-8">
               <div className="bg-[#F3F2EB] p-6 border border-gray-200 shadow-sm rounded-3xl">
                 <div className="flex items-center justify-between mb-6">
                   <div className="h-6 bg-gray-200 rounded w-40 animate-pulse"></div>
@@ -140,7 +140,7 @@ const BudgetAndAudienceSection = () => {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Money Spend Card */}
 
-            <div className=' bg-white rounded-3xl p-8'>
+            <div className=' bg-neutral-base rounded-3xl p-8'>
             <div className="bg-[#F3F2EB]  p-6 border border-gray-200 shadow-sm rounded-3xl">
               {/* Header */}
 
@@ -153,11 +153,11 @@ const BudgetAndAudienceSection = () => {
                     className="flex items-center space-x-2 bg-gray-900 text-white px-3 py-1.5 rounded text-sm hover:bg-gray-800 transition-colors"
                   >
                     <span>{selectedPeriod}</span>
-                    <ChevronDown className="h-3 w-3" />
+                    <ArrowDownLine className="h-3 w-3" />
                   </button>
 
                   {isDropdownOpen && (
-                    <div className="absolute right-0 mt-2 w-40 bg-white border border-gray-200 rounded-lg shadow-lg z-10">
+                    <div className="absolute right-0 mt-2 w-40 bg-neutral-base border border-gray-200 rounded-lg shadow-lg z-10">
                       {periods.map((period) => (
                         <button
                           key={period}
@@ -207,13 +207,13 @@ const BudgetAndAudienceSection = () => {
 
             {/* Audience Sentiment Card */}
 
-            <div className=' bg-white rounded-3xl p-8'>
+            <div className=' bg-neutral-base rounded-3xl p-8'>
             <div className="bg-[#F3F2EB]  p-6 border border-gray-200 shadow-sm rounded-3xl">
               {/* Header */}
               <div className="flex items-center justify-between mb-6">
                 <h3 className="text-lg font-medium text-gray-900">Employee Structure</h3>
                 <button className="text-white  bg-black p-1 rounded-lg">
-                  <MoreHorizontal className="h-5 w-5 rotate-90" />
+                  <MoreLine className="h-5 w-5 rotate-90" />
                 </button>
               </div>
 
@@ -251,7 +251,7 @@ const BudgetAndAudienceSection = () => {
               <div className="grid grid-cols-3 gap-4">
                 <div className="flex items-center space-x-2">
                   <div className="w-6 h-6 bg-green-600 rounded flex items-center justify-center">
-                    <Plus className="h-4 w-4 text-white" />
+                    <AddLine className="h-4 w-4 text-white" />
                   </div>
                   <span className="text-sm text-gray-700">Positive</span>
                 </div>
@@ -263,7 +263,7 @@ const BudgetAndAudienceSection = () => {
                 
                 <div className="flex items-center space-x-2">
                   <div className="w-6 h-6 bg-green-300 rounded flex items-center justify-center">
-                    <Minus className="h-4 w-4 text-white" />
+                    <SubtractLine className="h-4 w-4 text-white" />
                   </div>
                   <span className="text-sm text-gray-700">Negative</span>
                 </div>

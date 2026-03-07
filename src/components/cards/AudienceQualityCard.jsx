@@ -1,7 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { Shield, AlertCircle, CheckCircle, TrendingUp } from 'lucide-react';
+import { ShieldLine, AlertCircle, CheckLine, LineChartLine } from '@phyoofficial/phyo-icon-library';
 
 export default function AudienceQualityCard({ demographics }) {
   if (!demographics) return null;
@@ -38,7 +38,7 @@ export default function AudienceQualityCard({ demographics }) {
       whileInView={{ opacity: 1, scale: 1 }}
       viewport={{ once: true }}
       transition={{ duration: 0.4 }}
-      className="bg-white rounded-xl shadow-md border border-gray-200 p-6"
+      className="bg-neutral-base rounded-xl shadow-md border border-gray-200 p-6"
     >
       <div className="flex items-center gap-2 mb-6">
         <div className={`bg-gradient-to-br ${qualityBg.replace('bg-', 'from-')}-50 ${qualityBg.replace('bg-', 'to-')}-100 p-2.5 rounded-lg`}>

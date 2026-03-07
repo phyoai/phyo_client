@@ -1,6 +1,6 @@
 'use client'
 import React, { useState } from 'react';
-import { ChevronDown } from 'lucide-react';
+import { ArrowDownLine } from '@phyoofficial/phyo-icon-library';
 import { useAuth } from '../../context/AuthContext';
 
 const UserProfile = ({ user: propUser }) => {
@@ -16,14 +16,14 @@ const UserProfile = ({ user: propUser }) => {
   };
 
   // Get user name or email
-  const displayName = user?.companyName || user?.name || user?.email?.split('@')[0] || 'User';
+  const displayName = user?.companyName || user?.name || user?.email?.split('@')[0] || 'UserLine';
   const userType = user?.type || 'Brand';
 
   return (
     <div className="relative">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-4 bg-white rounded-2xl px-5 py-3 hover:shadow-sm transition-all border-0 shadow-sm"
+        className="flex items-center gap-4 bg-neutral-base rounded-2xl px-5 py-3 hover:shadow-sm transition-all border-0 shadow-sm"
       >
         <div className="w-10 h-10 bg-gradient-to-br from-blue-400 to-blue-500 rounded-full flex items-center justify-center">
           <span className="text-white text-base font-semibold">
@@ -36,13 +36,13 @@ const UserProfile = ({ user: propUser }) => {
         <span className="bg-[#E3FFDE33] text-[#00674F] text-sm font-semibold px-3 py-1 rounded-lg">
           {userType}
         </span>
-        <ChevronDown className="h-5 w-5 text-gray-700 ml-2" />
+        <ArrowDownLine className="h-5 w-5 text-gray-700 ml-2" />
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-52 bg-white rounded-xl shadow-xl border border-gray-100 py-2 z-10">
+        <div className="absolute right-0 mt-2 w-52 bg-neutral-base rounded-xl shadow-xl border border-gray-100 py-2 z-10">
           <a href="/brand/settings" className="block px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
-            Profile Settings
+            Profile FileSettingsLine
           </a>
           <a href="/brand/account" className="block px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
             Account

@@ -1,5 +1,5 @@
 import FormContainer from '../../../app/brand/components/FormContainer'
-import Image from 'next/image'
+import Image2Line from 'next/image'
 import React, { Suspense } from 'react'
 
 const page = () => {
@@ -9,11 +9,11 @@ const page = () => {
         submit: "Create Account",
         fields: [{ name: "email", type: "email", placeholder: "Email", label: "Email", required: true }, { name: "password", type: "password", placeholder: "Password", label: "Password", required: true }, { name: "confirmPassword", type: "password", placeholder: "Confirm Password", label: "Confirm Password", required: true }],
     }, {
-        title: "Enter Your Phone Number",
+        title: "Enter Your PhoneLine Number",
         description: "",
         submit: "Next",
         fields: [{
-            name: "mobileNumber", type: "text", placeholder: "Enter Phone Number", label: "", required: true,
+            name: "mobileNumber", type: "text", placeholder: "Enter PhoneLine Number", label: "", required: true,
         }],
     }, {
         title: "What is Your Profession/Role ?",
@@ -55,9 +55,9 @@ const page = () => {
     return (
         <div className='bg-[#F1FFEF] flex gap-5 h-screen p-5'>
             <div className='w-1/2'>
-                <Image src={"/welcome.png"} width={200} height={300} alt='brand' className='absolute bottom-0 left-0 w-[30%] h-[70%]' />
+                <Image2Line src={"/welcome.png"} width={200} height={300} alt='brand' className='absolute bottom-0 left-0 w-[30%] h-[70%]' />
             </div>
-            <div className='bg-white rounded-lg w-[50%] h-full'>
+            <div className='bg-neutral-base rounded-lg w-[50%] h-full'>
                 <Suspense fallback={<div>Loading...</div>}>
                     <FormContainer steps={steps} />
                 </Suspense>

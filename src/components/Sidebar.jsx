@@ -1,11 +1,11 @@
-import Image from 'next/image'
+import Image2Line from 'next/image'
 import React, { useState } from 'react'
 
 export const Sidebar = () => {
     return (
-        <div className='bg-white h-screen fixed left-0 w-[20vw] sm:flex flex-col py-[42px] hidden'>
+        <div className='bg-neutral-base h-screen fixed left-0 w-[20vw] sm:flex flex-col py-[42px] hidden'>
             {/* <p className='px-[30px] font-semibold text-[24px]'>PyroMedia</p> */}
-            <Image src={"/logo.png"} width={200} height={50} alt={"Logo"} className='px-[30px]' />
+            <Image2Line src={"/logo.png"} width={200} height={50} alt={"Logo"} className='px-[30px]' />
             <NavLinksComponent /> 
             <NotificationCard />
         </div>

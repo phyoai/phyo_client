@@ -2,7 +2,7 @@
 
 import { motion } from 'framer-motion';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
-import { MapPin, Globe, Info } from 'lucide-react';
+import { MapPinLine, GlobeLine, Information2Line } from '@phyoofficial/phyo-icon-library';
 import { useState } from 'react';
 
 export default function LocationChart({ data, title, type = 'country' }) {
@@ -27,7 +27,7 @@ export default function LocationChart({ data, title, type = 'country' }) {
   const CustomTooltip = ({ active, payload }) => {
     if (active && payload && payload.length) {
       return (
-        <div className="bg-white px-4 py-2 rounded-lg shadow-lg border border-gray-200">
+        <div className="bg-neutral-base px-4 py-2 rounded-lg shadow-lg border border-gray-200">
           <p className="font-semibold text-gray-800">{payload[0].payload.name}</p>
           <p className="text-gray-600">{payload[0].value.toFixed(1)}%</p>
         </div>
@@ -46,7 +46,7 @@ export default function LocationChart({ data, title, type = 'country' }) {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ duration: 0.4, delay: 0.2 }}
-      className="bg-white rounded-xl shadow-md border border-gray-200 p-6"
+      className="bg-neutral-base rounded-xl shadow-md border border-gray-200 p-6"
     >
       <div className="flex items-center justify-between mb-5">
         <div className="flex items-center gap-2">

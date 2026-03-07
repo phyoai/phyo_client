@@ -1,4 +1,4 @@
-import Image from 'next/image'
+import Image2Line from 'next/image'
 import React from 'react'
 import { Swiper, SwiperSlide } from 'swiper/react'
 import { Autoplay, EffectFade, Pagination } from 'swiper/modules'
@@ -49,7 +49,7 @@ const CompaignPhases = () => {
                     >
                         {
                             phasesData.map((ele) => {
-                                return <SwiperSlide key={ele.title} className='bg-white'>
+                                return <SwiperSlide key={ele.title} className='bg-neutral-base'>
                                     <div className='flex flex-col'>
                                         <h2 className='text-center font-bold text-[30px] sm:text-[40px] md:text-[50px]'>{ele.phase} The Campaign</h2>
                                         <div className='flex flex-col md:flex-row gap-5'>
@@ -58,7 +58,7 @@ const CompaignPhases = () => {
                                                 <p className='max-w-full sm:max-w-[80%] md:max-w-[55%]'>{ele.description}</p>
                                             </span>
                                             <div className='w-full md:w-1/2 rounded-md'>
-                                                <Image src={ele.image} alt={ele.title} width={550} height={290} layout="responsive" className='rounded-md' />
+                                                <Image2Line src={ele.image} alt={ele.title} width={550} height={290} layout="responsive" className='rounded-md' />
                                             </div>
                                         </div>
                                     </div>

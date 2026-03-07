@@ -1,8 +1,8 @@
 'use client'
 import React, { useState, useEffect } from 'react';
-import { ArrowLeft, MoreVertical } from 'lucide-react';
+import { ArrowLeftLine, MoreLine } from '@phyoofficial/phyo-icon-library';
 import { useRouter } from 'next/navigation';
-import Image from 'next/image';
+import Image2Line from 'next/image';
 import RejectionModal from '@/components/RejectionModal';
 import NewApplicationsSkeleton from '@/components/NewApplicationsSkeleton';
 
@@ -280,14 +280,14 @@ const NewApplicationsPage = () => {
   }
 
   return (
-    <div className="bg-white h-screen flex flex-col overflow-hidden">
+    <div className="bg-neutral-base h-screen flex flex-col overflow-hidden">
       {/* App Bar */}
-      <div className="bg-white flex items-center justify-between px-4 py-2 border-b border-gray-100 shrink-0">
+      <div className="bg-neutral-base flex items-center justify-between px-4 py-2 border-b border-gray-100 shrink-0">
         <button
           onClick={handleBack}
           className="flex items-center justify-center w-12 h-12 rounded-full hover:bg-gray-100 transition-colors"
         >
-          <ArrowLeft className="w-6 h-6 text-gray-700" />
+          <ArrowLeftLine className="w-6 h-6 text-gray-700" />
         </button>
 
         <h1 className="text-xl font-semibold text-[#242527] flex-1 px-2">
@@ -298,7 +298,7 @@ const NewApplicationsPage = () => {
           type="button"
           className="flex items-center justify-center w-12 h-12 rounded-full hover:bg-gray-100 transition-colors"
         >
-          <MoreVertical className="w-6 h-6 text-gray-700" />
+          <MoreLine className="w-6 h-6 text-gray-700" />
         </button>
       </div>
 
@@ -309,12 +309,12 @@ const NewApplicationsPage = () => {
           {applicationsData.map((application) => (
             <div
               key={application.id}
-              className="bg-white flex items-center py-3 border-b border-gray-100"
+              className="bg-neutral-base flex items-center py-3 border-b border-gray-100"
             >
               {/* Avatar */}
               <div className="flex items-center px-4 py-1.5 shrink-0">
                 <div className="w-12 h-12 rounded-full overflow-hidden bg-green-500">
-                  <Image
+                  <Image2Line
                     src={application.avatar}
                     alt={application.name}
                     width={48}
@@ -356,9 +356,9 @@ const NewApplicationsPage = () => {
             <div className="flex flex-col h-full">
               {/* Scrollable Top Section */}
               <div className="flex-1 overflow-y-auto" onScroll={handleScroll}>
-                {/* Cover Image */}
+                {/* Cover Image2Line */}
                 <div className="relative h-[271px] w-full overflow-hidden bg-gradient-to-r from-orange-400 via-yellow-500 to-pink-500">
-                  <Image
+                  <Image2Line
                     src={selectedApplication.coverImage}
                     alt="Cover"
                     fill
@@ -369,8 +369,8 @@ const NewApplicationsPage = () => {
                 {/* Profile Section */}
                 <div className="relative -mt-24 mb-6">
                   <div className="flex flex-col items-center">
-                    <div className="w-[200px] h-[200px] rounded-full overflow-hidden border-4 border-white bg-white shadow-lg">
-                      <Image
+                    <div className="w-[200px] h-[200px] rounded-full overflow-hidden border-4 border-white bg-neutral-base shadow-lg">
+                      <Image2Line
                         src={selectedApplication.avatar}
                         alt={selectedApplication.name}
                         width={200}
@@ -388,7 +388,7 @@ const NewApplicationsPage = () => {
                       </p>
                       
                       <div className="inline-flex items-center gap-1 mt-3 px-3 py-1 bg-[#02b523] text-white rounded-full text-sm font-medium">
-                        <span className="w-2 h-2 bg-white rounded-full" />
+                        <span className="w-2 h-2 bg-neutral-base rounded-full" />
                         {selectedApplication.availabilityStatus}
                       </div>
                     </div>
@@ -416,7 +416,7 @@ const NewApplicationsPage = () => {
                 </div>
 
                 {/* Tabs */}
-                <div className="border-b border-gray-200 bg-white sticky top-0 z-10">
+                <div className="border-b border-gray-200 bg-neutral-base sticky top-0 z-10">
                   {/* Compact Header - Only visible when scrolled */}
                   <div 
                     className={`overflow-hidden transition-all duration-300 ease-in-out border-b border-gray-100 ${
@@ -433,7 +433,7 @@ const NewApplicationsPage = () => {
                         <div className={`inline-flex items-center gap-1 px-2 py-1 bg-[#02b523] text-white rounded-full text-xs font-medium transition-all duration-300 delay-75 ${
                           isScrolled ? 'translate-y-0 scale-100' : '-translate-y-2 scale-95'
                         }`}>
-                          <span className="w-1.5 h-1.5 bg-white rounded-full animate-pulse" />
+                          <span className="w-1.5 h-1.5 bg-neutral-base rounded-full animate-pulse" />
                           Available Now
                         </div>
                       </div>
@@ -504,7 +504,7 @@ const NewApplicationsPage = () => {
                           <span className="text-base font-semibold text-[#242527]">{selectedApplication.stats.brandCollaborations}</span>
                         </div>
                         <div className="flex justify-between items-center">
-                          <span className="text-base text-[#505152]">Instagram Followers</span>
+                          <span className="text-base text-[#505152]">InstagramFill Followers</span>
                           <span className="text-base font-semibold text-[#242527]">{selectedApplication.stats.instagramFollowers}</span>
                         </div>
                         <div className="flex justify-between items-center">
@@ -512,11 +512,11 @@ const NewApplicationsPage = () => {
                           <span className="text-base font-semibold text-[#242527]">{selectedApplication.stats.linkedinFollowers}</span>
                         </div>
                         <div className="flex justify-between items-center">
-                          <span className="text-base text-[#505152]">X Followers</span>
+                          <span className="text-base text-[#505152]">CloseLine Followers</span>
                           <span className="text-base font-semibold text-[#242527]">{selectedApplication.stats.xFollowers}</span>
                         </div>
                         <div className="flex justify-between items-center">
-                          <span className="text-base text-[#505152]">Youtube Subscribers</span>
+                          <span className="text-base text-[#505152]">YoutubeFill Subscribers</span>
                           <span className="text-base font-semibold text-[#242527]">{selectedApplication.stats.youtubeSubscribers}</span>
                         </div>
                       </div>
@@ -526,13 +526,13 @@ const NewApplicationsPage = () => {
                     <div className="py-4">
                       <h3 className="text-base font-semibold text-[#505152] mb-3">Pricing & Deliverables</h3>
                       <div className="space-y-4">
-                        {/* Instagram */}
+                        {/* InstagramFill */}
                         <div className="border border-[rgba(36,37,39,0.12)] rounded-xl overflow-hidden">
-                          <div className="flex items-center px-6 py-3 bg-white">
+                          <div className="flex items-center px-6 py-3 bg-neutral-base">
                             <svg className="w-6 h-6 mr-4" viewBox="0 0 24 24" fill="none">
                               <path d="M12 2C6.477 2 2 6.477 2 12C2 17.523 6.477 22 12 22C17.523 22 22 17.523 22 12C22 6.477 17.523 2 12 2ZM12 20C7.589 20 4 16.411 4 12C4 7.589 7.589 4 12 4C16.411 4 20 7.589 20 12C20 16.411 16.411 20 12 20Z" fill="#242527"/>
                             </svg>
-                            <span className="text-base font-semibold text-[#242527]">Instagram</span>
+                            <span className="text-base font-semibold text-[#242527]">InstagramFill</span>
                           </div>
                           <div className="border-t border-[rgba(36,37,39,0.12)]">
                             <div className="flex justify-between items-center px-4 py-3 border-b border-[rgba(36,37,39,0.12)]">
@@ -556,11 +556,11 @@ const NewApplicationsPage = () => {
 
                         {/* YouTube */}
                         <div className="border border-[rgba(36,37,39,0.12)] rounded-xl overflow-hidden w-[375px]">
-                          <div className="flex items-center px-6 py-3 bg-white">
+                          <div className="flex items-center px-6 py-3 bg-neutral-base">
                             <svg className="w-6 h-6 mr-4" viewBox="0 0 24 24" fill="none">
                               <path d="M19.606 6.995C19.53 6.697 19.314 6.472 19.067 6.403C18.63 6.28 16.5 6 12 6C7.5 6 5.37 6.28 4.933 6.403C4.686 6.472 4.47 6.697 4.394 6.995C4.285 7.419 4 9.196 4 12C4 14.804 4.285 16.581 4.394 17.005C4.47 17.303 4.686 17.528 4.933 17.597C5.37 17.72 7.5 18 12 18C16.5 18 18.63 17.72 19.067 17.597C19.314 17.528 19.53 17.303 19.606 17.005C19.715 16.581 20 14.804 20 12C20 9.196 19.715 7.419 19.606 6.995ZM10 15V9L15 12L10 15Z" fill="#242527"/>
                             </svg>
-                            <span className="text-base font-semibold text-[#242527]">Youtube</span>
+                            <span className="text-base font-semibold text-[#242527]">YoutubeFill</span>
                           </div>
                           <div className="border-t border-[rgba(36,37,39,0.12)]">
                             <div className="flex justify-between items-center px-4 py-3 border-b border-[rgba(36,37,39,0.12)]">
@@ -578,13 +578,13 @@ const NewApplicationsPage = () => {
                           </div>
                         </div>
 
-                        {/* X (Twitter) */}
+                        {/* CloseLine (TwitterXLine) */}
                         <div className="border border-[rgba(36,37,39,0.12)] rounded-xl overflow-hidden w-[375px]">
-                          <div className="flex items-center px-6 py-3 bg-white">
+                          <div className="flex items-center px-6 py-3 bg-neutral-base">
                             <svg className="w-6 h-6 mr-4" viewBox="0 0 24 24" fill="none">
                               <path d="M18.244 2.25H21.552L14.325 10.51L22.827 21.75H16.17L10.956 14.933L4.99 21.75H1.68L9.41 12.915L1.254 2.25H8.08L12.793 8.481L18.244 2.25ZM17.083 19.77H18.916L7.084 4.126H5.117L17.083 19.77Z" fill="#242527"/>
                             </svg>
-                            <span className="text-base font-semibold text-[#242527]">X (twitter)</span>
+                            <span className="text-base font-semibold text-[#242527]">CloseLine (twitter)</span>
                           </div>
                           <div className="border-t border-[rgba(36,37,39,0.12)]">
                             <div className="flex justify-between items-center px-4 py-3">
@@ -596,11 +596,11 @@ const NewApplicationsPage = () => {
 
                         {/* LinkedIn */}
                         <div className="border border-[rgba(36,37,39,0.12)] rounded-xl overflow-hidden w-[375px]">
-                          <div className="flex items-center px-6 py-3 bg-white">
+                          <div className="flex items-center px-6 py-3 bg-neutral-base">
                             <svg className="w-6 h-6 mr-4" viewBox="0 0 24 24" fill="none">
                               <path d="M19 3C19.5304 3 20.0391 3.21071 20.4142 3.58579C20.7893 3.96086 21 4.46957 21 5V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H19ZM18.5 18.5V13.2C18.5 12.3354 18.1565 11.5062 17.5452 10.8948C16.9338 10.2835 16.1046 9.94 15.24 9.94C14.39 9.94 13.4 10.46 12.92 11.24V10.13H10.13V18.5H12.92V13.57C12.92 12.8 13.54 12.17 14.31 12.17C14.6813 12.17 15.0374 12.3175 15.2999 12.5801C15.5625 12.8426 15.71 13.1987 15.71 13.57V18.5H18.5ZM6.88 8.56C7.32556 8.56 7.75288 8.383 8.06794 8.06794C8.383 7.75288 8.56 7.32556 8.56 6.88C8.56 5.95 7.81 5.19 6.88 5.19C6.43178 5.19 6.00193 5.36805 5.68499 5.68499C5.36805 6.00193 5.19 6.43178 5.19 6.88C5.19 7.81 5.95 8.56 6.88 8.56ZM8.27 18.5V10.13H5.5V18.5H8.27Z" fill="#242527"/>
                             </svg>
-                            <span className="text-base font-semibold text-[#242527]">Linkedin</span>
+                            <span className="text-base font-semibold text-[#242527]">LinkedinFill</span>
                           </div>
                           <div className="border-t border-[rgba(36,37,39,0.12)]">
                             <div className="flex justify-between items-center px-4 py-3">
@@ -809,7 +809,7 @@ const NewApplicationsPage = () => {
               </div>
 
               {/* Sticky Action Buttons */}
-              <div className="flex gap-4 p-6 border-t border-gray-200 bg-white shrink-0">
+              <div className="flex gap-4 p-6 border-t border-gray-200 bg-neutral-base shrink-0">
                 <button
                   onClick={handleReject}
                   className="flex-1 px-6 py-3 border border-[#43573b] text-[#43573b] rounded-full font-semibold hover:bg-[#43573b] hover:text-white transition-colors flex items-center justify-center gap-2"
@@ -835,7 +835,7 @@ const NewApplicationsPage = () => {
           ) : (
             <div className="flex flex-col items-center justify-center h-full bg-[#f0f0f0] rounded-lg">
               <div className="text-center">
-                <Image
+                <Image2Line
                   src="/logo.png"
                   alt="Phyo Logo"
                   width={286}

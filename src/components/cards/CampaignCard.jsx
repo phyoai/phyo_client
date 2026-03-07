@@ -1,5 +1,5 @@
 import React from 'react';
-import { Heart } from 'lucide-react';
+import { HeartLine } from '@phyoofficial/phyo-icon-library';
 
 /**
  * Reusable Campaign Card Component
@@ -16,11 +16,11 @@ export default function CampaignCard({
 }) {
   return (
     <div 
-      className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-all cursor-pointer border border-gray-100"
+      className="bg-neutral-base rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-all cursor-pointer border border-gray-100"
       onClick={onClick}
     >
       {/* Campaign Header */}
-      <div className="p-3 flex items-center justify-between bg-white">
+      <div className="p-3 flex items-center justify-between bg-neutral-base">
         <div className="flex items-center gap-3">
           <div className={`w-9 h-9 ${initialsColor} rounded-full flex items-center justify-center text-white font-semibold text-xs`}>
             {brandInitials}
@@ -37,11 +37,11 @@ export default function CampaignCard({
             onLike?.();
           }}
         >
-          <Heart className="h-4 w-4 text-gray-400" />
+          <HeartLine className="h-4 w-4 text-gray-400" />
         </button>
       </div>
 
-      {/* Campaign Image */}
+      {/* Campaign Image2Line */}
       <div className="relative w-full aspect-[4/3] overflow-hidden">
         <img 
           src={campaignImage} 

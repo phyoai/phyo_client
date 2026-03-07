@@ -103,7 +103,7 @@ Warm regards,
   }
 
   return (
-    <div className="flex-1 flex flex-col bg-white">
+    <div className="flex-1 flex flex-col bg-neutral-base">
       <ChatHeader contact={selectedContact} />
       
       {/* Messages Area */}

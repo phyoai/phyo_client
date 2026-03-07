@@ -161,7 +161,7 @@ const StatsSection = () => {
   };
 
   return (
-    <section className="py-16 px-6 bg-white" ref={ref}>
+    <section className="py-16 px-6 bg-neutral-base" ref={ref}>
       <div className="max-w-7xl mx-auto">
         <motion.div 
           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
@@ -221,7 +221,7 @@ const StatsSection = () => {
 
                 {/* Animated underline */}
                 <motion.div
-                  className={`h-1 mx-auto rounded-full ${stat.bgColor === 'bg-green-500' ? 'bg-white/30' : 'bg-green-500'}`}
+                  className={`h-1 mx-auto rounded-full ${stat.bgColor === 'bg-green-500' ? 'bg-neutral-base/30' : 'bg-green-500'}`}
                   initial={{ width: 0 }}
                   animate={isInView ? { width: '60%' } : { width: 0 }}
                   transition={{ duration: 0.8, delay: index * 0.2 + 1 }}

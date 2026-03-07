@@ -1,7 +1,7 @@
 // components/HelpAndSupportSection.jsx
 'use client'
 import React, { useState } from 'react';
-import { Search, ChevronDown, ChevronUp, ArrowRight } from 'lucide-react';
+import { SearchLine, ArrowDownLine, ArrowUpLine, ArrowRightLine } from '@phyoofficial/phyo-icon-library';
 
 const HelpAndSupportSection = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -65,15 +65,15 @@ const HelpAndSupportSection = () => {
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-6">Help & Support</h1>
           
-          {/* Search Bar */}
+          {/* SearchLine Bar */}
           <div className="relative">
-            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+            <SearchLine className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
             <input
               type="text"
-              placeholder="Search influencer"
+              placeholder="SearchLine influencer"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-11 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-gray-300 focus:border-gray-300 bg-white shadow-sm text-sm"
+              className="w-full pl-11 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-gray-300 focus:border-gray-300 bg-neutral-base shadow-sm text-sm"
             />
           </div>
         </div>
@@ -81,28 +81,28 @@ const HelpAndSupportSection = () => {
         {/* Help Categories */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
           {/* Getting Started Card */}
-          <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
+          <div className="bg-neutral-base rounded-2xl p-6 border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
             <h3 className="text-lg font-semibold text-gray-900 mb-2">Getting Started</h3>
             <p className="text-gray-500 text-sm mb-4">Learn the basic of creating and managing campaigns</p>
             <button className="flex items-center space-x-1 text-blue-600 hover:text-blue-700 text-sm font-medium transition-colors">
               <span>Learn More</span>
-              <ArrowRight className="h-4 w-4" />
+              <ArrowRightLine className="h-4 w-4" />
             </button>
           </div>
 
           {/* Campaign Management Card */}
-          <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
+          <div className="bg-neutral-base rounded-2xl p-6 border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
             <h3 className="text-lg font-semibold text-gray-900 mb-2">Campaign Management</h3>
             <p className="text-gray-500 text-sm mb-4">Tips for running successful influencer campaigns</p>
             <button className="flex items-center space-x-1 text-blue-600 hover:text-blue-700 text-sm font-medium transition-colors">
               <span>Learn More</span>
-              <ArrowRight className="h-4 w-4" />
+              <ArrowRightLine className="h-4 w-4" />
             </button>
           </div>
         </div>
 
         {/* FAQ Section */}
-        <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm mb-8">
+        <div className="bg-neutral-base rounded-2xl p-6 border border-gray-100 shadow-sm mb-8">
           <h2 className="text-xl font-semibold text-gray-900 mb-6">Frequently Asked Questions</h2>
           
           <div className="space-y-0">
@@ -114,9 +114,9 @@ const HelpAndSupportSection = () => {
                 >
                   <span className="text-gray-700 text-sm font-normal">{faq.question}</span>
                   {openFAQ === faq.id ? (
-                    <ChevronUp className="h-4 w-4 text-gray-500 flex-shrink-0" />
+                    <ArrowUpLine className="h-4 w-4 text-gray-500 flex-shrink-0" />
                   ) : (
-                    <ChevronDown className="h-4 w-4 text-gray-500 flex-shrink-0" />
+                    <ArrowDownLine className="h-4 w-4 text-gray-500 flex-shrink-0" />
                   )}
                 </button>
                 
@@ -134,7 +134,7 @@ const HelpAndSupportSection = () => {
         </div>
 
         {/* Contact Support Form */}
-        <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
+        <div className="bg-neutral-base rounded-2xl p-6 border border-gray-100 shadow-sm">
           <h2 className="text-xl font-semibold text-gray-900 mb-6">Contact Support</h2>
           
           <form onSubmit={handleSubmit} className="space-y-5">

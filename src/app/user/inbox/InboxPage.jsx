@@ -217,9 +217,9 @@ const InboxPage = () => {
   return (
     <div className="flex h-screen overflow-hidden bg-gray-50">
       {/* Left Sidebar - Invitations List */}
-      <div className="w-full sm:w-[30%] bg-white border-r border-gray-200 flex flex-col overflow-hidden">
+      <div className="w-full sm:w-[30%] bg-neutral-base border-r border-gray-200 flex flex-col overflow-hidden">
         {/* Sticky Header */}
-        <div className="flex-shrink-0 bg-white border-b border-gray-200">
+        <div className="flex-shrink-0 bg-neutral-base border-b border-gray-200">
           <div className="px-4 sm:px-6 py-4 sm:py-5">
             <h1 className="text-lg sm:text-xl font-semibold text-gray-900">Inbox</h1>
           </div>
@@ -382,7 +382,7 @@ const InboxPage = () => {
                       </div>
                       <button
                         onClick={() => handleWithdraw(request.id)}
-                        className="px-3 py-1.5 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded-full hover:bg-gray-50 transition-colors flex-shrink-0"
+                        className="px-3 py-1.5 text-xs font-medium text-gray-700 bg-neutral-base border border-gray-300 rounded-full hover:bg-gray-50 transition-colors flex-shrink-0"
                       >
                         withdraw
                       </button>
@@ -396,7 +396,7 @@ const InboxPage = () => {
       </div>
 
       {/* Right Side - Chat Interface or Empty State */}
-      <div className="flex-1 flex flex-col bg-white overflow-hidden">
+      <div className="flex-1 flex flex-col bg-neutral-base overflow-hidden">
         {selectedConversation ? (
           <>
             {/* Chat Header */}
@@ -455,7 +455,7 @@ const InboxPage = () => {
                     )}
                     {message.voice && (
                       <div className="flex items-center gap-3 min-w-[200px]">
-                        <button className="w-8 h-8 flex items-center justify-center bg-white bg-opacity-20 rounded-full hover:bg-opacity-30 transition-colors">
+                        <button className="w-8 h-8 flex items-center justify-center bg-neutral-base bg-opacity-20 rounded-full hover:bg-opacity-30 transition-colors">
                           <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
                             <path d="M8 5v14l11-7z" />
                           </svg>
@@ -465,7 +465,7 @@ const InboxPage = () => {
                             {[...Array(20)].map((_, i) => (
                               <div
                                 key={i}
-                                className="w-0.5 bg-white bg-opacity-60 rounded-full"
+                                className="w-0.5 bg-neutral-base bg-opacity-60 rounded-full"
                                 style={{ height: `${Math.random() * 100}%` }}
                               />
                             ))}
@@ -508,7 +508,7 @@ const InboxPage = () => {
                 {/* Attachment Options Panel - Positioned above link button */}
                 {showAttachments && (
                   <div className="absolute bottom-[calc(100%+0.5rem)]  right-24 z-50">
-                    <div className="bg-white rounded-2xl shadow-xl border border-gray-200 p-3 flex items-center gap-2.5">
+                    <div className="bg-neutral-base rounded-2xl shadow-xl border border-gray-200 p-3 flex items-center gap-2.5">
                       {attachmentOptions.map((option, index) => {
                         const IconComponent = option.icon;
                         return (

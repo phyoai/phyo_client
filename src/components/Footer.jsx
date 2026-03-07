@@ -1,7 +1,7 @@
 import React from 'react'
-import { Instagram, Facebook, Twitter, Linkedin } from 'lucide-react';
+import { InstagramFill, FacebookFill, TwitterXLine, LinkedinFill } from '@phyoofficial/phyo-icon-library';
 import Link from 'next/link';
-import Image from 'next/image';
+import Image2Line from 'next/image';
 
 
 const Footer = () => {
@@ -10,7 +10,7 @@ const Footer = () => {
       <div className='flex-1'>
         <div className="flex-shrink-0 ">
           <Link href="/">
-            <Image src={"/logo.png"} alt='logo' height={100} width={100} />
+            <Image2Line src={"/logo.png"} alt='logo' height={100} width={100} />
           </Link>
         </div>
         <p className='flex text-[14px] mt-8 text-[#59565F] flex-wrap'>
@@ -27,7 +27,7 @@ const Footer = () => {
 
       <div className='flex-1 mt-8'>
         <h3 className='text-[#5FC34E] leading-[24px] pb-[14px] text-[16px]'>FOLLOW US</h3>
-        <span className='flex gap-x-4'> <Instagram />  <Facebook />  <Twitter /> <Linkedin /></span>
+        <span className='flex gap-x-4'> <InstagramFill />  <FacebookFill />  <TwitterXLine /> <LinkedinFill /></span>
         <div className='mt-4'>
           <Link href="/privacy-policy" className='text-[#59565F] hover:text-[#5FC34E] transition-colors text-[12px]'>
             Privacy Policy

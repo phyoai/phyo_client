@@ -53,7 +53,7 @@ export default function BrandAccount() {
       setLoading(false);
     }
   };
-console.log('User profile data:', user);
+console.log('UserLine profile data:', user);
 
   const getInitials = (name) => {
     if (!name) return 'J';
@@ -343,8 +343,8 @@ console.log('User profile data:', user);
   if (loading) {
     return (
       <div className="w-full h-screen overflow-hidden flex flex-col dark:bg-[#121212]">
-        <div className="flex-shrink-0 bg-white dark:bg-[#1e1e1e] border-b border-gray-100 dark:border-gray-700">
-          <div className="px-4 sm:px-6 lg:px-9 py-4 sm:py-5">
+        <div className="flex-shrink-0 bg-neutral-base dark:bg-[#1e1e1e] border-b border-gray-100 dark:border-gray-700">
+          <div className="">
             <div className="h-7 bg-gray-200 dark:bg-gray-700 rounded w-32 animate-pulse"></div>
           </div>
         </div>
@@ -359,7 +359,7 @@ console.log('User profile data:', user);
           </div>
           <div className="mb-6">
             <div className="bg-[#f0f0f0] dark:bg-[#2a2a2a] rounded-2xl p-2">
-              <div className="bg-white dark:bg-[#1e1e1e] rounded-lg overflow-hidden">
+              <div className="bg-neutral-base dark:bg-[#1e1e1e] rounded-lg overflow-hidden">
                 {[1, 2, 3, 4, 5].map((i, idx) => (
                   <React.Fragment key={i}>
                     <div className="px-6 py-5 flex items-center justify-between">
@@ -416,7 +416,7 @@ console.log('User profile data:', user);
   );
 
   const RightPanelEmail = () => (
-    <div className="flex flex-col h-full p-6 bg-white dark:bg-[#1e1e1e]">
+    <div className="flex flex-col h-full p-6 bg-neutral-base dark:bg-[#1e1e1e]">
       <h3 className="text-base font-semibold text-[#242527] dark:text-white mb-4">Email</h3>
       <div className="flex-1">
         <input
@@ -438,7 +438,7 @@ console.log('User profile data:', user);
   );
 
   const RightPanelPhone = () => (
-    <div className="flex flex-col h-full p-6 bg-white dark:bg-[#1e1e1e]">
+    <div className="flex flex-col h-full p-6 bg-neutral-base dark:bg-[#1e1e1e]">
       <h3 className="text-base font-semibold text-[#242527] dark:text-white mb-4">Contact Information</h3>
       <div className="flex-1 space-y-4">
         <div>
@@ -489,7 +489,7 @@ console.log('User profile data:', user);
   );
 
   const RightPanelBio = () => (
-    <div className="flex flex-col h-full p-6 bg-white dark:bg-[#1e1e1e]">
+    <div className="flex flex-col h-full p-6 bg-neutral-base dark:bg-[#1e1e1e]">
       <h3 className="text-base font-semibold text-[#242527] dark:text-white mb-4">Bio</h3>
       <div className="flex-1">
         <textarea
@@ -512,15 +512,15 @@ console.log('User profile data:', user);
 
   const RightPanelSocials = () => {
     const socialFields = [
-      { key: 'instagram', label: 'Instagram', placeholder: 'https://instagram.com/yourbrand' },
-      { key: 'facebook', label: 'Facebook', placeholder: 'https://facebook.com/yourbrand' },
-      { key: 'linkedin', label: 'Linkedin', placeholder: 'https://linkedin.com/company/…' },
-      { key: 'twitter', label: 'X (Twitter)', placeholder: 'https://x.com/yourbrand' },
-      { key: 'youtube', label: 'Youtube', placeholder: 'https://youtube.com/@yourbrand' },
+      { key: 'instagram', label: 'InstagramFill', placeholder: 'https://instagram.com/yourbrand' },
+      { key: 'facebook', label: 'FacebookFill', placeholder: 'https://facebook.com/yourbrand' },
+      { key: 'linkedin', label: 'LinkedinFill', placeholder: 'https://linkedin.com/company/…' },
+      { key: 'twitter', label: 'CloseLine (TwitterXLine)', placeholder: 'https://x.com/yourbrand' },
+      { key: 'youtube', label: 'YoutubeFill', placeholder: 'https://youtube.com/@yourbrand' },
       { key: 'personalSite', label: 'Personal', placeholder: 'https://yourwebsite.com' },
     ];
     return (
-      <div className="flex flex-col h-full p-6 bg-white dark:bg-[#1e1e1e]">
+      <div className="flex flex-col h-full p-6 bg-neutral-base dark:bg-[#1e1e1e]">
         <h3 className="text-base font-semibold text-[#242527] dark:text-white mb-4">Socials</h3>
         <div className="flex-1 space-y-4">
           {socialFields.map(({ key, label, placeholder }) => (
@@ -559,7 +559,7 @@ const RightPanelCategories = () => {
   };
 
   return (
-    <div className="flex flex-col h-full p-6 bg-white dark:bg-[#1e1e1e]">
+    <div className="flex flex-col h-full p-6 bg-neutral-base dark:bg-[#1e1e1e]">
       {/* Header with title and toggle button */}
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-base font-semibold text-[#242527] dark:text-white">
@@ -613,7 +613,7 @@ const RightPanelCategories = () => {
       {!isCollapsed && (
         <>
           {/* Category List with Checkboxes */}
-          <div className="flex-1 overflow-y-auto border border-[#e6e6e6] dark:border-gray-600 rounded-xl bg-white dark:bg-[#2a2a2a] pb-4">
+          <div className="flex-1 overflow-y-auto border border-[#e6e6e6] dark:border-gray-600 rounded-xl bg-neutral-base dark:bg-[#2a2a2a] pb-4">
             {CATEGORY_OPTIONS.map(cat => {
               const isSelected = selected.includes(cat);
               return (
@@ -653,7 +653,7 @@ const RightPanelCategories = () => {
 };
 
   const RightPanelBrandImages = () => (
-    <div className="flex flex-col h-full p-6 bg-white dark:bg-[#1e1e1e]">
+    <div className="flex flex-col h-full p-6 bg-neutral-base dark:bg-[#1e1e1e]">
       <h3 className="text-base font-semibold text-[#242527] dark:text-white mb-4">Brand Images</h3>
       <div className="flex-1">
         <div className="flex gap-4 overflow-x-auto pb-2">
@@ -703,7 +703,7 @@ const RightPanelCategories = () => {
   );
 
   const RightPanelLocation = () => (
-    <div className="flex flex-col h-full p-6 bg-white dark:bg-[#1e1e1e]">
+    <div className="flex flex-col h-full p-6 bg-neutral-base dark:bg-[#1e1e1e]">
       <h3 className="text-base font-semibold text-[#242527] dark:text-white mb-4">Location</h3>
       <div className="flex-1 space-y-4">
         <div>
@@ -738,7 +738,7 @@ const RightPanelCategories = () => {
   );
 
   const RightPanelPassword = () => (
-    <div className="flex flex-col h-full p-6 bg-white dark:bg-[#1e1e1e]">
+    <div className="flex flex-col h-full p-6 bg-neutral-base dark:bg-[#1e1e1e]">
       <h3 className="text-base font-semibold text-[#242527] dark:text-white mb-4">Password</h3>
       <div className="flex-1 space-y-4">
         <div>
@@ -795,7 +795,7 @@ const RightPanelCategories = () => {
         className="absolute inset-0 bg-black/40"
         onClick={() => setShowLogoutConfirm(false)}
       />
-      <div className="relative w-[90%] max-w-md bg-white dark:bg-[#1e1e1e] rounded-3xl shadow-xl p-8">
+      <div className="relative w-[90%] max-w-md bg-neutral-base dark:bg-[#1e1e1e] rounded-3xl shadow-xl p-8">
         <h2 className="text-2xl font-semibold text-[#242527] dark:text-white mb-3">
           Are you sure you want to log out?
         </h2>
@@ -833,7 +833,7 @@ const RightPanelCategories = () => {
           onClick={() => { setShowOTPModal(false); setOtpValue(''); }}
         />
 
-        <div className="relative w-[90%] max-w-sm bg-white dark:bg-[#1e1e1e] rounded-2xl shadow-xl overflow-hidden">
+        <div className="relative w-[90%] max-w-sm bg-neutral-base dark:bg-[#1e1e1e] rounded-2xl shadow-xl overflow-hidden">
           {otpSentSuccess && (
             <div className="bg-green-500 text-white text-sm px-4 py-2 text-center font-medium">
               OTP sent successfully.
@@ -842,7 +842,7 @@ const RightPanelCategories = () => {
 
           <div className="p-6">
             <h3 className="text-xl font-semibold text-[#242527] dark:text-white text-center mb-2">
-              {otpType === 'email' ? 'Verify Email' : 'Verify Phone number'}
+              {otpType === 'email' ? 'Verify Email' : 'Verify PhoneLine number'}
             </h3>
 
             <p className="text-sm text-[#808080] dark:text-gray-400 text-center mb-6 leading-relaxed">
@@ -879,7 +879,7 @@ const RightPanelCategories = () => {
                   }}
                   className="w-9 h-9 sm:w-11 sm:h-11 text-center text-lg font-semibold bg-[#f0f0f0]
                              border-[3px] border-[#e6e6e6] rounded-lg
-                             focus:outline-none focus:ring-2 focus:ring-[#43573b] focus:bg-white
+                             focus:outline-none focus:ring-2 focus:ring-[#43573b] focus:bg-neutral-base
                              text-[#242527] dark:bg-[#2a2a2a] dark:border-gray-600 dark:text-white"
                 />
               ))}
@@ -916,8 +916,8 @@ const RightPanelCategories = () => {
   return (
     <div className="w-full h-screen overflow-hidden flex flex-col dark:bg-[#121212]">
       {/* Fixed App Bar */}
-      <div className="flex-shrink-0 bg-white dark:bg-[#1e1e1e]">
-        <div className="px-4 sm:px-6 lg:px-9 py-4 sm:py-5">
+      <div className="flex-shrink-0 bg-neutral-base dark:bg-[#1e1e1e] border-b border-gray-100 dark:border-gray-700">
+          <div className="px-4 sm:px-6 lg:px-9 py-4 sm:py-5">
           <h1 className="text-lg sm:text-xl font-semibold text-[#242527] dark:text-white">{t('account_title')}</h1>
         </div>
       </div>
@@ -933,7 +933,7 @@ const RightPanelCategories = () => {
           </div>
           <div className="flex-1">
             <h2 className="text-xl font-semibold text-[#242527] dark:text-white mb-1 truncate">
-              {user?.contact?.first_name || user?.agencyName || user?.name || 'User'}
+              {user?.contact?.first_name || user?.agencyName || user?.name || 'UserLine'}
             </h2>
             <span className="inline-flex items-center px-2 py-1 text-xs font-medium text-[#666] dark:text-gray-400 bg-[#f0f0f0] dark:bg-[#2a2a2a] rounded-md">
               {user?.plan || user?.subscription || 'Free'}
@@ -947,7 +947,7 @@ const RightPanelCategories = () => {
 
         {/* Menu Section */}
         <div className="mb-6">
-          <div className="bg-white dark:bg-[#1e1e1e] rounded-2xl overflow-hidden border border-[#e6e6e6] dark:border-gray-700">
+          <div className="bg-neutral-base dark:bg-[#1e1e1e] rounded-2xl overflow-hidden border border-[#e6e6e6] dark:border-gray-700">
             <button className="w-full" onClick={() => setEditingSection('profile-editor')}>
               <MenuItem icon={AccountCircleFill} label={t('update_profile')} />
               <div className="h-px bg-[#e6e6e6] dark:bg-gray-700 mx-4"></div>
@@ -978,7 +978,7 @@ const RightPanelCategories = () => {
                 label={t('dark_theme')}
                 rightElement={
                   <div className={`w-11 h-8 rounded-full transition-colors flex items-center px-1 ${darkMode ? 'bg-[#3d4f36]' : 'bg-gray-300'}`}>
-                    <div className={`w-6 h-6 bg-white rounded-full transition-transform ${darkMode ? 'translate-x-3' : 'translate-x-0'}`}></div>
+                    <div className={`w-6 h-6 bg-neutral-base rounded-full transition-transform ${darkMode ? 'translate-x-3' : 'translate-x-0'}`}></div>
                   </div>
                 }
                 textColor="text-[#242527] dark:text-gray-200"
@@ -1035,7 +1035,7 @@ const RightPanelCategories = () => {
     />
 
     {/* Modal */}
-    <div className="relative w-[90%] max-w-md bg-white dark:bg-[#1e1e1e] rounded-2xl shadow-xl animate-fadeIn">
+    <div className="relative w-[90%] max-w-md bg-neutral-base dark:bg-[#1e1e1e] rounded-2xl shadow-xl animate-fadeIn">
 
       {/* Title */}
       <div className="px-6 py-4 border-b border-gray-100 dark:border-gray-700">
@@ -1056,7 +1056,7 @@ const RightPanelCategories = () => {
             className="w-full flex items-center px-6 py-4 hover:bg-gray-50 dark:hover:bg-[#2a2a2a] transition-colors border-b border-gray-100 dark:border-gray-700 last:border-b-0"
           >
             {/* Radio Button */}
-            <div className="flex items-center justify-center w-6 h-6 rounded-full border-2 mr-4 flex-shrink-0 border-gray-400 bg-white dark:bg-[#1e1e1e]">
+            <div className="flex items-center justify-center w-6 h-6 rounded-full border-2 mr-4 flex-shrink-0 border-gray-400 bg-neutral-base dark:bg-[#1e1e1e]">
               {language === lang.code && (
                 <div className="w-3 h-3 rounded-full bg-[#43573B]" />
               )}
@@ -1078,11 +1078,11 @@ const RightPanelCategories = () => {
   </div>
 )}
 
-      {/* Edit Profile Modal */}
+      {/* EditLine Profile Modal */}
       {editingSection === 'profile-editor' && (
-        <div className="fixed inset-0 z-50 bg-white dark:bg-[#121212] flex flex-col">
+        <div className="fixed inset-0 z-50 bg-neutral-base dark:bg-[#121212] flex flex-col">
           {/* Modal Header */}
-          <div className="flex-shrink-0 flex items-center px-6 py-4 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-[#1e1e1e]">
+          <div className="flex-shrink-0 flex items-center px-6 py-4 border-b border-gray-200 dark:border-gray-700 bg-neutral-base dark:bg-[#1e1e1e]">
             <button
               onClick={closeEditSection}
               className="flex items-center justify-center hover:opacity-70 transition-opacity mr-3"
@@ -1097,7 +1097,7 @@ const RightPanelCategories = () => {
           {/* Two-column body */}
           <div className="flex flex-1 overflow-hidden">
             {/* LEFT COLUMN - Sticky sidebar */}
-            <div className={`${mobileView === 'panel' ? 'hidden' : 'flex flex-col'} md:flex md:flex-col w-full md:w-72 lg:w-80 flex-shrink-0 border-r border-gray-200 dark:border-gray-700 overflow-y-auto bg-white dark:bg-[#1e1e1e]`}>
+            <div className={`${mobileView === 'panel' ? 'hidden' : 'flex flex-col'} md:flex md:flex-col w-full md:w-72 lg:w-80 flex-shrink-0 border-r border-gray-200 dark:border-gray-700 overflow-y-auto bg-neutral-base dark:bg-[#1e1e1e]`}>
               {/* Avatar */}
               <div className="flex flex-col items-center py-8 px-6">
                 <div className="relative">
@@ -1122,7 +1122,7 @@ const RightPanelCategories = () => {
                   htmlFor="avatar-upload"
                   className="mt-3 text-base font-semibold text-[#242527] dark:text-white cursor-pointer hover:opacity-70 transition-opacity"
                 >
-                  Edit
+                  EditLine
                 </label>
                 <input
                   id="avatar-upload"
@@ -1163,8 +1163,8 @@ const RightPanelCategories = () => {
                     icon: UserCommunityLine,
                     label: 'Socials',
                     subtitle: [
-                      user?.social_media?.instagram && 'Instagram',
-                      user?.social_media?.linkedin && 'Linkedin',
+                      user?.social_media?.instagram && 'InstagramFill',
+                      user?.social_media?.linkedin && 'LinkedinFill',
                     ].filter(Boolean).join(', ') || 'Add social links',
                   },
                   {
@@ -1220,12 +1220,12 @@ const RightPanelCategories = () => {
             </div>
 
             {/* RIGHT COLUMN */}
-            <div className={`${mobileView === 'list' ? 'hidden' : 'flex flex-col'} md:flex md:flex-col flex-1 overflow-y-auto bg-white dark:bg-[#1e1e1e]`}>
+            <div className={`${mobileView === 'list' ? 'hidden' : 'flex flex-col'} md:flex md:flex-col flex-1 overflow-y-auto bg-neutral-base dark:bg-[#1e1e1e]`}>
               {/* Mobile back button */}
               {mobileView === 'panel' && activeEditTab && (
                 <button
                   onClick={() => { setMobileView('list'); setActiveEditTab(null); }}
-                  className="md:hidden flex items-center gap-2 px-6 py-4 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-[#1e1e1e]"
+                  className="md:hidden flex items-center gap-2 px-6 py-4 border-b border-gray-200 dark:border-gray-700 bg-neutral-base dark:bg-[#1e1e1e]"
                 >
                   <ArrowLeftLine className="w-5 h-5 text-[#242527] dark:text-white" />
                   <span className="text-base font-medium text-[#242527] dark:text-white">Back</span>
@@ -1254,7 +1254,7 @@ const RightPanelCategories = () => {
       {/* Pause Subscription Modal */}
       {showPauseModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white dark:bg-[#1e1e1e] rounded-3xl w-[400px] max-w-[90%] shadow-2xl overflow-hidden">
+          <div className="bg-neutral-base dark:bg-[#1e1e1e] rounded-3xl w-[400px] max-w-[90%] shadow-2xl overflow-hidden">
             {/* Header */}
             <div className="px-6 py-6 border-b border-gray-100 dark:border-gray-700">
               <h2 className="text-xl font-semibold text-[#242527] dark:text-white text-center">
@@ -1294,7 +1294,7 @@ const RightPanelCategories = () => {
       {/* Cancel Subscription Modal */}
       {showCancelModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white dark:bg-[#1e1e1e] rounded-3xl w-[400px] max-w-[90%] shadow-2xl overflow-hidden">
+          <div className="bg-neutral-base dark:bg-[#1e1e1e] rounded-3xl w-[400px] max-w-[90%] shadow-2xl overflow-hidden">
             {/* Header */}
             <div className="px-6 py-6 border-b border-gray-100 dark:border-gray-700">
               <h2 className="text-xl font-semibold text-[#242527] dark:text-white text-center">

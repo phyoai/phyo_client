@@ -1,11 +1,11 @@
 import React from 'react'
-import { ArrowRight } from 'lucide-react';
+import { ArrowRightLine } from '@phyoofficial/phyo-icon-library';
 
 const WhyPhyo = () => {
   return (
     <div>
         <h1 className='text-[#312F39] text-[48px] sm:leading-[66px] font-semibold text-center'><span className='text-[34px] font-medium'>Why</span> Phyo.AI?</h1>
-        <span className='flex text-[#00674F] justify-center items-center gap-4'><p className='text-center text-[#00674F] font-bold text-[22px] '>Unlock Your First Match for free   </p>  <ArrowRight /></span>
+        <span className='flex text-[#00674F] justify-center items-center gap-4'><p className='text-center text-[#00674F] font-bold text-[22px] '>Unlock Your First Match for free   </p>  <ArrowRightLine /></span>
          
         <div className='mt-[52px]'>
                <div className='flex flex-col sm:flex-row gap-2 p-1'>

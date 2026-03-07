@@ -1,7 +1,9 @@
 'use client'
 import React, { Suspense, useState, useRef, useEffect } from 'react';
-import { Search, Bell, Heart, ChevronRight, ArrowLeft, Mic, MoreVertical } from 'lucide-react';
+import { SearchLine, BellLine, HeartLine, ArrowRightLine, ArrowLeftLine, MicLine, MoreLine, Notification2Line } from '@phyoofficial/phyo-icon-library';
 import { useRouter } from 'next/navigation';
+import IconButton from '@/components/IconButton';
+import { colors } from '@/config/colors';
 
 // Commented out old components - will integrate with APIs later
 // import CampaignReport from './CampaignReport';
@@ -67,29 +69,27 @@ function DashboardContent() {
         }
       `}</style>
       
-      <div className={`h-full bg-[#FFFFFF] text-black transition-all duration-300 ${
+      <div className={`h-full transition-all duration-300 ${
         isFadingOut ? 'fade-out-dashboard' : ''
-      }`}>
+      }`} style={{ backgroundColor: colors.neutral.base, color: colors.text.neutral.base }}>
         {/* Sticky App Bar - Only Welcome header */}
-        <div className="sticky top-0 z-40 bg-[#FFFFFF] border-b border-gray-100">
+        <div className="sticky top-0 z-40 border-b" style={{ backgroundColor: colors.neutral.base, borderColor: colors.neutral.muted }}>
           <div className="px-4 sm:px-6 lg:px-8 py-3">
             <div className="flex items-center justify-between">
               {/* Welcome Section */}
               <div>
-                <h1 className="text-xl sm:text-2xl font-semibold text-gray-900">Welcome!</h1>
-                <p className="text-xs sm:text-sm text-gray-600">Search & Discover popular creators</p>
+                <h1 className="text-xl sm:text-2xl font-semibold" style={{ color: colors.text.neutral.base }}>Welcome!</h1>
+                <p className="text-xs sm:text-sm" style={{ color: colors.text.neutral.muted }}>SearchLine & Discover popular creators</p>
               </div>
 
               {/* Right Side - Notifications and Profile */}
               <div className="flex items-center gap-2 sm:gap-4">
-                <button 
+                <IconButton
+                  icon={Notification2Line}
                   onClick={() => router.push('/user/notifications')}
-                  className="p-2 hover:bg-gray-100 rounded-full transition-colors relative"
-                >
-                  <Bell className="h-5 w-5 sm:h-6 sm:w-6 text-gray-600" />
-                  <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
-                </button>
-                <div className="w-8 h-8 sm:w-10 sm:h-10 bg-teal-600 rounded-full flex items-center justify-center text-white font-semibold text-sm sm:text-base">
+                  size="md"
+                />
+                <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center text-white font-semibold text-sm sm:text-base" style={{ backgroundColor: colors.brand.base }}>
                   P
                 </div>
               </div>
@@ -99,31 +99,40 @@ function DashboardContent() {
 
         {/* Scrollable Content Section */}
         <div className="px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
-          {/* Search Bar - Clickable to activate search mode */}
+          {/* SearchLine Bar - Clickable to activate search mode */}
           <div className="flex justify-center mb-6 sm:mb-8">
-            <div 
+            <div
               className="relative w-full max-w-full sm:max-w-[70%] md:max-w-[50%] cursor-pointer"
               onClick={handleSearchClick}
             >
-              <Search className="absolute right-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-[#808080]" />
+              <SearchLine className="absolute right-4 top-1/2 transform -translate-y-1/2 h-5 w-5" style={{ color: colors.text.neutral.muted }} />
               <input
                 type="text"
-                placeholder="Search"
+                placeholder="SearchLine"
                 value={searchQuery}
                 onChange={(e) => e.preventDefault()}
                 onClick={handleSearchClick}
-                className="w-full pl-6 pr-12 py-3 bg-[#F0F0F0] rounded-full border border-gray-200 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent cursor-pointer"
+                className="w-full pl-6 pr-12 py-3 rounded-full border focus:outline-none focus:ring-2 focus:border-transparent cursor-pointer"
+                style={{
+                  backgroundColor: colors.neutral.muted,
+                  borderColor: colors.neutral.muted,
+                  color: colors.text.neutral.base
+                }}
                 readOnly
               />
             </div>
           </div>
 
-          {/* Search Suggestions */}
+          {/* SearchLine Suggestions */}
           <div className="flex flex-col items-center gap-2 mb-8 sm:mb-12">
             {searchSuggestions.map((suggestion, index) => (
               <div
                 key={index}
-                className="bg-[#C5CBC2] text-gray-700 px-4 sm:px-6 py-2 sm:py-2.5 rounded-full text-xs sm:text-sm cursor-pointer hover:bg-gray-400 transition-colors max-w-full sm:max-w-[600px] text-center"
+                className="px-4 sm:px-6 py-2 sm:py-2.5 rounded-full text-xs sm:text-sm cursor-pointer transition-colors max-w-full sm:max-w-[600px] text-center"
+                style={{
+                  backgroundColor: colors.neutral.muted,
+                  color: colors.text.neutral.base
+                }}
                 onClick={handleSearchClick}
               >
                 {suggestion}
@@ -132,13 +141,14 @@ function DashboardContent() {
           </div>
           <div className="mb-8">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-semibold text-gray-900">Top Influencers</h2>
-              <button 
+              <h2 className="text-xl font-semibold" style={{ color: colors.text.neutral.base }}>Top Influencers</h2>
+              <button
                 onClick={() => router.push('/user/influencers')}
-                className="flex items-center text-teal-600 hover:text-teal-700 font-medium text-sm"
+                className="flex items-center hover:opacity-80 font-medium text-sm transition-opacity"
+                style={{ color: colors.brand.base }}
               >
                 view all
-                <ChevronRight className="h-4 w-4 ml-1" />
+                <ArrowRightLine className="h-4 w-4 ml-1" />
               </button>
             </div>
 
@@ -147,13 +157,13 @@ function DashboardContent() {
               {topInfluencers.map((influencer) => (
                 <div key={influencer.id} className="flex flex-col items-center flex-shrink-0 cursor-pointer" onClick={() => router.push(`/user/influencers/${influencer.id}`)}>
                   <div className={`w-16 h-16 ${influencer.color} rounded-full flex items-center justify-center mb-2`}>
-                    <img 
-                      src={influencer.avatar} 
+                    <img
+                      src={influencer.avatar}
                       alt={influencer.name}
                       className="w-14 h-14 rounded-full object-cover"
                     />
                   </div>
-                  <span className="text-xs text-gray-700 font-medium">{influencer.name}</span>
+                  <span className="text-xs font-medium" style={{ color: colors.text.neutral.base }}>{influencer.name}</span>
                 </div>
               ))}
             </div>
@@ -162,34 +172,32 @@ function DashboardContent() {
           {/* Top Campaigns Section */}
           <div>
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-semibold text-gray-900">Top Campaigns</h2>
-              <button className="flex items-center text-teal-600 hover:text-teal-700 font-medium text-sm">
+              <h2 className="text-xl font-semibold" style={{ color: colors.text.neutral.base }}>Top Campaigns</h2>
+              <button className="flex items-center hover:opacity-80 font-medium text-sm transition-opacity" style={{ color: colors.brand.base }}>
                 view all
-                <ChevronRight className="h-4 w-4 ml-1" />
+                <ArrowRightLine className="h-4 w-4 ml-1" />
               </button>
             </div>
 
             {/* Campaigns Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {topCampaigns.map((campaign) => (
-                <div key={campaign.id} className="bg-[#F0F0F0] rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+                <div key={campaign.id} className="rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow" style={{ backgroundColor: colors.neutral.muted }}>
                   {/* Campaign Header */}
                   <div className="p-4 flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-white font-semibold text-sm">
+                      <div className="w-10 h-10 rounded-full flex items-center justify-center text-white font-semibold text-sm" style={{ backgroundColor: colors.brand.base }}>
                         {campaign.brandInitials}
                       </div>
                       <div>
-                        <h3 className="font-semibold text-gray-900">{campaign.brandName}</h3>
-                        <p className="text-xs text-gray-500">{campaign.timeAgo}</p>
+                        <h3 className="font-semibold" style={{ color: colors.text.neutral.base }}>{campaign.brandName}</h3>
+                        <p className="text-xs" style={{ color: colors.text.neutral.muted }}>{campaign.timeAgo}</p>
                       </div>
                     </div>
-                    <button className="p-2 hover:bg-gray-100 rounded-full transition-colors">
-                      <Heart className="h-5 w-5 text-gray-400" />
-                    </button>
+                    <IconButton icon={HeartLine} size="sm" variant="default" />
                   </div>
 
-                  {/* Campaign Image */}
+                  {/* Campaign Image2Line */}
                   <div className={`relative h-[60%] bg-gradient-to-br ${campaign.bgColor} p-6 flex items-center justify-center`}>
                     {/* Decorative Elements */}
                     <div className="absolute inset-0 opacity-20 ">
@@ -200,7 +208,7 @@ function DashboardContent() {
                       <div className="absolute top-1/2 left-1/4 text-white text-sm">★</div>
                       <div className="absolute top-1/3 right-1/3 text-white text-sm">✦</div>
                     </div>
-                    
+
                     {/* Main Text */}
                     <div className="relative z-10 text-center ">
                       <h3 className="text-white text-3xl font-bold mb-2 leading-tight">

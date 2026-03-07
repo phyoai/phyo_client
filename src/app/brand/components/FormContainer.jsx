@@ -636,7 +636,7 @@ const FormContainer = ({ steps, theme = 'brand' }) => {
 
     return (
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-        <div className="bg-white rounded-lg p-8 w-full max-w-md mx-4">
+        <div className="bg-neutral-base rounded-lg p-8 w-full max-w-md mx-4">
           <div className="text-center">
             <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-yellow-100 mb-4">
               <svg className="h-8 w-8 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -668,9 +668,9 @@ const FormContainer = ({ steps, theme = 'brand' }) => {
 
   return (
     <FormProvider {...methods}>
-      <div className="h-screen flex flex-col bg-white">
+      <div className="h-screen flex flex-col bg-neutral-base">
         {/* Fixed App Bar */}
-        <div className="bg-white flex items-center justify-between px-1 py-2 shrink-0 border-b border-gray-200">
+        <div className="bg-neutral-base flex items-center justify-between px-1 py-2 shrink-0 border-b border-gray-200">
           {/* Back Button */}
           <button
             type="button"
@@ -717,7 +717,7 @@ const FormContainer = ({ steps, theme = 'brand' }) => {
         ) : !alreadySubmitted ? (
           <>
             {/* Fixed Progress Steps */}
-            <div className="bg-white px-9 py-4 shrink-0">
+            <div className="bg-neutral-base px-9 py-4 shrink-0">
               <div className={`mx-auto ${theme === 'influencer' ? 'max-w-[80%] px-4' : 'max-w-4xl px-10'}`}>
                 {/* Step Circles and Labels */}
                 <div className="flex items-start justify-between relative">
@@ -823,7 +823,7 @@ const FormContainer = ({ steps, theme = 'brand' }) => {
             </div>
 
             {/* Fixed Bottom Navigation Buttons */}
-            <div className="bg-white px-9 py-4 shrink-0 border-t border-gray-200">
+            <div className="bg-neutral-base px-9 py-4 shrink-0 border-t border-gray-200">
               <div className={`mx-auto ${theme === 'influencer' ? 'max-w-5xl px-4' : 'max-w-4xl px-40'}`}>
                 <div className="flex gap-2">
                   {currentStep > 0 && (

@@ -1,7 +1,7 @@
 'use client'
 import React, { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, MoreVertical, X, Upload, Calendar, Check, Users } from 'lucide-react';
+import { ArrowLeftLine, MoreLine, CloseLine, UploadLine, CalendarLine, CheckLine, UserLine } from '@phyoofficial/phyo-icon-library';
 import { campaignAPI } from '../../../../utils/api';
 
 const CreateCampaignPage = () => {
@@ -200,7 +200,7 @@ const CreateCampaignPage = () => {
                   >
                     {type}
                     {selectedCampaignTypes.includes(type) && (
-                      <X className="w-4 h-4" />
+                      <CloseLine className="w-4 h-4" />
                     )}
                   </button>
                 ))}
@@ -230,10 +230,10 @@ const CreateCampaignPage = () => {
       case 3: // Deliverables Step
         return (
           <div className="space-y-4">
-            {/* Instagram Reels */}
-            <div className="bg-white flex items-center pl-4">
+            {/* InstagramFill Reels */}
+            <div className="bg-neutral-base flex items-center pl-4">
               <div className="flex-1 flex items-center justify-center pr-4 py-3">
-                <p className="text-base font-semibold text-[#242527]">Instagram Reels</p>
+                <p className="text-base font-semibold text-[#242527]">InstagramFill Reels</p>
               </div>
               <div className="flex items-center justify-center">
                 <div className="flex items-center px-2 py-4">
@@ -264,10 +264,10 @@ const CreateCampaignPage = () => {
               </div>
             </div>
 
-            {/* Instagram Stories */}
-            <div className="bg-white flex items-center pl-4">
+            {/* InstagramFill Stories */}
+            <div className="bg-neutral-base flex items-center pl-4">
               <div className="flex-1 flex items-center justify-center pr-4 py-3">
-                <p className="text-base font-semibold text-[#242527]">Instagram Stories</p>
+                <p className="text-base font-semibold text-[#242527]">InstagramFill Stories</p>
               </div>
               <div className="flex items-center justify-center">
                 <div className="flex items-center px-2 py-4">
@@ -298,10 +298,10 @@ const CreateCampaignPage = () => {
               </div>
             </div>
 
-            {/* Instagram Post */}
-            <div className="bg-white flex items-center pl-4">
+            {/* InstagramFill Post */}
+            <div className="bg-neutral-base flex items-center pl-4">
               <div className="flex-1 flex items-center justify-center pr-4 py-3">
-                <p className="text-base font-semibold text-[#242527]">Instagram Post</p>
+                <p className="text-base font-semibold text-[#242527]">InstagramFill Post</p>
               </div>
               <div className="flex items-center justify-center">
                 <div className="flex items-center px-2 py-4">
@@ -671,7 +671,7 @@ const CreateCampaignPage = () => {
               <div>
                 <h3 className="text-xs font-semibold text-[#9ca3af] uppercase tracking-wide mb-3">Campaign Period</h3>
                 <div className="flex items-center gap-3 text-base text-[#242527] font-medium">
-                  <Calendar size={18} className="text-gray-400" />
+                  <CalendarLine size={18} className="text-gray-400" />
                   <span>{formData.campaignStartDate ? new Date(formData.campaignStartDate).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) : 'June 1, 2026'}</span>
                   <span className="text-gray-400">→</span>
                   <span>{formData.campaignEndDate ? new Date(formData.campaignEndDate).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) : 'June 30, 2026'}</span>
@@ -688,7 +688,7 @@ const CreateCampaignPage = () => {
                   {/* Influencers */}
                   <div>
                     <div className="flex items-center gap-2 mb-1">
-                      <Users size={16} className="text-gray-400" />
+                      <UserLine size={16} className="text-gray-400" />
                       <span className="text-sm font-medium text-[#6b7280]">Influencers</span>
                     </div>
                     <p className="text-base text-[#242527] font-medium">
@@ -822,7 +822,7 @@ const CreateCampaignPage = () => {
                 {formData.instagramStories > 0 && (
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 bg-white rounded-lg flex items-center justify-center border border-gray-300">
+                      <div className="w-12 h-12 bg-neutral-base rounded-lg flex items-center justify-center border border-gray-300">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#43573b" strokeWidth="2">
                           <rect x="3" y="3" width="18" height="18" rx="2"/>
                           <path d="M12 8v8"/>
@@ -830,7 +830,7 @@ const CreateCampaignPage = () => {
                         </svg>
                       </div>
                       <div>
-                        <p className="text-base font-semibold text-[#242527]">Instagram Story</p>
+                        <p className="text-base font-semibold text-[#242527]">InstagramFill Story</p>
                         <p className="text-xs text-[#6b7280]">UTC • Duration 15 Secs</p>
                       </div>
                     </div>
@@ -843,14 +843,14 @@ const CreateCampaignPage = () => {
                 {formData.instagramReels > 0 && (
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 bg-white rounded-lg flex items-center justify-center border border-gray-300">
+                      <div className="w-12 h-12 bg-neutral-base rounded-lg flex items-center justify-center border border-gray-300">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#43573b" strokeWidth="2">
                           <path d="M6 4h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/>
                           <polygon points="10 8 16 12 10 16 10 8"/>
                         </svg>
                       </div>
                       <div>
-                        <p className="text-base font-semibold text-[#242527]">Instagram Reel</p>
+                        <p className="text-base font-semibold text-[#242527]">InstagramFill Reel</p>
                         <p className="text-xs text-[#6b7280]">UTC • Duration 30-60 Secs</p>
                       </div>
                     </div>
@@ -863,7 +863,7 @@ const CreateCampaignPage = () => {
                 {formData.instagramPosts > 0 && (
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 bg-white rounded-lg flex items-center justify-center border border-gray-300">
+                      <div className="w-12 h-12 bg-neutral-base rounded-lg flex items-center justify-center border border-gray-300">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#43573b" strokeWidth="2">
                           <rect x="3" y="3" width="18" height="18" rx="2"/>
                           <circle cx="8.5" cy="8.5" r="1.5"/>
@@ -871,8 +871,8 @@ const CreateCampaignPage = () => {
                         </svg>
                       </div>
                       <div>
-                        <p className="text-base font-semibold text-[#242527]">Instagram Post</p>
-                        <p className="text-xs text-[#6b7280]">UTC • Image/Video</p>
+                        <p className="text-base font-semibold text-[#242527]">InstagramFill Post</p>
+                        <p className="text-xs text-[#6b7280]">UTC • Image2Line/Video</p>
                       </div>
                     </div>
                     <div className="w-10 h-10 bg-[#43573b] text-white rounded-full flex items-center justify-center font-bold text-sm">
@@ -932,13 +932,13 @@ const CreateCampaignPage = () => {
       // Build deliverables array
       const deliverables = [];
       if (formData.instagramReels > 0) {
-        deliverables.push(`${formData.instagramReels} Instagram Reels`);
+        deliverables.push(`${formData.instagramReels} InstagramFill Reels`);
       }
       if (formData.instagramStories > 0) {
-        deliverables.push(`${formData.instagramStories} Instagram Stories`);
+        deliverables.push(`${formData.instagramStories} InstagramFill Stories`);
       }
       if (formData.instagramPosts > 0) {
-        deliverables.push(`${formData.instagramPosts} Instagram Posts`);
+        deliverables.push(`${formData.instagramPosts} InstagramFill Posts`);
       }
 
       const transformedData = {
@@ -1014,15 +1014,15 @@ const CreateCampaignPage = () => {
   ];
 
   return (
-    <div className="bg-white h-screen flex flex-col overflow-hidden">
+    <div className="bg-neutral-base h-screen flex flex-col overflow-hidden">
       {/* Fixed App Bar */}
-      <div className="bg-white flex items-center justify-between px-4 py-2 shrink-0 border-b border-gray-100 sticky top-0 z-20">
+      <div className="bg-neutral-base flex items-center justify-between px-4 py-2 shrink-0 border-b border-gray-100 sticky top-0 z-20">
         {/* Back Button */}
         <button
           onClick={handleBack}
           className="flex items-center justify-center w-12 h-12 rounded-full hover:bg-gray-100 transition-colors"
         >
-          <ArrowLeft className="w-6 h-6 text-gray-700" />
+          <ArrowLeftLine className="w-6 h-6 text-gray-700" />
         </button>
 
         {/* Title */}
@@ -1035,12 +1035,12 @@ const CreateCampaignPage = () => {
           type="button"
           className="flex items-center justify-center w-12 h-12 rounded-full hover:bg-gray-100 transition-colors"
         >
-          <MoreVertical className="w-6 h-6 text-gray-700" />
+          <MoreLine className="w-6 h-6 text-gray-700" />
         </button>
       </div>
 
       {/* Fixed Progress Steps */}
-      <div className="bg-white px-9 py-4 shrink-0 sticky top-[60px] z-10 border-b border-gray-50">
+      <div className="bg-neutral-base px-9 py-4 shrink-0 sticky top-[60px] z-10 border-b border-gray-50">
         <div className="max-w-5xl mx-auto px-10">
           <div className="flex items-start justify-between relative">
             {steps.map((step, index) => (
@@ -1097,7 +1097,7 @@ const CreateCampaignPage = () => {
       </div>
 
       {/* Fixed Bottom Navigation */}
-      <div className="bg-white px-9 py-4 shrink-0 border-t border-gray-200 sticky bottom-0 z-20">
+      <div className="bg-neutral-base px-9 py-4 shrink-0 border-t border-gray-200 sticky bottom-0 z-20">
         <div className="max-w-4xl mx-auto px-40">
           <div className="flex gap-2">
             {currentStep < 7 ? (

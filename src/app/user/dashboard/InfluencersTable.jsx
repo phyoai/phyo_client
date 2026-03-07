@@ -66,15 +66,15 @@ const InfluencersTable = () => {
     <div className="bg-[#F5F3EE] py-6">
       <div className="max-w-7xl mx-auto px-6">
         {/* Section Header */}
-        <div className="flex items-center justify-between mb-6 bg-white p-5 rounded-3xl">
+        <div className="flex items-center justify-between mb-6 bg-neutral-base p-5 rounded-3xl">
           <h2 className="text-2xl font-bold text-gray-900">Influencers (25)</h2>
           <button className="text-green-600 hover:text-green-700 font-medium">
             View all
           </button>
         </div>
-<div className=' bg-white p-6 rounded-3xl'>
+<div className=' bg-neutral-base p-6 rounded-3xl'>
         {/* Table Container */}
-        <div className="bg-white rounded-3xl shadow-sm border border-gray-200 overflow-hidden">
+        <div className="bg-neutral-base rounded-3xl shadow-sm border border-gray-200 overflow-hidden">
           {/* Table Header */}
           <div className="bg-[#00674F] text-white">
             <div className="grid grid-cols-7 gap-4 px-6 py-4">

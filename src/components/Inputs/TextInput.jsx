@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useFormContext } from 'react-hook-form';
-import { Eye, EyeOff } from 'lucide-react';
+import { EyeLine, EyeOffLine } from '@phyoofficial/phyo-icon-library';
 
 const TextInput = ({ name, label, placeholder, required = false, className = '', type = 'text', validation = {} }) => {
   const { register, formState: { errors }, getFieldState } = useFormContext();

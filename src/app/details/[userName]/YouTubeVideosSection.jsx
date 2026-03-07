@@ -16,7 +16,7 @@ const YouTubeVideosSection = ({ creator }) => {
   const videos = creator.youtubeData?.videos || [];
   if (!videos.length) return null;
   return (
-    <div className='bg-white rounded-xl shadow-lg p-8 mb-8'>
+    <div className='bg-neutral-base rounded-xl shadow-lg p-8 mb-8'>
       <div className='flex items-center justify-between mb-6'>
         <h2 className='text-2xl font-bold text-gray-900 flex items-center gap-3'>
           <div className='w-8 h-8 bg-red-600 rounded-lg flex items-center justify-center'>
@@ -24,7 +24,7 @@ const YouTubeVideosSection = ({ creator }) => {
               <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
             </svg>
           </div>
-          Youtube Video
+          YoutubeFill Video
         </h2>
         <button className='bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-medium transition-colors text-sm'>
           View all
@@ -49,7 +49,7 @@ const YouTubeVideosSection = ({ creator }) => {
                   </svg>
                 </div>
               )}
-              {/* Play Button */}
+              {/* PlayLine Button */}
               <div className='absolute inset-0 flex items-center justify-center bg-black bg-opacity-30'>
                 <div className='w-16 h-16 bg-red-600 bg-opacity-90 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform'>
                   <svg className="w-8 h-8 text-white ml-1" fill="currentColor" viewBox="0 0 24 24">

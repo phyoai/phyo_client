@@ -6,7 +6,7 @@ import nextDynamic from 'next/dynamic';
 const AllCampaignsSection = nextDynamic(() => import('./AllCampaignsSection'), {
   ssr: false,
   loading: () => (
-    <div className="bg-white dark:bg-[#121212] min-h-screen py-8">
+    <div className="bg-neutral-base dark:bg-[#121212] min-h-screen py-8">
       <div className="w-full px-4">
         {/* Header Skeleton */}
         <div className="flex items-center justify-between mb-8">
@@ -37,7 +37,7 @@ const AllCampaignsSection = nextDynamic(() => import('./AllCampaignsSection'), {
                   </div>
                   <div className="w-12 h-12 bg-gray-200 dark:bg-gray-700 rounded-full animate-pulse"></div>
                 </div>
-                {/* Card Image */}
+                {/* Card Image2Line */}
                 <div className="h-[216px] bg-gray-200 dark:bg-gray-700 animate-pulse"></div>
               </div>
             ))}
@@ -52,7 +52,7 @@ const AllCampaignsSection = nextDynamic(() => import('./AllCampaignsSection'), {
           </div>
           <div className="space-y-3">
             {[...Array(5)].map((_, i) => (
-              <div key={i} className="bg-white dark:bg-[#1e1e1e] rounded-lg border border-gray-200 dark:border-gray-700 p-4 flex items-center gap-3">
+              <div key={i} className="bg-neutral-base dark:bg-[#1e1e1e] rounded-lg border border-gray-200 dark:border-gray-700 p-4 flex items-center gap-3">
                 <div className="w-12 h-12 bg-gray-200 dark:bg-gray-700 rounded-full animate-pulse"></div>
                 <div className="flex-1">
                   <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/3 mb-2 animate-pulse"></div>

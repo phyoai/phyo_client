@@ -1,6 +1,6 @@
 'use client'
 import React, { useState, useRef, useEffect } from 'react';
-import { ArrowLeft, Smile, Paperclip, Mic } from 'lucide-react';
+import { ArrowLeftLine, ChatSmile3Line, ClipboardLine, MicLine } from '@phyoofficial/phyo-icon-library';
 import { useRouter, useSearchParams } from 'next/navigation';
 
 export default function ChatPage({ params }) {
@@ -204,15 +204,15 @@ export default function ChatPage({ params }) {
   };
 
   return (
-    <div className="flex flex-col h-screen bg-white">
+    <div className="flex flex-col h-screen bg-neutral-base">
       {/* Chat Header */}
-      <div className="flex items-center justify-between px-4 sm:px-6 py-4 border-b border-gray-200 bg-white sticky top-0 z-10">
+      <div className="flex items-center justify-between px-4 sm:px-6 py-4 border-b border-gray-200 bg-neutral-base sticky top-0 z-10">
         <div className="flex items-center gap-3 sm:gap-4">
           <button
             onClick={() => router.back()}
             className="p-2 hover:bg-gray-100 rounded-full transition-colors"
           >
-            <ArrowLeft className="h-5 w-5 text-gray-700" />
+            <ArrowLeftLine className="h-5 w-5 text-gray-700" />
           </button>
           <div className="flex items-center gap-2 sm:gap-3">
             <div className="w-10 sm:w-12 h-10 sm:h-12 rounded-full bg-gradient-to-br from-orange-300 to-red-400 flex-shrink-0"></div>
@@ -230,7 +230,7 @@ export default function ChatPage({ params }) {
       </div>
 
       {/* Messages Container */}
-      <div className="flex-1 overflow-y-auto px-4 sm:px-6 py-4 space-y-3 bg-white">
+      <div className="flex-1 overflow-y-auto px-4 sm:px-6 py-4 space-y-3 bg-neutral-base">
         {messages.map((msg) => (
           <div key={msg.id} className={`flex ${msg.sender === 'me' ? 'justify-end' : 'justify-start'} gap-2`}>
             {msg.type === 'typing' ? (
@@ -267,7 +267,7 @@ export default function ChatPage({ params }) {
                   <div className="flex-1">
                     <div className="flex gap-1 mb-1">
                       {[...Array(12)].map((_, i) => (
-                        <div key={i} className="h-6 w-1 bg-white opacity-60 rounded-full" style={{ height: Math.random() * 20 + 8 + 'px' }}></div>
+                        <div key={i} className="h-6 w-1 bg-neutral-base opacity-60 rounded-full" style={{ height: Math.random() * 20 + 8 + 'px' }}></div>
                       ))}
                     </div>
                     <p className="text-xs opacity-75">{msg.voice.duration}</p>
@@ -301,7 +301,7 @@ export default function ChatPage({ params }) {
 
       {/* Emoji Picker */}
       {showEmojiPicker && (
-        <div className="px-4 sm:px-6 py-3 border-t border-gray-200 bg-white">
+        <div className="px-4 sm:px-6 py-3 border-t border-gray-200 bg-neutral-base">
           <div className="flex flex-wrap gap-2 justify-center">
             {emojis.map((emoji, idx) => (
               <button
@@ -321,7 +321,7 @@ export default function ChatPage({ params }) {
 
       {/* Attachment Panel */}
       {showAttachments && (
-        <div className="px-4 sm:px-6 py-4 border-t border-gray-200 bg-white">
+        <div className="px-4 sm:px-6 py-4 border-t border-gray-200 bg-neutral-base">
           <div className="flex gap-4 justify-center">
             <button
               onClick={() => documentInputRef.current?.click()}
@@ -389,7 +389,7 @@ export default function ChatPage({ params }) {
                     <svg className="w-5 h-5 text-[#43573b]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                     </svg>
-                    <span className="text-sm text-gray-700">Image ready to send</span>
+                    <span className="text-sm text-gray-700">Image2Line ready to send</span>
                   </>
                 ) : (
                   <>
@@ -417,14 +417,14 @@ export default function ChatPage({ params }) {
       )}
 
       {/* Message Input */}
-      <div className="px-4 sm:px-6 py-4 border-t border-gray-200 bg-white">
+      <div className="px-4 sm:px-6 py-4 border-t border-gray-200 bg-neutral-base">
         <div className="flex items-end gap-2 sm:gap-3">
           <div className="flex-1 flex items-center gap-2 bg-gray-100 rounded-full px-4 py-3">
             <button
               onClick={() => setShowEmojiPicker(!showEmojiPicker)}
               className="p-1.5 hover:bg-gray-200 rounded-full transition-colors flex-shrink-0"
             >
-              <Smile className="w-5 h-5 text-[#43573b]" />
+              <ChatSmile3Line className="w-5 h-5 text-[#43573b]" />
             </button>
             <input
               type="text"
@@ -438,13 +438,13 @@ export default function ChatPage({ params }) {
               onClick={() => setShowAttachments(!showAttachments)}
               className="p-1.5 hover:bg-gray-200 rounded-full transition-colors flex-shrink-0"
             >
-              <Paperclip className="w-5 h-5 text-[#43573b]" />
+              <ClipboardLine className="w-5 h-5 text-[#43573b]" />
             </button>
             <button
               onClick={handleVoiceRecord}
               className={`p-1.5 rounded-full transition-colors flex-shrink-0 ${isRecording ? 'bg-red-200' : 'hover:bg-gray-200'}`}
             >
-              <Mic className={`w-5 h-5 ${isRecording ? 'text-red-600' : 'text-[#43573b]'}`} />
+              <MicLine className={`w-5 h-5 ${isRecording ? 'text-red-600' : 'text-[#43573b]'}`} />
             </button>
           </div>
           <button

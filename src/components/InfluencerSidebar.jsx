@@ -1,166 +1,170 @@
 'use client'
 import React, { useState } from 'react';
-import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
+import { useSidebar } from '../app/context/SidebarContext';
+import { colors } from '@/config/colors';
 import {
-  LayoutDashboard,
-  Mail,
-  Megaphone,
-  Settings,
-  HelpCircle,
-  LogOut,
-  Handshake,
-  Wallet,
-  UserCircle
-} from 'lucide-react';
+  Dashboard3Line,
+  Dashboard3Fill,
+  InboxLine,
+  InboxFill,
+  BriefcaseLine,
+  BriefcaseFill,
+  FileSettingsLine,
+  FileSettingsFill,
+  Information2Line,
+  Information2Fill,
+  LogoutBoxLine,
+  WalletLine,
+  WalletFill,
+  AccountCircleLine,
+  AccountCircleFill,
+} from '@phyoofficial/phyo-icon-library';
+import NavRail from './NavRail';
+import NavItem from './NavItem';
 
 const InfluencerSidebar = () => {
   const pathname = usePathname();
   const router = useRouter();
   const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const { isExpanded, setIsExpanded } = useSidebar();
+  const [mounted, setMounted] = React.useState(false);
 
-  const navItems = [
-    { name: 'Dashboard', href: '/influencer/dashboard', icon: LayoutDashboard },
-    { name: 'Inbox', href: '/influencer/inbox', icon: Mail },
-    { name: 'Campaigns', href: '/influencer/campaigns', icon: Megaphone },
-    { name: 'Deals', href: '/influencer/deals', icon: Handshake },
-    { name: 'Earnings', href: '/influencer/earnings', icon: Wallet },
-    { name: 'Profile Management', href: '/influencer/profile-management', icon: UserCircle },
-    { name: 'Account', href: `/${role}/account`, icon: UserCircle },
-    { name: 'Settings', href: '/influencer/settings', icon: Settings },
+  React.useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const navItemsConfig = [
+    { name: 'Dashboard', href: '/influencer/dashboard', activeIcon: Dashboard3Fill, inactiveIcon: Dashboard3Line },
+    { name: 'Inbox', href: '/influencer/inbox', activeIcon: InboxFill, inactiveIcon: InboxLine },
+    { name: 'Campaigns', href: '/influencer/campaigns', activeIcon: Dashboard3Fill, inactiveIcon: Dashboard3Line },
+    { name: 'Deals', href: '/influencer/deals', activeIcon: BriefcaseFill, inactiveIcon: BriefcaseLine },
+    { name: 'Earnings', href: '/influencer/earnings', activeIcon: WalletFill, inactiveIcon: WalletLine },
+    { name: 'Profile Management', href: '/influencer/profile-management', activeIcon: AccountCircleFill, inactiveIcon: AccountCircleLine },
+    { name: 'Account', href: '/influencer/account', activeIcon: AccountCircleFill, inactiveIcon: AccountCircleLine },
+    { name: 'Settings', href: '/influencer/settings', activeIcon: FileSettingsFill, inactiveIcon: FileSettingsLine },
   ];
 
-  const bottomNavItems = [
-    { name: 'Help', href: '/influencer/help', icon: HelpCircle },
-    { name: 'Logout Account', href: '#', icon: LogOut, isLogout: true },
+  const bottomNavItemsConfig = [
+    { name: 'Help', href: '/influencer/help', activeIcon: Information2Fill, inactiveIcon: Information2Line },
   ];
 
   const handleLogout = () => {
-    // Clear authentication tokens
     localStorage.removeItem('authToken');
     localStorage.removeItem('userInfo');
     document.cookie = 'authToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
-    
-    // Close modal and redirect to main login page
     setShowLogoutModal(false);
     router.push('/login');
   };
 
-  return (
-    <div className="h-screen w-64 bg-white border-r border-gray-200 fixed left-0 top-0 flex flex-col">
-      {/* Logo Section */}
-      <div className="p-6">
-        <img 
-          src="/logo.png" 
-          alt="Ph40" 
-          className="h-8 w-auto"
+  const navItems = [
+    ...navItemsConfig.map((item) => ({
+      ...item,
+      component: (
+        <NavItem
+          key={item.name}
+          href={item.href}
+          icon={pathname === item.href ? item.activeIcon : item.inactiveIcon}
+          label={item.name}
+          isActive={pathname === item.href}
+          isExpanded={isExpanded}
         />
-      </div>
+      ),
+    })),
+    ...bottomNavItemsConfig.map((item) => ({
+      ...item,
+      isBottom: true,
+      component: (
+        <NavItem
+          key={item.name}
+          href={item.href}
+          icon={pathname === item.href ? item.activeIcon : item.inactiveIcon}
+          label={item.name}
+          isActive={pathname === item.href}
+          isExpanded={isExpanded}
+        />
+      ),
+    })),
+    {
+      name: 'Logout Account',
+      isBottom: true,
+      component: (
+        <button
+          key="logout"
+          onClick={() => setShowLogoutModal(true)}
+          className={`flex gap-[4px] items-center py-[6px] relative shrink-0 w-full transition-colors duration-300 bg-transparent border-none cursor-pointer ${
+            isExpanded ? 'rounded-[32px] px-[12px]' : 'flex-col justify-center h-[64px]'
+          }`}
+        >
+          <div className="flex items-center justify-center relative rounded-[8px] shrink-0">
+            <div className={`flex gap-[10px] items-center justify-center relative rounded-[8px] shrink-0 transition-all duration-300 ${
+              isExpanded ? 'px-[4px] py-[8px]' : 'h-[32px] p-[4px]'
+            }`}>
+              <LogoutBoxLine width={24} height={24} fill={colors.semantic.error.bold} />
+            </div>
+          </div>
+          <div
+            className={`flex flex-col font-medium justify-center leading-none relative shrink-0 text-center transition-colors duration-300 text-[14px] tracking-[0.2px] ${
+              isExpanded ? 'whitespace-nowrap' : 'w-full'
+            }`}
+            style={{ color: colors.semantic.error.bold }}
+          >
+            <p className="leading-[20px]">Logout</p>
+          </div>
+        </button>
+      ),
+    },
+  ];
 
-      {/* Main Navigation */}
-      <nav className="flex-1">
-        <div className="px-3 space-y-1">
-          {navItems.map((item) => {
-            const Icon = item.icon;
-            const isActive = pathname === item.href;
+  return (
+    <>
+      <NavRail
+        isExpanded={isExpanded}
+        setIsExpanded={setIsExpanded}
+        navItems={navItems}
+        activeHref={pathname}
+        navRefs={React.useRef([])}
+        mounted={mounted}
+      />
 
-            return (
-              <Link
-                key={item.name}
-                href={item.href}
-                className={`flex items-center px-3 py-3 text-sm font-medium rounded-lg transition-colors ${
-                  isActive
-                    ? 'bg-green-100 text-green-800'
-                    : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-                }`}
-              >
-                <Icon className="mr-3 h-5 w-5" />
-                {item.name}
-              </Link>
-            );
-          })}
-        </div>
-
-        {/* Bottom Navigation Items */}
-        <div className="px-3 space-y-1 mt-8">
-          {bottomNavItems.map((item) => {
-            const Icon = item.icon;
-            const isActive = pathname === item.href;
-
-            if (item.isLogout) {
-              return (
-                <button
-                  key={item.name}
-                  onClick={() => setShowLogoutModal(true)}
-                  className="flex items-center w-full px-3 py-3 text-sm font-medium text-red-600 hover:bg-red-50 hover:text-red-700 rounded-lg transition-colors"
-                >
-                  <Icon className="mr-3 h-5 w-5" />
-                  {item.name}
-                </button>
-              );
-            }
-
-            return (
-              <Link
-                key={item.name}
-                href={item.href}
-                className={`flex items-center px-3 py-3 text-sm font-medium rounded-lg transition-colors ${
-                  isActive
-                    ? 'bg-green-100 text-green-800'
-                    : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-                }`}
-              >
-                <Icon className="mr-3 h-5 w-5" />
-                {item.name}
-              </Link>
-            );
-          })}
-        </div>
-      </nav>
-
-      {/* Get PRO Section */}
-      <div className="p-4 border-t border-gray-200">
-        <div className="bg-green-50 rounded-lg p-4 text-center">
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">
-            Get PRO!!
-          </h3>
-          <p className="text-sm text-gray-600 mb-4">
-            Upgrade now to unlock premium features
-          </p>
-          <button className="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-lg transition-colors">
-            Upgrade Now
-          </button>
-        </div>
-      </div>
-
-      {/* Logout Confirmation Modal */}
       {showLogoutModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-8 max-w-sm w-full mx-4 shadow-xl">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[100]">
+          <div
+            className="rounded-lg p-8 max-w-sm w-full mx-4 shadow-xl"
+            style={{ backgroundColor: colors.ui.white }}
+          >
             <div className="flex justify-center mb-4">
-              <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center">
-                <LogOut className="w-8 h-8 text-red-600" />
+              <div
+                className="w-16 h-16 rounded-full flex items-center justify-center"
+                style={{ backgroundColor: '#FEE2E2' }}
+              >
+                <LogoutBoxLine width={32} height={32} fill={colors.semantic.error.bold} />
               </div>
             </div>
-            
-            <h2 className="text-2xl font-bold text-gray-900 text-center mb-2">
-              Logout
-            </h2>
-            
-            <p className="text-gray-600 text-center mb-6">
-              Are you sure you want to logout?
-            </p>
-            
+            <h2 className="text-2xl font-bold text-center mb-2" style={{ color: colors.text.neutral.base }}>Logout</h2>
+            <p className="text-center mb-6" style={{ color: colors.neutral.inverse.muted }}>Are you sure you want to logout?</p>
             <div className="flex gap-3">
               <button
                 onClick={() => setShowLogoutModal(false)}
-                className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium"
+                className="flex-1 px-4 py-2 rounded-lg transition-colors font-medium border"
+                style={{
+                  borderColor: colors.neutral.muted,
+                  color: colors.text.neutral.base,
+                }}
+                onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = colors.neutral.muted)}
+                onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
               >
                 Cancel
               </button>
               <button
                 onClick={handleLogout}
-                className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium"
+                className="flex-1 px-4 py-2 rounded-lg transition-colors font-medium"
+                style={{
+                  backgroundColor: colors.semantic.error.bold,
+                  color: colors.ui.white,
+                }}
+                onMouseEnter={(e) => (e.currentTarget.style.opacity = '0.9')}
+                onMouseLeave={(e) => (e.currentTarget.style.opacity = '1')}
               >
                 Yes, Logout
               </button>
@@ -168,7 +172,7 @@ const InfluencerSidebar = () => {
           </div>
         </div>
       )}
-    </div>
+    </>
   );
 };
 

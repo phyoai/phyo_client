@@ -1,32 +1,32 @@
 import React from 'react';
-import { Edit2, MapPin, Calendar, MoreHorizontal, FileText, Clock, CheckCircle, AlertCircle, BarChart3 } from 'lucide-react';
+import { MapPinLine, CalendarLine, MoreLine, CheckLine, BarChartLine, EditLine, ClockwiseLine, AlertFill } from '@phyoofficial/phyo-icon-library';
 
 const ServiceProviderProfile = () => {
   const projectStats = [
     {
       title: "In Progress",
       value: "50",
-      icon: <Clock className="w-6 h-6 text-emerald-600" />
+      icon: <ClockwiseLine className="w-6 h-6 text-emerald-600" />
     },
     {
       title: "Upcoming",
       value: "50", 
-      icon: <Calendar className="w-6 h-6 text-emerald-600" />
+      icon: <CalendarLine className="w-6 h-6 text-emerald-600" />
     },
     {
       title: "Completed",
       value: "50",
-      icon: <CheckCircle className="w-6 h-6 text-emerald-600" />
+      icon: <CheckLine className="w-6 h-6 text-emerald-600" />
     },
     {
       title: "Pending",
       value: "50",
-      icon: <AlertCircle className="w-6 h-6 text-emerald-600" />
+      icon: <AlertFill className="w-6 h-6 text-emerald-600" />
     },
     {
       title: "Total Project",
       value: "50",
-      icon: <BarChart3 className="w-6 h-6 text-emerald-600" />
+      icon: <BarChartLine className="w-6 h-6 text-emerald-600" />
     }
   ];
 
@@ -69,7 +69,7 @@ const ServiceProviderProfile = () => {
     <div className="min-h-screen bg-gray-50 p-6">
       <div className="max-w-7xl mx-auto">
         {/* Profile Header */}
-        <div className="bg-white rounded-lg p-6 mb-6 shadow-sm border border-gray-200">
+        <div className="bg-neutral-base rounded-lg p-6 mb-6 shadow-sm border border-gray-200">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
               <img 
@@ -97,7 +97,7 @@ const ServiceProviderProfile = () => {
                 <div className="text-sm text-gray-600">Engagement rate</div>
               </div>
               <button className="flex items-center space-x-2 bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700">
-                <Edit2 className="w-4 h-4" />
+                <EditLine className="w-4 h-4" />
                 <span>Edit</span>
               </button>
             </div>
@@ -105,7 +105,7 @@ const ServiceProviderProfile = () => {
         </div>
 
         {/* About Section */}
-        <div className="bg-white rounded-lg p-6 mb-6 shadow-sm border border-gray-200">
+        <div className="bg-neutral-base rounded-lg p-6 mb-6 shadow-sm border border-gray-200">
           <h2 className="text-xl font-bold text-gray-900 mb-3">About</h2>
           <p className="text-gray-600 mb-6">
             UI/UX design focuses on creating user-friendly and visually appealing interfaces. UI deals with look and layout, while UX ensures a seamless, enjoyable experience for users by enhancing usability and satisfaction.
@@ -115,7 +115,7 @@ const ServiceProviderProfile = () => {
             <div>
               <h3 className="font-semibold text-gray-900 mb-2">Location</h3>
               <div className="flex items-center text-gray-600">
-                <MapPin className="w-4 h-4 mr-2" />
+                <MapPinLine className="w-4 h-4 mr-2" />
                 <span>London, UK</span>
               </div>
             </div>
@@ -123,7 +123,7 @@ const ServiceProviderProfile = () => {
             <div>
               <h3 className="font-semibold text-gray-900 mb-2">Experience</h3>
               <div className="flex items-center text-gray-600">
-                <Calendar className="w-4 h-4 mr-2" />
+                <CalendarLine className="w-4 h-4 mr-2" />
                 <span>3 - 7 Years</span>
               </div>
             </div>
@@ -145,7 +145,7 @@ const ServiceProviderProfile = () => {
           {/* Project Stats Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
             {projectStats.map((stat, index) => (
-              <div key={index} className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
+              <div key={index} className="bg-neutral-base rounded-lg p-6 shadow-sm border border-gray-200">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm font-medium text-gray-600 mb-1">{stat.title}</p>
@@ -161,7 +161,7 @@ const ServiceProviderProfile = () => {
         </div>
 
         {/* Our Work Progress */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+        <div className="bg-neutral-base rounded-lg shadow-sm border border-gray-200">
           <div className="px-6 py-4 border-b border-gray-200">
             <h2 className="text-xl font-bold text-gray-900">Our Work Progress</h2>
           </div>
@@ -196,7 +196,7 @@ const ServiceProviderProfile = () => {
                   <div className="flex-1 flex items-center justify-end space-x-4">
                     <span className="text-gray-600 text-sm">{work.date}</span>
                     <button className="text-gray-400 hover:text-gray-600">
-                      <MoreHorizontal className="w-5 h-5" />
+                      <MoreLine className="w-5 h-5" />
                     </button>
                   </div>
                 </div>

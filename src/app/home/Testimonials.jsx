@@ -1,10 +1,10 @@
-import Image from "next/image";
+import Image2Line from "next/image";
 
 const testimonials = [
   {
     id: 1,
     logo: "/ninjacart.png", // Replace with actual logo path
-    quote: "It was great collaborating with the Pyromedia team, they have a strong grasp of data and are proficient in platform like LinkedIn, Instagram and YouTube. I wholeheartedly recommend their service. ",
+    quote: "It was great collaborating with the Pyromedia team, they have a strong grasp of data and are proficient in platform like LinkedIn, InstagramFill and YouTube. I wholeheartedly recommend their service. ",
     name: "Suheil Mohan",
     role: "Head of Brand (NinjaCart)",
     avatar: "/dummyAvatar.jpg", // Replace with actual image path
@@ -27,7 +27,7 @@ const awards = [
 
 export default function Testimonials() {
   return (
-    <section className="py-12 bg-white">
+    <section className="py-12 bg-neutral-base">
       <h2 className="text-4xl font-bold text-center mb-8">Testimonial</h2>
 
       {/* Testimonials */}
@@ -36,11 +36,11 @@ export default function Testimonials() {
           <div key={t.id} className="border border-green-400 p-6 rounded-2xl shadow-md">
             <div className="flex items-center justify-between mb-4">
               <span className="text-gray-300 text-5xl">“</span>
-              <Image src={t.logo} alt="Company Logo" width={100} height={40} />
+              <Image2Line src={t.logo} alt="Company Logo" width={100} height={40} />
             </div>
             <p className="text-gray-700 mb-4">{t.quote}</p>
             <div className="flex items-center gap-3">
-              <Image src={t.avatar} alt={t.name} width={40} height={40} className="rounded-full" />
+              <Image2Line src={t.avatar} alt={t.name} width={40} height={40} className="rounded-full" />
               <div>
                 <p className="text-green-700 font-semibold">{t.name}</p>
                 <p className="text-gray-500 text-sm">{t.role}</p>
@@ -54,7 +54,7 @@ export default function Testimonials() {
       {/* <div className="grid md:grid-cols-3 gap-6 mt-10 px-6 lg:px-20">
         {awards.map((award) => (
           <div key={award.id} className="border border-green-400 p-6 rounded-2xl shadow-md flex flex-col items-center text-center">
-            <Image src={award.image} alt="Award" width={100} height={100} />
+            <Image2Line src={award.image} alt="Award" width={100} height={100} />
             <p className="mt-4 text-gray-700">{award.text}</p>
             {award.stat && <p className="text-green-700 font-bold text-xl">{award.stat}</p>}
           </div>

@@ -2,7 +2,10 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, MoreVertical } from 'lucide-react';
+import { ArrowLeftLine } from '@phyoofficial/phyo-icon-library';
+import AppBar from '@/components/AppBar';
+import Button from '@/components/Button';
+import IconButton from '@/components/IconButton';
 
 const RadioButton = ({ selected = false, disabled = false, onChange }) => {
   return (
@@ -94,7 +97,7 @@ export default function UpgradePlan() {
         '10 AI-Powered Campaign Reports',
         'Dedicated Chat Support',
         'AI optimizes campaigns',
-        'Unlimited Users',
+        'Unlimited UserLine',
         'Historical Data (Up to 6 months)',
         'Exportable Analytics (CSV/ PDF)',
         'AI Smart Creators, Niche, Region, Top',
@@ -129,7 +132,7 @@ export default function UpgradePlan() {
  // Payment success view
 if (paymentSuccess) {
   return (
-    <div className="bg-white h-screen flex flex-col items-center justify-center px-4">
+    <div className="bg-neutral-base h-screen flex flex-col items-center justify-center px-4">
       <style>{`
         @keyframes popScale {
           0% {
@@ -170,12 +173,13 @@ if (paymentSuccess) {
         }
       `}</style>
 
-      <button
+      <IconButton
+        icon={ArrowLeftLine}
+        size="lg"
+        variant="default"
         onClick={() => router.push('/brand/account')}
-        className="absolute top-4 left-4 flex items-center justify-center w-12 h-12 hover:bg-gray-100 rounded-full transition-colors"
-      >
-        <ArrowLeft className="w-6 h-6 text-[#242527]" />
-      </button>
+        className="absolute top-4 left-4"
+      />
 
       <div className="flex flex-col items-center gap-6">
         <div className="pop-scale">
@@ -194,12 +198,13 @@ if (paymentSuccess) {
           Your plan has been updated and all features are now unlocked.
         </p>
 
-        <button
+        <Button
+          variant="primary"
+          size="lg"
           onClick={() => router.push('/brand/dashboard')}
-          className="bg-[#43573B] hover:bg-[#3d4f36] text-white py-3 px-8 rounded-full font-semibold transition-colors"
         >
           Go to home
-        </button>
+        </Button>
       </div>
     </div>
   );
@@ -208,15 +213,15 @@ if (paymentSuccess) {
   // Billing form view
   if (showBillingForm) {
     return (
-      <div className="bg-white h-screen flex flex-col">
+      <div className="bg-neutral-base h-screen flex flex-col">
         {/* Header */}
         <div className="flex items-center justify-between px-4 py-4 border-b border-gray-100">
-          <button
+          <IconButton
+            icon={ArrowLeftLine}
+            size="lg"
+            variant="default"
             onClick={() => setShowBillingForm(false)}
-            className="flex items-center justify-center w-12 h-12 hover:bg-gray-100 rounded-full transition-colors"
-          >
-            <ArrowLeft className="w-6 h-6 text-[#242527]" />
-          </button>
+          />
           <h2 className="text-xl font-semibold text-[#242527]" style={{ fontFamily: 'Manrope, sans-serif' }}>
             Billing
           </h2>
@@ -230,9 +235,9 @@ if (paymentSuccess) {
             <div>
               <h3 className="text-lg font-semibold text-[#242527] mb-4">Contact Details</h3>
 
-              {/* Phone Number */}
+              {/* PhoneLine Number */}
               <div className="mb-4">
-                <label className="block text-sm font-medium text-[#242527] mb-2">Phone number</label>
+                <label className="block text-sm font-medium text-[#242527] mb-2">PhoneLine number</label>
                 <div className="flex gap-2">
                   <select className="w-20 bg-gray-100 border border-gray-200 rounded px-3 py-2 text-[#242527]">
                     <option>+91</option>
@@ -330,13 +335,14 @@ if (paymentSuccess) {
         </div>
 
         {/* Proceed Button */}
-        <div className="sticky bottom-0 px-6 py-4 border-t border-gray-100 flex justify-center bg-white">
-          <button
+        <div className="sticky bottom-0 px-6 py-4 border-t border-gray-100 flex justify-center bg-neutral-base">
+          <Button
+            variant="primary"
+            size="lg"
             onClick={() => setPaymentSuccess(true)}
-            className="bg-[#43573B] hover:bg-[#3d4f36] text-white py-3 px-8 rounded-full font-semibold transition-colors"
           >
             Proceed to payment
-          </button>
+          </Button>
         </div>
       </div>
     );
@@ -344,26 +350,13 @@ if (paymentSuccess) {
 
   // Plans view (default)
   return (
-    <div className="bg-white h-screen flex flex-col">
-      {/* Header/App Bar */}
-      <div className="bg-white flex items-center justify-between px-1 py-2 border-b border-gray-100 shrink-0">
-        <button
-          onClick={() => router.push('/brand/account')}
-          className="flex items-center justify-center w-12 h-12 hover:bg-gray-100 rounded-full transition-colors"
-        >
-          <ArrowLeft className="w-6 h-6 text-[#242527]" />
-        </button>
-
-        <div className="flex-1 px-2">
-          <h2 className="text-xl font-semibold text-[#242527]" style={{ fontFamily: 'Manrope, sans-serif' }}>
-            Plans & Billings
-          </h2>
-        </div>
-
-        <button className="flex items-center justify-center w-12 h-12 hover:bg-gray-100 rounded-full transition-colors">
-          <MoreVertical className="w-6 h-6 text-[#242527]" />
-        </button>
-      </div>
+    <div className="bg-neutral-base h-screen flex flex-col">
+      <AppBar
+        title="Plans & Billings"
+        onBack={() => router.push('/brand/account')}
+        showMenu={true}
+        onMenuClick={() => console.log('Open menu')}
+      />
 
       {/* Plans Container */}
       <div className="flex-1 px-9 py-4">
@@ -428,18 +421,15 @@ if (paymentSuccess) {
       </div>
 
       {/* Proceed to Billing Button */}
-      <div className="sticky bottom-0 px-9 py-4 border-t border-gray-100 flex justify-center bg-white">
-        <button
+      <div className="sticky bottom-0 px-9 py-4 border-t border-gray-100 flex justify-center bg-neutral-base">
+        <Button
+          variant="primary"
+          size="lg"
           onClick={() => setShowBillingForm(true)}
           disabled={selectedPlan === 'free'}
-          className={`py-3 px-8 rounded-full font-semibold transition-colors min-h-[48px] flex items-center justify-center ${
-            selectedPlan === 'free'
-              ? 'bg-gray-300 text-gray-600 cursor-not-allowed'
-              : 'bg-[#43573B] hover:bg-[#3d4f36] text-white'
-          }`}
         >
           {selectedPlan === 'free' ? 'Select a plan to proceed' : 'Proceed to billing'}
-        </button>
+        </Button>
       </div>
     </div>
   );

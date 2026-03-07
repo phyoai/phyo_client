@@ -1,6 +1,6 @@
 'use client'
 import React from 'react';
-import { X } from 'lucide-react';
+import { CloseLine } from '@phyoofficial/phyo-icon-library';
 
 const RoleSelectionModal = ({ isOpen, onClose, onSelectInfluencer, onSelectBrand }) => {
   if (!isOpen) return null;
@@ -15,13 +15,13 @@ const RoleSelectionModal = ({ isOpen, onClose, onSelectInfluencer, onSelectBrand
       
       {/* Modal */}
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-        <div className="bg-white rounded-3xl shadow-2xl max-w-md w-full relative animate-fadeIn">
+        <div className="bg-neutral-base rounded-3xl shadow-2xl max-w-md w-full relative animate-fadeIn">
           {/* Close Button */}
           <button
             onClick={onClose}
             className="absolute top-4 right-4 p-2 hover:bg-gray-100 rounded-full transition-colors"
           >
-            <X className="h-5 w-5 text-gray-600" />
+            <CloseLine className="h-5 w-5 text-gray-600" />
           </button>
 
           {/* Content */}

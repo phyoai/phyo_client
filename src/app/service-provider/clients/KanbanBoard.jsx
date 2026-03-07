@@ -1,5 +1,5 @@
 import React from 'react';
-import { MoreHorizontal, MessageCircle } from 'lucide-react';
+import { MoreLine, Message3Line } from '@phyoofficial/phyo-icon-library';
 
 const KanbanBoard = () => {
   const columns = [
@@ -144,14 +144,14 @@ const KanbanBoard = () => {
   ];
 
   const TaskCard = ({ task }) => (
-    <div className="bg-white rounded-lg p-4 mb-3 shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
+    <div className="bg-neutral-base rounded-lg p-4 mb-3 shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
       <div className="flex items-start justify-between mb-3">
         <div className="flex-1">
           <h3 className="font-semibold text-gray-900 text-sm mb-1">{task.title}</h3>
           <p className="text-gray-500 text-xs">{task.subtitle}</p>
         </div>
         <button className="text-gray-400 hover:text-gray-600">
-          <MoreHorizontal className="w-4 h-4" />
+          <MoreLine className="w-4 h-4" />
         </button>
       </div>
       
@@ -169,14 +169,14 @@ const KanbanBoard = () => {
         <div className="flex items-center space-x-2">
           <img 
             src={task.avatar} 
-            alt="User avatar" 
+            alt="UserLine avatar" 
             className="w-6 h-6 rounded-full object-cover"
           />
           <span className="text-gray-500 text-xs">{task.date}</span>
         </div>
         
         <div className="flex items-center space-x-1 text-gray-400">
-          <MessageCircle className="w-4 h-4" />
+          <Message3Line className="w-4 h-4" />
           <span className="text-xs">{task.comments}</span>
         </div>
       </div>
@@ -193,12 +193,12 @@ const KanbanBoard = () => {
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center space-x-2">
                   <h2 className="font-semibold text-gray-900">{column.title}</h2>
-                  <span className="bg-white text-gray-600 text-xs px-2 py-1 rounded-full">
+                  <span className="bg-neutral-base text-gray-600 text-xs px-2 py-1 rounded-full">
                     {column.count}
                   </span>
                 </div>
                 <button className="text-gray-400 hover:text-gray-600">
-                  <MoreHorizontal className="w-4 h-4" />
+                  <MoreLine className="w-4 h-4" />
                 </button>
               </div>
               

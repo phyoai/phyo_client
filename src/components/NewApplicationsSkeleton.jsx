@@ -2,9 +2,9 @@ import React from 'react';
 
 const NewApplicationsSkeleton = () => {
   return (
-    <div className="bg-white h-screen flex flex-col overflow-hidden">
+    <div className="bg-neutral-base h-screen flex flex-col overflow-hidden">
       {/* App Bar Skeleton */}
-      <div className="bg-white flex items-center justify-between px-4 py-2 border-b border-gray-100 shrink-0">
+      <div className="bg-neutral-base flex items-center justify-between px-4 py-2 border-b border-gray-100 shrink-0">
         <div className="w-12 h-12 rounded-full bg-gray-200 animate-pulse" />
         <div className="h-6 bg-gray-200 rounded flex-1 mx-4 max-w-[200px] animate-pulse" />
         <div className="w-12 h-12 rounded-full bg-gray-200 animate-pulse" />
@@ -17,7 +17,7 @@ const NewApplicationsSkeleton = () => {
           {[1, 2, 3, 4, 5].map((index) => (
             <div
               key={index}
-              className="bg-white flex items-center py-3 border-b border-gray-100"
+              className="bg-neutral-base flex items-center py-3 border-b border-gray-100"
             >
               {/* Avatar Skeleton */}
               <div className="flex items-center px-4 py-1.5 shrink-0">
@@ -47,7 +47,7 @@ const NewApplicationsSkeleton = () => {
           <div className="flex flex-col h-full">
             {/* Scrollable Top Section */}
             <div className="flex-1 overflow-y-auto">
-              {/* Cover Image Skeleton */}
+              {/* Cover Image2Line Skeleton */}
               <div className="relative h-[271px] w-full bg-gray-200 animate-pulse" />
 
               {/* Profile Section Skeleton */}
@@ -78,7 +78,7 @@ const NewApplicationsSkeleton = () => {
               </div>
 
               {/* Tabs Skeleton */}
-              <div className="border-b border-gray-200 bg-white sticky top-0 z-10">
+              <div className="border-b border-gray-200 bg-neutral-base sticky top-0 z-10">
                 <div className="flex">
                   {[1, 2, 3].map((index) => (
                     <div key={index} className="flex-1 pb-4 flex justify-center">
@@ -110,7 +110,7 @@ const NewApplicationsSkeleton = () => {
                     {[1, 2, 3, 4].map((index) => (
                       <div key={index} className="border border-gray-200 rounded-xl overflow-hidden">
                         {/* Platform Header */}
-                        <div className="flex items-center px-6 py-3 bg-white">
+                        <div className="flex items-center px-6 py-3 bg-neutral-base">
                           <div className="w-6 h-6 bg-gray-200 rounded mr-4 animate-pulse" />
                           <div className="h-4 bg-gray-200 rounded w-24 animate-pulse" />
                         </div>
@@ -158,7 +158,7 @@ const NewApplicationsSkeleton = () => {
             </div>
 
             {/* Sticky Action Buttons Skeleton */}
-            <div className="flex gap-4 p-6 border-t border-gray-200 bg-white shrink-0">
+            <div className="flex gap-4 p-6 border-t border-gray-200 bg-neutral-base shrink-0">
               <div className="flex-1 h-12 bg-gray-200 rounded-full animate-pulse" />
               <div className="flex-1 h-12 bg-gray-200 rounded-full animate-pulse" />
             </div>

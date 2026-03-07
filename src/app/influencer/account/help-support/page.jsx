@@ -2,7 +2,11 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, MoreVertical, FileText, MessageSquare, Mail, Phone, X, Search } from 'lucide-react';
+import { ArrowLeftLine, FileTextLine, Message3Line, MailLine, PhoneLine, CloseLine, SearchLine } from '@phyoofficial/phyo-icon-library';
+import AppBar from '@/components/AppBar';
+import Button from '@/components/Button';
+import IconButton from '@/components/IconButton';
+import Card from '@/components/Card';
 
 export default function HelpSupport() {
   const router = useRouter();
@@ -37,7 +41,7 @@ export default function HelpSupport() {
     {
       id: 3,
       title: "What's the difference between influencer and brand accounts?",
-      content: "**Influencer Accounts** are designed for content creators and influencers who want to collaborate with brands. Features include:\n- Portfolio showcase\n- Analytics dashboard for engagement tracking\n- Collaboration requests from brands\n- Direct messaging with brands\n\n**Brand Accounts** are for businesses looking to collaborate with influencers. Features include:\n- Search and filter influencers by niche\n- Campaign management tools\n- Budget and deliverable tracking\n- Team collaboration features\n\nChoose the account type that best fits your role in the influencer marketing ecosystem."
+      content: "**Influencer Accounts** are designed for content creators and influencers who want to collaborate with brands. Features include:\n- Portfolio showcase\n- Analytics dashboard for engagement tracking\n- Collaboration requests from brands\n- Direct messaging with brands\n\n**Brand Accounts** are for businesses looking to collaborate with influencers. Features include:\n- SearchLine and filter influencers by niche\n- Campaign management tools\n- Budget and deliverable tracking\n- Team collaboration features\n\nChoose the account type that best fits your role in the influencer marketing ecosystem."
     },
     {
       id: 4,
@@ -47,7 +51,7 @@ export default function HelpSupport() {
     {
       id: 5,
       title: "How can user feedback improve product design?",
-      content: "User feedback is invaluable for improving our platform:\n\n1. **Direct Feedback**: We actively listen to suggestions and complaints from our users.\n\n2. **Usage Analytics**: We analyze how users interact with different features to identify pain points.\n\n3. **User Testing**: We conduct regular sessions with users to understand their needs and frustrations.\n\n4. **Community Forum**: Our community discusses feature requests and improvements.\n\n5. **Continuous Iteration**: Based on feedback, we regularly update and improve our features.\n\n6. **Transparency**: We keep our users informed about upcoming changes and improvements.\n\nIf you have feedback or suggestions, please don't hesitate to contact our support team. Your input helps us build a better platform for everyone."
+      content: "UserLine feedback is invaluable for improving our platform:\n\n1. **Direct Feedback**: We actively listen to suggestions and complaints from our users.\n\n2. **Usage Analytics**: We analyze how users interact with different features to identify pain points.\n\n3. **UserLine Testing**: We conduct regular sessions with users to understand their needs and frustrations.\n\n4. **Community Forum**: Our community discusses feature requests and improvements.\n\n5. **Continuous Iteration**: Based on feedback, we regularly update and improve our features.\n\n6. **Transparency**: We keep our users informed about upcoming changes and improvements.\n\nIf you have feedback or suggestions, please don't hesitate to contact our support team. Your input helps us build a better platform for everyone."
     }
   ];
 
@@ -58,47 +62,35 @@ export default function HelpSupport() {
   const selectedFaq = faqs.find(faq => faq.id === selectedFaqId);
 
   const FaqItem = ({ faq, onClick }) => (
-    <button onClick={onClick} className="w-full flex items-center px-6 py-5 bg-white hover:bg-gray-50 transition-colors">
-      <FileText className="w-6 h-6 text-[#43573b] mr-3 flex-shrink-0" strokeWidth={1.5} />
+    <button onClick={onClick} className="w-full flex items-center px-6 py-5 bg-neutral-base hover:bg-gray-50 transition-colors">
+      <FileTextLine className="w-6 h-6 text-[#43573b] mr-3 flex-shrink-0" strokeWidth={1.5} />
       <span className="text-base font-semibold text-[#242527] text-left">{faq.title}</span>
     </button>
   );
 
   return (
-    <div className="w-full h-full flex flex-col bg-white">
-      {/* App Bar */}
-      <div className="flex items-center justify-between px-1 py-2 border-b border-gray-100">
-        <button
-          onClick={() => router.back()}
-          className="flex items-center justify-center w-12 h-12 rounded-full hover:bg-gray-100 transition-colors"
-        >
-          <ArrowLeft className="w-6 h-6 text-[#242527]" />
-        </button>
-        
-        <h1 className="flex-1 text-xl font-semibold text-[#242527] px-2">
-          Help & Support
-        </h1>
-        
-        <button
-          onClick={() => setIsLanguageModalOpen(true)}
-          className="flex items-center justify-center w-12 h-12 rounded-full hover:bg-gray-100 transition-colors"
-        >
-          <MoreVertical className="w-6 h-6 text-[#242527]" />
-        </button>
-      </div>
+    <div className="w-full h-full flex flex-col bg-neutral-base">
+      <AppBar
+        title="Help & Support"
+        onBack={() => router.back()}
+        showMenu={true}
+        onMenuClick={() => setIsLanguageModalOpen(true)}
+      />
 
       {/* Content */}
       <div className="flex-1 overflow-y-auto px-9 relative flex flex-col">
         {selectedFaqId ? (
           /* FAQ Detail View */
           <>
-            <button
-              onClick={() => setSelectedFaqId(null)}
-              className="flex items-center gap-2 px-4 py-4 text-[#242527] hover:bg-gray-50 rounded -ml-4"
-            >
-              <ArrowLeft className="w-5 h-5" />
-              <span className="text-sm font-semibold">Back</span>
-            </button>
+            <div className="flex items-center gap-2 px-4 py-4 -ml-4">
+              <IconButton
+                icon={ArrowLeftLine}
+                size="sm"
+                variant="default"
+                onClick={() => setSelectedFaqId(null)}
+              />
+              <span className="text-sm font-semibold text-[#242527]">Back</span>
+            </div>
             <div className="flex-1 px-4 py-4">
               <h1 className="text-2xl font-semibold text-[#242527] mb-4">{selectedFaq.title}</h1>
               <p className="text-base text-[#505152] whitespace-pre-line leading-relaxed">{selectedFaq.content}</p>
@@ -113,13 +105,13 @@ export default function HelpSupport() {
               <p className="text-lg text-[#242527] mb-6">How can we help?</p>
             </div>
 
-            {/* Search Box */}
+            {/* SearchLine Box */}
             <div className="px-4 pb-6">
               <div className="relative">
-                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                <SearchLine className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
                 <input
                   type="text"
-                  placeholder="Search Help Center"
+                  placeholder="SearchLine Help Center"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="w-full pl-12 pr-10 py-3 bg-gray-100 rounded-full text-[#242527] placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-300"
@@ -129,7 +121,7 @@ export default function HelpSupport() {
                     onClick={() => setSearchQuery('')}
                     className="absolute right-4 top-1/2 transform -translate-y-1/2"
                   >
-                    <X className="w-5 h-5 text-gray-400" />
+                    <CloseLine className="w-5 h-5 text-gray-400" />
                   </button>
                 )}
               </div>
@@ -165,60 +157,55 @@ export default function HelpSupport() {
 
         {/* Contact Us FAB - Only show when not in detail view and no search */}
         {!selectedFaqId && !searchQuery && (
-          <button
+          <Button
+            variant="primary"
+            size="lg"
+            icon={Message3Line}
             onClick={() => setIsModalOpen(true)}
-            className="fixed bottom-9 right-9 bg-[#43573b] hover:bg-[#3d4f36] text-white px-4 py-4 rounded-xl flex items-center gap-2 shadow-lg transition-colors"
+            className="fixed bottom-9 right-9 rounded-xl"
           >
-            <MessageSquare className="w-6 h-6" strokeWidth={1.5} />
-            <span className="text-base font-semibold">Contact Us</span>
-          </button>
+            Contact Us
+          </Button>
         )}
       </div>
 
       {/* Contact Us Modal */}
       {isModalOpen && (
-        <div 
+        <div
           className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
           onClick={() => setIsModalOpen(false)}
         >
-          <div 
-            className="bg-white rounded-3xl w-[400px] max-w-[90%] overflow-hidden shadow-2xl"
+          <Card
+            variant="default"
+            className="w-[400px] max-w-[90%] rounded-3xl overflow-hidden"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header */}
-            <div className="flex items-center justify-between px-4 pt-4">
+            <div className="flex items-center justify-between pb-4 border-b border-gray-100">
               <h2 className="text-lg font-semibold text-[#242527]">Contact us by</h2>
-              <button 
+              <IconButton
+                icon={CloseLine}
+                size="sm"
+                variant="default"
                 onClick={() => setIsModalOpen(false)}
-                className="p-1 hover:bg-gray-100 rounded-full transition-colors"
-              >
-                <X className="w-5 h-5 text-[#242527]" />
-              </button>
+              />
             </div>
 
             {/* Contact Options */}
-            <div className="flex flex-col">
+            <div className="flex flex-col -mx-6 -mb-6 -mt-2">
               {/* Email Option */}
-              <button className="flex items-center w-full hover:bg-gray-50 transition-colors">
-                <div className="flex items-center px-6 py-5">
-                  <Mail className="w-6 h-6 text-[#43573b]" strokeWidth={1.5} />
-                </div>
-                <div className="flex-1 py-3 pr-4">
-                  <p className="text-base font-semibold text-[#242527] text-left">Email</p>
-                </div>
+              <button className="flex items-center w-full px-6 py-5 hover:bg-gray-50 transition-colors border-b border-gray-100">
+                <MailLine className="w-6 h-6 text-[#43573b] mr-4 flex-shrink-0" strokeWidth={1.5} />
+                <p className="text-base font-semibold text-[#242527] text-left">Email</p>
               </button>
 
               {/* Call Us Option */}
-              <button className="flex items-center w-full hover:bg-gray-50 transition-colors">
-                <div className="flex items-center px-6 py-5">
-                  <Phone className="w-6 h-6 text-[#43573b]" strokeWidth={1.5} />
-                </div>
-                <div className="flex-1 py-3 pr-4">
-                  <p className="text-base font-semibold text-[#242527] text-left">Call Us</p>
-                </div>
+              <button className="flex items-center w-full px-6 py-5 hover:bg-gray-50 transition-colors">
+                <PhoneLine className="w-6 h-6 text-[#43573b] mr-4 flex-shrink-0" strokeWidth={1.5} />
+                <p className="text-base font-semibold text-[#242527] text-left">Call Us</p>
               </button>
             </div>
-          </div>
+          </Card>
         </div>
       )}
 
@@ -228,23 +215,25 @@ export default function HelpSupport() {
           className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
           onClick={() => setIsLanguageModalOpen(false)}
         >
-          <div
-            className="bg-white rounded-3xl w-[400px] max-w-[90%] overflow-hidden shadow-2xl"
+          <Card
+            variant="default"
+            className="w-[400px] max-w-[90%] rounded-3xl overflow-hidden"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header */}
-            <div className="flex items-center justify-between px-6 pt-6 pb-4">
-              <button
+            <div className="flex items-center justify-between pb-4 border-b border-gray-100 -mx-6 -mt-6 px-6 pt-6 mb-2">
+              <IconButton
+                icon={CloseLine}
+                size="sm"
+                variant="default"
                 onClick={() => setIsLanguageModalOpen(false)}
-                className="p-1 hover:bg-gray-100 rounded-full transition-colors"
-              >
-                <X className="w-5 h-5 text-[#242527]" />
-              </button>
+              />
               <h2 className="text-lg font-semibold text-[#242527]">Select Language</h2>
+              <div className="w-6" />
             </div>
 
             {/* Language Options */}
-            <div className="flex flex-col max-h-[60vh] overflow-y-auto">
+            <div className="flex flex-col max-h-[60vh] overflow-y-auto -mx-6 -mb-6">
               {languages.map((language) => (
                 <button
                   key={language.id}
@@ -252,7 +241,7 @@ export default function HelpSupport() {
                   className="flex items-center w-full px-6 py-4 hover:bg-gray-50 transition-colors border-b border-gray-100 last:border-b-0"
                 >
                   {/* Radio Button */}
-                  <div className={`flex items-center justify-center w-6 h-6 rounded-full border-2 mr-4 flex-shrink-0 border-gray-400 bg-white`}>
+                  <div className={`flex items-center justify-center w-6 h-6 rounded-full border-2 mr-4 flex-shrink-0 border-gray-400 bg-neutral-base`}>
                     {selectedLanguage === language.id && (
                       <div className="w-3 h-3 rounded-full bg-[#43573B]" />
                     )}
@@ -266,7 +255,7 @@ export default function HelpSupport() {
                 </button>
               ))}
             </div>
-          </div>
+          </Card>
         </div>
       )}
     </div>

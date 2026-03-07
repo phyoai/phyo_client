@@ -34,7 +34,7 @@ const RejectionModal = ({ isOpen, onClose, onConfirm, creatorName }) => {
       
       {/* Modal */}
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-        <div className="bg-white rounded-[24px] shadow-[0px_16px_48px_0px_rgba(12,12,13,0.24)] w-[480px] relative animate-fadeIn">
+        <div className="bg-neutral-base rounded-[24px] shadow-[0px_16px_48px_0px_rgba(12,12,13,0.24)] w-[480px] relative animate-fadeIn">
           {/* Content */}
           <div className="p-6 flex flex-col gap-2">
             {/* Title */}

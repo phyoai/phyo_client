@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import Image from 'next/image';
+import Image2Line from 'next/image';
 import { useAuth } from '../../context/AuthContext';
 
 const BrandLogin = () => {
@@ -40,7 +40,7 @@ const BrandLogin = () => {
           {/* Logo Skeleton */}
           <div className="w-32 h-32 bg-gray-200 rounded-full mx-auto mb-8 animate-pulse"></div>
           {/* Form Skeleton */}
-          <div className="bg-white rounded-lg shadow-lg p-8 space-y-4">
+          <div className="bg-neutral-base rounded-lg shadow-lg p-8 space-y-4">
             <div className="h-8 bg-gray-200 rounded w-48 mx-auto mb-6 animate-pulse"></div>
             <div className="h-12 bg-gray-200 rounded animate-pulse"></div>
             <div className="h-12 bg-gray-200 rounded animate-pulse"></div>
@@ -223,9 +223,9 @@ const BrandLogin = () => {
   return (
     <div className='bg-[#0000] flex gap-5 h-screen p-5'>
       <div className='w-1/2'>
-        <Image src={"/welcome.png"} width={200} height={300} alt='brand' className='absolute bottom-0 left-0 w-[30%] h-[70%]' />
+        <Image2Line src={"/welcome.png"} width={200} height={300} alt='brand' className='absolute bottom-0 left-0 w-[30%] h-[70%]' />
       </div>
-      <div className='bg-white rounded-lg w-[50%] h-full'>
+      <div className='bg-neutral-base rounded-lg w-[50%] h-full'>
         <div className="flex items-center justify-center h-full">
           <div className="w-full max-w-md p-8">
             <h2 className="text-2xl font-bold mb-6 text-center text-gray-900">Brand Login</h2>
@@ -288,7 +288,7 @@ const BrandLogin = () => {
       {/* Forgot Password Modal */}
       {showForgotPassword && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-8 w-full max-w-md mx-4">
+          <div className="bg-neutral-base rounded-lg p-8 w-full max-w-md mx-4">
             <div className="flex justify-between items-center mb-6">
               <h3 className="text-xl font-bold text-gray-900">Reset Password</h3>
               <button

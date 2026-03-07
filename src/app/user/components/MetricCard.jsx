@@ -1,6 +1,6 @@
 'use client'
 import React from 'react';
-import { MoreHorizontal } from 'lucide-react';
+import { MoreLine } from '@phyoofficial/phyo-icon-library';
 
 const MetricCard = ({ title, value, percentage, icon: Icon, iconBg }) => {
   // Format large numbers
@@ -26,7 +26,7 @@ const MetricCard = ({ title, value, percentage, icon: Icon, iconBg }) => {
           <span className="text-gray-900 font-medium text-sm">{title}</span>
         </div>
         <button className="text-gray-400 hover:text-gray-600 transition-colors">
-          <MoreHorizontal className="h-5 w-5" />
+          <MoreLine className="h-5 w-5" />
         </button>
       </div>
       

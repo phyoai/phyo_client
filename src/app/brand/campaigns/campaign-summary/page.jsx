@@ -1,21 +1,29 @@
 'use client'
 import React from 'react';
-import { ChevronLeft, MoreVertical, Share2, Download, DollarSign, Users, FileText, Calendar, Plus, Play, User2 } from 'lucide-react';
+import { ArrowLeftLine, MoreLine, Share2Line, DownloadLine, MoneyDollarBoxLine, UserLine, FileTextLine, CalendarLine, AddLine, PlayLine, User2 } from '@phyoofficial/phyo-icon-library';
+import Button from '@/components/Button';
+import IconButton from '@/components/IconButton';
+import Card from '@/components/Card';
 
 export default function CampaignSummary() {
   return (
-    <div className="min-h-screen bg-white flex flex-col">
+    <div className="min-h-screen bg-neutral-base flex flex-col">
       {/* Header */}
-      <div className="sticky top-0 bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between z-10">
+      <div className="sticky top-0 bg-neutral-base border-b border-gray-200 px-4 py-3 flex items-center justify-between z-10">
         <div className="flex items-center gap-3 flex-1">
-          <button className="p-2 hover:bg-gray-100 rounded-full transition-colors -ml-2">
-            <ChevronLeft className="w-5 h-5 text-gray-700" />
-          </button>
+          <IconButton
+            icon={ArrowLeftLine}
+            size="md"
+            variant="default"
+            className="-ml-2"
+          />
           <h1 className="text-lg font-semibold text-gray-900">Campaign Summary</h1>
         </div>
-        <button className="p-2 hover:bg-gray-100 rounded-full transition-colors">
-          <MoreVertical className="w-5 h-5 text-gray-700" />
-        </button>
+        <IconButton
+          icon={MoreLine}
+          size="md"
+          variant="default"
+        />
       </div>
 
       {/* Content */}
@@ -36,7 +44,7 @@ export default function CampaignSummary() {
             </div>
             {/* Status Badge */}
             <span className="bg-green-600 text-white text-xs font-semibold px-3 py-1 rounded flex items-center gap-1">
-              <span className="w-2 h-2 bg-white rounded-full"></span>
+              <span className="w-2 h-2 bg-neutral-base rounded-full"></span>
               On going
             </span>
           </div>
@@ -53,7 +61,7 @@ export default function CampaignSummary() {
             {/* Budget */}
             <div className="border border-gray-200 rounded-2xl p-4">
               <div className="flex items-center gap-2 mb-3">
-                <DollarSign className="w-5 h-5 text-gray-600" />
+                <MoneyDollarBoxLine className="w-5 h-5 text-gray-600" />
                 <p className="text-sm text-gray-600 font-medium">Budget</p>
               </div>
               <p className="text-2xl font-bold text-gray-900">$25,000</p>
@@ -63,7 +71,7 @@ export default function CampaignSummary() {
             {/* Influencers */}
             <div className="border border-gray-200 rounded-2xl p-4">
               <div className="flex items-center gap-2 mb-3">
-                <Users className="w-5 h-5 text-gray-600" />
+                <UserLine className="w-5 h-5 text-gray-600" />
                 <p className="text-sm text-gray-600 font-medium">Influencers</p>
               </div>
               <p className="text-2xl font-bold text-gray-900">15</p>
@@ -73,7 +81,7 @@ export default function CampaignSummary() {
             {/* Total Posts */}
             <div className="border border-gray-200 rounded-2xl p-4">
               <div className="flex items-center gap-2 mb-3">
-                <FileText className="w-5 h-5 text-gray-600" />
+                <FileTextLine className="w-5 h-5 text-gray-600" />
                 <p className="text-sm text-gray-600 font-medium">Total Posts</p>
               </div>
               <p className="text-2xl font-bold text-gray-900">41</p>
@@ -83,7 +91,7 @@ export default function CampaignSummary() {
             {/* Duration */}
             <div className="border border-gray-200 rounded-2xl p-4">
               <div className="flex items-center gap-2 mb-3">
-                <Calendar className="w-5 h-5 text-gray-600" />
+                <CalendarLine className="w-5 h-5 text-gray-600" />
                 <p className="text-sm text-gray-600 font-medium">Duration</p>
               </div>
               <p className="text-2xl font-bold text-gray-900">30</p>
@@ -128,7 +136,7 @@ export default function CampaignSummary() {
             <div>
               <p className="text-sm text-gray-600 font-medium mb-2">Campaign Period</p>
               <div className="flex items-center gap-2">
-                <Calendar className="w-4 h-4 text-gray-600" />
+                <CalendarLine className="w-4 h-4 text-gray-600" />
                 <p className="text-base text-gray-900">June 1, 2026 → June 30, 2026</p>
               </div>
             </div>
@@ -139,12 +147,12 @@ export default function CampaignSummary() {
             <h3 className="text-lg font-bold text-gray-900 mb-6">Deliverables Breakdown</h3>
 
             <div className="space-y-4">
-              {/* Instagram Story */}
+              {/* InstagramFill Story */}
               <div className="flex items-center justify-between py-4 border-b border-gray-200">
                 <div className="flex items-center gap-3">
-                  <Plus className="w-6 h-6 text-gray-700" />
+                  <AddLine className="w-6 h-6 text-gray-700" />
                   <div>
-                    <h4 className="font-semibold text-gray-900">Instagram Story</h4>
+                    <h4 className="font-semibold text-gray-900">InstagramFill Story</h4>
                     <p className="text-sm text-gray-600">UTC • Duration 15 Secs</p>
                   </div>
                 </div>
@@ -153,12 +161,12 @@ export default function CampaignSummary() {
                 </div>
               </div>
 
-              {/* Instagram Reel */}
+              {/* InstagramFill Reel */}
               <div className="flex items-center justify-between py-4">
                 <div className="flex items-center gap-3">
-                  <Play className="w-6 h-6 text-gray-700" />
+                  <PlayLine className="w-6 h-6 text-gray-700" />
                   <div>
-                    <h4 className="font-semibold text-gray-900">Instagram Reel</h4>
+                    <h4 className="font-semibold text-gray-900">InstagramFill Reel</h4>
                     <p className="text-sm text-gray-600">UTC • Duration 30-60 Secs</p>
                   </div>
                 </div>
@@ -177,7 +185,7 @@ export default function CampaignSummary() {
               {/* Influencers */}
               <div className="flex items-center justify-between py-3 border-b border-gray-200">
                 <div className="flex items-center gap-2">
-                  <Users className="w-5 h-5 text-gray-600" />
+                  <UserLine className="w-5 h-5 text-gray-600" />
                   <p className="text-base text-gray-600 font-medium">Influencers</p>
                 </div>
                 <p className="text-lg font-bold text-gray-900">15</p>
@@ -318,16 +326,24 @@ export default function CampaignSummary() {
       </div>
 
       {/* Fixed Footer */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4">
+      <div className="fixed bottom-0 left-0 right-0 bg-neutral-base border-t border-gray-200 p-4">
         <div className="max-w-4xl mx-auto flex gap-3">
-          <button className="flex-1 bg-green-100 hover:bg-green-200 text-green-700 font-semibold py-3 px-6 rounded-full transition-colors flex items-center justify-center gap-2">
-            <Share2 className="w-4 h-4" />
+          <Button
+            variant="secondary"
+            size="lg"
+            icon={Share2Line}
+            fullWidth
+          >
             Share
-          </button>
-          <button className="flex-1 bg-green-700 hover:bg-green-800 text-white font-semibold py-3 px-6 rounded-full transition-colors flex items-center justify-center gap-2">
-            <Download className="w-4 h-4" />
+          </Button>
+          <Button
+            variant="primary"
+            size="lg"
+            icon={DownloadLine}
+            fullWidth
+          >
             Download
-          </button>
+          </Button>
         </div>
       </div>
     </div>

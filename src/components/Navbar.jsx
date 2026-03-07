@@ -1,18 +1,18 @@
 import { useState } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
+import Image2Line from 'next/image';
 
 export default function Navbar({ token }) {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <nav className="w-full bg-white shadow-md fixed top-0 left-0 z-50">
+    <nav className="w-full bg-neutral-base shadow-md fixed top-0 left-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <div className="flex-shrink-0">
             <Link href="/">
-              <Image src={"/logo.png"} alt='logo' height={80} width={80} />
+              <Image2Line src={"/logo.png"} alt='logo' height={80} width={80} />
             </Link>
           </div>
 
@@ -73,7 +73,7 @@ export default function Navbar({ token }) {
 
       {/* Mobile Dropdown */}
       {isOpen && (
-        <div className="md:hidden bg-white shadow-lg">
+        <div className="md:hidden bg-neutral-base shadow-lg">
           <div className="px-4 py-4 space-y-4">
             <Link href="/">
               <p className="block text-gray-700 hover:text-[color:var(--dark-green)]">Home</p>

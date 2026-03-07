@@ -9,7 +9,7 @@ const AudienceDemographics = ({ creator }) => {
       instagramData.audienceByCountry?.length > 0);
   if (!hasDemographics) return null;
   return (
-    <div className='bg-white rounded-xl shadow-lg p-8 mb-8'>
+    <div className='bg-neutral-base rounded-xl shadow-lg p-8 mb-8'>
       <h2 className='text-2xl font-bold text-gray-900 mb-6 flex items-center gap-3'>
         <div className='w-8 h-8 bg-purple-600 rounded-lg flex items-center justify-center'>
           <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -171,7 +171,7 @@ const AudienceDemographics = ({ creator }) => {
           </h3>
           <div className='grid grid-cols-2 md:grid-cols-4 gap-4'>
             {Object.entries(instagramData.collaborationCharges).map(([key, value]) => (
-              <div key={key} className='bg-white rounded-lg p-4 text-center shadow-sm border border-gray-100'>
+              <div key={key} className='bg-neutral-base rounded-lg p-4 text-center shadow-sm border border-gray-100'>
                 <div className='text-2xl font-bold text-gray-900 mb-1'>
                   ₹{value}
                 </div>

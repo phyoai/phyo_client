@@ -1,6 +1,6 @@
 'use client'
 import React, { useState } from 'react';
-import { ArrowLeft, Bell, MoreVertical, Check, X, ChevronRight } from 'lucide-react';
+import { ArrowLeftLine, BellLine, MoreLine, CheckLine, CloseLine, ArrowRightLine } from '@phyoofficial/phyo-icon-library';
 import { useRouter } from 'next/navigation';
 
 function NotificationsPage() {
@@ -67,16 +67,16 @@ function NotificationsPage() {
   ];
 
   return (
-    <div className='min-h-screen bg-white'>
+    <div className='min-h-screen bg-neutral-base'>
       {/* Header */}
-      <div className="bg-white px-1 py-2 border-b border-gray-100">
+      <div className="bg-neutral-base px-1 py-2 border-b border-gray-100">
         <div className="flex items-center justify-between">
           {/* Left - Back Button */}
           <button 
             onClick={() => router.back()}
             className="p-3 hover:bg-gray-100 rounded-full transition-colors"
           >
-            <ArrowLeft className="h-6 w-6 text-[#242527]" />
+            <ArrowLeftLine className="h-6 w-6 text-[#242527]" />
           </button>
 
           {/* Center - Title */}
@@ -92,10 +92,11 @@ function NotificationsPage() {
           {/* Right - Actions */}
           <div className="flex items-center gap-2">
             <button className="p-3 hover:bg-gray-100 rounded-full transition-colors">
-              <Bell className="h-6 w-6 text-[#242527]" />
+              {/* <BellLine className="h-6 w-6 text-[#242527]" /> */}
+              <BellLine className="h-6 w-6 text-[#242527]" />
             </button>
             <button className="p-3 hover:bg-gray-100 rounded-full transition-colors">
-              <MoreVertical className="h-6 w-6 text-[#242527]" />
+              <MoreLine className="h-6 w-6 text-[#242527]" />
             </button>
           </div>
         </div>
@@ -126,7 +127,7 @@ function NotificationsPage() {
           {notifications.map((notification) => (
             <div 
               key={notification.id} 
-              className="bg-white border-b border-gray-100 hover:bg-gray-50 transition-colors"
+              className="bg-neutral-base border-b border-gray-100 hover:bg-gray-50 transition-colors"
             >
               <div className="flex items-center py-3">
                 {/* Avatar */}
@@ -166,10 +167,10 @@ function NotificationsPage() {
                   {notification.hasActions && (
                     <>
                       <button className="p-3 hover:bg-green-50 rounded-full transition-colors">
-                        <Check className="h-6 w-6 text-[#08a64a]" />
+                        <CheckLine className="h-6 w-6 text-[#08a64a]" />
                       </button>
                       <button className="p-3 hover:bg-red-50 rounded-full transition-colors">
-                        <X className="h-6 w-6 text-[#bf3709]" />
+                        <CloseLine className="h-6 w-6 text-[#bf3709]" />
                       </button>
                     </>
                   )}
@@ -207,7 +208,7 @@ function NotificationsPage() {
                   )}
                   
                   {notification.hasChevron && (
-                    <ChevronRight className="h-6 w-6 text-[#6c6d6e]" />
+                    <ArrowRightLine className="h-6 w-6 text-[#6c6d6e]" />
                   )}
                 </div>
               </div>

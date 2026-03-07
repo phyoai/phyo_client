@@ -18,7 +18,7 @@ export default function InlineConversionCard({
     <div className="mb-8 bg-gradient-to-br from-gray-800 via-gray-900 to-black rounded-3xl p-6 sm:p-8 text-white relative overflow-hidden">
       {/* Background decorative shapes */}
       <div className="absolute inset-0 opacity-10">
-        <div className="absolute top-10 right-20 w-32 h-32 bg-white rounded-full blur-3xl"></div>
+        <div className="absolute top-10 right-20 w-32 h-32 bg-neutral-base rounded-full blur-3xl"></div>
         <div className="absolute bottom-10 right-10 w-40 h-40 bg-gray-500 rounded-full blur-3xl"></div>
       </div>
 
@@ -45,13 +45,13 @@ export default function InlineConversionCard({
         <div className="flex flex-wrap gap-3">
           <button 
             onClick={() => router.push('/brand/account/upgrade-plan')}
-            className="px-5 py-2 bg-white text-gray-900 rounded-full font-semibold hover:bg-gray-100 transition-colors text-sm"
+            className="px-5 py-2 bg-neutral-base text-gray-900 rounded-full font-semibold hover:bg-gray-100 transition-colors text-sm"
           >
             {primaryButtonText}
           </button>
           <button 
             onClick={() => router.push('/brand/learn-more')}
-            className="px-5 py-2 border border-white text-white rounded-full font-semibold hover:bg-white/10 transition-colors text-sm"
+            className="px-5 py-2 border border-white text-white rounded-full font-semibold hover:bg-neutral-base/10 transition-colors text-sm"
           >
             {secondaryButtonText}
           </button>

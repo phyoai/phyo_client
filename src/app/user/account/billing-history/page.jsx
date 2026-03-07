@@ -2,7 +2,10 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { User, ArrowLeft, MoreVertical, Copy, Download } from 'lucide-react';
+import { UserLine, FileCopyLine, DownloadLine, MoreLine } from '@phyoofficial/phyo-icon-library';
+import AppBar from '@/components/AppBar';
+import Button from '@/components/Button';
+import IconButton from '@/components/IconButton';
 
 export default function BillingHistory() {
   const router = useRouter();
@@ -15,7 +18,7 @@ export default function BillingHistory() {
       title: 'Cancelled Free Trial',
       date: '3:45 PM 05-01-2026',
       amount: '+₹0',
-      action: 'Download Invoice'
+      action: 'DownloadLine Invoice'
     },
     {
       id: 2,
@@ -30,14 +33,14 @@ export default function BillingHistory() {
       title: 'Cancelled Free Trial',
       date: '3:45 PM 05-01-2026',
       amount: '+₹0',
-      action: 'Download Invoice'
+      action: 'DownloadLine Invoice'
     },
     {
       id: 4,
       title: 'Subscription Upgrade',
       date: '11:00 AM 08-30-2026',
       amount: '+₹999',
-      action: 'Download Receipt'
+      action: 'DownloadLine Receipt'
     },
     {
       id: 5,
@@ -49,26 +52,11 @@ export default function BillingHistory() {
   ];
 
   return (
-    <div className="bg-white h-screen flex flex-col">
-      {/* Header/App Bar */}
-      <div className="bg-white flex items-center justify-between px-1 py-2 border-b border-gray-100 shrink-0">
-        <button
-          onClick={() => router.push('/brand/account')}
-          className="flex items-center justify-center w-12 h-12 hover:bg-gray-100 rounded-full transition-colors"
-        >
-          <ArrowLeft className="w-6 h-6 text-[#242527]" />
-        </button>
-        
-        <div className="flex-1 px-2">
-          <h2 className="text-xl font-semibold text-[#242527]" style={{ fontFamily: 'Manrope, sans-serif' }}>
-            Billing history
-          </h2>
-        </div>
-        
-        {/* <button className="flex items-center justify-center w-12 h-12 hover:bg-gray-100 rounded-full transition-colors">
-          <MoreVertical className="w-6 h-6 text-[#242527]" />
-        </button> */}
-      </div>
+    <div className="bg-neutral-base h-screen flex flex-col">
+      <AppBar
+        title="Billing history"
+        onBack={() => router.push('/brand/account')}
+      />
 
       {/* Billing History Container */}
       <div className="flex-1 overflow-y-auto px-9 py-4">
@@ -90,14 +78,14 @@ export default function BillingHistory() {
               </div>
 
               {/* Transaction List */}
-              <div className="bg-white flex flex-col">
+              <div className="bg-neutral-base flex flex-col">
                 {billingHistory.map((transaction, index) => (
                   <div key={transaction.id}>
                     <div className="flex items-center w-full relative">
                       {/* Leading Avatar */}
                       <div className="flex items-center px-4 py-1.5">
                         <div className="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center">
-                          <User className="w-6 h-6 text-white" />
+                          <UserLine className="w-6 h-6 text-white" />
                         </div>
                       </div>
 
@@ -123,22 +111,23 @@ export default function BillingHistory() {
 
                       {/* Three Dot Menu */}
                       <div className="relative">
-                        <button
+                        <IconButton
+                          icon={MoreLine}
+                          size="md"
+                          variant="default"
                           onClick={() => setOpenMenuId(openMenuId === transaction.id ? null : transaction.id)}
-                          className="flex items-center justify-center w-10 h-10 hover:bg-gray-100 rounded-full transition-colors mr-2"
-                        >
-                          <MoreVertical className="w-5 h-5 text-gray-600" />
-                        </button>
+                          className="mr-2"
+                        />
 
                         {/* Dropdown Menu */}
                         {openMenuId === transaction.id && (
-                          <div className="absolute right-0 mt-1 w-48 bg-white rounded-lg shadow-lg border border-gray-200 z-10">
+                          <div className="absolute right-0 mt-1 w-48 bg-neutral-base rounded-lg shadow-lg border border-gray-200 z-10">
                             <button className="w-full text-left px-4 py-3 hover:bg-gray-50 text-sm text-gray-700 flex items-center gap-2 border-b border-gray-100">
-                              <Download className="w-4 h-4" />
-                              Download Invoice
+                              <DownloadLine className="w-4 h-4" />
+                              DownloadLine Invoice
                             </button>
                             <button className="w-full text-left px-4 py-3 hover:bg-gray-50 text-sm text-gray-700 flex items-center gap-2">
-                              <Copy className="w-4 h-4" />
+                              <FileCopyLine className="w-4 h-4" />
                               Copy Details
                             </button>
                           </div>

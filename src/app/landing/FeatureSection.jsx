@@ -1,5 +1,5 @@
 import React from 'react';
-import Image from 'next/image';
+import Image2Line from 'next/image';
 import { motion, useInView } from 'framer-motion';
 
 const FeatureSection = () => {
@@ -78,12 +78,12 @@ const FeatureSection = () => {
             animate={isInView1 ? "visible" : "hidden"}
           >
             <motion.div 
-              className="inline-block px-4 py-2 bg-white/80 rounded-full text-sm font-medium text-gray-600 backdrop-blur-sm"
+              className="inline-block px-4 py-2 bg-neutral-base/80 rounded-full text-sm font-medium text-gray-600 backdrop-blur-sm"
               variants={badgeVariants}
               whileHover={{ scale: 1.05 }}
               transition={{ duration: 0.2 }}
             >
-              Search Instantly
+              SearchLine Instantly
             </motion.div>
             <motion.h1 
               className="text-5xl lg:text-6xl font-bold text-gray-900 leading-tight"
@@ -113,7 +113,7 @@ const FeatureSection = () => {
             </motion.p>
           </motion.div>
           
-          {/* Image - animates from right */}
+          {/* Image2Line - animates from right */}
           <motion.div 
             className="relative"
             variants={rightToLeftVariants}
@@ -121,7 +121,7 @@ const FeatureSection = () => {
             animate={isInView1 ? "visible" : "hidden"}
           >
             <motion.div 
-              className="relative z-10 bg-white rounded-2xl shadow-2xl p-6 transform rotate-1 hover:rotate-0 transition-transform duration-300"
+              className="relative z-10 bg-neutral-base rounded-2xl shadow-2xl p-6 transform rotate-1 hover:rotate-0 transition-transform duration-300"
               variants={imageVariants}
               whileHover={{ 
                 scale: 1.05, 
@@ -129,7 +129,7 @@ const FeatureSection = () => {
                 transition: { duration: 0.3 }
               }}
             >
-              <Image
+              <Image2Line
                 src="/feature4.png"
                 alt="Creator search interface"
                 width={600}
@@ -150,7 +150,7 @@ const FeatureSection = () => {
       {/* Second Section - Campaign Tracking */}
       <section className="py-20 px-6 bg-gradient-to-br from-green-50 to-green-100" ref={ref2}>
         <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-12 items-center">
-          {/* Image - animates from left */}
+          {/* Image2Line - animates from left */}
           <motion.div 
             className="relative order-2 lg:order-1"
             variants={leftToRightVariants}
@@ -166,7 +166,7 @@ const FeatureSection = () => {
                 transition: { duration: 0.3 }
               }}
             >
-              <Image
+              <Image2Line
                 src="/landing/feature1.png"
                 alt="Campaign tracking dashboard"
                 width={600}
@@ -273,7 +273,7 @@ const FeatureSection = () => {
             </motion.p>
           </motion.div>
           
-          {/* Image - animates from right */}
+          {/* Image2Line - animates from right */}
           <motion.div 
             className="relative"
             variants={rightToLeftVariants}
@@ -281,7 +281,7 @@ const FeatureSection = () => {
             animate={isInView3 ? "visible" : "hidden"}
           >
             <motion.div 
-              className="relative z-10 bg-white rounded-2xl shadow-2xl p-6 transform rotate-1 hover:rotate-0 transition-transform duration-300"
+              className="relative z-10 bg-neutral-base rounded-2xl shadow-2xl p-6 transform rotate-1 hover:rotate-0 transition-transform duration-300"
               variants={imageVariants}
               whileHover={{ 
                 scale: 1.05, 
@@ -289,7 +289,7 @@ const FeatureSection = () => {
                 transition: { duration: 0.3 }
               }}
             >
-              <Image
+              <Image2Line
                 src="/feature3.png"
                 alt="Campaign management interface"
                 width={600}

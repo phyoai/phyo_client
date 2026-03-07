@@ -2,7 +2,11 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, MoreVertical } from 'lucide-react';
+import { ArrowLeftLine } from '@phyoofficial/phyo-icon-library';
+import AppBar from '@/components/AppBar';
+import Button from '@/components/Button';
+import IconButton from '@/components/IconButton';
+import { colors } from '@/config/colors';
 
 const RadioButton = ({ selected = false, disabled = false, onChange }) => {
   return (
@@ -13,13 +17,13 @@ const RadioButton = ({ selected = false, disabled = false, onChange }) => {
     >
       <div className="w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all"
         style={{
-          borderColor: disabled ? '#808080' : '#43573B',
+          borderColor: disabled ? colors.text.neutral.muted : colors.brand.base,
           backgroundColor: 'transparent'
         }}
       >
         {selected && (
           <div className="w-3 h-3 rounded-full"
-            style={{ backgroundColor: disabled ? '#808080' : '#43573B' }}
+            style={{ backgroundColor: disabled ? colors.text.neutral.muted : colors.brand.base }}
           />
         )}
       </div>
@@ -94,7 +98,7 @@ export default function UpgradePlan() {
         '10 AI-Powered Campaign Reports',
         'Dedicated Chat Support',
         'AI optimizes campaigns',
-        'Unlimited Users',
+        'Unlimited UserLine',
         'Historical Data (Up to 6 months)',
         'Exportable Analytics (CSV/ PDF)',
         'AI Smart Creators, Niche, Region, Top',
@@ -129,7 +133,7 @@ export default function UpgradePlan() {
  // Payment success view
 if (paymentSuccess) {
   return (
-    <div className="bg-white h-screen flex flex-col items-center justify-center px-4">
+    <div className="h-screen flex flex-col items-center justify-center px-4" style={{ backgroundColor: colors.neutral.base }}>
       <style>{`
         @keyframes popScale {
           0% {
@@ -170,36 +174,38 @@ if (paymentSuccess) {
         }
       `}</style>
 
-      <button
+      <IconButton
+        icon={ArrowLeftLine}
+        size="lg"
+        variant="default"
         onClick={() => router.push('/brand/account')}
-        className="absolute top-4 left-4 flex items-center justify-center w-12 h-12 hover:bg-gray-100 rounded-full transition-colors"
-      >
-        <ArrowLeft className="w-6 h-6 text-[#242527]" />
-      </button>
+        className="absolute top-4 left-4"
+      />
 
       <div className="flex flex-col items-center gap-6">
         <div className="pop-scale">
           <svg width="150" height="150" viewBox="0 0 150 150" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <rect width="150" height="150" fill="#E8F5E9"/>
-            <circle cx="75" cy="75" r="60" fill="#43573B"/>
+            <rect width="150" height="150" fill={colors.accent.subtle}/>
+            <circle cx="75" cy="75" r="60" fill={colors.brand.base}/>
             <path d="M55 75L68 88L95 60" stroke="white" strokeWidth="8" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
           </svg>
         </div>
 
-        <h1 className="text-3xl font-bold text-[#242527] text-center">
+        <h1 className="text-3xl font-bold text-center" style={{ color: colors.text.neutral.base }}>
           Payment successful
         </h1>
 
-        <p className="text-lg text-gray-600 text-center max-w-md">
+        <p className="text-lg text-center max-w-md" style={{ color: colors.text.neutral.muted }}>
           Your plan has been updated and all features are now unlocked.
         </p>
 
-        <button
+        <Button
+          variant="primary"
+          size="lg"
           onClick={() => router.push('/brand/dashboard')}
-          className="bg-[#43573B] hover:bg-[#3d4f36] text-white py-3 px-8 rounded-full font-semibold transition-colors"
         >
           Go to home
-        </button>
+        </Button>
       </div>
     </div>
   );
@@ -208,16 +214,16 @@ if (paymentSuccess) {
   // Billing form view
   if (showBillingForm) {
     return (
-      <div className="bg-white h-screen flex flex-col">
+      <div className="h-screen flex flex-col" style={{ backgroundColor: colors.neutral.base }}>
         {/* Header */}
-        <div className="flex items-center justify-between px-4 py-4 border-b border-gray-100">
-          <button
+        <div className="flex items-center justify-between px-4 py-4 border-b" style={{ borderColor: colors.neutral.muted }}>
+          <IconButton
+            icon={ArrowLeftLine}
+            size="lg"
+            variant="default"
             onClick={() => setShowBillingForm(false)}
-            className="flex items-center justify-center w-12 h-12 hover:bg-gray-100 rounded-full transition-colors"
-          >
-            <ArrowLeft className="w-6 h-6 text-[#242527]" />
-          </button>
-          <h2 className="text-xl font-semibold text-[#242527]" style={{ fontFamily: 'Manrope, sans-serif' }}>
+          />
+          <h2 className="text-xl font-semibold" style={{ color: colors.text.neutral.base, fontFamily: 'Manrope, sans-serif' }}>
             Billing
           </h2>
           <div className="w-12" />
@@ -228,13 +234,13 @@ if (paymentSuccess) {
           <form className="space-y-6">
             {/* Contact Details Section */}
             <div>
-              <h3 className="text-lg font-semibold text-[#242527] mb-4">Contact Details</h3>
+              <h3 className="text-lg font-semibold mb-4" style={{ color: colors.text.neutral.base }}>Contact Details</h3>
 
-              {/* Phone Number */}
+              {/* PhoneLine Number */}
               <div className="mb-4">
-                <label className="block text-sm font-medium text-[#242527] mb-2">Phone number</label>
+                <label className="block text-sm font-medium mb-2" style={{ color: colors.text.neutral.base }}>PhoneLine number</label>
                 <div className="flex gap-2">
-                  <select className="w-20 bg-gray-100 border border-gray-200 rounded px-3 py-2 text-[#242527]">
+                  <select className="w-20 border rounded px-3 py-2" style={{ backgroundColor: colors.neutral.muted, borderColor: colors.neutral.muted, color: colors.text.neutral.base }}>
                     <option>+91</option>
                   </select>
                   <input
@@ -242,35 +248,38 @@ if (paymentSuccess) {
                     placeholder="07ABCDE1234F1Z5"
                     value={billingData.phone}
                     onChange={(e) => setBillingData({ ...billingData, phone: e.target.value })}
-                    className="flex-1 bg-gray-100 border border-gray-200 rounded px-4 py-2 text-[#242527] placeholder-gray-400"
+                    className="flex-1 border rounded px-4 py-2"
+                    style={{ backgroundColor: colors.neutral.muted, borderColor: colors.neutral.muted, color: colors.text.neutral.base }}
                   />
                 </div>
               </div>
 
               {/* Email */}
               <div>
-                <label className="block text-sm font-medium text-[#242527] mb-2">Finance Contact Email</label>
+                <label className="block text-sm font-medium mb-2" style={{ color: colors.text.neutral.base }}>Finance Contact Email</label>
                 <input
                   type="email"
                   placeholder="jhondoe@gmail.com"
                   value={billingData.email}
                   onChange={(e) => setBillingData({ ...billingData, email: e.target.value })}
-                  className="w-full bg-gray-100 border border-gray-200 rounded px-4 py-2 text-[#242527] placeholder-gray-400"
+                  className="w-full border rounded px-4 py-2"
+                  style={{ backgroundColor: colors.neutral.muted, borderColor: colors.neutral.muted, color: colors.text.neutral.base }}
                 />
               </div>
             </div>
 
             {/* Billing Address Section */}
             <div>
-              <h3 className="text-lg font-semibold text-[#242527] mb-4">Billing Address</h3>
+              <h3 className="text-lg font-semibold mb-4" style={{ color: colors.text.neutral.base }}>Billing Address</h3>
 
               {/* Country */}
               <div className="mb-4">
-                <label className="block text-sm font-medium text-[#242527] mb-2">Country/Region</label>
+                <label className="block text-sm font-medium mb-2" style={{ color: colors.text.neutral.base }}>Country/Region</label>
                 <select
                   value={billingData.country}
                   onChange={(e) => setBillingData({ ...billingData, country: e.target.value })}
-                  className="w-full bg-gray-100 border border-gray-200 rounded px-4 py-2 text-[#242527]"
+                  className="w-full border rounded px-4 py-2"
+                  style={{ backgroundColor: colors.neutral.muted, borderColor: colors.neutral.muted, color: colors.text.neutral.base }}
                 >
                   <option>India</option>
                   <option>USA</option>
@@ -280,49 +289,53 @@ if (paymentSuccess) {
 
               {/* House/Building No */}
               <div className="mb-4">
-                <label className="block text-sm font-medium text-[#242527] mb-2">House/Building No.</label>
+                <label className="block text-sm font-medium mb-2" style={{ color: colors.text.neutral.base }}>House/Building No.</label>
                 <input
                   type="text"
                   placeholder="H-32"
                   value={billingData.house}
                   onChange={(e) => setBillingData({ ...billingData, house: e.target.value })}
-                  className="w-full bg-gray-100 border border-gray-200 rounded px-4 py-2 text-[#242527] placeholder-gray-400"
+                  className="w-full border rounded px-4 py-2"
+                  style={{ backgroundColor: colors.neutral.muted, borderColor: colors.neutral.muted, color: colors.text.neutral.base }}
                 />
               </div>
 
               {/* Street */}
               <div className="mb-4">
-                <label className="block text-sm font-medium text-[#242527] mb-2">Street No.</label>
+                <label className="block text-sm font-medium mb-2" style={{ color: colors.text.neutral.base }}>Street No.</label>
                 <input
                   type="text"
                   placeholder="Street No.4"
                   value={billingData.street}
                   onChange={(e) => setBillingData({ ...billingData, street: e.target.value })}
-                  className="w-full bg-gray-100 border border-gray-200 rounded px-4 py-2 text-[#242527] placeholder-gray-400"
+                  className="w-full border rounded px-4 py-2"
+                  style={{ backgroundColor: colors.neutral.muted, borderColor: colors.neutral.muted, color: colors.text.neutral.base }}
                 />
               </div>
 
               {/* City */}
               <div className="mb-4">
-                <label className="block text-sm font-medium text-[#242527] mb-2">City</label>
+                <label className="block text-sm font-medium mb-2" style={{ color: colors.text.neutral.base }}>City</label>
                 <input
                   type="text"
                   placeholder="Saket"
                   value={billingData.city}
                   onChange={(e) => setBillingData({ ...billingData, city: e.target.value })}
-                  className="w-full bg-gray-100 border border-gray-200 rounded px-4 py-2 text-[#242527] placeholder-gray-400"
+                  className="w-full border rounded px-4 py-2"
+                  style={{ backgroundColor: colors.neutral.muted, borderColor: colors.neutral.muted, color: colors.text.neutral.base }}
                 />
               </div>
 
               {/* State */}
               <div>
-                <label className="block text-sm font-medium text-[#242527] mb-2">State</label>
+                <label className="block text-sm font-medium mb-2" style={{ color: colors.text.neutral.base }}>State</label>
                 <input
                   type="text"
                   placeholder="State"
                   value={billingData.state}
                   onChange={(e) => setBillingData({ ...billingData, state: e.target.value })}
-                  className="w-full bg-gray-100 border border-gray-200 rounded px-4 py-2 text-[#242527] placeholder-gray-400"
+                  className="w-full border rounded px-4 py-2"
+                  style={{ backgroundColor: colors.neutral.muted, borderColor: colors.neutral.muted, color: colors.text.neutral.base }}
                 />
               </div>
             </div>
@@ -330,13 +343,14 @@ if (paymentSuccess) {
         </div>
 
         {/* Proceed Button */}
-        <div className="sticky bottom-0 px-6 py-4 border-t border-gray-100 flex justify-center bg-white">
-          <button
+        <div className="sticky bottom-0 px-6 py-4 border-t flex justify-center" style={{ backgroundColor: colors.neutral.base, borderColor: colors.neutral.muted }}>
+          <Button
+            variant="primary"
+            size="lg"
             onClick={() => setPaymentSuccess(true)}
-            className="bg-[#43573B] hover:bg-[#3d4f36] text-white py-3 px-8 rounded-full font-semibold transition-colors"
           >
             Proceed to payment
-          </button>
+          </Button>
         </div>
       </div>
     );
@@ -344,26 +358,13 @@ if (paymentSuccess) {
 
   // Plans view (default)
   return (
-    <div className="bg-white h-screen flex flex-col">
-      {/* Header/App Bar */}
-      <div className="bg-white flex items-center justify-between px-1 py-2 border-b border-gray-100 shrink-0">
-        <button
-          onClick={() => router.push('/brand/account')}
-          className="flex items-center justify-center w-12 h-12 hover:bg-gray-100 rounded-full transition-colors"
-        >
-          <ArrowLeft className="w-6 h-6 text-[#242527]" />
-        </button>
-
-        <div className="flex-1 px-2">
-          <h2 className="text-xl font-semibold text-[#242527]" style={{ fontFamily: 'Manrope, sans-serif' }}>
-            Plans & Billings
-          </h2>
-        </div>
-
-        <button className="flex items-center justify-center w-12 h-12 hover:bg-gray-100 rounded-full transition-colors">
-          <MoreVertical className="w-6 h-6 text-[#242527]" />
-        </button>
-      </div>
+    <div className="h-screen flex flex-col" style={{ backgroundColor: colors.neutral.base }}>
+      <AppBar
+        title="Plans & Billings"
+        onBack={() => router.push('/brand/account')}
+        showMenu={true}
+        onMenuClick={() => console.log('Open menu')}
+      />
 
       {/* Plans Container */}
       <div className="flex-1 px-9 py-4">
@@ -371,13 +372,17 @@ if (paymentSuccess) {
           {plans.map((plan) => (
             <div
               key={plan.id}
-              className={`bg-[#F0F0F0] border-2 ${plan.borderColor} rounded-xl flex-1 min-w-[250px] max-w-[280px] flex flex-col py-3 transition-all hover:shadow-lg cursor-pointer`}
+              className={`border-2 rounded-xl flex-1 min-w-[250px] max-w-[280px] flex flex-col py-3 transition-all hover:shadow-lg cursor-pointer`}
+              style={{
+                backgroundColor: colors.neutral.muted,
+                borderColor: plan.borderColor
+              }}
               onClick={() => !plan.isCurrent && setSelectedPlan(plan.id)}
             >
               {/* Current Plan Label (only for free plan) */}
               {plan.isCurrent && (
                 <div className="px-4 mb-3">
-                  <p className="text-xs text-[#808080] tracking-wide" style={{ fontFamily: 'Inter, sans-serif' }}>
+                  <p className="text-xs tracking-wide" style={{ color: colors.text.neutral.muted, fontFamily: 'Inter, sans-serif' }}>
                     Current Plan
                   </p>
                 </div>
@@ -400,12 +405,12 @@ if (paymentSuccess) {
               {/* Pricing */}
               <div className="flex flex-col gap-0 mb-5">
                 <div className="px-4">
-                  <p className="text-4xl font-bold text-[#242527] leading-tight" style={{ fontFamily: 'Manrope, sans-serif' }}>
+                  <p className="text-4xl font-bold leading-tight" style={{ color: colors.text.neutral.base, fontFamily: 'Manrope, sans-serif' }}>
                     {plan.price}
                   </p>
                 </div>
                 <div className="px-4">
-                  <p className="text-xl font-semibold text-[#242527]" style={{ fontFamily: 'Manrope, sans-serif' }}>
+                  <p className="text-xl font-semibold" style={{ color: colors.text.neutral.base, fontFamily: 'Manrope, sans-serif' }}>
                     {plan.name}
                   </p>
                 </div>
@@ -413,7 +418,7 @@ if (paymentSuccess) {
 
               {/* Benefits */}
               <div className="flex-1 px-4 overflow-y-auto">
-                <ul className="text-[#333] text-base space-y-1" style={{ fontFamily: 'Work Sans, sans-serif' }}>
+                <ul className="text-base space-y-1" style={{ color: colors.text.neutral.base, fontFamily: 'Work Sans, sans-serif' }}>
                   {plan.benefits.map((benefit, index) => (
                     <li key={index} className="flex items-start leading-6">
                       <span className="mr-2">•</span>
@@ -428,18 +433,15 @@ if (paymentSuccess) {
       </div>
 
       {/* Proceed to Billing Button */}
-      <div className="sticky bottom-0 px-9 py-4 border-t border-gray-100 flex justify-center bg-white">
-        <button
+      <div className="sticky bottom-0 px-9 py-4 border-t flex justify-center" style={{ backgroundColor: colors.neutral.base, borderColor: colors.neutral.muted }}>
+        <Button
+          variant="primary"
+          size="lg"
           onClick={() => setShowBillingForm(true)}
           disabled={selectedPlan === 'free'}
-          className={`py-3 px-8 rounded-full font-semibold transition-colors min-h-[48px] flex items-center justify-center ${
-            selectedPlan === 'free'
-              ? 'bg-gray-300 text-gray-600 cursor-not-allowed'
-              : 'bg-[#43573B] hover:bg-[#3d4f36] text-white'
-          }`}
         >
           {selectedPlan === 'free' ? 'Select a plan to proceed' : 'Proceed to billing'}
-        </button>
+        </Button>
       </div>
     </div>
   );

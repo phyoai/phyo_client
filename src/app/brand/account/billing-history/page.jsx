@@ -2,7 +2,11 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { User, ArrowLeft, MoreVertical, Copy, Download } from 'lucide-react';
+import { UserLine, FileCopyLine, DownloadLine, MoreLine } from '@phyoofficial/phyo-icon-library';
+import AppBar from '@/components/AppBar';
+import Button from '@/components/Button';
+import IconButton from '@/components/IconButton';
+import { colors } from '@/config/colors';
 
 export default function BillingHistory() {
   const router = useRouter();
@@ -15,7 +19,7 @@ export default function BillingHistory() {
       title: 'Cancelled Free Trial',
       date: '3:45 PM 05-01-2026',
       amount: '+₹0',
-      action: 'Download Invoice'
+      action: 'DownloadLine Invoice'
     },
     {
       id: 2,
@@ -30,14 +34,14 @@ export default function BillingHistory() {
       title: 'Cancelled Free Trial',
       date: '3:45 PM 05-01-2026',
       amount: '+₹0',
-      action: 'Download Invoice'
+      action: 'DownloadLine Invoice'
     },
     {
       id: 4,
       title: 'Subscription Upgrade',
       date: '11:00 AM 08-30-2026',
       amount: '+₹999',
-      action: 'Download Receipt'
+      action: 'DownloadLine Receipt'
     },
     {
       id: 5,
@@ -49,26 +53,11 @@ export default function BillingHistory() {
   ];
 
   return (
-    <div className="bg-white h-screen flex flex-col">
-      {/* Header/App Bar */}
-      <div className="bg-white flex items-center justify-between px-1 py-2 border-b border-gray-100 shrink-0">
-        <button
-          onClick={() => router.push('/brand/account')}
-          className="flex items-center justify-center w-12 h-12 hover:bg-gray-100 rounded-full transition-colors"
-        >
-          <ArrowLeft className="w-6 h-6 text-[#242527]" />
-        </button>
-        
-        <div className="flex-1 px-2">
-          <h2 className="text-xl font-semibold text-[#242527]" style={{ fontFamily: 'Manrope, sans-serif' }}>
-            Billing history
-          </h2>
-        </div>
-        
-        {/* <button className="flex items-center justify-center w-12 h-12 hover:bg-gray-100 rounded-full transition-colors">
-          <MoreVertical className="w-6 h-6 text-[#242527]" />
-        </button> */}
-      </div>
+    <div className="h-screen flex flex-col" style={{ backgroundColor: colors.neutral.base }}>
+      <AppBar
+        title="Billing history"
+        onBack={() => router.push('/brand/account')}
+      />
 
       {/* Billing History Container */}
       <div className="flex-1 overflow-y-auto px-9 py-4">
@@ -76,7 +65,7 @@ export default function BillingHistory() {
           {billingHistory.length === 0 ? (
             /* Empty State */
             <div className="flex items-center justify-center h-full">
-              <p className="text-xl text-gray-600" style={{ fontFamily: 'Manrope, sans-serif' }}>
+              <p className="text-xl" style={{ color: colors.text.neutral.muted, fontFamily: 'Manrope, sans-serif' }}>
                 no transactions created yet
               </p>
             </div>
@@ -84,61 +73,62 @@ export default function BillingHistory() {
             <>
               {/* Section Heading */}
               <div className="flex items-center justify-between pb-3 pt-6 px-4">
-                <h3 className="text-lg font-semibold text-[#242527]" style={{ fontFamily: 'Manrope, sans-serif' }}>
+                <h3 className="text-lg font-semibold" style={{ color: colors.text.neutral.base, fontFamily: 'Manrope, sans-serif' }}>
                   December 2025
                 </h3>
               </div>
 
               {/* Transaction List */}
-              <div className="bg-white flex flex-col">
+              <div className="flex flex-col" style={{ backgroundColor: colors.neutral.base }}>
                 {billingHistory.map((transaction, index) => (
                   <div key={transaction.id}>
                     <div className="flex items-center w-full relative">
                       {/* Leading Avatar */}
                       <div className="flex items-center px-4 py-1.5">
-                        <div className="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center">
-                          <User className="w-6 h-6 text-white" />
+                        <div className="w-12 h-12 rounded-full flex items-center justify-center" style={{ backgroundColor: colors.brand.base }}>
+                          <UserLine className="w-6 h-6 text-white" />
                         </div>
                       </div>
 
                       {/* Text Content */}
                       <div className="flex-1 flex flex-col justify-center pr-4 py-3">
-                        <p className="text-base font-semibold text-[#242527] truncate" style={{ fontFamily: 'Work Sans, sans-serif' }}>
+                        <p className="text-base font-semibold truncate" style={{ color: colors.text.neutral.base, fontFamily: 'Work Sans, sans-serif' }}>
                           {transaction.title}
                         </p>
-                        <p className="text-sm text-[#808080]" style={{ fontFamily: 'Work Sans, sans-serif' }}>
+                        <p className="text-sm" style={{ color: colors.text.neutral.muted, fontFamily: 'Work Sans, sans-serif' }}>
                           {transaction.date}
                         </p>
                       </div>
 
                       {/* Trailing Amount */}
                       <div className="flex flex-col items-end justify-center pr-4 py-3">
-                        <p className={`text-base font-semibold ${transaction.isNegative ? 'text-red-600' : 'text-[#242527]'}`} style={{ fontFamily: 'Work Sans, sans-serif' }}>
+                        <p className="text-base font-semibold" style={{ color: transaction.isNegative ? colors.semantic.error.bold : colors.text.neutral.base, fontFamily: 'Work Sans, sans-serif' }}>
                           {transaction.amount}
                         </p>
-                        <p className="text-sm text-[#808080] cursor-pointer hover:underline" style={{ fontFamily: 'Work Sans, sans-serif' }}>
+                        <p className="text-sm cursor-pointer hover:underline" style={{ color: colors.text.neutral.muted, fontFamily: 'Work Sans, sans-serif' }}>
                           {transaction.action}
                         </p>
                       </div>
 
                       {/* Three Dot Menu */}
                       <div className="relative">
-                        <button
+                        <IconButton
+                          icon={MoreLine}
+                          size="md"
+                          variant="default"
                           onClick={() => setOpenMenuId(openMenuId === transaction.id ? null : transaction.id)}
-                          className="flex items-center justify-center w-10 h-10 hover:bg-gray-100 rounded-full transition-colors mr-2"
-                        >
-                          <MoreVertical className="w-5 h-5 text-gray-600" />
-                        </button>
+                          className="mr-2"
+                        />
 
                         {/* Dropdown Menu */}
                         {openMenuId === transaction.id && (
-                          <div className="absolute right-0 mt-1 w-48 bg-white rounded-lg shadow-lg border border-gray-200 z-10">
-                            <button className="w-full text-left px-4 py-3 hover:bg-gray-50 text-sm text-gray-700 flex items-center gap-2 border-b border-gray-100">
-                              <Download className="w-4 h-4" />
-                              Download Invoice
+                          <div className="absolute right-0 mt-1 w-48 rounded-lg shadow-lg z-10" style={{ backgroundColor: colors.neutral.base, borderColor: colors.neutral.muted, borderWidth: '1px' }}>
+                            <button className="w-full text-left px-4 py-3 text-sm flex items-center gap-2 transition-colors" style={{ color: colors.text.neutral.base, borderBottomColor: colors.neutral.muted, borderBottomWidth: '1px' }}>
+                              <DownloadLine className="w-4 h-4" />
+                              DownloadLine Invoice
                             </button>
-                            <button className="w-full text-left px-4 py-3 hover:bg-gray-50 text-sm text-gray-700 flex items-center gap-2">
-                              <Copy className="w-4 h-4" />
+                            <button className="w-full text-left px-4 py-3 text-sm flex items-center gap-2 transition-colors" style={{ color: colors.text.neutral.base }}>
+                              <FileCopyLine className="w-4 h-4" />
                               Copy Details
                             </button>
                           </div>
@@ -148,7 +138,7 @@ export default function BillingHistory() {
 
                     {/* Divider */}
                     {index < billingHistory.length - 1 && (
-                      <div className="h-px bg-gray-200 w-full" />
+                      <div className="h-px w-full" style={{ backgroundColor: colors.neutral.muted }} />
                     )}
                   </div>
                 ))}

@@ -1,11 +1,11 @@
 "use client";
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import Image from 'next/image';
+import Image2Line from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import { searchAPI, authUtils } from '../../utils/api';
 
-// Custom Image Component using Next.js Image
+// Custom Image2Line Component using Next.js Image2Line
 const ProfileImage = ({ src, alt, name, className }) => {
   const [imageError, setImageError] = useState(false);
 
@@ -73,7 +73,7 @@ const ProfileImage = ({ src, alt, name, className }) => {
 
   return (
     <div className="relative">
-      <Image
+      <Image2Line
         src={imageUrl}
         alt={alt}
         width={80}
@@ -130,7 +130,7 @@ const Hero = () => {
           setPrompt("");
           localStorage.removeItem('landing_search_results');
           localStorage.removeItem('landing_search_prompt');
-          console.log('Token expired or invalid. User logged out.');
+          console.log('Token expired or invalid. UserLine logged out.');
         }
       } else {
         setIsAuthenticated(false);
@@ -226,7 +226,7 @@ const Hero = () => {
         localStorage.removeItem('landing_search_prompt');
       }
     } catch (err) {
-      console.error('Search error:', err);
+      console.error('SearchLine error:', err);
       
       // Check if the error is about invalid/expired token
       if (err.response?.status === 403 && err.response?.data?.message?.includes('Invalid or expired token')) {
@@ -290,13 +290,13 @@ const Hero = () => {
   // Skeleton Card Component
   const SkeletonCard = () => (
     <motion.div
-      className="bg-white rounded-2xl p-4 sm:p-6 shadow-lg w-full max-w-3xl mx-auto"
+      className="bg-neutral-base rounded-2xl p-4 sm:p-6 shadow-lg w-full max-w-3xl mx-auto"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
     >
       <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-6">
-        {/* Profile Image Skeleton */}
+        {/* Profile Image2Line Skeleton */}
         <div className="relative flex-shrink-0">
           <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 animate-pulse" 
                style={{ 
@@ -378,7 +378,7 @@ const Hero = () => {
           onClick={() => setShowLoginModal(false)}
         >
           <motion.div
-            className="bg-white rounded-2xl p-6 sm:p-8 max-w-md w-full shadow-2xl"
+            className="bg-neutral-base rounded-2xl p-6 sm:p-8 max-w-md w-full shadow-2xl"
             initial={{ scale: 0.9, y: 20 }}
             animate={{ scale: 1, y: 0 }}
             exit={{ scale: 0.9, y: 20 }}
@@ -503,7 +503,7 @@ const Hero = () => {
     <div 
       className="min-h-screen bg-cover bg-center bg-no-repeat bg-fixed relative flex flex-col items-center justify-start sm:justify-center px-0 sm:px-6 py-4 sm:py-0 overflow-x-hidden w-full max-w-full box-border"
       style={{
-        backgroundImage: `url(${isMobile ? '/Phone.png' : '/landing/hero_bg1.jpg'})`,
+        backgroundImage: `url(${isMobile ? '/PhoneLine.png' : '/landing/hero_bg1.jpg'})`,
         backgroundSize: 'cover',
         backgroundPosition: 'center center',
         backgroundAttachment: 'scroll'
@@ -528,7 +528,7 @@ const Hero = () => {
   variants={titleVariants}
 >
   World's First AI Powered<br className="hidden sm:block" />
-  <span className="sm:hidden"> </span>Influencer Search Engine
+  <span className="sm:hidden"> </span>Influencer SearchLine Engine
 </motion.h1>
 
 {/* Subtitle */}
@@ -536,16 +536,16 @@ const Hero = () => {
   className="text-sm sm:text-base md:text-lg lg:text-xl text-gray-300 mb-6 sm:mb-8 md:mb-12 max-w-sm sm:max-w-md md:max-w-lg lg:max-w-2xl mx-auto px-2 sm:px-4 leading-relaxed"
   variants={itemVariants}
 >
-  Search Influencers in Seconds with Phyo and Reach<br className="hidden sm:block" />
+  SearchLine Influencers in Seconds with Phyo and Reach<br className="hidden sm:block" />
   <span className="sm:hidden"> </span>the Right Audience Faster.
 </motion.p>
 
-        {/* Search Bar */}
+        {/* SearchLine Bar */}
         <motion.div 
           className="relative max-w-4xl mx-auto mb-12 sm:mb-20 px-4 sm:px-2"
           variants={searchBarVariants}
         >
-          <div className="flex flex-col sm:flex-row items-center bg-white rounded-2xl sm:rounded-full shadow-2xl overflow-hidden w-full max-w-full">
+          <div className="flex flex-col sm:flex-row items-center bg-neutral-base rounded-2xl sm:rounded-full shadow-2xl overflow-hidden w-full max-w-full">
             <input
               type="text"
               placeholder="Describe the influencers you need (e.g. I need influencers in mumbai )"
@@ -558,7 +558,7 @@ const Hero = () => {
               className="bg-green-500 hover:bg-green-600 transition-colors duration-200 p-4 sm:p-6 m-2 rounded-full w-full sm:w-auto flex items-center justify-center px-4 sm:px-6"
               onClick={results.length > 0 ? handleClearResults : handleSearch}
               disabled={loading}
-              aria-label={results.length > 0 ? "Clear results" : "Search"}
+              aria-label={results.length > 0 ? "Clear results" : "SearchLine"}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               transition={{ duration: 0.2 }}
@@ -604,7 +604,7 @@ const Hero = () => {
                 </svg>
               )}
               <span className="ml-2 sm:hidden text-white font-medium">
-                {loading ? 'Searching...' : results.length > 0 ? 'Clear' : 'Search'}
+                {loading ? 'Searching...' : results.length > 0 ? 'Clear' : 'SearchLine'}
               </span>
             </motion.button>
           </div>
@@ -672,7 +672,7 @@ const Hero = () => {
                     <h3 className="text-white font-bold text-lg sm:text-xl mb-2">
                       {error.includes('free searches') || error.includes('credits') || error.includes('upgrade')
                         ? '🚀 Upgrade Required'
-                        : 'Search Error'}
+                        : 'SearchLine Error'}
                     </h3>
                     <p className="text-white/90 text-sm sm:text-base leading-relaxed">
                       {error}
@@ -699,7 +699,7 @@ const Hero = () => {
                             }
                           }, 100);
                         }}
-                        className="mt-4 bg-white text-orange-600 font-semibold py-2 px-6 rounded-full hover:bg-gray-100 transition-colors text-sm sm:text-base shadow-lg"
+                        className="mt-4 bg-neutral-base text-orange-600 font-semibold py-2 px-6 rounded-full hover:bg-gray-100 transition-colors text-sm sm:text-base shadow-lg"
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
                       >
@@ -744,7 +744,7 @@ const Hero = () => {
               {results.map((influencer, index) => (
                 <motion.div
                   key={influencer.username || index}
-                  className="bg-white rounded-2xl p-4 sm:p-6 shadow-lg w-full max-w-3xl mx-auto cursor-pointer hover:shadow-2xl transition-shadow"
+                  className="bg-neutral-base rounded-2xl p-4 sm:p-6 shadow-lg w-full max-w-3xl mx-auto cursor-pointer hover:shadow-2xl transition-shadow"
                   variants={cardVariants}
                   initial="hidden"
                   animate="visible"
@@ -755,7 +755,7 @@ const Hero = () => {
                   style={{ cursor: 'pointer' }}
                 >
                   <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-6">
-                    {/* Profile Image */}
+                    {/* Profile Image2Line */}
                     <div className="relative flex-shrink-0">
                       <ProfileImage
                         src={influencer.profile_pic_url}
@@ -873,7 +873,7 @@ const Hero = () => {
           )}
         </AnimatePresence>
 
-        {/* Feature Image */}
+        {/* Feature Image2Line */}
         <AnimatePresence>
           {results.length === 0 && !loading && (
             <motion.div 
@@ -887,9 +887,9 @@ const Hero = () => {
                 whileHover={{ scale: 1.02, y: -10 }}
                 transition={{ duration: 0.4, ease: "easeOut" }}
               >
-                <Image
+                <Image2Line
                   src="/landing/hero_feature.png"
-                  alt="Phyo AI Influencer Search Platform Preview"
+                  alt="Phyo AI Influencer SearchLine Platform Preview"
                   width={800}
                   height={600}
                   className="w-full h-auto rounded-lg shadow-2xl max-w-full"

@@ -39,7 +39,7 @@ const Comparison = () => {
             phyo: "Detailed reports (ROI, audience sentiment, platform-wise sharing)",
             other: "Basic engagement summaries",
         },
-        "Global Search": {
+        "Global SearchLine": {
             phyo: "Influencers across 15+ countries including India, the United States, the United Kingdom, Australia, Germany, Indonesia, Vietnam, Thailand, Singapore, the Philippines, Malaysia, Canada, South Korea, Japan, and Italy.",
             other: "Limited to local markets",
         },
@@ -51,7 +51,7 @@ const Comparison = () => {
        <div className="overflow-x-auto">
            <table className='border w-full bg-gradient-to-b from-[color:var(--dark-green)] to-[color:var(--green)] table-fixed shadow-lg'>
             <thead>
-                <tr className='[&>*:nth-child(1)]:bg-white [&>*:nth-child(2)]:bg-white text-center'>
+                <tr className='[&>*:nth-child(1)]:bg-neutral-base [&>*:nth-child(2)]:bg-neutral-base text-center'>
                     <th className='border py-3 text-[color:var(--dark-green)]'>Feature</th>
                     <th className='border py-3 text-red-500'>Other Platforms</th>
                     <th className='border py-3 text-white'>Phyo</th>
@@ -59,7 +59,7 @@ const Comparison = () => {
             </thead>
             <tbody>
                 {Object.keys(data).map((ele)=> {
-                    return <tr key={ele} className='[&>*:nth-child(1)]:bg-white [&>*:nth-child(2)]:bg-white text-center border'>
+                    return <tr key={ele} className='[&>*:nth-child(1)]:bg-neutral-base [&>*:nth-child(2)]:bg-neutral-base text-center border'>
                         <td className='border px-4 py-2'>{ele}</td>
                         <td className='border px-4 py-2'>{data[ele].other}</td>
                         <td className='border text-white px-4 py-2'>{data[ele].phyo}</td>

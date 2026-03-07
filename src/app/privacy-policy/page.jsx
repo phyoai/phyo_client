@@ -6,7 +6,7 @@ const PrivacyPolicy = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
-        <div className="bg-white rounded-xl shadow-lg p-6 sm:p-8">
+        <div className="bg-neutral-base rounded-xl shadow-lg p-6 sm:p-8">
           {/* Header */}
           <div className="text-center mb-8">
             <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
@@ -50,7 +50,7 @@ const PrivacyPolicy = () => {
               <li><strong>Account Information:</strong> Profile information for brands and influencers, communication preferences</li>
               <li><strong>Payment Information:</strong> Payment details processed securely through Razorpay including transaction data, billing information</li>
               <li><strong>Transaction Data:</strong> Items purchased, payment amounts, transaction history</li>
-              <li><strong>User-Generated Content:</strong> Campaign descriptions, search queries, feedback and reviews</li>
+              <li><strong>UserLine-Generated Content:</strong> Campaign descriptions, search queries, feedback and reviews</li>
               <li><strong>KYC Documents:</strong> As required by RBI regulations and applicable laws</li>
             </ul>
 
@@ -194,7 +194,7 @@ const PrivacyPolicy = () => {
             </p>
             <ul className="list-disc list-inside text-gray-700 text-sm sm:text-base leading-relaxed space-y-2">
               <li><strong>Razorpay:</strong> Payment processing, transaction management, and financial compliance</li>
-              <li><strong>Social Media Platforms:</strong> Instagram, YouTube, etc. for publicly available influencer data</li>
+              <li><strong>Social Media Platforms:</strong> InstagramFill, YouTube, etc. for publicly available influencer data</li>
               <li><strong>Cloud Services:</strong> AWS/Google Cloud for secure hosting and data storage</li>
               <li><strong>Analytics Providers:</strong> For platform usage analysis and performance monitoring</li>
               <li><strong>Communication Services:</strong> Email and SMS service providers for notifications</li>
@@ -204,7 +204,7 @@ const PrivacyPolicy = () => {
             </p>
           </div>
 
-          {/* User Rights under DPDP Act */}
+          {/* UserLine Rights under DPDP Act */}
           <div className="mb-8">
             <h2 className="text-xl sm:text-2xl font-semibold text-gray-800 mb-4">
               9. Your Rights Under DPDP Act 2023
@@ -296,7 +296,7 @@ const PrivacyPolicy = () => {
               <p className="text-gray-700 text-sm sm:text-base leading-relaxed">
               Email: phyo.aiofficial@gmail.com<br/>
                 
-                Phone: 7249005806
+                PhoneLine: 7249005806
               </p>
             </div>
            

@@ -1,6 +1,6 @@
 "use client";
 
-import { Minus, Plus } from "lucide-react";
+import { SubtractLine, AddLine } from '@phyoofficial/phyo-icon-library';
 import { useState } from "react";
 
 const faqs = [
@@ -8,11 +8,11 @@ const faqs = [
   { question: "How does Phyo.ai find influencers?", answer: "Phyo.ai uses AI algorithms to analyze and suggest influencers based on your campaign needs." },
   { question: "Is there a free trial?", answer: "Yes, Phyo offers a free trial with limited features." },
   { question: "Can I generate a report for my ongoing or previous campaign?", answer: "Yes, you can generate reports for both ongoing and past campaigns in your dashboard." },
-  { question: "How many platforms are available on Phyo?", answer: "Phyo supports multiple social platforms, including Instagram, YouTube, and TikTok." },
+  { question: "How many platforms are available on Phyo?", answer: "Phyo supports multiple social platforms, including InstagramFill, YouTube, and TikTok." },
   { question: "Can I search communities on Phyo?", answer: "Yes, you can explore various influencer communities on Phyo." },
   { question: "Can I cancel my subscription?", answer: "Yes, you can cancel your subscription anytime from your account settings." },
   { question: "How does Phyo ensure influencer authenticity?", answer: "Phyo verifies influencers based on engagement metrics and AI analysis." },
-  { question: "Which social platforms does Phyo support?", answer: "Phyo supports Instagram, YouTube, TikTok, and Twitter." },
+  { question: "Which social platforms does Phyo support?", answer: "Phyo supports InstagramFill, YouTube, TikTok, and TwitterXLine." },
   { question: "Can I try Phyo for free?", answer: "Yes, Phyo offers a free trial for new users." },
 ];
 
@@ -34,7 +34,7 @@ export default function Faq() {
               onClick={() => toggleFAQ(index)}
             >
               {faq.question}
-              {openIndex === index ? <Minus className="text-green-600" /> : <Plus className="text-green-600" />}
+              {openIndex === index ? <SubtractLine className="text-green-600" /> : <AddLine className="text-green-600" />}
             </button>
             {openIndex === index && <p className="text-[#00674F] font-medium pb-3">{faq.answer}</p>}
           </div>

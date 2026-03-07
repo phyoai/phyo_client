@@ -1,4 +1,4 @@
-import Image from 'next/image';
+import Image2Line from 'next/image';
 import Link from 'next/link';
 
 const Footer = () => {
@@ -15,7 +15,7 @@ const Footer = () => {
           {/* Logo and Description */}
           <div className="md:col-span-1">
             <div className="mb-6">
-              <Image 
+              <Image2Line 
                 src="/logo_white.png" 
                 alt="PHYO Logo" 
                 width={120} 
@@ -65,7 +65,7 @@ const Footer = () => {
               <li><Link href="#" className="text-gray-300 hover:text-white transition-colors text-sm">Log in</Link></li>
               <li><Link href="#" className="text-gray-300 hover:text-white transition-colors text-sm">Dashboard</Link></li>
               <li><Link href="#" className="text-gray-300 hover:text-white transition-colors text-sm">Features</Link></li>
-              <li><Link href="#" className="text-gray-300 hover:text-white transition-colors text-sm">Settings</Link></li>
+              <li><Link href="#" className="text-gray-300 hover:text-white transition-colors text-sm">FileSettingsLine</Link></li>
             </ul>
           </div> */}
 

@@ -1,9 +1,8 @@
 'use client'
 import React, { useState, useRef, useEffect } from 'react';
-import { ArrowLeft, MoreVertical, MessageSquare, UserPlus, Bookmark, ChevronLeft } from 'lucide-react';
+import { ArrowLeftLine, MoreLine, BookmarkLine, YoutubeFill, InstagramFill, TwitterXLine, UserAddLine, Message3Line, FacebookCircleFill } from '@phyoofficial/phyo-icon-library';
 import { useRouter } from 'next/navigation';
-import Image from 'next/image';
-import { BookmarkLine, YoutubeFill, InstagramFill, TwitterXLine, UserAddLine, Message3Line, FacebookCircleFill } from '@phyoofficial/phyo-icon-library';
+import Image2Line from 'next/image';
 
 const influencersData = [
   {
@@ -193,14 +192,14 @@ const TopInfluencersPage = () => {
   };
 
   return (
-    <div className="bg-white h-screen flex flex-col overflow-hidden">
+    <div className="bg-neutral-base h-screen flex flex-col overflow-hidden">
       {/* App Bar */}
-      <div className="bg-white flex items-center justify-between px-4 py-2 border-b border-gray-100 shrink-0">
+      <div className="bg-neutral-base flex items-center justify-between px-4 py-2 border-b border-gray-100 shrink-0">
         <button
           onClick={handleBack}
           className="flex items-center justify-center w-12 h-12 rounded-full hover:bg-gray-100 transition-colors"
         >
-          <ArrowLeft className="w-6 h-6 text-gray-700" />
+          <ArrowLeftLine className="w-6 h-6 text-gray-700" />
         </button>
 
         <h1 className="text-xl font-semibold text-[#242527] flex-1 px-2">
@@ -211,7 +210,7 @@ const TopInfluencersPage = () => {
           type="button"
           className="flex items-center justify-center w-12 h-12 rounded-full hover:bg-gray-100 transition-colors"
         >
-          <MoreVertical className="w-6 h-6 text-gray-700" />
+          <MoreLine className="w-6 h-6 text-gray-700" />
         </button>
       </div>
 
@@ -220,7 +219,7 @@ const TopInfluencersPage = () => {
         {/* Influencers List */}
         <div className={`flex flex-col ${selectedInfluencer ? 'w-[604px]' : 'flex-1'} border-r border-gray-200 transition-all duration-300 shrink-0 overflow-hidden`}>
           {/* Categories - Sticky */}
-          <div className="px-6 py-4 border-b border-gray-100 bg-white sticky top-0 z-10">
+          <div className="px-6 py-4 border-b border-gray-100 bg-neutral-base sticky top-0 z-10">
             <div className="flex items-center gap-2">
               {/* Left Arrow */}
               <button
@@ -299,7 +298,7 @@ const TopInfluencersPage = () => {
                   >
                     <div className="flex items-center gap-3 mb-3">
                       <div className="w-12 h-12 rounded-full overflow-hidden bg-blue-500">
-                        <Image
+                        <Image2Line
                           src={influencer.avatar}
                           alt={influencer.name}
                           width={48}
@@ -369,13 +368,13 @@ const TopInfluencersPage = () => {
         </div>
 
         {/* Profile Panel */}
-        <div className="flex-1 overflow-y-auto bg-white m-1 shadow-[0_0_20px_rgba(0,0,0,0.1)] rounded-lg">
+        <div className="flex-1 overflow-y-auto bg-neutral-base m-1 shadow-[0_0_20px_rgba(0,0,0,0.1)] rounded-lg">
           {selectedInfluencer ? (
             <InfluencerProfile influencer={selectedInfluencer} />
           ) : (
             <div className="flex flex-col items-center justify-center h-full bg-[#f0f0f0]">
               <div className="text-center">
-                <Image
+                <Image2Line
                   src="/logo.png"
                   alt="Phyo Logo"
                   width={286}
@@ -448,7 +447,7 @@ function InfluencerProfile({ influencer }) {
     <div className="w-full h-full relative rounded-lg overflow-y-auto">
       {/* Yellow Background - Sticky at top */}
       <div className="sticky top-0 bg-yellow-400 h-[400px] z-0">
-        {/* Profile Image - Centered */}
+        {/* Profile Image2Line - Centered */}
         <div className="absolute inset-0 flex items-center justify-center pt-8">
           <div className="w-64 h-64 rounded-full overflow-hidden shadow-lg">
             {/* Placeholder for profile image */}
@@ -458,27 +457,27 @@ function InfluencerProfile({ influencer }) {
 
         {/* Top Action Buttons - Overlaid */}
         <div className="absolute top-4 left-4 right-4 flex justify-between z-10">
-          <button className="w-10 h-10 bg-white rounded-full flex items-center justify-center hover:bg-gray-100 shadow-md">
-            <ArrowLeft className="h-5 w-5" />
+          <button className="w-10 h-10 bg-neutral-base rounded-full flex items-center justify-center hover:bg-gray-100 shadow-md">
+            <ArrowLeftLine className="h-5 w-5" />
           </button>
           <div className="flex gap-2">
             <button
               onClick={() => setShowSaveModal(true)}
-              className="w-10 h-10 bg-white rounded-full flex items-center justify-center hover:bg-gray-100 shadow-md"
+              className="w-10 h-10 bg-neutral-base rounded-full flex items-center justify-center hover:bg-gray-100 shadow-md"
             >
               <BookmarkLine className="h-5 w-5" />
             </button>
             <div className="relative" ref={moreMenuRef}>
               <button
                 onClick={() => setShowMoreMenu(!showMoreMenu)}
-                className="w-10 h-10 bg-white rounded-full flex items-center justify-center hover:bg-gray-100 shadow-md"
+                className="w-10 h-10 bg-neutral-base rounded-full flex items-center justify-center hover:bg-gray-100 shadow-md"
               >
-                <MoreVertical className="h-5 w-5" />
+                <MoreLine className="h-5 w-5" />
               </button>
 
               {/* More Menu Dropdown */}
               {showMoreMenu && (
-                <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 z-50">
+                <div className="absolute right-0 mt-2 w-48 bg-neutral-base rounded-lg shadow-lg py-2 z-50">
                   <button
                     onClick={() => {
                       setShowMoreMenu(false);
@@ -525,7 +524,7 @@ function InfluencerProfile({ influencer }) {
       {/* Save to List Modal */}
       {showSaveModal && (
         <div className="fixed inset-0 bg-black bg-opacity-25 flex items-center justify-center z-50" onClick={() => setShowSaveModal(false)}>
-          <div className="bg-white rounded-3xl shadow-xl w-[480px]" onClick={(e) => e.stopPropagation()}>
+          <div className="bg-neutral-base rounded-3xl shadow-xl w-[480px]" onClick={(e) => e.stopPropagation()}>
             {/* Header */}
             <div className="px-4 pt-4 pb-3">
               <h3 className="text-lg font-semibold text-[#242527]">Save to...</h3>
@@ -609,7 +608,7 @@ function InfluencerProfile({ influencer }) {
       )}
 
       {/* Profile Content - White card that scrolls over yellow background */}
-      <div className="relative bg-white rounded-t-3xl -mt-8 z-10 shadow-lg">
+      <div className="relative bg-neutral-base rounded-t-3xl -mt-8 z-10 shadow-lg">
         <div className="px-4 py-6 pb-28">
           {/* Username and Name */}
           <div className="mb-6">
@@ -666,7 +665,7 @@ function InfluencerProfile({ influencer }) {
             {/* Likes and Views Graphs */}
             <div className="flex gap-3 overflow-x-auto mb-6">
               {/* Likes Graph */}
-              <div className="bg-white border-[0.5px] border-[#e6e6e6] rounded-xl p-2 min-w-[380px] flex-shrink-0">
+              <div className="bg-neutral-base border-[0.5px] border-[#e6e6e6] rounded-xl p-2 min-w-[380px] flex-shrink-0">
                 <div className="mb-2">
                   <p className="text-[#242527] text-base font-semibold leading-6 tracking-[0.24px]">{influencer.likes} Likes</p>
                   <div className="flex items-center gap-1 text-xs">
@@ -707,7 +706,7 @@ function InfluencerProfile({ influencer }) {
               </div>
 
               {/* Views Graph */}
-              <div className="bg-white border-[0.5px] border-[#e6e6e6] rounded-xl p-2 min-w-[380px] flex-shrink-0">
+              <div className="bg-neutral-base border-[0.5px] border-[#e6e6e6] rounded-xl p-2 min-w-[380px] flex-shrink-0">
                 <div className="mb-2">
                   <p className="text-[#242527] text-base font-semibold leading-6 tracking-[0.24px]">{influencer.views} views</p>
                   <div className="flex items-center gap-1 text-xs">
@@ -754,7 +753,7 @@ function InfluencerProfile({ influencer }) {
             <h3 className="text-[#242527] text-xl font-semibold leading-7 tracking-[-0.14px] mb-3">Audience Insights</h3>
 
             {/* Age Group */}
-            <div className="bg-white border-[0.5px] border-[#e6e6e6] rounded-xl p-2 mb-3">
+            <div className="bg-neutral-base border-[0.5px] border-[#e6e6e6] rounded-xl p-2 mb-3">
               <p className="text-[#242527] text-base font-semibold leading-6 tracking-[0.24px] mb-2">Age Group</p>
               <div className="flex gap-2">
                 <div className="flex flex-col justify-between text-[#333] text-xs py-2 text-right" style={{ minWidth: '32px' }}>
@@ -797,7 +796,7 @@ function InfluencerProfile({ influencer }) {
             </div>
 
             {/* Gender */}
-            <div className="bg-white border-[0.5px] border-[#e6e6e6] rounded-xl p-2 mb-3">
+            <div className="bg-neutral-base border-[0.5px] border-[#e6e6e6] rounded-xl p-2 mb-3">
               <p className="text-[#242527] text-base font-semibold leading-6 tracking-[0.24px] mb-2">Gender</p>
               <div className="flex items-center justify-center py-4">
                 <svg width="150" height="150" viewBox="0 0 150 150">
@@ -819,7 +818,7 @@ function InfluencerProfile({ influencer }) {
             </div>
 
             {/* Top Locations */}
-            <div className="bg-white border-[0.5px] border-[#e6e6e6] rounded-xl p-2">
+            <div className="bg-neutral-base border-[0.5px] border-[#e6e6e6] rounded-xl p-2">
               <p className="text-[#242527] text-base font-semibold leading-6 tracking-[0.24px] mb-2">Top Locations</p>
               <div className="flex gap-2">
                 <div className="flex flex-col justify-between text-[#333] text-xs py-2 text-right" style={{ minWidth: '32px' }}>
@@ -932,14 +931,14 @@ function InfluencerProfile({ influencer }) {
       </div>
 
       {/* Bottom Action Buttons - Sticky at bottom */}
-      <div className="sticky bottom-0 bg-white border-t border-gray-200 px-4 py-4 z-20 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)]">
+      <div className="sticky bottom-0 bg-neutral-base border-t border-gray-200 px-4 py-4 z-20 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)]">
         <div className="flex gap-3">
           <button className="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-[#dae3d1] rounded-full text-[#43573b] text-base font-semibold hover:bg-[#c9d9ba] transition-colors tracking-[0.24px]">
-            <UserPlus className="h-6 w-6" />
+            <UserAddLine className="h-6 w-6" />
             Invite
           </button>
           <button className="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-[#43573b] rounded-full text-white text-base font-semibold hover:bg-[#374829] transition-colors tracking-[0.24px]">
-            <MessageSquare className="h-6 w-6" />
+            <Message3Line className="h-6 w-6" />
             Send Message
           </button>
         </div>

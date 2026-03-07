@@ -1,7 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { TrendingUp, Heart, MessageCircle, Share2, Eye } from 'lucide-react';
+import { LineChartLine, HeartLine, MessageCircle, Share2, EyeLine } from '@phyoofficial/phyo-icon-library';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 export default function EngagementCard({ avgEngagement, followers, demographics }) {
@@ -47,7 +47,7 @@ export default function EngagementCard({ avgEngagement, followers, demographics 
   const CustomTooltip = ({ active, payload }) => {
     if (active && payload && payload.length) {
       return (
-        <div className="bg-white px-3 py-2 rounded-lg shadow-lg border border-gray-200">
+        <div className="bg-neutral-base px-3 py-2 rounded-lg shadow-lg border border-gray-200">
           <p className="text-xs text-gray-600">{payload[0].payload.month}</p>
           <p className="font-bold text-gray-800">{payload[0].value.toFixed(2)}%</p>
         </div>
@@ -62,11 +62,11 @@ export default function EngagementCard({ avgEngagement, followers, demographics 
       whileInView={{ opacity: 1, scale: 1 }}
       viewport={{ once: true }}
       transition={{ duration: 0.4, delay: 0.1 }}
-      className="bg-white rounded-xl shadow-md border border-gray-200 p-6"
+      className="bg-neutral-base rounded-xl shadow-md border border-gray-200 p-6"
     >
       <div className="flex items-center gap-2 mb-6">
         <div className={`bg-gradient-to-br ${engagementBg.replace('bg-', 'from-')}-50 ${engagementBg.replace('bg-', 'to-')}-100 p-2.5 rounded-lg`}>
-          <TrendingUp className={engagementColor} size={20} />
+          <LineChartLine className={engagementColor} size={20} />
         </div>
         <div>
           <h3 className="text-lg font-bold text-gray-900">Engagement Rate</h3>

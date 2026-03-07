@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, MoreVertical } from 'lucide-react';
+import AppBar from '@/components/AppBar';
 
 export default function NotificationPreferences() {
   const router = useRouter();
@@ -28,31 +28,20 @@ export default function NotificationPreferences() {
         className="relative inline-flex items-center"
       >
         <div className={`w-11 h-8 rounded-full transition-colors flex items-center px-1 ${enabled ? 'bg-[#3d4f36]' : 'bg-gray-300'}`}>
-          <div className={`w-6 h-6 bg-white rounded-full transition-transform ${enabled ? 'translate-x-3' : 'translate-x-0'}`}></div>
+          <div className={`w-6 h-6 bg-neutral-base rounded-full transition-transform ${enabled ? 'translate-x-3' : 'translate-x-0'}`}></div>
         </div>
       </button>
     </div>
   );
 
   return (
-    <div className="w-full h-full flex flex-col bg-white">
-      {/* App Bar */}
-      <div className="flex items-center justify-between px-1 py-2 border-b border-gray-100">
-        <button
-          onClick={() => router.back()}
-          className="flex items-center justify-center w-12 h-12 rounded-full hover:bg-gray-100 transition-colors"
-        >
-          <ArrowLeft className="w-6 h-6 text-[#242527]" />
-        </button>
-        
-        <h1 className="flex-1 text-xl font-semibold text-[#242527] px-2">
-          Notification preferences
-        </h1>
-        
-        <button className="flex items-center justify-center w-12 h-12 rounded-full hover:bg-gray-100 transition-colors">
-          <MoreVertical className="w-6 h-6 text-[#242527]" />
-        </button>
-      </div>
+    <div className="w-full h-full flex flex-col bg-neutral-base">
+      <AppBar
+        title="Notification preferences"
+        onBack={() => router.back()}
+        showMenu={true}
+        onMenuClick={() => console.log('Open menu')}
+      />
 
       {/* Content */}
       <div className="flex-1 overflow-y-auto px-9 py-4">

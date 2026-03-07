@@ -24,26 +24,39 @@ function UserLayoutContent({ children, pathname }) {
   // Hide sidebar for all account sub-pages (but not the main account page)
   const isAccountSubPage = pathname.startsWith('/user/account/');
   // Hide sidebar for dynamic campaign details page only
-const isCampaignDetailsPage =
-  pathname.startsWith('/user/campaigns/') &&
-  !pathname.includes('/create-campaign') &&
-  !pathname.includes('/new-applications') &&
-  !pathname.includes('/all-campaigns') &&
-  !pathname.includes('/all-drafts');
-  
-  if (isCreateCampaignPage || isNewApplicationsPage || isAllCampaignsPage || isAllDraftsPage || isInfluencerSearchPage || isInfluencersPage || isNotificationsPage || isAccountSubPage || isCampaignDetailsPage) {
-    console.log('UserLayout: Rendering page without sidebar');
+  const isCampaignDetailsPage =
+    pathname.startsWith('/user/campaigns/') &&
+    !pathname.includes('/create-campaign') &&
+    !pathname.includes('/new-applications') &&
+    !pathname.includes('/all-campaigns') &&
+    !pathname.includes('/all-drafts');
+  // Hide sidebar for inbox page
+  const isInboxPage = pathname === '/user/inbox';
+
+  if (
+    isCreateCampaignPage ||
+    isNewApplicationsPage ||
+    isAllCampaignsPage ||
+    isAllDraftsPage ||
+    isInfluencerSearchPage ||
+    isInfluencersPage ||
+    isNotificationsPage ||
+    isAccountSubPage ||
+    isCampaignDetailsPage ||
+    isInboxPage
+  ) {
+    // console.log('UserLayout: Rendering page without sidebar');
     return <>{children}</>;
   }
   
-  console.log('UserLayout: Rendering layout with sidebar');
+  // console.log('UserLayout: Rendering layout with sidebar');
   
   return (
-    <div className="flex min-h-screen bg-[#FFFFFF]">
+    <div className="flex min-h-screen bg-neutral-base">
       <UserSidebar />
-      <main className={`flex-1 bg-[#FFFFFF] transition-all duration-300 ease-in-out ${
-        isExpanded ? 'ml-[220px]' : 'ml-[96px]'
-      } h-screen overflow-y-auto`}>
+      <main className={`flex-1 bg-neutral-base text-text-base border-l border-primary transition-all duration-300 ease-in-out ${
+        isExpanded ? 'ml-[240px]' : 'ml-[80px]'
+      } h-screen overflow-y-auto p-8`}>
         {children}
       </main>
     </div>

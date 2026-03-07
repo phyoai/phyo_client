@@ -28,7 +28,7 @@ export default function AdminLogin() {
     <div className="min-h-screen flex items-center justify-center bg-green-50">
       <form
         onSubmit={handleSubmit}
-        className="bg-white p-8 rounded shadow-md w-full max-w-sm border border-green-200"
+        className="bg-neutral-base p-8 rounded shadow-md w-full max-w-sm border border-green-200"
       >
         <h2 className="text-2xl font-bold mb-6 text-green-700 text-center">Admin Login</h2>
         <div className="mb-4">

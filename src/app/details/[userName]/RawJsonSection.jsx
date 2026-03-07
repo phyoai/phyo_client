@@ -1,7 +1,7 @@
 import React from 'react';
 
 const RawJsonSection = ({ creator }) => (
-  <div className='bg-white rounded-xl shadow-lg p-8'>
+  <div className='bg-neutral-base rounded-xl shadow-lg p-8'>
     <h2 className='text-2xl font-bold text-gray-900 mb-6 flex items-center gap-3'>
       <div className='w-8 h-8 bg-gray-700 rounded-lg flex items-center justify-center'>
         <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">

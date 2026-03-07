@@ -2,13 +2,13 @@
 
 import { useState, useEffect, useRef } from "react";
 import { YoutubeFill, InstagramFill, TwitterXLine } from '@phyoofficial/phyo-icon-library';
-import { ShieldCheck, ExternalLink, Globe, ArrowLeft, MoreVertical } from 'lucide-react';
+import { ShieldCheckLine, ExternalLinkLine, GlobeLine, ArrowLeftLine, MoreLine } from '@phyoofficial/phyo-icon-library';
 
 const SOCIALS = [
-  { platform: "Youtube",   icon: <YoutubeFill size={18} /> },
-  { platform: "Instagram", icon: <InstagramFill size={18} /> },
-  { platform: "Twitter",   icon: <TwitterXLine size={18} /> },
-  { platform: "Website",   icon: <Globe size={18} /> },
+  { platform: "YoutubeFill",   icon: <YoutubeFill size={18} /> },
+  { platform: "InstagramFill", icon: <InstagramFill size={18} /> },
+  { platform: "TwitterXLine",   icon: <TwitterXLine size={18} /> },
+  { platform: "Website",   icon: <GlobeLine size={18} /> },
 ];
 
 export default function BrandProfile() {
@@ -54,10 +54,10 @@ export default function BrandProfile() {
         boxSizing: "border-box",
       }}>
         <button style={{ background: "none", border: "none", cursor: "pointer", padding: 4 }}>
-          <ArrowLeft size={22} className="text-gray-950" />
+          <ArrowLeftLine size={22} className="text-gray-950" />
         </button>
         <button style={{ background: "none", border: "none", cursor: "pointer", padding: 4 }}>
-          <MoreVertical size={22} className="text-gray-950" />
+          <MoreLine size={22} className="text-gray-950" />
         </button>
       </div>
     
@@ -126,7 +126,7 @@ export default function BrandProfile() {
             }}>
               Lenskart
             </h1>
-            <ShieldCheck size={22} className="text-[#43573b] flex-shrink-0" />
+            <ShieldCheckLine size={22} className="text-[#43573b] flex-shrink-0" />
           </div>
           <p style={{ fontSize: 15, color: "#4b5563", margin: "0 0 14px", lineHeight: 1.5 }}>
             Creating beautiful sunglasses for modern living
@@ -192,7 +192,7 @@ export default function BrandProfile() {
             }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
                 <h3 style={{ fontSize: 17, fontWeight: 700, color: "#111", margin: 0 }}>About</h3>
-                <ExternalLink size={20} className="text-gray-600" />
+                <ExternalLinkLine size={20} className="text-gray-600" />
               </div>
               <p style={{ fontSize: 14, color: "#6b7280", lineHeight: 1.8, margin: 0 }}>
                 Um, I'm happy you're home. You're an idiot, Steve Harrington. You're beautiful, Nancy Wheeler. You're right. You are a freak.... Who would you rather be friends with: Bowie or Kenny Rogers? Why's he gotta kick the door? Why do we even need weapons anyway? We have her. Friends don't lie.
@@ -239,7 +239,7 @@ export default function BrandProfile() {
                     display: "flex", alignItems: "center", justifyContent: "center",
                     background: "#fafafa",
                   }}>
-                    <ExternalLink size={15} className="text-gray-500" />
+                    <ExternalLinkLine size={15} className="text-gray-500" />
                   </div>
                 </div>
               ))}

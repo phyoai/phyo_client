@@ -1,14 +1,14 @@
 "use client"
 import React, { useState, useEffect } from 'react'
 import { useParams } from 'next/navigation'
-import Image from 'next/image'
+import Image2Line from 'next/image'
 import ProfileHeader from './ProfileHeader'
 import InstagramReelsSection from './InstagramReelsSection'
 import YouTubeVideosSection from './YouTubeVideosSection'
 import RawJsonSection from './RawJsonSection'
 import PageLoader from './PageLoader'
 
-// Custom Image Component using Next.js Image (same as Hero component)
+// Custom Image2Line Component using Next.js Image2Line (same as Hero component)
 const ProfileImage = ({ src, alt, name, className }) => {
   const [imageError, setImageError] = useState(false);
 
@@ -59,7 +59,7 @@ const ProfileImage = ({ src, alt, name, className }) => {
 
   return (
     <div className="relative">
-      <Image
+      <Image2Line
         src={imageUrl}
         alt={alt}
         width={80}
@@ -141,7 +141,7 @@ export default function Page() {
   const DemographicsSection = ({ data, platform }) => {
     if (!data || (!data.genderDistribution?.length && !data.ageDistribution?.length && !data.audienceByCountry?.length)) {
       return (
-        <div className="bg-white rounded-xl shadow-lg p-4 sm:p-6 mb-6 sm:mb-8">
+        <div className="bg-neutral-base rounded-xl shadow-lg p-4 sm:p-6 mb-6 sm:mb-8">
           <h2 className="text-xl sm:text-2xl font-bold text-gray-800 mb-4">{platform} Demographics</h2>
           <p className="text-gray-600 text-sm sm:text-base">No demographic data available for {platform}</p>
         </div>
@@ -149,7 +149,7 @@ export default function Page() {
     }
 
     return (
-      <div className="bg-white rounded-xl shadow-lg p-4 sm:p-6 mb-6 sm:mb-8">
+      <div className="bg-neutral-base rounded-xl shadow-lg p-4 sm:p-6 mb-6 sm:mb-8">
         <h2 className="text-xl sm:text-2xl font-bold text-gray-800 mb-4 sm:mb-6">{platform} Demographics</h2>
         
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
@@ -258,7 +258,7 @@ export default function Page() {
 
   // Get current platform data
   const currentData = activeTab === 'instagram' ? creator.instagramData : creator.youtubeData;
-  const platformName = activeTab === 'instagram' ? 'Instagram' : 'YouTube';
+  const platformName = activeTab === 'instagram' ? 'InstagramFill' : 'YouTube';
 
   return (
     <div className='min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 px-4 sm:px-6 py-6 sm:py-8'>
@@ -266,24 +266,24 @@ export default function Page() {
         <ProfileHeader creator={creator} />
         
         {/* Platform Toggle */}
-        <div className="bg-white rounded-xl shadow-lg p-4 sm:p-6 mb-6 sm:mb-8">
+        <div className="bg-neutral-base rounded-xl shadow-lg p-4 sm:p-6 mb-6 sm:mb-8">
           <div className="flex items-center justify-center">
             <div className="bg-gray-100 p-1 rounded-lg flex w-full max-w-xs sm:max-w-none sm:w-auto">
               <button
                 onClick={() => setActiveTab('instagram')}
                 className={`flex-1 sm:flex-none px-4 sm:px-6 py-2 rounded-md font-medium transition-all duration-200 text-sm sm:text-base ${
                   activeTab === 'instagram'
-                    ? 'bg-white text-pink-600 shadow-md'
+                    ? 'bg-neutral-base text-pink-600 shadow-md'
                     : 'text-gray-600 hover:text-gray-800'
                 }`}
               >
-                Instagram
+                InstagramFill
               </button>
               <button
                 onClick={() => setActiveTab('youtube')}
                 className={`flex-1 sm:flex-none px-4 sm:px-6 py-2 rounded-md font-medium transition-all duration-200 text-sm sm:text-base ${
                   activeTab === 'youtube'
-                    ? 'bg-white text-red-600 shadow-md'
+                    ? 'bg-neutral-base text-red-600 shadow-md'
                     : 'text-gray-600 hover:text-gray-800'
                 }`}
               >
@@ -297,7 +297,7 @@ export default function Page() {
         <div className='grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 mb-6 sm:mb-8'>
           {/* Followers */}
           {currentData?.followers > 0 && (
-            <div className='bg-white rounded-xl shadow-lg p-4 sm:p-6 text-center'>
+            <div className='bg-neutral-base rounded-xl shadow-lg p-4 sm:p-6 text-center'>
               <div className={`text-xl sm:text-3xl font-bold mb-1 sm:mb-2 ${activeTab === 'instagram' ? 'text-pink-600' : 'text-red-600'}`}>
                 {formatValue(currentData?.followers)}
               </div>
@@ -309,7 +309,7 @@ export default function Page() {
 
           {/* Collaboration Charges - Reel/Video */}
           {currentData?.collaborationCharges?.reel > 0 && (
-            <div className='bg-white rounded-xl shadow-lg p-4 sm:p-6 text-center'>
+            <div className='bg-neutral-base rounded-xl shadow-lg p-4 sm:p-6 text-center'>
               <div className='text-xl sm:text-3xl font-bold text-green-600 mb-1 sm:mb-2'>
                 ₹{formatValue(currentData?.collaborationCharges?.reel)}
               </div>
@@ -321,7 +321,7 @@ export default function Page() {
 
           {/* Post Rate */}
           {currentData?.collaborationCharges?.post > 0 && (
-            <div className='bg-white rounded-xl shadow-lg p-4 sm:p-6 text-center'>
+            <div className='bg-neutral-base rounded-xl shadow-lg p-4 sm:p-6 text-center'>
               <div className='text-xl sm:text-3xl font-bold text-blue-600 mb-1 sm:mb-2'>
                 ₹{formatValue(currentData?.collaborationCharges?.post)}
               </div>
@@ -331,7 +331,7 @@ export default function Page() {
 
           {/* Story Rate */}
           {currentData?.collaborationCharges?.story > 0 && (
-            <div className='bg-white rounded-xl shadow-lg p-4 sm:p-6 text-center'>
+            <div className='bg-neutral-base rounded-xl shadow-lg p-4 sm:p-6 text-center'>
               <div className='text-xl sm:text-3xl font-bold text-purple-600 mb-1 sm:mb-2'>
                 ₹{formatValue(currentData?.collaborationCharges?.story)}
               </div>
@@ -345,7 +345,7 @@ export default function Page() {
 
         {/* BrightData Profile Information */}
         {creator.brightDataProfile && (
-          <div className="bg-white rounded-xl shadow-lg p-4 sm:p-6 mb-6 sm:mb-8">
+          <div className="bg-neutral-base rounded-xl shadow-lg p-4 sm:p-6 mb-6 sm:mb-8">
             <h2 className="text-xl sm:text-2xl font-bold text-gray-800 mb-4 sm:mb-6">Profile Analytics</h2>
             
             {/* Profile Details */}

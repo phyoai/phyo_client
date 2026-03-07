@@ -12,7 +12,7 @@ const ToggleInput = ({
   const { control } = useFormContext();
 
   return (
-    <div className={`bg-white flex items-center pl-4 ${className}`}>
+    <div className={`bg-neutral-base flex items-center pl-4 ${className}`}>
       <div className="flex items-center w-full">
         <div className="flex-1 flex flex-col items-start justify-center pr-4 py-3">
           <label 
@@ -40,7 +40,7 @@ const ToggleInput = ({
                   }`}
                 >
                   <span
-                    className={`inline-block w-6 h-6 transform rounded-full bg-white shadow-lg transition-transform duration-200 ease-in-out ${
+                    className={`inline-block w-6 h-6 transform rounded-full bg-neutral-base shadow-lg transition-transform duration-200 ease-in-out ${
                       field.value ? 'translate-x-[22px]' : 'translate-x-1'
                     }`}
                   />

@@ -1,6 +1,6 @@
 'use client'
 import React, { useState } from 'react';
-import { ChevronLeft, MoreVertical, Download, X } from 'lucide-react';
+import { ArrowLeftLine, MoreLine, DownloadLine, CloseLine } from '@phyoofficial/phyo-icon-library';
 
 export default function InfluencersDetailsWithDeliverables() {
   const [deliverableStates, setDeliverableStates] = useState({
@@ -32,7 +32,7 @@ export default function InfluencersDetailsWithDeliverables() {
   const deliverables = [
     {
       id: 1,
-      type: 'Instagram Post',
+      type: 'InstagramFill Post',
       submittedDate: 'Submitted June 15, 2026',
       image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=200&h=200&fit=crop',
       caption: 'Loving this new summer collection! 😍\nPerfect for the beach. #SummerVibes\n#Fashion #Ad',
@@ -40,7 +40,7 @@ export default function InfluencersDetailsWithDeliverables() {
     },
     {
       id: 2,
-      type: 'Instagram Reel',
+      type: 'InstagramFill Reel',
       submittedDate: 'Submitted June 15, 2026',
       image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=200&h=200&fit=crop',
       status: 'approved'
@@ -69,17 +69,17 @@ export default function InfluencersDetailsWithDeliverables() {
   ];
 
   return (
-    <div className="min-h-screen bg-white flex flex-col">
+    <div className="min-h-screen bg-neutral-base flex flex-col">
       {/* Header */}
-      <div className="sticky top-0 bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between z-10">
+      <div className="sticky top-0 bg-neutral-base border-b border-gray-200 px-4 py-3 flex items-center justify-between z-10">
         <div className="flex items-center gap-3 flex-1">
           <button className="p-2 hover:bg-gray-100 rounded-full transition-colors -ml-2">
-            <ChevronLeft className="w-5 h-5 text-gray-700" />
+            <ArrowLeftLine className="w-5 h-5 text-gray-700" />
           </button>
           <h1 className="text-lg font-semibold text-gray-900">Influencers Details</h1>
         </div>
         <button className="p-2 hover:bg-gray-100 rounded-full transition-colors">
-          <MoreVertical className="w-5 h-5 text-gray-700" />
+          <MoreLine className="w-5 h-5 text-gray-700" />
         </button>
       </div>
 
@@ -127,7 +127,7 @@ export default function InfluencersDetailsWithDeliverables() {
           {/* Submitted Deliverables */}
           <div>
             <div className="flex items-center gap-2 mb-4">
-              <Download className="w-5 h-5 text-gray-700" />
+              <DownloadLine className="w-5 h-5 text-gray-700" />
               <h3 className="text-base font-semibold text-gray-900">Submitted Deliverables</h3>
             </div>
 
@@ -143,7 +143,7 @@ export default function InfluencersDetailsWithDeliverables() {
                         className="w-24 h-24 rounded-lg object-cover"
                       />
                       <div className="mt-2 flex justify-center">
-                        <Download className="w-4 h-4 text-gray-400" />
+                        <DownloadLine className="w-4 h-4 text-gray-400" />
                       </div>
                     </div>
 
@@ -153,7 +153,7 @@ export default function InfluencersDetailsWithDeliverables() {
                         <h4 className="font-semibold text-gray-900">{deliverable.type}</h4>
                         <p className="text-xs text-gray-600 mt-1">{deliverable.submittedDate}</p>
                         
-                        {/* Caption (for Instagram Post) */}
+                        {/* Caption (for InstagramFill Post) */}
                         {deliverable.id === 1 && (
                           <div className="mt-3">
                             <p className="text-xs text-gray-600 font-medium mb-1">Caption</p>
@@ -241,7 +241,7 @@ export default function InfluencersDetailsWithDeliverables() {
  {/* Request Changes Modal */}
       {showRequestChangesModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-2xl shadow-xl max-w-md w-full">
+          <div className="bg-neutral-base rounded-2xl shadow-xl max-w-md w-full">
             {/* Modal Header */}
             <div className="flex items-center justify-between p-6 border-b border-gray-200">
               <h2 className="text-lg font-semibold text-gray-900">Required Changes</h2>
@@ -249,7 +249,7 @@ export default function InfluencersDetailsWithDeliverables() {
                 onClick={() => setShowRequestChangesModal(false)}
                 className="p-1 hover:bg-gray-100 rounded-full transition-colors"
               >
-                <X className="w-5 h-5 text-gray-600" />
+                <CloseLine className="w-5 h-5 text-gray-600" />
               </button>
             </div>
 

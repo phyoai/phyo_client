@@ -2,6 +2,9 @@
 import { useState, useEffect } from "react";
 import { influencerAPI, brandAPI } from "@/utils/api";
 import { useRouter } from "next/navigation";
+import Button from '@/components/Button';
+import IconButton from '@/components/IconButton';
+import Card from '@/components/Card';
 
 const TABS = ["Brands", "Influencers"];
 
@@ -34,7 +37,7 @@ const InfoRow = ({ label, value, link = false }) => {
   if (!value || value === "N/A" || value === "") return null;
 
   return (
-    <div className="group bg-white/40 backdrop-blur-sm p-4 rounded-xl border border-white/20 hover:bg-white/60 hover:border-green-200/50 transition-all duration-300 hover:shadow-lg hover:scale-[1.02]">
+    <div className="group bg-neutral-base/40 backdrop-blur-sm p-4 rounded-xl border border-white/20 hover:bg-neutral-base/60 hover:border-green-200/50 transition-all duration-300 hover:shadow-lg hover:scale-[1.02]">
       <div className="font-semibold text-gray-600 text-xs mb-1.5 uppercase tracking-wide">
         {label}
       </div>
@@ -63,10 +66,10 @@ const RequestDetailsModal = ({ request, type, onClose, onApprove, onReject, load
 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-md flex items-center justify-center z-50 p-4 animate-fadeIn">
-      <div className="bg-white/95 backdrop-blur-xl rounded-3xl shadow-2xl max-w-4xl w-full max-h-[90vh] flex flex-col overflow-hidden border border-white/20 animate-slideUp">
+      <div className="bg-neutral-base/95 backdrop-blur-xl rounded-3xl shadow-2xl max-w-4xl w-full max-h-[90vh] flex flex-col overflow-hidden border border-white/20 animate-slideUp">
         {/* Header with Gradient */}
         <div className="relative bg-gradient-to-r from-green-500 via-green-600 to-emerald-600 px-8 py-6">
-          <div className="absolute inset-0 bg-white/10"></div>
+          <div className="absolute inset-0 bg-neutral-base/10"></div>
           <div className="relative">
             <h2 className="text-3xl font-bold text-white tracking-tight">
               {isBrand ? "Brand" : "Influencer"} Request Details
@@ -77,7 +80,8 @@ const RequestDetailsModal = ({ request, type, onClose, onApprove, onReject, load
           </div>
           <button
             onClick={onClose}
-            className="absolute top-6 right-6 text-white/80 hover:text-white hover:bg-white/20 transition-all duration-200 rounded-full w-9 h-9 flex items-center justify-center text-2xl font-light backdrop-blur-sm"
+            className="absolute top-6 right-6 text-white/80 hover:text-white hover:bg-neutral-base/20 transition-all duration-200 rounded-full w-9 h-9 flex items-center justify-center text-2xl font-light backdrop-blur-sm"
+            title="Close"
           >
             ×
           </button>
@@ -128,7 +132,7 @@ const RequestDetailsModal = ({ request, type, onClose, onApprove, onReject, load
                     value={`${request.contact?.first_name || ""} ${request.contact?.last_name || ""}`}
                   />
                   <InfoRow label="Email" value={request.contact?.email} />
-                  <InfoRow label="Phone" value={request.contact?.phone} />
+                  <InfoRow label="PhoneLine" value={request.contact?.phone} />
                   <InfoRow label="Job Title" value={request.contact?.job_title} />
                   <InfoRow label="Website" value={request.website_url} link />
                   <InfoRow label="Industry" value={request.industry} />
@@ -143,7 +147,7 @@ const RequestDetailsModal = ({ request, type, onClose, onApprove, onReject, load
                   <InfoRow label="Full Name" value={request.full_name} />
                   <InfoRow label="Stage Name" value={request.stage_name} />
                   <InfoRow label="Email" value={request.contact?.email} />
-                  <InfoRow label="Phone" value={request.contact?.phone} />
+                  <InfoRow label="PhoneLine" value={request.contact?.phone} />
                   <InfoRow label="Gender" value={request.gender} />
                   <InfoRow
                     label="Date of Birth"
@@ -187,7 +191,7 @@ const RequestDetailsModal = ({ request, type, onClose, onApprove, onReject, load
                   ? request.social_media.instagram
                   : request.social_media.instagram.username) && (
                   <InfoRow
-                    label="Instagram"
+                    label="InstagramFill"
                     value={
                       isBrand
                         ? request.social_media.instagram
@@ -199,7 +203,7 @@ const RequestDetailsModal = ({ request, type, onClose, onApprove, onReject, load
               {request.social_media?.facebook &&
                 (isBrand || request.social_media.facebook.profile_url) && (
                   <InfoRow
-                    label="Facebook"
+                    label="FacebookFill"
                     value={
                       isBrand
                         ? request.social_media.facebook
@@ -211,7 +215,7 @@ const RequestDetailsModal = ({ request, type, onClose, onApprove, onReject, load
               {request.social_media?.twitter &&
                 (isBrand || request.social_media.twitter.username) && (
                   <InfoRow
-                    label="Twitter"
+                    label="TwitterXLine"
                     value={
                       isBrand
                         ? request.social_media.twitter
@@ -254,19 +258,19 @@ const RequestDetailsModal = ({ request, type, onClose, onApprove, onReject, load
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {request.rate_card.instagram_post && (
                   <InfoRow
-                    label="Instagram Post"
+                    label="InstagramFill Post"
                     value={`₹${request.rate_card.instagram_post}`}
                   />
                 )}
                 {request.rate_card.instagram_story && (
                   <InfoRow
-                    label="Instagram Story"
+                    label="InstagramFill Story"
                     value={`₹${request.rate_card.instagram_story}`}
                   />
                 )}
                 {request.rate_card.instagram_reel && (
                   <InfoRow
-                    label="Instagram Reel"
+                    label="InstagramFill Reel"
                     value={`₹${request.rate_card.instagram_reel}`}
                   />
                 )}
@@ -372,46 +376,35 @@ const RequestDetailsModal = ({ request, type, onClose, onApprove, onReject, load
 
         {/* Footer with Action Buttons */}
         {isPending && (
-          <div className="bg-white/90 backdrop-blur-lg border-t border-gray-200/50 px-8 py-5 flex gap-3 justify-end">
-            <button
+          <div className="bg-neutral-base/90 backdrop-blur-lg border-t border-gray-200/50 px-8 py-5 flex gap-3 justify-end">
+            <Button
+              variant="secondary"
+              size="md"
               onClick={onClose}
               disabled={loading}
-              className="px-6 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl font-semibold transition-all duration-200 hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+              loading={loading}
             >
-              {loading ? (
-                <>
-                  <LoadingSpinner /> Processing...
-                </>
-              ) : (
-                "Cancel"
-              )}
-            </button>
-            <button
+              {loading ? "Processing..." : "Cancel"}
+            </Button>
+            <Button
+              variant="outlined"
+              size="md"
               onClick={() => onReject(request._id || request.id)}
               disabled={loading}
-              className="px-6 py-3 bg-gradient-to-r from-red-500 to-rose-600 hover:from-red-600 hover:to-rose-700 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+              loading={loading}
+              className="border-red-400 text-red-600 hover:bg-red-50"
             >
-              {loading ? (
-                <>
-                  <LoadingSpinner /> Processing...
-                </>
-              ) : (
-                "Reject"
-              )}
-            </button>
-            <button
+              {loading ? "Processing..." : "Reject"}
+            </Button>
+            <Button
+              variant="primary"
+              size="md"
               onClick={() => onApprove(request._id || request.id)}
               disabled={loading}
-              className="px-6 py-3 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+              loading={loading}
             >
-              {loading ? (
-                <>
-                  <LoadingSpinner /> Processing...
-                </>
-              ) : (
-                "Approve"
-              )}
-            </button>
+              {loading ? "Processing..." : "Approve"}
+            </Button>
           </div>
         )}
       </div>
@@ -525,7 +518,7 @@ export default function AdminDashboard() {
     <div className="h-screen w-screen overflow-hidden bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 flex flex-col">
       {/* Header - Fixed with Glassmorphism */}
       <div className="relative bg-gradient-to-r from-green-500 via-green-600 to-emerald-600 shadow-xl">
-        <div className="absolute inset-0 bg-white/10 backdrop-blur-sm"></div>
+        <div className="absolute inset-0 bg-neutral-base/10 backdrop-blur-sm"></div>
         <div className="relative px-8 py-8 flex flex-col md:flex-row md:items-center md:justify-between">
           <div>
             <h1 className="text-4xl font-bold text-white text-center md:text-left tracking-tight">
@@ -535,27 +528,29 @@ export default function AdminDashboard() {
               Manage brand and influencer requests efficiently
             </p>
           </div>
-          <button
+          <Button
+            variant="primary"
+            size="lg"
             onClick={handleLogout}
-            className="mt-6 md:mt-0 px-6 py-3 bg-gradient-to-r from-red-500 to-rose-600 hover:from-red-600 hover:to-rose-700 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-200"
+            className="mt-6 md:mt-0"
           >
             Logout
-          </button>
+          </Button>
         </div>
       </div>
 
       {/* Main Content Container */}
       <div className="flex-1 overflow-hidden flex flex-col p-6">
-        <div className="bg-white/70 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/30 flex flex-col h-full overflow-hidden">
+        <div className="bg-neutral-base/70 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/30 flex flex-col h-full overflow-hidden">
           {/* Tabs - Glassmorphism */}
-          <div className="flex border-b border-gray-200/30 bg-white/50 backdrop-blur-sm rounded-t-3xl">
+          <div className="flex border-b border-gray-200/30 bg-neutral-base/50 backdrop-blur-sm rounded-t-3xl">
             {TABS.map((t) => (
               <button
                 key={t}
                 className={`flex-1 px-6 py-4 font-bold text-lg focus:outline-none transition-all duration-300 ${
                   tab === t
                     ? "text-white bg-gradient-to-r from-green-500 to-emerald-600 shadow-lg"
-                    : "text-gray-600 hover:bg-white/60 hover:text-green-600"
+                    : "text-gray-600 hover:bg-neutral-base/60 hover:text-green-600"
                 } ${tab === t ? "rounded-tl-3xl" : ""} ${t === TABS[TABS.length - 1] && tab === t ? "rounded-tr-3xl" : ""}`}
                 onClick={() => setTab(t)}
               >
@@ -565,20 +560,16 @@ export default function AdminDashboard() {
           </div>
 
           {/* Action Bar */}
-          <div className="p-5 bg-white/40 backdrop-blur-sm border-b border-gray-200/30">
-            <button
+          <div className="p-5 bg-neutral-base/40 backdrop-blur-sm border-b border-gray-200/30">
+            <Button
+              variant="primary"
+              size="md"
               onClick={tab === "Brands" ? fetchBrandRequests : fetchInfluencerRequests}
-              className="px-6 py-3 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
               disabled={loading}
+              loading={loading}
             >
-              {loading ? (
-                <>
-                  <LoadingSpinner /> Refreshing...
-                </>
-              ) : (
-                "Refresh Requests"
-              )}
-            </button>
+              {loading ? "Refreshing..." : "Refresh Requests"}
+            </Button>
 
             {/* Error Message */}
             {error && (
@@ -653,40 +644,34 @@ export default function AdminDashboard() {
 
                         {/* Action Buttons */}
                         <div className="flex gap-3 flex-wrap">
-                          <button
+                          <Button
+                            variant="tertiary"
+                            size="sm"
                             onClick={() => setSelectedRequest(req)}
-                            className="px-5 py-2.5 bg-gradient-to-r from-blue-500 to-cyan-600 hover:from-blue-600 hover:to-cyan-700 text-white rounded-xl font-semibold text-sm shadow-lg hover:shadow-xl transition-all duration-200"
                           >
                             View Details
-                          </button>
+                          </Button>
                           {isPending && (
                             <>
-                              <button
+                              <Button
+                                variant="primary"
+                                size="sm"
                                 onClick={() => handleApprove(req._id || req.id)}
-                                className="px-5 py-2.5 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white rounded-xl font-semibold text-sm shadow-lg hover:shadow-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                                 disabled={actionLoading}
+                                loading={actionLoading}
                               >
-                                {actionLoading ? (
-                                  <>
-                                    <LoadingSpinner /> Processing...
-                                  </>
-                                ) : (
-                                  "Approve"
-                                )}
-                              </button>
-                              <button
+                                {actionLoading ? "Processing..." : "Approve"}
+                              </Button>
+                              <Button
+                                variant="outlined"
+                                size="sm"
                                 onClick={() => handleReject(req._id || req.id)}
-                                className="px-5 py-2.5 bg-gradient-to-r from-red-500 to-rose-600 hover:from-red-600 hover:to-rose-700 text-white rounded-xl font-semibold text-sm shadow-lg hover:shadow-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                                 disabled={actionLoading}
+                                loading={actionLoading}
+                                className="border-red-400 text-red-600"
                               >
-                                {actionLoading ? (
-                                  <>
-                                    <LoadingSpinner /> Processing...
-                                  </>
-                                ) : (
-                                  "Reject"
-                                )}
-                              </button>
+                                {actionLoading ? "Processing..." : "Reject"}
+                              </Button>
                             </>
                           )}
                         </div>

@@ -4,17 +4,17 @@ import SearchBar from '../../../components/SearchBar';
 import UserProfile from '../components/UserProfile';
 import MetricCard from '../components/MetricCard';
 import {
-  Users,
+  UserLine,
   Radio,
-  Heart,
-  DollarSign,
-  Eye,
+  HeartLine,
+  MoneyDollarBoxLine,
+  EyeLine,
   Target,
-  BarChart3,
-  ThumbsUp,
-  ChevronDown,
-  Download
-} from 'lucide-react';
+  BarChartLine,
+  ThumbUpLine,
+  ArrowDownLine,
+  DownloadLine
+} from '@phyoofficial/phyo-icon-library';
 import { campaignAPI, userAPI } from '../../../utils/api';
 
 const CampaignsReport = () => {
@@ -58,7 +58,7 @@ const CampaignsReport = () => {
       title: 'Influencers',
       value: totalInfluencers || 50,
       percentage: '+25.5%',
-      icon: Users,
+      icon: UserLine,
       iconBg: 'bg-teal-600'
     },
     {
@@ -72,21 +72,21 @@ const CampaignsReport = () => {
       title: 'Engagement',
       value: totalEngagement > 0 ? totalEngagement.toLocaleString() : '1M+',
       percentage: '+25.5%',
-      icon: Heart,
+      icon: HeartLine,
       iconBg: 'bg-teal-600'
     },
     {
       title: 'Budget Spent',
       value: `${(totalBudget || 1200000).toLocaleString()}+`,
       percentage: '+25.5%',
-      icon: DollarSign,
+      icon: MoneyDollarBoxLine,
       iconBg: 'bg-teal-600'
     },
     {
       title: 'Cost Per View',
       value: `${costPerView}%`,
       percentage: '+25.5%',
-      icon: Eye,
+      icon: EyeLine,
       iconBg: 'bg-teal-600'
     },
     {
@@ -100,14 +100,14 @@ const CampaignsReport = () => {
       title: 'Total Views',
       value: totalViews > 0 ? totalViews.toLocaleString() : '10M+',
       percentage: '+25.5%',
-      icon: BarChart3,
+      icon: BarChartLine,
       iconBg: 'bg-teal-600'
     },
     {
       title: 'Audience Sentiment',
       value: 'Positive',
       percentage: '+25.5%',
-      icon: ThumbsUp,
+      icon: ThumbUpLine,
       iconBg: 'bg-teal-600'
     }
   ];
@@ -118,7 +118,7 @@ const CampaignsReport = () => {
       <div className="bg-[#F3F2EB] px-8 py-4  border-gray-200 sticky top-0 z-10">
         <div className="flex items-center justify-between">
           <div className="flex-1 max-w-sm">
-            <SearchBar placeholder="Search influencer" />
+            <SearchBar placeholder="SearchLine influencer" />
           </div>
           <UserProfile user={user} />
         </div>
@@ -127,7 +127,7 @@ const CampaignsReport = () => {
       {/* Main Content */}
       <div className="px-8 py-2">
         {/* Header Section */}
-        <div className="flex items-center justify-between mb-8 bg-white p-5 rounded-3xl">
+        <div className="flex items-center justify-between mb-8 bg-neutral-base p-5 rounded-3xl">
           <h1 className="text-3xl  font-semibold text-gray-900">Campaigns Report</h1>
           
           {/* Filters and Actions */}
@@ -135,13 +135,13 @@ const CampaignsReport = () => {
             {/* LinkedIn Filter */}
             <button className="flex items-center gap-2 px-4 py-2 bg-[#F3F2EB]  rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50">
               <span className="text-blue-600">in</span> LinkedIn
-              <ChevronDown size={16} className="text-gray-500" />
+              <ArrowDownLine size={16} className="text-gray-500" />
             </button>
 
             {/* Lifetime Filter */}
             <button className="flex items-center gap-2 px-4 py-2 bg-[#F3F2EB]  rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50">
               Lifetime
-              <ChevronDown size={16} className="text-gray-500" />
+              <ArrowDownLine size={16} className="text-gray-500" />
             </button>
 
             {/* AI Campaign Analyser Button */}
@@ -149,9 +149,9 @@ const CampaignsReport = () => {
               AI Campaign Analyser
             </button>
 
-            {/* Download Button */}
+            {/* DownloadLine Button */}
             <button className="flex items-center justify-center w-10 h-10 bg-[#00674F] text-white rounded-lg hover:bg-teal-600 transition-colors">
-              <Download size={18} />
+              <DownloadLine size={18} />
             </button>
           </div>
         </div>
@@ -159,7 +159,7 @@ const CampaignsReport = () => {
         {/* Metrics Grid */}
         {loading ? (
           // Metrics Cards Skeleton
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 bg-white p-6 rounded-2xl">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 bg-neutral-base p-6 rounded-2xl">
             {[1, 2, 3, 4, 5, 6].map((i) => (
               <div key={i} className="bg-gray-50 border border-gray-200 rounded-xl p-4">
                 <div className="flex items-start justify-between mb-3">
@@ -174,7 +174,7 @@ const CampaignsReport = () => {
         ) : error ? (
           <div className="text-center text-red-600 py-12 font-medium">{error}</div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 bg- p-6 rounded-2xl bg-white">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 bg- p-6 rounded-2xl bg-neutral-base">
             {metrics.map((metric, index) => (
               <MetricCard
                 key={index}

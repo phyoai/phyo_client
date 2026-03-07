@@ -159,7 +159,7 @@ const ComparisonTable = () => {
   };
 
   return (
-    <section className="py-20 px-6 bg-white" ref={ref}>
+    <section className="py-20 px-6 bg-neutral-base" ref={ref}>
       <motion.div 
         className="max-w-6xl mx-auto"
         variants={containerVariants}
@@ -206,7 +206,7 @@ const ComparisonTable = () => {
 
         {/* Comparison Table */}
         <motion.div 
-          className="bg-white rounded-md shadow-xl overflow-hidden border border-gray-100"
+          className="bg-neutral-base rounded-md shadow-xl overflow-hidden border border-gray-100"
           variants={tableVariants}
           whileHover={{ 
             boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)",
@@ -258,7 +258,7 @@ const ComparisonTable = () => {
               <motion.div
                 key={index}
                 className={`grid grid-cols-3 border-b border-gray-100 transition-colors duration-200 ${
-                  index % 2 === 0 ? 'bg-white' : 'bg-gray-50/50'
+                  index % 2 === 0 ? 'bg-neutral-base' : 'bg-gray-50/50'
                 }`}
                 variants={rowVariants}
                 whileHover={{ 

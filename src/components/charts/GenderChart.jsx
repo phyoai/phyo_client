@@ -2,7 +2,7 @@
 
 import { motion } from 'framer-motion';
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
-import { Users, Info } from 'lucide-react';
+import { UserLine, Information2Line } from '@phyoofficial/phyo-icon-library';
 import { useState } from 'react';
 
 export default function GenderChart({ data }) {
@@ -19,7 +19,7 @@ export default function GenderChart({ data }) {
   const CustomTooltip = ({ active, payload }) => {
     if (active && payload && payload.length) {
       return (
-        <div className="bg-white px-4 py-2 rounded-lg shadow-lg border border-gray-200">
+        <div className="bg-neutral-base px-4 py-2 rounded-lg shadow-lg border border-gray-200">
           <p className="font-semibold text-gray-800">{payload[0].name}</p>
           <p className="text-gray-600">{payload[0].value.toFixed(1)}%</p>
         </div>
@@ -34,12 +34,12 @@ export default function GenderChart({ data }) {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ duration: 0.4 }}
-      className="bg-white rounded-xl shadow-md border border-gray-200 p-6"
+      className="bg-neutral-base rounded-xl shadow-md border border-gray-200 p-6"
     >
       <div className="flex items-center justify-between mb-5">
         <div className="flex items-center gap-2">
           <div className="bg-gradient-to-br from-blue-50 to-blue-100 p-2.5 rounded-lg">
-            <Users className="text-blue-600" size={20} />
+            <UserLine className="text-blue-600" size={20} />
           </div>
           <h3 className="text-lg font-bold text-gray-900">Gender Distribution</h3>
         </div>

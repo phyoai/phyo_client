@@ -14,7 +14,7 @@ import { InfluencersList } from './Search'
 import axios from 'axios'
 import Brands from './Brands'
 import CTA from './CTA'
-import Image from 'next/image'
+import Image2Line from 'next/image'
 import Comparison from './Comparison'
 import CompaignPhases from './CompaignPhases'
 
@@ -59,7 +59,7 @@ export default function Home({ token }) {
                 <ImageGroup />
 
                 <Brands />
-                <CTA audience={"Brands"} headline={"Search Influencers in seconds for your next influencer campaign."} text={"With low TAT and cost-effectiveness your next influencer campaign is ready to get high ROI, we help you with Shortlisting Ideation Brief consultation Scripting Shooting Going Live Making the process seamless and easy."} />
+                <CTA audience={"Brands"} headline={"SearchLine Influencers in seconds for your next influencer campaign."} text={"With low TAT and cost-effectiveness your next influencer campaign is ready to get high ROI, we help you with Shortlisting Ideation Brief consultation Scripting Shooting Going Live Making the process seamless and easy."} />
                 {/* <HowItWorks /> */}
                 <CompaignPhases />
                 <Comparison />
@@ -87,9 +87,9 @@ const ImageGroup = () => {
     return (
         <div className='relative max-w-[80%] mx-auto mb-[50px]'>
 
-            <Image src={"/dashboard.png"} width={850} height={550} alt='Dashboard' className='w-[60vw] h-[220px] sm:h-[550px]' />
-            <Image src={"/table.png"} width={450} height={550} alt='Table' className='absolute top-[12%] -right-[5vw] w-[200px] h-[120px] sm:w-[450px] sm:h-[40%]' />
-            <Image src={"/table1.png"} width={350} height={550} alt='Table' className='absolute -bottom-[15%] -right-[5vw] w-[200px] h-[120px] sm:w-[40vw] sm:h-[70%]' />
+            <Image2Line src={"/dashboard.png"} width={850} height={550} alt='Dashboard' className='w-[60vw] h-[220px] sm:h-[550px]' />
+            <Image2Line src={"/table.png"} width={450} height={550} alt='Table' className='absolute top-[12%] -right-[5vw] w-[200px] h-[120px] sm:w-[450px] sm:h-[40%]' />
+            <Image2Line src={"/table1.png"} width={350} height={550} alt='Table' className='absolute -bottom-[15%] -right-[5vw] w-[200px] h-[120px] sm:w-[40vw] sm:h-[70%]' />
         </div>
     )
 }
@@ -101,7 +101,7 @@ const Header = () => {
             <h2 className='text-white text-[16px] text-center max-w-[50%] mx-auto'>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et. </h2>
             <div className='mt-[55px] border-2 border-[color:var(--dark-green)] flex p-2 pl-[40px] rounded-xl '>
                 <input type="text" placeholder="Example: I want to find best influencer fashion industry" className='outline-none bg-transparent border-none flex-grow py-2 text-white' />
-                <button className='bg-white px-6 py-2 rounded-md'>Find</button>
+                <button className='bg-neutral-base px-6 py-2 rounded-md'>Find</button>
             </div>
         </div>
     )

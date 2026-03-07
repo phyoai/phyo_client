@@ -1,4 +1,4 @@
-import Image from 'next/image'
+import Image2Line from 'next/image'
 import React from 'react'
 
 const Benefits = () => {
@@ -25,7 +25,7 @@ const Benefits = () => {
                 benefitsArr.map((ele) => {
                     return <div key={ele.title} className='flex flex-col items-center text-center sm:w-full md:w-[30%]'>
                         <div className='px-[px] py-[30px] sm:px-[20px] border-4 border-[color:var(--light-green)] flex justify-center items-center rounded-lg'>
-                            <Image width={266} height={266} src={ele.img} alt='benefit' />
+                            <Image2Line width={266} height={266} src={ele.img} alt='benefit' />
                         </div>
                         <h3 className='font-bold text-[16px] sm:text-[18px] mt-[15px]'>{ele.title}</h3>
                         <p className='text-[16px] max-w-[90%] sm:max-w-[100%]'>{ele.description}</p>

@@ -1,6 +1,9 @@
 'use client'
 import React, { useState } from 'react';
-import { ChevronLeft, MoreVertical, TrendingUp, Users, Clock, AlertCircle } from 'lucide-react';
+import { ArrowLeftLine, MoreLine, LineChartLine, UserLine, Clock, AlertCircle } from '@phyoofficial/phyo-icon-library';
+import Button from '@/components/Button';
+import IconButton from '@/components/IconButton';
+import Card from '@/components/Card';
 
 export default function BoostCampaign() {
   const [selectedOptions, setSelectedOptions] = useState([]);
@@ -62,18 +65,23 @@ export default function BoostCampaign() {
   };
 
   return (
-    <div className="min-h-screen bg-white flex flex-col">
+    <div className="min-h-screen bg-neutral-base flex flex-col">
       {/* Header */}
-      <div className="sticky top-0 bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between">
+      <div className="sticky top-0 bg-neutral-base border-b border-gray-200 px-4 py-3 flex items-center justify-between">
         <div className="flex items-center gap-3 flex-1">
-          <button className="p-2 hover:bg-gray-100 rounded-full transition-colors -ml-2">
-            <ChevronLeft className="w-5 h-5 text-gray-700" />
-          </button>
+          <IconButton
+            icon={ArrowLeftLine}
+            size="md"
+            variant="default"
+            className="-ml-2"
+          />
           <h1 className="text-lg font-semibold text-gray-900">Boost Campaign</h1>
         </div>
-        <button className="p-2 hover:bg-gray-100 rounded-full transition-colors">
-          <MoreVertical className="w-5 h-5 text-gray-700" />
-        </button>
+        <IconButton
+          icon={MoreLine}
+          size="md"
+          variant="default"
+        />
       </div>
 
       {/* Content */}
@@ -107,7 +115,7 @@ export default function BoostCampaign() {
               className={`border-2 rounded-2xl p-6 cursor-pointer transition-all ${
                 selectedOptions.includes(option.id)
                   ? 'border-green-600 bg-green-50'
-                  : 'border-gray-200 bg-white'
+                  : 'border-gray-200 bg-neutral-base'
               }`}
             >
               <div className="flex items-start gap-4">
@@ -154,15 +162,22 @@ export default function BoostCampaign() {
       </div>
 
       {/* Fixed Footer */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4">
+      <div className="fixed bottom-0 left-0 right-0 bg-neutral-base border-t border-gray-200 p-4">
         <div className="max-w-2xl mx-auto flex gap-3">
-          <button className="flex-1 border-2 border-gray-300 text-gray-700 font-semibold py-3 px-6 rounded-full hover:bg-gray-50 transition-colors">
+          <Button
+            variant="outlined"
+            size="lg"
+            fullWidth
+          >
             Cancel
-          </button>
-          <button className="flex-1 bg-green-700 hover:bg-green-800 text-white font-semibold py-3 px-6 rounded-full transition-colors flex items-center justify-center gap-2">
-            <span>🚀</span>
+          </Button>
+          <Button
+            variant="primary"
+            size="lg"
+            fullWidth
+          >
             Boost Campaign
-          </button>
+          </Button>
         </div>
       </div>
     </div>

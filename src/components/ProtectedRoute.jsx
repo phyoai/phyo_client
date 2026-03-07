@@ -37,7 +37,7 @@ const ProtectedRoute = ({ children, userType, fallback }) => {
             // Redirect to brand signup if user type doesn't match
             const currentPath = window.location.pathname;
             const signupUrl = `/brand/signup?redirect=${encodeURIComponent(currentPath)}`;
-            console.log('ProtectedRoute: User type mismatch, redirecting to', signupUrl);
+            console.log('ProtectedRoute: UserLine type mismatch, redirecting to', signupUrl);
             router.push(signupUrl);
             return;
           }

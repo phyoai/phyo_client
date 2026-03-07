@@ -4,18 +4,18 @@ import { useEffect, useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { 
-  ArrowLeft, 
-  Users, 
-  UserPlus, 
-  ImageIcon, 
-  CheckCircle, 
-  Briefcase,
-  TrendingUp,
-  Globe,
-  MapPin,
-  Calendar,
-  Heart
-} from 'lucide-react';
+  ArrowLeftLine, 
+  UserLine, 
+  UserAddLine, 
+  Image2Line, 
+  CheckLine, 
+  BriefcaseLine,
+  LineChartLine,
+  GlobeLine,
+  MapPinLine,
+  CalendarLine,
+  HeartLine
+} from '@phyoofficial/phyo-icon-library';
 import GenderChart from '@/components/charts/GenderChart';
 import AgeChart from '@/components/charts/AgeChart';
 import LocationChart from '@/components/charts/LocationChart';
@@ -115,7 +115,7 @@ export default function InfluencerDetailsPage() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-white rounded-2xl shadow-xl p-8 max-w-md w-full text-center"
+          className="bg-neutral-base rounded-2xl shadow-xl p-8 max-w-md w-full text-center"
         >
           <div className="text-red-500 text-6xl mb-4">⚠️</div>
           <h2 className="text-2xl font-bold text-gray-800 mb-2">Error</h2>
@@ -124,7 +124,7 @@ export default function InfluencerDetailsPage() {
             onClick={handleBack}
             className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg transition-colors inline-flex items-center gap-2"
           >
-            <ArrowLeft size={20} />
+            <ArrowLeftLine size={20} />
             Go Back
           </button>
         </motion.div>
@@ -147,15 +147,15 @@ export default function InfluencerDetailsPage() {
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.4 }}
-        className="bg-white/80 backdrop-blur-md border-b border-gray-200 sticky top-0 z-50 shadow-sm"
+        className="bg-neutral-base/80 backdrop-blur-md border-b border-gray-200 sticky top-0 z-50 shadow-sm"
       >
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <button
             onClick={handleBack}
             className="flex items-center gap-2 text-gray-700 hover:text-green-600 transition-colors group font-medium"
           >
-            <ArrowLeft size={20} className="group-hover:-translate-x-1 transition-transform" />
-            <span>Back to Search</span>
+            <ArrowLeftLine size={20} className="group-hover:-translate-x-1 transition-transform" />
+            <span>Back to SearchLine</span>
           </button>
         </div>
       </motion.div>
@@ -166,7 +166,7 @@ export default function InfluencerDetailsPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="bg-white rounded-3xl shadow-lg border border-gray-200 overflow-hidden mb-8"
+          className="bg-neutral-base rounded-3xl shadow-lg border border-gray-200 overflow-hidden mb-8"
         >
           {/* Top Banner */}
           <div className="h-32 bg-gradient-to-r from-green-500 to-green-600 relative">
@@ -186,7 +186,7 @@ export default function InfluencerDetailsPage() {
                 transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
                 className="relative shrink-0"
               >
-                <div className="w-32 h-32 rounded-2xl bg-white p-1 shadow-xl">
+                <div className="w-32 h-32 rounded-2xl bg-neutral-base p-1 shadow-xl">
                   <img
                     src={getProxiedImageUrl(influencer.profile_pic_url)}
                     alt={influencer.profile_name}
@@ -204,7 +204,7 @@ export default function InfluencerDetailsPage() {
                     transition={{ delay: 0.4, type: "spring" }}
                     className="absolute -bottom-2 -right-2 bg-blue-500 rounded-full p-2 shadow-lg"
                   >
-                    <CheckCircle className="text-white" size={20} />
+                    <CheckLine className="text-white" size={20} />
                   </motion.div>
                 )}
               </motion.div>
@@ -238,7 +238,7 @@ export default function InfluencerDetailsPage() {
                 >
                   {influencer.is_business && (
                     <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-green-50 text-green-700 rounded-lg text-sm font-medium border border-green-200">
-                      <Briefcase size={14} />
+                      <BriefcaseLine size={14} />
                       Business Account
                     </span>
                   )}
@@ -266,28 +266,28 @@ export default function InfluencerDetailsPage() {
             >
               <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-xl p-4 border border-green-200">
                 <div className="flex items-center gap-2 mb-2">
-                  <Users className="text-green-600" size={20} />
+                  <UserLine className="text-green-600" size={20} />
                   <p className="text-sm text-gray-600 font-medium">Followers</p>
                 </div>
                 <p className="text-2xl font-bold text-gray-900">{formatNumber(influencer.followers)}</p>
               </div>
               <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-4 border border-blue-200">
                 <div className="flex items-center gap-2 mb-2">
-                  <UserPlus className="text-blue-600" size={20} />
+                  <UserAddLine className="text-blue-600" size={20} />
                   <p className="text-sm text-gray-600 font-medium">Following</p>
                 </div>
                 <p className="text-2xl font-bold text-gray-900">{formatNumber(influencer.following)}</p>
               </div>
               <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl p-4 border border-purple-200">
                 <div className="flex items-center gap-2 mb-2">
-                  <ImageIcon className="text-purple-600" size={20} />
+                  <Image2Line className="text-purple-600" size={20} />
                   <p className="text-sm text-gray-600 font-medium">Posts</p>
                 </div>
                 <p className="text-2xl font-bold text-gray-900">{formatNumber(influencer.posts_count)}</p>
               </div>
               <div className="bg-gradient-to-br from-pink-50 to-pink-100 rounded-xl p-4 border border-pink-200">
                 <div className="flex items-center gap-2 mb-2">
-                  <Heart className="text-pink-600" size={20} />
+                  <HeartLine className="text-pink-600" size={20} />
                   <p className="text-sm text-gray-600 font-medium">Engagement</p>
                 </div>
                 <p className="text-2xl font-bold text-gray-900">{influencer.avg_engagement?.toFixed(2)}%</p>

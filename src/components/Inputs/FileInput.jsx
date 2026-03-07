@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useFormContext } from 'react-hook-form';
-import { CloudUpload, CircleCheck } from 'lucide-react';
+import { CloudUpload, CheckLine } from '@phyoofficial/phyo-icon-library';
 
 const FileInput = ({ name, label, required = false, className = '', accept = '', multiple = false }) => {
     const {
@@ -81,7 +81,7 @@ const FileInput = ({ name, label, required = false, className = '', accept = '',
                 }`}>
                     {fileName ? (
                         <>
-                            <CircleCheck className="mb-2 text-[#43573b] w-6 h-6" />
+                            <CheckLine className="mb-2 text-[#43573b] w-6 h-6" />
                             <span className="text-sm text-gray-700 text-center">
                                 {fileName}
                             </span>

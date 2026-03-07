@@ -1,5 +1,5 @@
 import React from 'react';
-import { Edit2, MapPin, Calendar, Upload } from 'lucide-react';
+import { EditLine, MapPinLine, CalendarLine, UploadLine } from '@phyoofficial/phyo-icon-library';
 
 const PortfolioComponent = () => {
   const webDesignProjects = [
@@ -85,7 +85,7 @@ const PortfolioComponent = () => {
     <div className="min-h-screen bg-gray-50 p-6">
       <div className="max-w-7xl mx-auto">
         {/* Profile Header */}
-        <div className="bg-white rounded-lg p-6 mb-6 shadow-sm border border-gray-200">
+        <div className="bg-neutral-base rounded-lg p-6 mb-6 shadow-sm border border-gray-200">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
               <img 
@@ -113,15 +113,15 @@ const PortfolioComponent = () => {
                 <div className="text-sm text-gray-600">Engagement rate</div>
               </div>
               <button className="flex items-center space-x-2 bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700">
-                <Edit2 className="w-4 h-4" />
-                <span>Edit</span>
+                <EditLine className="w-4 h-4" />
+                <span>EditLine</span>
               </button>
             </div>
           </div>
         </div>
 
         {/* About Section */}
-        <div className="bg-white rounded-lg p-6 mb-8 shadow-sm border border-gray-200">
+        <div className="bg-neutral-base rounded-lg p-6 mb-8 shadow-sm border border-gray-200">
           <h2 className="text-xl font-bold text-gray-900 mb-3">About</h2>
           <p className="text-gray-600 mb-6">
             UI/UX design focuses on creating user-friendly and visually appealing interfaces. UI deals with look and layout, while UX ensures a seamless, enjoyable experience for users by enhancing usability and satisfaction.
@@ -131,7 +131,7 @@ const PortfolioComponent = () => {
             <div>
               <h3 className="font-semibold text-gray-900 mb-2">Location</h3>
               <div className="flex items-center text-gray-600">
-                <MapPin className="w-4 h-4 mr-2" />
+                <MapPinLine className="w-4 h-4 mr-2" />
                 <span>London, UK</span>
               </div>
             </div>
@@ -139,7 +139,7 @@ const PortfolioComponent = () => {
             <div>
               <h3 className="font-semibold text-gray-900 mb-2">Experience</h3>
               <div className="flex items-center text-gray-600">
-                <Calendar className="w-4 h-4 mr-2" />
+                <CalendarLine className="w-4 h-4 mr-2" />
                 <span>3 - 7 Years</span>
               </div>
             </div>
@@ -159,14 +159,14 @@ const PortfolioComponent = () => {
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-2xl font-bold text-gray-900">Web Design</h2>
             <button className="flex items-center space-x-2 bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700">
-              <Upload className="w-4 h-4" />
+              <UploadLine className="w-4 h-4" />
               <span>Upload Portfolio</span>
             </button>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {webDesignProjects.map((project) => (
-              <div key={project.id} className="bg-white rounded-lg overflow-hidden shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
+              <div key={project.id} className="bg-neutral-base rounded-lg overflow-hidden shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
                 <div className="aspect-video overflow-hidden">
                   <img 
                     src={project.image} 
@@ -189,7 +189,7 @@ const PortfolioComponent = () => {
           
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
             {appDesignProjects.map((project) => (
-              <div key={project.id} className="bg-white rounded-lg overflow-hidden shadow-sm border border-gray-200 hover:shadow-md transition-shadow relative">
+              <div key={project.id} className="bg-neutral-base rounded-lg overflow-hidden shadow-sm border border-gray-200 hover:shadow-md transition-shadow relative">
                 {project.highlight && (
                   <div className="absolute top-2 left-2 bg-blue-500 text-white px-2 py-1 rounded text-xs font-medium z-10">
                     Prototyping

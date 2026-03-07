@@ -13,7 +13,7 @@ import 'react-toastify/dist/ReactToastify.css';
 const formFields = [
     {
         name: 'email',
-        label: 'Email/Phone number',
+        label: 'Email/PhoneLine number',
         type: 'email',
         placeholder: 'john@example.com',
         validation: { 
@@ -189,7 +189,7 @@ function LoginForm() {
                         } else if (userData.influencerRegistrationStatus === 'COMPLETED') {
                             redirect = '/influencer/dashboard';
                         } else {
-                            // User hasn't completed any registration
+                            // UserLine hasn't completed any registration
                             redirect = '/user/dashboard';
                         }
                     } else if (userType === 'BRAND') {
@@ -257,7 +257,7 @@ function LoginForm() {
                         } else if (userData.influencerRegistrationStatus === 'COMPLETED') {
                             redirect = '/influencer/dashboard';
                         } else {
-                            // User hasn't completed any registration
+                            // UserLine hasn't completed any registration
                             redirect = '/user/dashboard';
                         }
                     } else if (userType === 'BRAND') {
@@ -285,14 +285,14 @@ function LoginForm() {
     // Show loading if checking authentication
     if (isAuthenticated()) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-white">
+            <div className="min-h-screen flex items-center justify-center bg-neutral-base">
                 <div className="animate-spin rounded-full h-16 w-16 border-4 border-[#00897B] border-t-transparent"></div>
             </div>
         );
     }
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-white relative overflow-hidden">
+        <div className="min-h-screen flex items-center justify-center bg-neutral-base relative overflow-hidden">
             {/* Logo - Top Left - Fixed Position */}
             <div className="absolute top-6 left-8 z-20">
                 <img 
@@ -314,7 +314,7 @@ function LoginForm() {
 
             {/* Middle Section - Login Form */}
             <div className="w-full max-w-[30%] flex items-center justify-center p-4 z-10">
-                <div className="w-full bg-white rounded-2xl shadow-xl py-6 px-6 border border-gray-100">
+                <div className="w-full bg-neutral-base rounded-2xl shadow-xl py-6 px-6 border border-gray-100">
                     <div className="mb-6">
                         <h2 className="text-2xl font-bold text-gray-900 mb-1">Welcome Back</h2>
                         <p className="text-gray-500 text-sm">
@@ -333,7 +333,7 @@ function LoginForm() {
                                         type={field.name === 'password' && showPassword ? 'text' : field.type}
                                         placeholder={field.placeholder}
                                         {...register(field.name, field.validation)}
-                                        className="w-full px-4 py-1.5 bg-[#F0F0F0]  border-4 rounded-lg focus:ring-2 focus:ring-[#43573B] focus:bg-white outline-none transition-all text-gray-900 placeholder-gray-400 text-sm"
+                                        className="w-full px-4 py-1.5 bg-[#F0F0F0]  border-4 rounded-lg focus:ring-2 focus:ring-[#43573B] focus:bg-neutral-base outline-none transition-all text-gray-900 placeholder-gray-400 text-sm"
                                     />
                                     {field.name === 'password' && (
                                         <button
@@ -374,7 +374,7 @@ function LoginForm() {
                                 type="checkbox"
                                 id="terms"
                                 required
-                                className="mt-0.5 w-5 h-5 text-[#43573B] bg-white border-2 border-gray-300 rounded focus:ring-2 focus:ring-[#43573B] checked:bg-[#43573B] checked:border-[#43573B] cursor-pointer"
+                                className="mt-0.5 w-5 h-5 text-[#43573B] bg-neutral-base border-2 border-gray-300 rounded focus:ring-2 focus:ring-[#43573B] checked:bg-[#43573B] checked:border-[#43573B] cursor-pointer"
                                 style={{
                                     accentColor: '#43573B'
                                 }}
@@ -405,7 +405,7 @@ function LoginForm() {
                                 {/* <div className="w-full border-t border-gray-300"></div> */}
                             </div>
                             <div className="relative flex justify-center text-sm">
-                                <span className="px-3 bg-white text-gray-500 text-xs font-bold">or login with</span>
+                                <span className="px-3 bg-neutral-base text-gray-500 text-xs font-bold">or login with</span>
                             </div>
                         </div>
 
@@ -420,7 +420,7 @@ function LoginForm() {
                                         googleBtn.click();
                                     }
                                 }}
-                                className="w-full flex items-center justify-center gap-3 px-4 py-2.5 bg-white border-[#43573B] border-2 rounded-lg hover:bg-gray-50 transition-all duration-200 font-medium text-gray-700 text-sm shadow-sm"
+                                className="w-full flex items-center justify-center gap-3 px-4 py-2.5 bg-neutral-base border-[#43573B] border-2 rounded-lg hover:bg-gray-50 transition-all duration-200 font-medium text-gray-700 text-sm shadow-sm"
                             >
                                 <svg className="w-5 h-5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                     <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
@@ -486,7 +486,7 @@ export default function LoginPage() {
     return (
         <GoogleOAuthProvider clientId={clientId}>
             <Suspense fallback={
-                <div className="min-h-screen flex items-center justify-center bg-white">
+                <div className="min-h-screen flex items-center justify-center bg-neutral-base">
                     <div className="animate-spin rounded-full h-16 w-16 border-4 border-[#00897B] border-t-transparent"></div>
                 </div>
             }>

@@ -1,6 +1,6 @@
 'use client'
 import React, { useState } from 'react';
-import { ChevronDown, ChevronUp } from 'lucide-react';
+import { ArrowDownLine, ArrowUpLine } from '@phyoofficial/phyo-icon-library';
 import { motion, AnimatePresence, useInView } from 'framer-motion';
 
 const FAQSection = () => {
@@ -226,7 +226,7 @@ const FAQSection = () => {
               <motion.div
                 key={index}
                 className={`border border-gray-200 rounded-2xl overflow-hidden transition-all duration-300 ${
-                  openIndex === index ? 'bg-green-500 text-white shadow-lg' : 'bg-white hover:border-green-300'
+                  openIndex === index ? 'bg-green-500 text-white shadow-lg' : 'bg-neutral-base hover:border-green-300'
                 }`}
                 variants={faqItemVariants}
                 whileHover={{
@@ -258,9 +258,9 @@ const FAQSection = () => {
                     transition={{ duration: 0.3, ease: "easeInOut" }}
                   >
                     {openIndex === index ? (
-                      <ChevronUp className="w-5 h-5 flex-shrink-0" />
+                      <ArrowUpLine className="w-5 h-5 flex-shrink-0" />
                     ) : (
-                      <ChevronDown className="w-5 h-5 flex-shrink-0" />
+                      <ArrowDownLine className="w-5 h-5 flex-shrink-0" />
                     )}
                   </motion.div>
                 </motion.button>

@@ -97,7 +97,7 @@ export const AuthProvider = ({ children }) => {
           } else if (userData.influencerRegistrationStatus === 'COMPLETED') {
             redirectPath = '/influencer/dashboard';
           } else {
-            // User hasn't completed any registration
+            // UserLine hasn't completed any registration
             redirectPath = '/user/dashboard';
           }
         } else if (userData.type === 'BRAND') {

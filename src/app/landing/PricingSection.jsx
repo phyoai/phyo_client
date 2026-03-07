@@ -196,7 +196,7 @@ const PricingSection = () => {
         '10 AI-Powered Campaign Reports',
         'Dedicated Chat Support',
         'AI optimizes campaigns',
-        'Unlimited Users',
+        'Unlimited UserLine',
         'Historical Data (Up to 6 months)',
         'Exportable Analytics (CSV/PDF)',
         'AI Smart Creators, Niche, Region, Top',
@@ -258,7 +258,7 @@ const PricingSection = () => {
               onClick={() => setBillingCycle('monthly')}
               className={`px-6 py-2 rounded-full transition-colors ${
                 billingCycle === 'monthly' 
-                  ? 'bg-white text-black' 
+                  ? 'bg-neutral-base text-black' 
                   : 'text-white border border-gray-500'
               }`}
             >
@@ -268,7 +268,7 @@ const PricingSection = () => {
               onClick={() => setBillingCycle('annually')}
               className={`px-6 py-2 rounded-full transition-colors flex items-center ${
                 billingCycle === 'annually' 
-                  ? 'bg-white text-black' 
+                  ? 'bg-neutral-base text-black' 
                   : 'text-white border border-gray-500'
               }`}
             >

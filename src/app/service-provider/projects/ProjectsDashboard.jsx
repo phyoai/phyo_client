@@ -1,32 +1,32 @@
 import React from 'react';
-import { FileText, Calendar, CheckCircle, Clock, BarChart3, MoreHorizontal } from 'lucide-react';
+import { FileTextLine, CalendarLine, CheckLine, ClockwiseLine, BarChartLine, MoreLine } from '@phyoofficial/phyo-icon-library';
 
 const ProjectsDashboard = () => {
   const projectStats = [
     {
       title: "In Progress",
       value: "50",
-      icon: <FileText className="w-6 h-6 text-emerald-600" />
+      icon: <FileTextLine className="w-6 h-6 text-emerald-600" />
     },
     {
       title: "Upcoming",
       value: "50", 
-      icon: <FileText className="w-6 h-6 text-emerald-600" />
+      icon: <FileTextLine className="w-6 h-6 text-emerald-600" />
     },
     {
       title: "Completed",
       value: "50",
-      icon: <CheckCircle className="w-6 h-6 text-emerald-600" />
+      icon: <CheckLine className="w-6 h-6 text-emerald-600" />
     },
     {
       title: "Pending",
       value: "50",
-      icon: <Clock className="w-6 h-6 text-emerald-600" />
+      icon: <ClockwiseLine className="w-6 h-6 text-emerald-600" />
     },
     {
       title: "Total Project",
       value: "50",
-      icon: <BarChart3 className="w-6 h-6 text-emerald-600" />
+      icon: <BarChartLine className="w-6 h-6 text-emerald-600" />
     }
   ];
 
@@ -75,7 +75,7 @@ const ProjectsDashboard = () => {
           {/* Project Stats Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
             {projectStats.map((stat, index) => (
-              <div key={index} className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
+              <div key={index} className="bg-neutral-base rounded-lg p-6 shadow-sm border border-gray-200">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm font-medium text-gray-600 mb-1">{stat.title}</p>
@@ -91,7 +91,7 @@ const ProjectsDashboard = () => {
         </div>
 
         {/* Our Work Progress */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+        <div className="bg-neutral-base rounded-lg shadow-sm border border-gray-200">
           <div className="px-6 py-4 border-b border-gray-200">
             <h2 className="text-2xl font-bold text-gray-900">Our Work Progress</h2>
           </div>
@@ -135,7 +135,7 @@ const ProjectsDashboard = () => {
                     {/* Menu */}
                     <div className="col-span-1 flex justify-end">
                       <button className="text-gray-400 hover:text-gray-600 p-1">
-                        <MoreHorizontal className="w-5 h-5" />
+                        <MoreLine className="w-5 h-5" />
                       </button>
                     </div>
                   </div>

@@ -1,7 +1,7 @@
 'use client'
 import React, { useState } from 'react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Tooltip } from 'recharts';
-import { ChevronDown } from 'lucide-react';
+import { ArrowDownLine } from '@phyoofficial/phyo-icon-library';
 
 const PostTimelineChart = () => {
   const [selectedPeriod, setSelectedPeriod] = useState('Year');
@@ -27,16 +27,16 @@ const PostTimelineChart = () => {
   const CustomTooltip = ({ active, payload, label }) => {
     if (active && payload && payload.length) {
       return (
-        <div className="bg-white p-3 border border-gray-200 rounded-lg shadow-lg">
+        <div className="bg-neutral-base p-3 border border-gray-200 rounded-lg shadow-lg">
           <p className="text-sm font-medium text-gray-900">{`Year: ${label}`}</p>
           <div className="space-y-1 mt-2">
             <div className="flex items-center space-x-2">
               <div className="w-3 h-3 bg-green-800 rounded-full"></div>
-              <span className="text-sm text-gray-600">User Click: {payload[0].value}%</span>
+              <span className="text-sm text-gray-600">UserLine Click: {payload[0].value}%</span>
             </div>
             <div className="flex items-center space-x-2">
               <div className="w-3 h-3 bg-green-300 rounded-full"></div>
-              <span className="text-sm text-gray-600">User Open: {payload[1].value}%</span>
+              <span className="text-sm text-gray-600">UserLine Open: {payload[1].value}%</span>
             </div>
           </div>
         </div>
@@ -46,7 +46,7 @@ const PostTimelineChart = () => {
   };
 
   return (
-    <div  className='bg-white p-6 rounded-3xl'>
+    <div  className='bg-neutral-base p-6 rounded-3xl'>
     <div className="bg-[#F3F2EB] rounded-3xl p-6 border border-gray-200 shadow-sm">
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
@@ -59,11 +59,11 @@ const PostTimelineChart = () => {
             className="flex items-center space-x-2 bg-gray-900 text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition-colors"
           >
             <span className="text-sm font-medium">{selectedPeriod}</span>
-            <ChevronDown className="h-4 w-4" />
+            <ArrowDownLine className="h-4 w-4" />
           </button>
 
           {isDropdownOpen && (
-            <div className="absolute right-0 mt-2 w-32 bg-white border border-gray-200 rounded-lg shadow-lg z-10">
+            <div className="absolute right-0 mt-2 w-32 bg-neutral-base border border-gray-200 rounded-lg shadow-lg z-10">
               {periods.map((period) => (
                 <button
                   key={period}
@@ -160,14 +160,14 @@ const PostTimelineChart = () => {
               <div className="w-3 h-3 bg-green-800 rounded-full"></div>
               <span className="text-2xl font-bold text-gray-900">42%</span>
             </div>
-            <span className="text-sm text-gray-600">User Click</span>
+            <span className="text-sm text-gray-600">UserLine Click</span>
           </div>
           <div className="text-center">
             <div className="flex items-center justify-center space-x-2 mb-1">
               <div className="w-3 h-3 bg-green-300 rounded-full"></div>
               <span className="text-2xl font-bold text-gray-900">58%</span>
             </div>
-            <span className="text-sm text-gray-600">User Open</span>
+            <span className="text-sm text-gray-600">UserLine Open</span>
           </div>
         </div>
       </div>

@@ -1,6 +1,6 @@
 'use client'
 import React, { useState, useRef } from 'react';
-import { Paperclip, Smile, Send } from 'lucide-react';
+import { Paperclip, Smile, Send } from '@phyoofficial/phyo-icon-library';
 import { SendPlane2Fill, SendPlaneFill } from '@phyoofficial/phyo-icon-library';
 
 const ChatInput = ({ onSendMessage, onFileSelect }) => {
@@ -33,7 +33,7 @@ const ChatInput = ({ onSendMessage, onFileSelect }) => {
     <div className="border-t border-gray-200 p-4">
       {/* Attachment Menu */}
       {showAttachments && (
-        <div className="mb-4 bg-white border border-gray-200 rounded-lg shadow-lg p-2 w-48">
+        <div className="mb-4 bg-neutral-base border border-gray-200 rounded-lg shadow-lg p-2 w-48">
           <button
             onClick={() => handleFileClick('document')}
             className="flex items-center space-x-3 w-full p-2 hover:bg-gray-50 rounded"

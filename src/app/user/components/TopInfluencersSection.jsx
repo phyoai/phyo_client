@@ -2,12 +2,12 @@
 import React from 'react';
 import InfluencerCard from './InfluencerCard';
 import { 
-  Linkedin, 
-  Instagram, 
-  Twitter, 
-  Youtube,
-  Facebook
-} from 'lucide-react';
+  LinkedinFill, 
+  InstagramFill, 
+  TwitterXLine, 
+  YoutubeFill,
+  FacebookFill
+} from '@phyoofficial/phyo-icon-library';
 
 const TopInfluencersSection = () => {
   // Sample influencer data
@@ -20,10 +20,10 @@ const TopInfluencersSection = () => {
       rating: 4.2,
       reviewCount: 1024,
       platforms: [
-        { icon: Linkedin, followers: "22.5k", engagement: "22.5k", color: "bg-blue-600" },
-        { icon: Instagram, followers: "22.5k", engagement: "22.5k", color: "bg-pink-500" },
-        { icon: Twitter, followers: "22.5k", engagement: "22.5k", color: "bg-blue-400" },
-        { icon: Youtube, followers: "22.5k", engagement: "22.5k", color: "bg-red-500" }
+        { icon: LinkedinFill, followers: "22.5k", engagement: "22.5k", color: "bg-blue-600" },
+        { icon: InstagramFill, followers: "22.5k", engagement: "22.5k", color: "bg-pink-500" },
+        { icon: TwitterXLine, followers: "22.5k", engagement: "22.5k", color: "bg-blue-400" },
+        { icon: YoutubeFill, followers: "22.5k", engagement: "22.5k", color: "bg-red-500" }
       ]
     },
     {
@@ -34,10 +34,10 @@ const TopInfluencersSection = () => {
       rating: 4.2,
       reviewCount: 1024,
       platforms: [
-        { icon: Linkedin, followers: "22.5k", engagement: "22.5k", color: "bg-blue-600" },
-        { icon: Instagram, followers: "22.5k", engagement: "22.5k", color: "bg-pink-500" },
-        { icon: Twitter, followers: "22.5k", engagement: "22.5k", color: "bg-blue-400" },
-        { icon: Youtube, followers: "22.5k", engagement: "22.5k", color: "bg-red-500" }
+        { icon: LinkedinFill, followers: "22.5k", engagement: "22.5k", color: "bg-blue-600" },
+        { icon: InstagramFill, followers: "22.5k", engagement: "22.5k", color: "bg-pink-500" },
+        { icon: TwitterXLine, followers: "22.5k", engagement: "22.5k", color: "bg-blue-400" },
+        { icon: YoutubeFill, followers: "22.5k", engagement: "22.5k", color: "bg-red-500" }
       ]
     },
     {
@@ -48,10 +48,10 @@ const TopInfluencersSection = () => {
       rating: 4.2,
       reviewCount: 1024,
       platforms: [
-        { icon: Linkedin, followers: "22.5k", engagement: "22.5k", color: "bg-blue-600" },
-        { icon: Instagram, followers: "22.5k", engagement: "22.5k", color: "bg-pink-500" },
-        { icon: Twitter, followers: "22.5k", engagement: "22.5k", color: "bg-blue-400" },
-        { icon: Youtube, followers: "22.5k", engagement: "22.5k", color: "bg-red-500" }
+        { icon: LinkedinFill, followers: "22.5k", engagement: "22.5k", color: "bg-blue-600" },
+        { icon: InstagramFill, followers: "22.5k", engagement: "22.5k", color: "bg-pink-500" },
+        { icon: TwitterXLine, followers: "22.5k", engagement: "22.5k", color: "bg-blue-400" },
+        { icon: YoutubeFill, followers: "22.5k", engagement: "22.5k", color: "bg-red-500" }
       ]
     },
     {
@@ -62,10 +62,10 @@ const TopInfluencersSection = () => {
       rating: 4.2,
       reviewCount: 1024,
       platforms: [
-        { icon: Linkedin, followers: "22.5k", engagement: "22.5k", color: "bg-blue-600" },
-        { icon: Instagram, followers: "22.5k", engagement: "22.5k", color: "bg-pink-500" },
-        { icon: Twitter, followers: "22.5k", engagement: "22.5k", color: "bg-blue-400" },
-        { icon: Youtube, followers: "22.5k", engagement: "22.5k", color: "bg-red-500" }
+        { icon: LinkedinFill, followers: "22.5k", engagement: "22.5k", color: "bg-blue-600" },
+        { icon: InstagramFill, followers: "22.5k", engagement: "22.5k", color: "bg-pink-500" },
+        { icon: TwitterXLine, followers: "22.5k", engagement: "22.5k", color: "bg-blue-400" },
+        { icon: YoutubeFill, followers: "22.5k", engagement: "22.5k", color: "bg-red-500" }
       ]
     },
     {
@@ -76,10 +76,10 @@ const TopInfluencersSection = () => {
       rating: 4.2,
       reviewCount: 1024,
       platforms: [
-        { icon: Linkedin, followers: "22.5k", engagement: "22.5k", color: "bg-blue-600" },
-        { icon: Instagram, followers: "22.5k", engagement: "22.5k", color: "bg-pink-500" },
-        { icon: Twitter, followers: "22.5k", engagement: "22.5k", color: "bg-blue-400" },
-        { icon: Youtube, followers: "22.5k", engagement: "22.5k", color: "bg-red-500" }
+        { icon: LinkedinFill, followers: "22.5k", engagement: "22.5k", color: "bg-blue-600" },
+        { icon: InstagramFill, followers: "22.5k", engagement: "22.5k", color: "bg-pink-500" },
+        { icon: TwitterXLine, followers: "22.5k", engagement: "22.5k", color: "bg-blue-400" },
+        { icon: YoutubeFill, followers: "22.5k", engagement: "22.5k", color: "bg-red-500" }
       ]
     },
     {
@@ -90,10 +90,10 @@ const TopInfluencersSection = () => {
       rating: 4.2,
       reviewCount: 1024,
       platforms: [
-        { icon: Linkedin, followers: "22.5k", engagement: "22.5k", color: "bg-blue-600" },
-        { icon: Instagram, followers: "22.5k", engagement: "22.5k", color: "bg-pink-500" },
-        { icon: Twitter, followers: "22.5k", engagement: "22.5k", color: "bg-blue-400" },
-        { icon: Youtube, followers: "22.5k", engagement: "22.5k", color: "bg-red-500" }
+        { icon: LinkedinFill, followers: "22.5k", engagement: "22.5k", color: "bg-blue-600" },
+        { icon: InstagramFill, followers: "22.5k", engagement: "22.5k", color: "bg-pink-500" },
+        { icon: TwitterXLine, followers: "22.5k", engagement: "22.5k", color: "bg-blue-400" },
+        { icon: YoutubeFill, followers: "22.5k", engagement: "22.5k", color: "bg-red-500" }
       ]
     }
   ];
@@ -102,7 +102,7 @@ const TopInfluencersSection = () => {
     <div className="bg-[#F3F2EB] py-8">
       <div className="max-w-7xl mx-auto px-6">
         {/* Section Header */}
-        <div className="flex items-center justify-between mb-2 bg-white p-5 rounded-3xl">
+        <div className="flex items-center justify-between mb-2 bg-neutral-base p-5 rounded-3xl">
           <h2 className="text-2xl font-bold text-gray-900">Top influencers</h2>
           <button className="text-green-600 hover:text-green-700 font-medium">
             View all
@@ -110,7 +110,7 @@ const TopInfluencersSection = () => {
         </div>
 
         {/* Influencers Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 bg-white p-8 rounded-3xl">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 bg-neutral-base p-8 rounded-3xl">
           {influencers.map((influencer) => (
             <InfluencerCard
               key={influencer.id}

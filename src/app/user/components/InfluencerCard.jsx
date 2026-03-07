@@ -1,6 +1,6 @@
 'use client'
 import React from 'react';
-import { CheckCircle, Star } from 'lucide-react';
+import { CheckLine, Star } from '@phyoofficial/phyo-icon-library';
 
 const InfluencerCard = ({ 
   name, 
@@ -23,7 +23,7 @@ const InfluencerCard = ({
           />
           {isVerified && (
             <div className="absolute -top-1 -right-1">
-              <CheckCircle className="w-6 h-6 text-[#00674F] bg-white rounded-full" />
+              <CheckLine className="w-6 h-6 text-[#00674F] bg-neutral-base rounded-full" />
             </div>
           )}
         </div>

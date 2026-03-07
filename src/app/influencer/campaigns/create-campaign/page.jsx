@@ -1,7 +1,7 @@
 'use client'
 import React, { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, MoreVertical, X, Upload, Calendar, Check, Users } from 'lucide-react';
+import { ArrowLeftLine, MoreLine, CloseLine, UploadLine, CalendarLine, CheckLine, UserLine } from '@phyoofficial/phyo-icon-library';
 import { campaignAPI } from '../../../../utils/api';
 
 const CreateCampaignPage = () => {
@@ -200,7 +200,7 @@ const CreateCampaignPage = () => {
                   >
                     {type}
                     {selectedCampaignTypes.includes(type) && (
-                      <X className="w-4 h-4" />
+                      <CloseLine className="w-4 h-4" />
                     )}
                   </button>
                 ))}
@@ -230,10 +230,10 @@ const CreateCampaignPage = () => {
       case 3: // Deliverables Step
         return (
           <div className="space-y-4">
-            {/* Instagram Reels */}
-            <div className="bg-white flex items-center pl-4">
+            {/* InstagramFill Reels */}
+            <div className="bg-neutral-base flex items-center pl-4">
               <div className="flex-1 flex items-center justify-center pr-4 py-3">
-                <p className="text-base font-semibold text-[#242527]">Instagram Reels</p>
+                <p className="text-base font-semibold text-[#242527]">InstagramFill Reels</p>
               </div>
               <div className="flex items-center justify-center">
                 <div className="flex items-center px-2 py-4">
@@ -264,10 +264,10 @@ const CreateCampaignPage = () => {
               </div>
             </div>
 
-            {/* Instagram Stories */}
-            <div className="bg-white flex items-center pl-4">
+            {/* InstagramFill Stories */}
+            <div className="bg-neutral-base flex items-center pl-4">
               <div className="flex-1 flex items-center justify-center pr-4 py-3">
-                <p className="text-base font-semibold text-[#242527]">Instagram Stories</p>
+                <p className="text-base font-semibold text-[#242527]">InstagramFill Stories</p>
               </div>
               <div className="flex items-center justify-center">
                 <div className="flex items-center px-2 py-4">
@@ -298,10 +298,10 @@ const CreateCampaignPage = () => {
               </div>
             </div>
 
-            {/* Instagram Post */}
-            <div className="bg-white flex items-center pl-4">
+            {/* InstagramFill Post */}
+            <div className="bg-neutral-base flex items-center pl-4">
               <div className="flex-1 flex items-center justify-center pr-4 py-3">
-                <p className="text-base font-semibold text-[#242527]">Instagram Post</p>
+                <p className="text-base font-semibold text-[#242527]">InstagramFill Post</p>
               </div>
               <div className="flex items-center justify-center">
                 <div className="flex items-center px-2 py-4">
@@ -795,13 +795,13 @@ const CreateCampaignPage = () => {
       // Build deliverables array
       const deliverables = [];
       if (formData.instagramReels > 0) {
-        deliverables.push(`${formData.instagramReels} Instagram Reels`);
+        deliverables.push(`${formData.instagramReels} InstagramFill Reels`);
       }
       if (formData.instagramStories > 0) {
-        deliverables.push(`${formData.instagramStories} Instagram Stories`);
+        deliverables.push(`${formData.instagramStories} InstagramFill Stories`);
       }
       if (formData.instagramPosts > 0) {
-        deliverables.push(`${formData.instagramPosts} Instagram Posts`);
+        deliverables.push(`${formData.instagramPosts} InstagramFill Posts`);
       }
 
       const transformedData = {
@@ -877,15 +877,15 @@ const CreateCampaignPage = () => {
   ];
 
   return (
-    <div className="bg-white h-screen flex flex-col overflow-hidden">
+    <div className="bg-neutral-base h-screen flex flex-col overflow-hidden">
       {/* Fixed App Bar */}
-      <div className="bg-white flex items-center justify-between px-4 py-2 shrink-0 border-b border-gray-100 sticky top-0 z-20">
+      <div className="bg-neutral-base flex items-center justify-between px-4 py-2 shrink-0 border-b border-gray-100 sticky top-0 z-20">
         {/* Back Button */}
         <button
           onClick={handleBack}
           className="flex items-center justify-center w-12 h-12 rounded-full hover:bg-gray-100 transition-colors"
         >
-          <ArrowLeft className="w-6 h-6 text-gray-700" />
+          <ArrowLeftLine className="w-6 h-6 text-gray-700" />
         </button>
 
         {/* Title */}
@@ -898,12 +898,12 @@ const CreateCampaignPage = () => {
           type="button"
           className="flex items-center justify-center w-12 h-12 rounded-full hover:bg-gray-100 transition-colors"
         >
-          <MoreVertical className="w-6 h-6 text-gray-700" />
+          <MoreLine className="w-6 h-6 text-gray-700" />
         </button>
       </div>
 
       {/* Fixed Progress Steps */}
-      <div className="bg-white px-9 py-4 shrink-0 sticky top-[60px] z-10 border-b border-gray-50">
+      <div className="bg-neutral-base px-9 py-4 shrink-0 sticky top-[60px] z-10 border-b border-gray-50">
         <div className="max-w-5xl mx-auto px-10">
           <div className="flex items-start justify-between relative">
             {steps.map((step, index) => (
@@ -960,7 +960,7 @@ const CreateCampaignPage = () => {
       </div>
 
       {/* Fixed Bottom Navigation */}
-      <div className="bg-white px-9 py-4 shrink-0 border-t border-gray-200 sticky bottom-0 z-20">
+      <div className="bg-neutral-base px-9 py-4 shrink-0 border-t border-gray-200 sticky bottom-0 z-20">
         <div className="max-w-4xl mx-auto px-40">
           <div className="flex gap-2">
             {currentStep < 7 ? (

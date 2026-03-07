@@ -66,7 +66,7 @@ const MultiSelect = ({
       
       <div className="relative">
         <div 
-          className={`min-h-[45px] p-3 border rounded-lg bg-white cursor-pointer focus:outline-none focus:ring-2 ${
+          className={`min-h-[45px] p-3 border rounded-lg bg-neutral-base cursor-pointer focus:outline-none focus:ring-2 ${
             hasError
               ? 'border-red-500 focus:ring-red-500'
               : 'border-gray-300 focus:ring-green-500'
@@ -114,7 +114,7 @@ const MultiSelect = ({
         </div>
         
         {isOpen && (
-          <div className="absolute top-full left-0 right-0 bg-white border border-gray-300 rounded-lg mt-1 max-h-40 overflow-y-auto z-10 shadow-lg">
+          <div className="absolute top-full left-0 right-0 bg-neutral-base border border-gray-300 rounded-lg mt-1 max-h-40 overflow-y-auto z-10 shadow-lg">
             {options.map((option) => (
               <div
                 key={option.value}

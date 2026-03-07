@@ -2,7 +2,7 @@
 'use client'
 import React, { useState } from 'react';
 import { LineChart, Line, ResponsiveContainer, Tooltip } from 'recharts';
-import { ChevronDown, TrendingUp } from 'lucide-react';
+import { ArrowDownLine, LineChartLine } from '@phyoofficial/phyo-icon-library';
 
 const EngagementSection = () => {
   const [selectedPeriod, setSelectedPeriod] = useState('Year');
@@ -37,10 +37,10 @@ const EngagementSection = () => {
     <div className="bg-[#F5F3EE] py-8">
       <div className="max-w-7xl mx-auto px-6">
         {/* Section Header */}
-        <div className="mb-4 rounded-3xl bg-white p-5">
+        <div className="mb-4 rounded-3xl bg-neutral-base p-5">
           <h2 className="text-2xl font-bold text-gray-900">Engagement</h2>
         </div>
-<div className=' bg-white p-6 rounded-3xl'>
+<div className=' bg-neutral-base p-6 rounded-3xl'>
         {/* Main Content Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Total Engagement Card */}
@@ -49,7 +49,7 @@ const EngagementSection = () => {
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-medium text-gray-900">Total Engagement</h3>
               <div className="flex items-center space-x-1 text-green-600">
-                <TrendingUp className="h-4 w-4" />
+                <LineChartLine className="h-4 w-4" />
                 <span className="text-sm font-medium">+465</span>
               </div>
             </div>
@@ -67,11 +67,11 @@ const EngagementSection = () => {
                   className="flex items-center space-x-2 bg-gray-900 text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition-colors"
                 >
                   <span className="text-sm font-medium">{selectedPeriod}</span>
-                  <ChevronDown className="h-4 w-4" />
+                  <ArrowDownLine className="h-4 w-4" />
                 </button>
 
                 {isDropdownOpen && (
-                  <div className="absolute left-0 mt-2 w-32 bg-white border border-gray-200 rounded-lg shadow-lg z-10">
+                  <div className="absolute left-0 mt-2 w-32 bg-neutral-base border border-gray-200 rounded-lg shadow-lg z-10">
                     {periods.map((period) => (
                       <button
                         key={period}

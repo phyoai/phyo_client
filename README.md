@@ -34,3 +34,13 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+
+
+✓ Switched to phyo_frontend branch
+✓ Staged all changes (git add -A)
+✓ Committed with message "working on user dashboard"
+✓ Pushed to origin/phyo_frontend
+✓ Switched to main branch
+✓ Merged phyo_frontend into main
+✓ Pushed main to origin/main

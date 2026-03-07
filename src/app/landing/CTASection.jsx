@@ -1,6 +1,6 @@
 import React from 'react';
-import Image from 'next/image';
-import { ArrowRight, Play } from 'lucide-react';
+import Image2Line from 'next/image';
+import { ArrowRightLine, PlayLine } from '@phyoofficial/phyo-icon-library';
 import { motion, useInView } from 'framer-motion';
 
 const CTASection = () => {
@@ -134,7 +134,7 @@ const CTASection = () => {
               animate={isInView ? { opacity: 1, x: 0 } : { opacity: 0, x: -20 }}
               transition={{ duration: 0.6, delay: 0.2 }}
             >
-              AI Search, Verified
+              AI SearchLine, Verified
             </motion.span>
             <br />
             <motion.span
@@ -194,7 +194,7 @@ const CTASection = () => {
                 animate={{ x: [0, 5, 0] }}
                 transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
               >
-                <ArrowRight className="w-5 h-5" />
+                <ArrowRightLine className="w-5 h-5" />
               </motion.div>
             </motion.button>
             
@@ -215,7 +215,7 @@ const CTASection = () => {
                 whileHover={{ scale: 1.2, rotate: 360 }}
                 transition={{ duration: 0.3 }}
               >
-                <Play className="w-5 h-5" />
+                <PlayLine className="w-5 h-5" />
               </motion.div>
               Watch Demo
             </motion.button>
@@ -280,13 +280,13 @@ const CTASection = () => {
           >
             {/* Dashboard Content */}
             <motion.div 
-              className="bg-white rounded-2xl overflow-hidden shadow-xl"
+              className="bg-neutral-base rounded-2xl overflow-hidden shadow-xl"
               initial={{ opacity: 0, scale: 0.9 }}
               animate={isInView ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.9 }}
               transition={{ duration: 0.8, delay: 0.5 }}
               whileHover={{ scale: 1.02 }}
             >
-              <Image
+              <Image2Line
                 src="/free-trial.png"
                 alt="Phyo Dashboard Interface"
                 width={700}
@@ -307,7 +307,7 @@ const CTASection = () => {
               }}
             >
               <motion.div 
-                className="bg-white rounded-full px-6 py-3 shadow-lg border border-gray-200"
+                className="bg-neutral-base rounded-full px-6 py-3 shadow-lg border border-gray-200"
                 animate={{
                   y: [0, -5, 0],
                 }}

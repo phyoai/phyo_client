@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { Users, ArrowRight, CheckCircle, TrendingUp } from 'lucide-react';
+import { UserLine, ArrowRightLine, CheckLine, LineChartLine } from '@phyoofficial/phyo-icon-library';
 
 export default function SearchResultsPage() {
   const router = useRouter();
@@ -78,7 +78,7 @@ export default function SearchResultsPage() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-white rounded-2xl shadow-xl p-8 max-w-md w-full text-center"
+          className="bg-neutral-base rounded-2xl shadow-xl p-8 max-w-md w-full text-center"
         >
           <div className="text-red-500 text-6xl mb-4">❌</div>
           <h2 className="text-2xl font-bold text-gray-800 mb-2">Error</h2>
@@ -105,7 +105,7 @@ export default function SearchResultsPage() {
           className="mb-8"
         >
           <h1 className="text-3xl md:text-4xl font-bold text-gray-800 mb-2">
-            Search Results
+            SearchLine Results
           </h1>
           <p className="text-gray-600">
             Found <span className="font-bold text-green-600">{data?.length || 0}</span> influencer(s) for: 
@@ -147,7 +147,7 @@ function InfluencerCard({ influencer, index, onClick }) {
       transition={{ duration: 0.5, delay: index * 0.1 }}
       whileHover={{ y: -8, scale: 1.02 }}
       onClick={onClick}
-      className="bg-white rounded-2xl shadow-lg overflow-hidden cursor-pointer group"
+      className="bg-neutral-base rounded-2xl shadow-lg overflow-hidden cursor-pointer group"
     >
       {/* Profile Header */}
       <div className="relative h-48 bg-gradient-to-br from-green-400 to-green-600">
@@ -163,7 +163,7 @@ function InfluencerCard({ influencer, index, onClick }) {
         <div className="flex items-center justify-center gap-2 mb-2">
           <h3 className="text-xl font-bold text-gray-800">{influencer.profile_name}</h3>
           {influencer.is_verified && (
-            <CheckCircle className="text-blue-500" size={20} />
+            <CheckLine className="text-blue-500" size={20} />
           )}
         </div>
         
@@ -179,7 +179,7 @@ function InfluencerCard({ influencer, index, onClick }) {
         {/* Quality Badge */}
         {influencer.demographics?.audience_quality_score && (
           <div className="flex items-center justify-center gap-2 bg-green-50 py-2 px-4 rounded-lg mb-4">
-            <TrendingUp className="text-green-600" size={16} />
+            <LineChartLine className="text-green-600" size={16} />
             <span className="text-sm font-semibold text-green-700">
               Quality: {influencer.demographics.audience_quality_score}/100
             </span>
@@ -189,7 +189,7 @@ function InfluencerCard({ influencer, index, onClick }) {
         {/* View Details Button */}
         <button className="w-full bg-green-600 hover:bg-green-700 text-white py-3 rounded-lg font-semibold transition-colors flex items-center justify-center gap-2 group-hover:gap-3">
           View Details
-          <ArrowRight size={18} className="transition-all" />
+          <ArrowRightLine size={18} className="transition-all" />
         </button>
       </div>
     </motion.div>

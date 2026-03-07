@@ -1,5 +1,5 @@
 'use client'
-import { ChartColumnIncreasing, Eye, Heart, Instagram, ThumbsUp, Youtube } from 'lucide-react'
+import { ChartColumnIncreasing, EyeLine, HeartLine, InstagramFill, ThumbUpLine, YoutubeFill } from '@phyoofficial/phyo-icon-library'
 import { useRouter } from 'next/navigation'
 import React from 'react'
 
@@ -59,7 +59,7 @@ const InfluencerCard = ({ influencer }) => {
     
     return (
         <div 
-            className='bg-white rounded-lg flex justify-between pb-2 overflow-hidden shadow-md sm:mx-96 cursor-pointer hover:shadow-xl transition-shadow duration-300 relative z-10' 
+            className='bg-neutral-base rounded-lg flex justify-between pb-2 overflow-hidden shadow-md sm:mx-96 cursor-pointer hover:shadow-xl transition-shadow duration-300 relative z-10' 
             onClick={handleCardClick}
             onMouseEnter={() => console.log('Mouse entered card')}
             style={{ cursor: 'pointer', userSelect: 'none' }}
@@ -90,7 +90,7 @@ const InfluencerCard = ({ influencer }) => {
                 {followers && (
                     <div className='flex items-center gap-4'>
                         <p className='flex items-center gap-2'>
-                            <Instagram size={18} className='text-[color:var(--green)]' />
+                            <InstagramFill size={18} className='text-[color:var(--green)]' />
                             <span className='font-semibold'>{followers.toLocaleString()}</span> followers
                         </p>
                         {postsCount && (
@@ -134,13 +134,13 @@ const InfluencerCard = ({ influencer }) => {
                         <span className='flex gap-4'>
                             {influencer?.youtubeData?.followers !== null && influencer?.youtubeData?.followers !== undefined && (
                                 <p className='flex gap-2 bg-[color:var(--dark-green)] px-4 py-2 rounded-md text-white text-sm'>
-                                    <Youtube size={18} />
+                                    <YoutubeFill size={18} />
                                     {influencer.youtubeData.followers.toLocaleString()}
                                 </p>
                             )}
                             {influencer?.instagramData?.followers !== null && influencer?.instagramData?.followers !== undefined && (
                                 <p className='flex gap-2 bg-[color:var(--dark-green)] px-4 py-2 rounded-md text-white text-sm'>
-                                    <Instagram size={18} />
+                                    <InstagramFill size={18} />
                                     {influencer.instagramData.followers.toLocaleString()}
                                 </p>
                             )}

@@ -12,7 +12,7 @@ import {
   YAxis,
   Tooltip,
 } from "recharts";
-import { MoreHorizontal, ChevronDown, TrendingUp } from "lucide-react";
+import { MoreLine, ArrowDownLine, LineChartLine } from '@phyoofficial/phyo-icon-library';
 
 const PostLiveAndTotalViewsSection = () => {
   const [selectedPeriod, setSelectedPeriod] = useState("Year");
@@ -48,7 +48,7 @@ const PostLiveAndTotalViewsSection = () => {
   const CustomTooltip = ({ active, payload, label }) => {
     if (active && payload && payload.length) {
       return (
-        <div className="bg-white border border-gray-200 rounded-lg shadow-lg p-2">
+        <div className="bg-neutral-base border border-gray-200 rounded-lg shadow-lg p-2">
           <p className="text-sm text-gray-600">{label}</p>
           <p className="text-sm font-medium text-gray-900">
             {payload[0].value.toLocaleString()} views
@@ -64,17 +64,17 @@ const PostLiveAndTotalViewsSection = () => {
       <div className="max-w-7xl mx-auto px-6">
         {/* Section Headers */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-          <h2 className="text-2xl font-bold text-gray-900 bg-white p-4 rounded-3xl">
+          <h2 className="text-2xl font-bold text-gray-900 bg-neutral-base p-4 rounded-3xl">
             Post Live
           </h2>
-          <h2 className="text-2xl font-bold text-gray-900 bg-white p-4 rounded-3xl">
+          <h2 className="text-2xl font-bold text-gray-900 bg-neutral-base p-4 rounded-3xl">
             Total Views
           </h2>
         </div>
 
         {/* Main Content Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div className=" rounded-3xl bg-white p-8">
+          <div className=" rounded-3xl bg-neutral-base p-8">
             {/* Employee Structure Card */}
             <div className="bg-[#F3F2EB] rounded-3xl p-6 border border-gray-200 shadow-sm">
               {/* Header */}
@@ -83,7 +83,7 @@ const PostLiveAndTotalViewsSection = () => {
                   Employee Structure
                 </h3>
                 <button className="text-white rotate-90 hover:text-gray-600 bg-black p-1  rounded-lg">
-                  <MoreHorizontal className="h-5 w-5" />
+                  <MoreLine className="h-5 w-5" />
                 </button>
               </div>
 
@@ -145,7 +145,7 @@ const PostLiveAndTotalViewsSection = () => {
             </div>
           </div>
 
-          <div className=" rounded-3xl bg-white p-8">
+          <div className=" rounded-3xl bg-neutral-base p-8">
             {/* Total Views Card */}
             <div className="bg-[#F3F2EB] rounded-3xl p-6 border border-gray-200 shadow-sm">
               {/* Header */}
@@ -159,11 +159,11 @@ const PostLiveAndTotalViewsSection = () => {
                     <span className="text-sm font-medium">
                       {selectedPeriod}
                     </span>
-                    <ChevronDown className="h-4 w-4" />
+                    <ArrowDownLine className="h-4 w-4" />
                   </button>
 
                   {isDropdownOpen && (
-                    <div className="absolute right-0 mt-2 w-32 bg-white border border-gray-200 rounded-lg shadow-lg z-10">
+                    <div className="absolute right-0 mt-2 w-32 bg-neutral-base border border-gray-200 rounded-lg shadow-lg z-10">
                       {periods.map((period) => (
                         <button
                           key={period}
@@ -183,7 +183,7 @@ const PostLiveAndTotalViewsSection = () => {
 
               {/* Growth Indicator */}
               <div className="flex items-center space-x-2 mb-4">
-                <TrendingUp className="h-4 w-4 text-green-600" />
+                <LineChartLine className="h-4 w-4 text-green-600" />
                 <span className="text-sm font-medium text-green-600">
                   +24.00%
                 </span>

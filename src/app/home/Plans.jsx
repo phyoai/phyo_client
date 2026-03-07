@@ -1,4 +1,4 @@
-import { BriefcaseBusiness, CircleCheck } from 'lucide-react';
+import { Briefcase2Line, CheckLine } from '@phyoofficial/phyo-icon-library';
 import React from 'react';
 
 const plansData = [
@@ -7,7 +7,7 @@ const plansData = [
     name: "Bronze",
     price: "Free",
     line: "Free plan includes",
-    features: ["Creator Search", "Creator insight (Basic)", "Content Inspiration"],
+    features: ["Creator SearchLine", "Creator insight (Basic)", "Content Inspiration"],
   },
   {
     id: 2,
@@ -15,7 +15,7 @@ const plansData = [
     price: "$19/Month [50 Credits]",
     line: "Everything on Free plus:",
     features: [
-      "Advanced Filters & Audience Based Search",
+      "Advanced Filters & Audience Based SearchLine",
       "Historical Cost",
       "Pre-Curated List & Brand Analysis",
       "Costing Insights",
@@ -31,7 +31,7 @@ const plansData = [
     features: [
       "Role-Based Access",
       "Volume Based Discount",
-      "Training Of The Platform For The Users",
+      "Training Of The Platform For The UserLine",
       "Dedicated Customer Success Manager",
     ],
   },
@@ -41,7 +41,7 @@ const plansData = [
     price: "$199/Month [Unlimited Credits]",
     line: "Everything on Free plus:",
     features: [
-      "Advanced Filters & Audience Based Search",
+      "Advanced Filters & Audience Based SearchLine",
       "Historical Cost",
       "Pre-Curated List & Brand Analysis",
       "Costing Insights",
@@ -57,11 +57,11 @@ const Plans = () => {
       <h2 className="text-[50px] text-center font-bold mt-[50px] mb-[100px] text-black">Find your perfect plan</h2>
       <div className="continer mx-auto text-center py-12 sm:px-[100px] px-[40px] bg-[#002B21] relative">
         <span className=' bg-[#002B21] p-4 sm:w-[30%] absolute top-[-3%] left-[25%] sm:top-[-9%] sm:left-[35%] rounded-2xl'>
-          <span className='bg-white rounded-full w-[50px] aspect-square absolute left-[-48px] bottom-[4px] sm:left-[-50px] sm:bottom-[12.5px]'>
+          <span className='bg-neutral-base rounded-full w-[50px] aspect-square absolute left-[-48px] bottom-[4px] sm:left-[-50px] sm:bottom-[12.5px]'>
             <span className='bg-[#002B21] w-[20px] aspect-square absolute bottom-0 right-[-3px] -z-10'></span>
           </span>
-          <p className='bg-[color:var(--dark-green)] px-4 py-2 rounded-lg font-bold flex gap-2 justify-center'> <BriefcaseBusiness /> Phyo Pricing</p>
-          <span className='bg-white rounded-full w-[50px] aspect-square absolute right-[-48px] bottom-[4px] sm:right-[-50px] sm:bottom-[12.5px]'>
+          <p className='bg-[color:var(--dark-green)] px-4 py-2 rounded-lg font-bold flex gap-2 justify-center'> <Briefcase2Line /> Phyo Pricing</p>
+          <span className='bg-neutral-base rounded-full w-[50px] aspect-square absolute right-[-48px] bottom-[4px] sm:right-[-50px] sm:bottom-[12.5px]'>
             <span className='bg-[#002B21] w-[20px] aspect-square absolute bottom-0 left-[-3px] -z-10'></span>
           </span>
         </span>
@@ -77,7 +77,7 @@ const Plans = () => {
               <p className="text-sm font-semibold mb-2 px-6 text-left mt-[21px]">{plan.line}</p>
               <ul className="text-sm text-left px-6 flex flex-col gap-2 mb-[21px]">
                 {plan.features.map((feature, index) => (
-                  <li key={index} className="mb-1 flex items-center gap-2"><CircleCheck color='#169B00' /> {feature}</li>
+                  <li key={index} className="mb-1 flex items-center gap-2"><CheckLine color='#169B00' /> {feature}</li>
                 ))}
               </ul>
               <button className="bg-green-700 hover:bg-green-600 text-white font-semibold py-2 px-4 m-6 rounded-lg mt-auto">

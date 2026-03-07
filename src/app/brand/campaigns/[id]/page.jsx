@@ -2,10 +2,13 @@
 
 import React, { useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { Image as ImageIcon, Calendar,ChevronLeft, TrendingUp, Users, BarChart3, DollarSign, Download, FileText, MoreVertical, Plus, Search, Video } from 'lucide-react';
+import { Image2Line as Image2Line, CalendarLine,ArrowLeftLine, LineChartLine, UserLine, BarChartLine, MoneyDollarBoxLine, DownloadLine, FileTextLine, MoreLine, AddLine, SearchLine, VideoLine } from '@phyoofficial/phyo-icon-library';
 import { campaignAPI } from '../../../../utils/api';
 import { SpendingBudgetGraph } from '@/components/SpendingBudgetGraph';
 import { LineChartGraph } from '@/components/AudienceEngagementGraphs';
+import Button from '@/components/Button';
+import IconButton from '@/components/IconButton';
+import Card from '@/components/Card';
 
 export default function CampaignDetailsPage() {
   const params = useParams();
@@ -40,7 +43,7 @@ export default function CampaignDetailsPage() {
 
   if (loading) {
     return (
-      <div className="w-full h-screen flex items-center justify-center bg-white">
+      <div className="w-full h-screen flex items-center justify-center bg-neutral-base">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto mb-4"></div>
           <p className="text-gray-600">Loading campaign details...</p>
@@ -51,7 +54,7 @@ export default function CampaignDetailsPage() {
 
   if (!campaign) {
     return (
-      <div className="w-full h-screen flex items-center justify-center bg-white">
+      <div className="w-full h-screen flex items-center justify-center bg-neutral-base">
         <div className="text-center">
           <p className="text-gray-600">Campaign not found</p>
         </div>
@@ -62,16 +65,16 @@ export default function CampaignDetailsPage() {
   const deliverables = [
     {
       id: 1,
-      title: 'Instagram Story',
+      title: 'InstagramFill Story',
       details: 'UTC • Duration 15 Secs',
-      icon: <Plus className="w-5 h-5" />,
+      icon: <AddLine className="w-5 h-5" />,
       status: '1'
     },
     {
       id: 2,
-      title: 'Instagram Reel',
+      title: 'InstagramFill Reel',
       details: 'UTC • Duration 30-60 Secs',
-      icon: <Video className="w-5 h-5" />,
+      icon: <VideoLine className="w-5 h-5" />,
       status: '3'
     }
   ];
@@ -143,26 +146,28 @@ export default function CampaignDetailsPage() {
   ];
 
   return (
-    <div className="w-full min-h-screen bg-white py-2 px-1 justify-between items-start">
+    <div className="w-full min-h-screen bg-neutral-base py-2 px-1 justify-between items-start">
       {/* Fixed Header Bar */}
-      <div className="fixed top-0 left-0 right-0 z-50 bg-white px-4 py-3 flex items-center justify-between border-b">
-        <button
+      <div className="fixed top-0 left-0 right-0 z-50 bg-neutral-base px-4 py-3 flex items-center justify-between border-b">
+        <IconButton
+          icon={ArrowLeftLine}
+          size="md"
+          variant="default"
           onClick={() => router.back()}
-          className="p-1 hover:bg-gray-100 rounded-full transition-colors"
-        >
-          <ChevronLeft className="w-6 h-6 text-gray-700" />
-        </button>
+        />
 
         <h1 className="text-lg font-semibold text-gray-900 flex-1 ml-4">
           {campaign.campaignName || 'Campaign'}
         </h1>
 
-        <button className="p-1 hover:bg-gray-100 rounded-full transition-colors">
-          <MoreVertical className="w-6 h-6 text-gray-700" />
-        </button>
+        <IconButton
+          icon={MoreLine}
+          size="md"
+          variant="default"
+        />
       </div>
 
-      <div className="min-h-screen w-full bg-white flex flex-col items-start gap-4 px-[160px] py-4 flex-1 self-stretch">
+      <div className="min-h-screen w-full bg-neutral-base flex flex-col items-start gap-4 px-[160px] py-4 flex-1 self-stretch">
         {/* HERO IMAGE */}
         <div className="relative w-full h-[520px]">
           {campaign.productImages?.length > 0 ? (
@@ -178,7 +183,7 @@ export default function CampaignDetailsPage() {
         </div>
 
         {/* FLOATING WHITE CARD */}
-        <div className="relative w-full -mt-24 bg-white rounded-t-[32px] shadow-xl z-20">
+        <div className="relative w-full -mt-24 bg-neutral-base rounded-t-[32px] shadow-xl z-20">
           <div className="max-w-5xl mx-auto px-6 pt-6 pb-16">
             {/* Brand Header Row */}
             <div className="flex items-center justify-between mb-6">
@@ -193,7 +198,7 @@ export default function CampaignDetailsPage() {
                 </div>
               </div>
               <span className="inline-flex items-center gap-2 bg-green-500 text-white text-sm px-4 py-1.5 rounded-full font-medium">
-                <span className="w-2 h-2 bg-white rounded-full" />
+                <span className="w-2 h-2 bg-neutral-base rounded-full" />
                 On going
               </span>
             </div>
@@ -251,7 +256,7 @@ export default function CampaignDetailsPage() {
                       <div className="h-[208px">
                         <div className="h-[208px">
                           {/* Card Container with gold border */}
-                          <div className="mb-4 border-2 border-amber-400 rounded-2xl bg-white shadow-sm">
+                          <div className="mb-4 border-2 border-amber-400 rounded-2xl bg-neutral-base shadow-sm">
                             <div className="flex flex-col items-start gap-4 px-6 py-6 self-stretch">
 
                               {/* Header */}
@@ -290,22 +295,24 @@ export default function CampaignDetailsPage() {
                               </div>
 
                               {/* Button */}
-                              <button
+                              <Button
+                                variant="tertiary"
+                                size="sm"
                                 onClick={() => {
                                   setResponded(!responded);
                                   router.push('/brand/campaigns/influencer-counter-offer');
                                 }}
-                                className="bg-green-200 hover:bg-green-300 text-green-700 font-medium text-sm px-5 py-2 rounded-full flex items-center gap-2 transition-colors self-center"
+                                className="self-center"
                               >
                                 → Respond to offer
-                              </button>
+                              </Button>
                             </div>
                           </div>
                         </div>
                       </div>
 
                       {/* Pending Review Card */}
-                      <div className="border-2 border-gray-300 rounded-2xl bg-white p-4">
+                      <div className="border-2 border-gray-300 rounded-2xl bg-neutral-base p-4">
                         <div className="">
                           {/* Card Container with blue border */}
                           <div className="">
@@ -324,7 +331,7 @@ export default function CampaignDetailsPage() {
                                 </div>
                                 <div className="flex-1">
                                   <p className="text-base font-semibold text-gray-900">Michael Smith submitted deliverables</p>
-                                  <p className="text-sm text-gray-600 mt-1">Instagram Post + Story ready for review</p>
+                                  <p className="text-sm text-gray-600 mt-1">InstagramFill Post + Story ready for review</p>
 
                                   {/* Thumbnail Images - Show images if exist, otherwise show placeholder icon */}
                                   {images && images.length > 0 ? (
@@ -340,22 +347,24 @@ export default function CampaignDetailsPage() {
                                     </div>
                                   ) : (
                                     <div className="w-14 h-14 bg-gray-200 rounded-lg flex items-center justify-center hover:bg-gray-300 transition-colors cursor-pointer">
-                                      <ImageIcon className="w-6 h-6 text-gray-500" />
+                                      <Image2Line className="w-6 h-6 text-gray-500" />
                                     </div>
                                   )}
                                 </div>
                               </div>
 
                               {/* Button */}
-                              <button
+                              <Button
+                                variant="tertiary"
+                                size="sm"
                                 onClick={() => {
                                   setResponded(!responded);
                                   router.push('/brand/campaigns/influencer-detail-deliverables');
                                 }}
-                                className="bg-green-200 hover:bg-green-300 text-green-700 font-medium text-sm px-5 py-2 rounded-full flex items-center gap-2 transition-colors self-center mt-auto"
+                                className="self-center mt-auto"
                               >
                                 → Review now
-                              </button>
+                              </Button>
                             </div>
                           </div>
                         </div>
@@ -364,7 +373,7 @@ export default function CampaignDetailsPage() {
                     </div>
 
                     {/* Campaign Summary Section */}
-                    <div className="border-2 border-gray-300 rounded-2xl bg-white p-8" >
+                    <div className="border-2 border-gray-300 rounded-2xl bg-neutral-base p-8" >
                       <h3 className="text-xl font-semibold text-gray-900 mb-6">Campaign Summary</h3>
 
                       <div className="space-y-6">
@@ -393,7 +402,7 @@ export default function CampaignDetailsPage() {
                         <div>
                           <p className="text-sm text-gray-500 font-medium mb-2">Campaign Period</p>
                           <div className="flex items-center gap-2 text-base text-gray-900">
-                            <Calendar className="w-4 h-4 text-gray-600" />
+                            <CalendarLine className="w-4 h-4 text-gray-600" />
                             <span>June 1, 2026 → June 30, 2026</span>
                           </div>
                         </div>
@@ -404,8 +413,8 @@ export default function CampaignDetailsPage() {
                     <div className="border-2 border-gray-300 rounded-2xl bg-gradient-to-r from-green-700 to-green-600 p-8 cursor-pointer" onClick={() => router.push('/brand/campaigns/boost-campaign')}>
                       <div className="flex items-start gap-4">
                         {/* Icon Circle */}
-                        <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center flex-shrink-0">
-                          <TrendingUp className="w-6 h-6 text-green-700" />
+                        <div className="w-12 h-12 bg-neutral-base rounded-full flex items-center justify-center flex-shrink-0">
+                          <LineChartLine className="w-6 h-6 text-green-700" />
                         </div>
 
                         <div className="flex-1">
@@ -418,15 +427,15 @@ export default function CampaignDetailsPage() {
                           {/* Stats */}
                           <div className="flex flex-wrap gap-6">
                             <div className="flex items-center gap-2">
-                              <TrendingUp className="w-4 h-4 text-green-50" />
+                              <LineChartLine className="w-4 h-4 text-green-50" />
                               <span className="text-sm font-medium text-green-50">+50% reach</span>
                             </div>
                             <div className="flex items-center gap-2">
-                              <Users className="w-4 h-4 text-green-50" />
+                              <UserLine className="w-4 h-4 text-green-50" />
                               <span className="text-sm font-medium text-green-50">+10 influencers</span>
                             </div>
                             <div className="flex items-center gap-2">
-                              <BarChart3 className="w-4 h-4 text-green-50" />
+                              <BarChartLine className="w-4 h-4 text-green-50" />
                               <span className="text-sm font-medium text-green-50">+65% ROI</span>
                             </div>
                           </div>
@@ -435,7 +444,7 @@ export default function CampaignDetailsPage() {
                     </div>
 
                     {/* Deliverables Section */}
-                    <div className="border-2 border-gray-300 rounded-2xl bg-white p-8">
+                    <div className="border-2 border-gray-300 rounded-2xl bg-neutral-base p-8">
                       <h3 className="text-xl font-semibold text-gray-900 mb-6">Deliverables</h3>
 
                       <div className="space-y-0 divide-y divide-gray-200">
@@ -467,7 +476,7 @@ export default function CampaignDetailsPage() {
                     </div>
 
                     {/* Budget & Compensation Section */}
-                    <div className="border-2 border-gray-300 rounded-2xl bg-white p-8">
+                    <div className="border-2 border-gray-300 rounded-2xl bg-neutral-base p-8">
                       <h3 className="text-xl font-semibold text-gray-900 mb-6">Budget & Compensation</h3>
 
                       <div className="space-y-6">
@@ -475,7 +484,7 @@ export default function CampaignDetailsPage() {
                         <div>
                           <div className="flex items-center justify-between mb-2">
                             <div className="flex items-center gap-2">
-                              <DollarSign className="w-4 h-4 text-gray-600" />
+                              <MoneyDollarBoxLine className="w-4 h-4 text-gray-600" />
                               <span className="text-sm text-gray-600 font-medium">Total Budget</span>
                             </div>
                             <span className="text-2xl font-bold text-gray-900">$50,000</span>
@@ -507,7 +516,7 @@ export default function CampaignDetailsPage() {
                     </div>
 
                     {/* Influencer Targeting Section */}
-                    <div className="border-2 border-gray-300 rounded-2xl bg-white p-8">
+                    <div className="border-2 border-gray-300 rounded-2xl bg-neutral-base p-8">
                       <div className="flex items-center justify-between mb-6">
                         <h3 className="text-xl font-semibold text-gray-900">Influencer Targeting</h3>
                       </div>
@@ -516,7 +525,7 @@ export default function CampaignDetailsPage() {
                         {/* Influencers */}
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2">
-                            <Users className="w-4 h-4 text-gray-600" />
+                            <UserLine className="w-4 h-4 text-gray-600" />
                             <span className="text-sm text-gray-600 font-medium">Influencers</span>
                           </div>
                           <span className="text-2xl font-bold text-gray-900">15</span>
@@ -548,7 +557,7 @@ export default function CampaignDetailsPage() {
                     </div>
 
                     {/* Product Media Section */}
-                    <div className="border-2 border-gray-300 rounded-2xl bg-white p-8">
+                    <div className="border-2 border-gray-300 rounded-2xl bg-neutral-base p-8">
                       <div className="flex items-center justify-between mb-6">
                         <h3 className="text-xl font-semibold text-gray-900">Product Media</h3>
                         {/* Count Badge */}
@@ -564,7 +573,7 @@ export default function CampaignDetailsPage() {
                             key={item}
                             className="aspect-square bg-gray-200 rounded-lg flex items-center justify-center hover:bg-gray-300 transition-colors cursor-pointer"
                           >
-                            <ImageIcon className="w-6 h-6 text-gray-500" />
+                            <Image2Line className="w-6 h-6 text-gray-500" />
                           </div>
                         ))}
                       </div>
@@ -572,7 +581,7 @@ export default function CampaignDetailsPage() {
 
                     {/* Timeline Section */}
 
-                    <div className="border-2 border-gray-300 rounded-2xl bg-white p-8">
+                    <div className="border-2 border-gray-300 rounded-2xl bg-neutral-base p-8">
                       <h3 className="text-xl font-semibold text-gray-900 mb-8">Timeline</h3>
 
                       {/* Timeline Container */}
@@ -609,14 +618,23 @@ export default function CampaignDetailsPage() {
                     </div>
 
                     <div className="flex gap-3 w-full">
-                      <button className="flex-1 px-6 py-3 bg-green-100 hover:bg-green-200 text-green-700 rounded-full font-semibold text-sm flex items-center justify-center gap-2 transition-colors" onClick={() => router.push('/brand/campaigns/campaign-summary')}>
-                        <FileText className="w-4 h-4" />
+                      <Button
+                        variant="tertiary"
+                        size="md"
+                        fullWidth
+                        icon={FileTextLine}
+                        onClick={() => router.push('/brand/campaigns/campaign-summary')}
+                      >
                         Summarize
-                      </button>
-                      <button className="flex-1 px-6 py-3 bg-green-700 hover:bg-green-800 text-white rounded-full font-semibold text-sm flex items-center justify-center gap-2 transition-colors">
-                        <Download className="w-4 h-4" />
+                      </Button>
+                      <Button
+                        variant="primary"
+                        size="md"
+                        fullWidth
+                        icon={DownloadLine}
+                      >
                         Report
-                      </button>
+                      </Button>
                     </div>
                   </div>
                 )}
@@ -625,18 +643,18 @@ export default function CampaignDetailsPage() {
                   <div>
                     {/* Stats Cards Section */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      <div className="border-2 border-gray-300 rounded-2xl bg-white p-8 flex flex-col items-center justify-center text-center">
+                      <div className="border-2 border-gray-300 rounded-2xl bg-neutral-base p-8 flex flex-col items-center justify-center text-center">
                         <p className="text-4xl font-bold text-gray-900 mb-2">15</p>
                         <p className="text-sm text-gray-600 font-medium">Total Influencers</p>
                       </div>
 
-                      <div className="border-2 border-gray-300 rounded-2xl bg-white p-8 flex flex-col items-center justify-center text-center">
+                      <div className="border-2 border-gray-300 rounded-2xl bg-neutral-base p-8 flex flex-col items-center justify-center text-center">
                         <p className="text-4xl font-bold text-gray-900 mb-2">2</p>
                         <p className="text-sm text-gray-600 font-medium">Currently Active</p>
                       </div>
                     </div>
                     {/* New Applications Section */}
-                    <div className="bg-white">
+                    <div className="bg-neutral-base">
                       {/* Header */}
                       <div className="flex items-center justify-between mb-8">
                         <h3 className="text-xl font-semibold text-gray-900">New Applications</h3>
@@ -666,15 +684,19 @@ export default function CampaignDetailsPage() {
                             </div>
 
                             {/* Right Section - Portfolio Button */}
-                            <button className="flex-shrink-0 ml-4 px-4 py-2 border-2 border-gray-300 text-gray-700 font-medium text-sm rounded-full hover:bg-gray-100 transition-colors">
+                            <Button
+                              variant="outlined"
+                              size="sm"
+                              className="flex-shrink-0 ml-4"
+                            >
                               portfolio
-                            </button>
+                            </Button>
                           </div>
                         ))}
                       </div>
                     </div>
                     {/* Influencers Working On Section */}
-                    <div className="bg-white">
+                    <div className="bg-neutral-base">
                       {/* Header */}
                       <div className="flex items-center justify-between mb-8">
                         <h3 className="text-lg font-semibold text-gray-900">Influencers working on</h3>
@@ -709,12 +731,12 @@ export default function CampaignDetailsPage() {
                     </div>
                     <div className="my-8 border-t border-gray-200"></div>
                     {/* Find More Influencers Section */}
-                    <div className="border-2 border-gray-300 rounded-2xl bg-white p-8">
+                    <div className="border-2 border-gray-300 rounded-2xl bg-neutral-base p-8">
 
                       {/* Header with Icon */}
                       <div className="flex items-start gap-4 mb-6">
                         <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
-                          <Search className="w-5 h-5 text-green-700" />
+                          <SearchLine className="w-5 h-5 text-green-700" />
                         </div>
                         <div>
                           <h3 className="text-lg font-semibold text-gray-900">Find More Influencers</h3>
@@ -748,10 +770,13 @@ export default function CampaignDetailsPage() {
                       </div>
 
                       {/* Discover Button */}
-                      <button className="w-full bg-green-700 hover:bg-green-800 text-white font-semibold py-3 px-6 rounded-lg flex items-center justify-center gap-2 transition-colors">
-                        <span className="text-lg">+</span>
-                        <span>Discover Influencers</span>
-                      </button>
+                      <Button
+                        variant="primary"
+                        size="lg"
+                        fullWidth
+                      >
+                        + Discover Influencers
+                      </Button>
                     </div>
 
                   </div>
@@ -760,7 +785,7 @@ export default function CampaignDetailsPage() {
                 {activeTab === "analytics" && (
                   <div>
                     {/* Analytics Placeholder Section */}
-                    <div className="border-2 border-gray-300 rounded-2xl bg-white p-8">
+                    <div className="border-2 border-gray-300 rounded-2xl bg-neutral-base p-8">
                       <div className="flex items-center justify-center py-8">
                         <p className="text-center text-sm text-gray-600">
                           Analytics data will be available once the campaign goes live.
@@ -772,9 +797,12 @@ export default function CampaignDetailsPage() {
                     <div>
                       <div className="flex items-center justify-between mb-4">
                         <h3 className="text-lg font-bold text-gray-900">Audience Engagement</h3>
-                        <button className="bg-green-700 text-white text-xs px-3 py-1 rounded-full font-medium hover:bg-green-800 transition-colors">
+                        <Button
+                          variant="primary"
+                          size="sm"
+                        >
                           likes ▼
-                        </button>
+                        </Button>
                       </div>
                       <LineChartGraph
                         title="9.2K Likes"
@@ -784,14 +812,17 @@ export default function CampaignDetailsPage() {
                       />
                     </div>
                     <br />
-                    <div className="h-px bg-white w-full"></div>
+                    <div className="h-px bg-neutral-base w-full"></div>
                     {/* Spending Budget */}
                     <div>
                       <div className="flex items-center justify-between mb-4">
                         <h3 className="text-lg font-bold text-gray-900">Spending Budget</h3>
-                        <button className="bg-green-700 text-white text-xs px-3 py-1 rounded-full font-medium hover:bg-green-800 transition-colors">
+                        <Button
+                          variant="primary"
+                          size="sm"
+                        >
                           months ▼
-                        </button>
+                        </Button>
                       </div>
                       <SpendingBudgetGraph
                         title="₹1,24,657.80"

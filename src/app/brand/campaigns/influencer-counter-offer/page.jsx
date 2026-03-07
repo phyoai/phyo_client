@@ -1,6 +1,6 @@
 'use client'
 import React, { useState } from 'react';
-import { ChevronLeft, MoreVertical, MessageCircle, X } from 'lucide-react';
+import { ArrowLeftLine, MoreLine, Message3Line, CloseLine } from '@phyoofficial/phyo-icon-library';
 
 export default function InfluencersDetails() {
   const [negotiationStatus, setNegotiationStatus] = useState('pending'); // pending, accepted, rejected
@@ -58,17 +58,17 @@ const handleCounterOfferClick = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-white flex flex-col">
+    <div className="min-h-screen bg-neutral-base flex flex-col">
       {/* Header */}
-      <div className="sticky top-0 bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between">
+      <div className="sticky top-0 bg-neutral-base border-b border-gray-200 px-4 py-3 flex items-center justify-between">
         <div className="flex items-center gap-3 flex-1">
           <button className="p-2 hover:bg-gray-100 rounded-full transition-colors -ml-2">
-            <ChevronLeft className="w-5 h-5 text-gray-700" />
+            <ArrowLeftLine className="w-5 h-5 text-gray-700" />
           </button>
           <h1 className="text-lg font-semibold text-gray-900">Influencers Details</h1>
         </div>
         <button className="p-2 hover:bg-gray-100 rounded-full transition-colors">
-          <MoreVertical className="w-5 h-5 text-gray-700" />
+          <MoreLine className="w-5 h-5 text-gray-700" />
         </button>
       </div>
 
@@ -142,7 +142,7 @@ const handleCounterOfferClick = () => {
             {/* Message from Influencer */}
             <div className="bg-gray-100 rounded-lg p-4 mb-4">
               <div className="flex items-start gap-3 mb-3">
-                <MessageCircle className="w-4 h-4 text-gray-600 flex-shrink-0 mt-1" />
+                <Message3Line className="w-4 h-4 text-gray-600 flex-shrink-0 mt-1" />
                 <h4 className="font-semibold text-gray-900 text-sm">Message from influencer</h4>
               </div>
               <p className="text-sm text-gray-700 leading-relaxed mb-3">
@@ -210,7 +210,7 @@ const handleCounterOfferClick = () => {
 {/* Counter Offer Modal */}
       {showCounterOfferModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-2xl shadow-xl max-w-md w-full">
+          <div className="bg-neutral-base rounded-2xl shadow-xl max-w-md w-full">
             {/* Modal Header */}
             <div className="flex items-center justify-between p-6 border-b border-gray-200">
               <h2 className="text-lg font-semibold text-gray-900">Send Counter Offer</h2>
@@ -218,7 +218,7 @@ const handleCounterOfferClick = () => {
                 onClick={() => setShowCounterOfferModal(false)}
                 className="p-1 hover:bg-gray-100 rounded-full transition-colors"
               >
-                <X className="w-5 h-5 text-gray-600" />
+                <CloseLine className="w-5 h-5 text-gray-600" />
               </button>
             </div>
 

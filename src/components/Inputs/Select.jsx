@@ -1,4 +1,4 @@
-import { ChevronDown } from 'lucide-react';
+import { ArrowDownLine } from '@phyoofficial/phyo-icon-library';
 import React, { useState, useRef, useEffect } from 'react';
 import { useFormContext, Controller } from 'react-hook-form';
 
@@ -103,11 +103,11 @@ const Select = ({ name, label, options, placeholder = "Select...", required = fa
                 <span className={selectedOption?.label ? 'text-gray-700' : 'text-gray-400'}>
                   {selectedOption?.label || placeholder}
                 </span>
-                <ChevronDown className="w-5 h-5 text-gray-700" />
+                <ArrowDownLine className="w-5 h-5 text-gray-700" />
               </div>
 
               {isOpen && (
-                <ul className="absolute z-10 bg-white border border-gray-200 mt-1 w-full rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                <ul className="absolute z-10 bg-neutral-base border border-gray-200 mt-1 w-full rounded-lg shadow-lg max-h-60 overflow-y-auto">
                   {options.map((option, idx) => (
                     <li
                       key={option.value}

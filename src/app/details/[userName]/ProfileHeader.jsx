@@ -24,7 +24,7 @@ const ProfileHeader = ({ creator }) => {
     <div className='bg-gradient-to-r from-green-50 to-green-100 rounded-2xl shadow-lg p-4 sm:p-6 lg:p-8 mb-8 border border-green-200'>
       {/* Main Profile Section */}
       <div className='flex flex-col sm:flex-row items-start gap-4 sm:gap-6'>
-        {/* Profile Image */}
+        {/* Profile Image2Line */}
         <div className='flex-shrink-0 self-center sm:self-start'>
           <ProfileImage
             src={creator.brightDataProfile?.profile_image_link}
@@ -119,7 +119,7 @@ const ProfileHeader = ({ creator }) => {
                 <h3 className='font-semibold text-gray-900'>Social Media</h3>
               </div>
               <div className='flex gap-2 flex-wrap'>
-                {/* Instagram */}
+                {/* InstagramFill */}
                 {(creator.brightDataProfile?.profile_url || creator.instagramData?.link) && (
                   <a
                     href={creator.brightDataProfile?.profile_url || creator.instagramData?.link}
@@ -158,7 +158,7 @@ const ProfileHeader = ({ creator }) => {
                     </svg>
                   </a>
                 )}
-                {/* Twitter */}
+                {/* TwitterXLine */}
                 {creator.brightDataProfile?.twitter_url && (
                   <a
                     href={creator.brightDataProfile.twitter_url}

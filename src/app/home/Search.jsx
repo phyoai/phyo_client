@@ -3,7 +3,7 @@ import React, { useState } from 'react'
 import InfluencerCard from '../../components/InfluencerCard'
 import axios from 'axios'
 
-export default function Search() {
+export default function SearchLine() {
     const [influencers, setInfluencers] = useState([])
     const [fetchingState, setFetchingState] = useState("idle")
     const [prompt, setPrompt] = useState("")
@@ -86,7 +86,7 @@ export default function Search() {
 const Header = ({ handleSubmit, fetchingState, prompt, setPrompt }) => {
     return (
         <div>
-            <h1 className='text-[color:var(--light-green)] font-semibold text-[64px] text-center'>Ai Search</h1>
+            <h1 className='text-[color:var(--light-green)] font-semibold text-[64px] text-center'>Ai SearchLine</h1>
             <h2 className='text-white text-[40px] font-medium text-center'>Find top right influencer for your brand</h2>
             <div className='mt-[55px] border-2 border-[color:var(--dark-green)] flex p-2 pl-[40px] rounded-xl'>
                 <input 
@@ -97,7 +97,7 @@ const Header = ({ handleSubmit, fetchingState, prompt, setPrompt }) => {
                     className='outline-none bg-transparent border-none flex-grow py-2 text-white' 
                 />
                 <button 
-                    className='bg-white px-6 py-2 rounded-md' 
+                    className='bg-neutral-base px-6 py-2 rounded-md' 
                     onClick={() => handleSubmit(prompt)}
                     disabled={fetchingState === "loading"}
                 >

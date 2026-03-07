@@ -2,7 +2,7 @@
 
 import { motion } from 'framer-motion';
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
-import { Globe } from 'lucide-react';
+import { GlobeLine } from '@phyoofficial/phyo-icon-library';
 
 const LANGUAGE_NAMES = {
   'en': 'English',
@@ -39,7 +39,7 @@ export default function LanguageChart({ data }) {
   const CustomTooltip = ({ active, payload }) => {
     if (active && payload && payload.length) {
       return (
-        <div className="bg-white px-4 py-2 rounded-lg shadow-lg border border-gray-200">
+        <div className="bg-neutral-base px-4 py-2 rounded-lg shadow-lg border border-gray-200">
           <p className="font-semibold text-gray-800">{payload[0].payload.name}</p>
           <p className="text-gray-600">{payload[0].value.toFixed(1)}%</p>
         </div>
@@ -74,7 +74,7 @@ export default function LanguageChart({ data }) {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ duration: 0.4, delay: 0.3 }}
-      className="bg-white rounded-xl shadow-md border border-gray-200 p-6"
+      className="bg-neutral-base rounded-xl shadow-md border border-gray-200 p-6"
     >
       <div className="flex items-center gap-2 mb-5">
         <div className="bg-gradient-to-br from-indigo-50 to-indigo-100 p-2.5 rounded-lg">

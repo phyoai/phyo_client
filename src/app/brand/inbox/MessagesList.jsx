@@ -3,8 +3,8 @@ import React from 'react';
 
 const MessagesList = ({ contacts, selectedContact, onSelectContact }) => {
   return (
-    <div className="w-80 bg-white border-r border-gray-200 flex flex-col h-full">
-      {/* Search Bar */}
+    <div className="w-80 bg-neutral-base border-r border-gray-200 flex flex-col h-full">
+      {/* SearchLine Bar */}
       <div className="p-4 border-b border-gray-200">
         <div className="relative">
           <svg className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -12,7 +12,7 @@ const MessagesList = ({ contacts, selectedContact, onSelectContact }) => {
           </svg>
           <input
             type="text"
-            placeholder="Search Messages"
+            placeholder="SearchLine Messages"
             className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
           />
         </div>

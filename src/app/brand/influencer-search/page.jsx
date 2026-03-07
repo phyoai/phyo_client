@@ -1,8 +1,7 @@
 'use client'
 import React, { useState, useRef, useEffect } from 'react';
-import { Search, ArrowLeft, Mic, MoreVertical, MessageSquare, UserPlus, Info, Play } from 'lucide-react';
+import { SearchLine, ArrowLeftLine, MicLine, MoreLine, Message3Line, UserAddLine, Information2Line, PlayLine, BookmarkLine, InstagramFill, InstagramLine, TwitterXLine, YoutubeFill, FacebookFill, FacebookCircleFill, InformationFill } from '@phyoofficial/phyo-icon-library';
 import { useRouter } from 'next/navigation';
-import { BookmarkLine, InstagramFill, InstagramLine, Message3Line, TwitterXLine, UserAddLine, YoutubeFill, FacebookFill, FacebookCircleFill } from '@phyoofficial/phyo-icon-library';
 
 export default function InfluencerSearch() {
   const router = useRouter();
@@ -303,18 +302,18 @@ export default function InfluencerSearch() {
         }
       `}</style>
 
-      <div className="min-h-screen bg-white">
+      <div className="min-h-screen bg-neutral-base">
         {/* Top Bar with centered search */}
-        <div className="relative z-40 bg-white px-6 py-3 flex items-center gap-4 search-fade-in">
+        <div className="relative z-40 bg-neutral-base px-6 py-3 flex items-center gap-4 search-fade-in">
           {/* Back Button - Fixed width */}
           <button 
             onClick={handleBackClick}
             className="p-2 hover:bg-gray-100 rounded-full transition-colors"
           >
-            <ArrowLeft className="h-5 w-5 text-gray-700" />
+            <ArrowLeftLine className="h-5 w-5 text-gray-700" />
           </button>
 
-          {/* Search Bar - Centered, grows to fill space */}
+          {/* SearchLine Bar - Centered, grows to fill space */}
           <div className="flex-1 flex justify-center gap-4">
             <div className="relative w-full max-w-[720px]">
               <input
@@ -331,14 +330,14 @@ export default function InfluencerSearch() {
                 onClick={handleSearch}
                 className="absolute right-4 top-1/2 transform -translate-y-1/2"
               >
-                <Search className="h-5 w-5 text-[#808080]" />
+                <SearchLine className="h-5 w-5 text-[#808080]" />
               </button>
             </div>
              <button 
               onClick={handleVoiceSearch}
               className="p-2 hover:bg-gray-100 rounded-full transition-colors"
             >
-              <Mic className="h-5 w-5 text-gray-700" />
+              <MicLine className="h-5 w-5 text-gray-700" />
             </button>
           </div>
 
@@ -349,12 +348,12 @@ export default function InfluencerSearch() {
               onClick={() => setShowTopBarMoreMenu(!showTopBarMoreMenu)}
               className="p-2 hover:bg-gray-100 rounded-full transition-colors"
             >
-              <MoreVertical className="h-5 w-5 text-gray-700" />
+              <MoreLine className="h-5 w-5 text-gray-700" />
             </button>
             
             {/* Top Bar Filter Menu */}
             {showTopBarMoreMenu && (
-              <div className="absolute right-0 mt-2 w-96 bg-white rounded-lg shadow-[0_4px_20px_rgba(0,0,0,0.15)] py-4 z-50 filter-dropdown-enter">
+              <div className="absolute right-0 mt-2 w-96 bg-neutral-base rounded-lg shadow-[0_4px_20px_rgba(0,0,0,0.15)] py-4 z-50 filter-dropdown-enter">
                 {/* Region */}
                 <div className="px-4 mb-4">
                   <label className="block text-sm font-medium text-[#242527] mb-2">Region</label>
@@ -405,14 +404,14 @@ export default function InfluencerSearch() {
           </div>
         </div>
 
-        {/* Voice Search Modal */}
+        {/* Voice SearchLine Modal */}
         {showVoiceModal && (
           <div className="fixed inset-0 bg-black bg-opacity-25 flex items-center justify-center z-50" onClick={closeVoiceModal}>
-            <div className="bg-white rounded-3xl shadow-2xl p-8 w-[500px] max-w-[90vw]" onClick={(e) => e.stopPropagation()}>
+            <div className="bg-neutral-base rounded-3xl shadow-2xl p-8 w-[500px] max-w-[90vw]" onClick={(e) => e.stopPropagation()}>
               {/* Header */}
               <h2 className="text-2xl font-semibold text-[#242527] mb-8">Speak</h2>
               
-              {/* Mic Button with Animation */}
+              {/* MicLine Button with Animation */}
               <div className="flex justify-center mb-8">
                 <button
                   onClick={toggleListening}
@@ -422,7 +421,7 @@ export default function InfluencerSearch() {
                       : 'bg-[#43573b] hover:bg-[#374829] shadow-lg'
                   }`}
                 >
-                  <Mic className="h-8 w-8 text-white" />
+                  <MicLine className="h-8 w-8 text-white" />
                 </button>
               </div>
               
@@ -441,7 +440,7 @@ export default function InfluencerSearch() {
           </div>
         )}
 
-        {/* Search Results Container or Loading State */}
+        {/* SearchLine Results Container or Loading State */}
         {!showResults ? (
           <div className="flex-1 flex items-center justify-center h-[calc(100vh-80px)]">
             <div 
@@ -449,12 +448,12 @@ export default function InfluencerSearch() {
                 isSearching ? 'opacity-100 scale-100' : 'opacity-0 scale-95'
               }`}
             >
-              {/* Mascot Image */}
+              {/* Mascot Image2Line */}
               <div className="mb-6 relative">
                 
                 {/* Fallback mascot */}
                 <div className="w-[187px] h-[279px] hidden items-center justify-center">
-                  <Search className="w-24 h-24 text-teal-600 animate-pulse" />
+                  <SearchLine className="w-24 h-24 text-teal-600 animate-pulse" />
                 </div>
               </div>
               <img
@@ -473,7 +472,7 @@ export default function InfluencerSearch() {
             </div>
           </div>
         ) : (
-          /* Search Results Container */
+          /* SearchLine Results Container */
           <div className="flex gap-2 sm:gap-4 px-3 sm:px-6 lg:px-9 h-[calc(100vh-96px)]">
             {/* Left Column - Results List */}
             <div className="flex flex-col gap-2 overflow-y-auto w-full lg:w-[604px] shrink-0 pr-2">
@@ -608,7 +607,7 @@ export default function InfluencerSearch() {
               
               {/* Upgrade Banner */}
               <div className="flex items-center bg-[#e7edfb] rounded-xl px-3 py-2 gap-3">
-                <Info className="h-6 w-6 text-[#0b4fd9] shrink-0" />
+                <InformationFill className="h-6 w-6 text-[#0b4fd9] shrink-0" />
                 <div className="flex items-center flex-1 gap-3">
                   <p className="text-sm text-[#242527] flex-1">
                     You have reached your limit. Upgrade plan for more.
@@ -676,7 +675,7 @@ function InfluencerCard({ name, bio, avatarColor, socials, onClick, onMessage, i
 
       <div
         onClick={onClick}
-        className="bg-white border border-gray-200 rounded-3xl p-6 m-1 flex flex-col gap-4 cursor-pointer hover:shadow-lg transition-shadow duration-200"
+        className="bg-neutral-base border border-gray-200 rounded-3xl p-6 m-1 flex flex-col gap-4 cursor-pointer hover:shadow-lg transition-shadow duration-200"
       >
         {/* Profile Header */}
         <div className="flex items-start gap-4">
@@ -826,7 +825,7 @@ function InfluencerProfile({ influencer, isInvited, onInvite }) {
       <div className="w-full h-full relative rounded-lg overflow-y-auto">
       {/* Yellow Background - Sticky at top */}
       <div className="sticky top-0 bg-yellow-400 h-[200px] sm:h-[250px] md:h-[300px] lg:h-[350px] z-0">
-        {/* Profile Image - Centered */}
+        {/* Profile Image2Line - Centered */}
         <div className="absolute inset-0 flex items-center justify-center pt-2 sm:pt-4 md:pt-6 lg:pt-8">
           <div className="w-32 h-32 sm:w-40 sm:h-40 md:w-48 md:h-48 lg:w-56 lg:h-56 rounded-full overflow-hidden shadow-lg">
             {/* Placeholder for profile image */}
@@ -836,27 +835,27 @@ function InfluencerProfile({ influencer, isInvited, onInvite }) {
         
         {/* Top Action Buttons - Overlaid */}
         <div className="absolute top-4 left-4 right-4 flex justify-between z-10">
-          <button className="w-10 h-10 bg-white rounded-full flex items-center justify-center hover:bg-gray-100 shadow-md">
-            <ArrowLeft className="h-5 w-5" />
+          <button className="w-10 h-10 bg-neutral-base rounded-full flex items-center justify-center hover:bg-gray-100 shadow-md">
+            <ArrowLeftLine className="h-5 w-5" />
           </button>
           <div className="flex gap-2">
             <button 
               onClick={() => setShowSaveModal(true)}
-              className="w-10 h-10 bg-white rounded-full flex items-center justify-center hover:bg-gray-100 shadow-md"
+              className="w-10 h-10 bg-neutral-base rounded-full flex items-center justify-center hover:bg-gray-100 shadow-md"
             >
               <BookmarkLine className="h-5 w-5" />
             </button>
             <div className="relative" ref={moreMenuRef}>
               <button 
                 onClick={() => setShowMoreMenu(!showMoreMenu)}
-                className="w-10 h-10 bg-white rounded-full flex items-center justify-center hover:bg-gray-100 shadow-md"
+                className="w-10 h-10 bg-neutral-base rounded-full flex items-center justify-center hover:bg-gray-100 shadow-md"
               >
-                <MoreVertical className="h-5 w-5" />
+                <MoreLine className="h-5 w-5" />
               </button>
               
               {/* More Menu Dropdown */}
               {showMoreMenu && (
-                <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 z-50">
+                <div className="absolute right-0 mt-2 w-48 bg-neutral-base rounded-lg shadow-lg py-2 z-50">
                   <button 
                     onClick={() => {
                       setShowMoreMenu(false);
@@ -903,7 +902,7 @@ function InfluencerProfile({ influencer, isInvited, onInvite }) {
       {/* Save to List Modal */}
       {showSaveModal && (
         <div className="fixed inset-0 bg-black bg-opacity-25 flex items-center justify-center z-50" onClick={() => setShowSaveModal(false)}>
-          <div className="bg-white rounded-3xl shadow-xl w-[480px]" onClick={(e) => e.stopPropagation()}>
+          <div className="bg-neutral-base rounded-3xl shadow-xl w-[480px]" onClick={(e) => e.stopPropagation()}>
             {/* Header */}
             <div className="px-4 pt-4 pb-3">
               <h3 className="text-lg font-semibold text-[#242527]">Save to...</h3>
@@ -987,7 +986,7 @@ function InfluencerProfile({ influencer, isInvited, onInvite }) {
       )}
 
       {/* Profile Content - White card that scrolls over yellow background */}
-      <div className="relative bg-white rounded-t-3xl -mt-3 sm:-mt-4 md:-mt-6 lg:-mt-8 z-10 shadow-lg">
+      <div className="relative bg-neutral-base rounded-t-3xl -mt-3 sm:-mt-4 md:-mt-6 lg:-mt-8 z-10 shadow-lg">
         <div className="px-3 sm:px-4 md:px-5 lg:px-6 py-3 sm:py-4 md:py-5 lg:py-6 pb-24 sm:pb-28">
           {/* Username and Name */}
           <div className="mb-4 sm:mb-6">
@@ -1044,7 +1043,7 @@ function InfluencerProfile({ influencer, isInvited, onInvite }) {
             {/* Likes and Views Graphs */}
             <div className="flex gap-2 sm:gap-3 overflow-x-auto mb-4 sm:mb-6">
               {/* Likes Graph */}
-              <div className="bg-white border-[0.5px] border-[#e6e6e6] rounded-xl p-2 min-w-[280px] sm:min-w-[320px] lg:min-w-[340px] flex-shrink-0">
+              <div className="bg-neutral-base border-[0.5px] border-[#e6e6e6] rounded-xl p-2 min-w-[280px] sm:min-w-[320px] lg:min-w-[340px] flex-shrink-0">
                 <div className="mb-2">
                   <p className="text-[#242527] text-base font-semibold leading-6 tracking-[0.24px]">{influencer.likes} Likes</p>
                   <div className="flex items-center gap-1 text-xs">
@@ -1085,7 +1084,7 @@ function InfluencerProfile({ influencer, isInvited, onInvite }) {
               </div>
 
               {/* Views Graph */}
-              <div className="bg-white border-[0.5px] border-[#e6e6e6] rounded-xl p-2 min-w-[280px] sm:min-w-[320px] lg:min-w-[340px] flex-shrink-0">
+              <div className="bg-neutral-base border-[0.5px] border-[#e6e6e6] rounded-xl p-2 min-w-[280px] sm:min-w-[320px] lg:min-w-[340px] flex-shrink-0">
                 <div className="mb-2">
                   <p className="text-[#242527] text-base font-semibold leading-6 tracking-[0.24px]">{influencer.views} views</p>
                   <div className="flex items-center gap-1 text-xs">
@@ -1132,7 +1131,7 @@ function InfluencerProfile({ influencer, isInvited, onInvite }) {
             <h3 className="text-[#242527] text-base sm:text-xl font-semibold leading-7 tracking-[-0.14px] mb-3">Audience Insights</h3>
             
             {/* Age Group */}
-            <div className="bg-white border-[0.5px] border-[#e6e6e6] rounded-xl p-2 mb-3">
+            <div className="bg-neutral-base border-[0.5px] border-[#e6e6e6] rounded-xl p-2 mb-3">
               <p className="text-[#242527] text-base font-semibold leading-6 tracking-[0.24px] mb-2">Age Group</p>
               <div className="flex gap-2">
                 <div className="flex flex-col justify-between text-[#333] text-xs py-2 text-right" style={{ minWidth: '32px' }}>
@@ -1175,7 +1174,7 @@ function InfluencerProfile({ influencer, isInvited, onInvite }) {
             </div>
 
             {/* Gender */}
-            <div className="bg-white border-[0.5px] border-[#e6e6e6] rounded-xl p-2 mb-3">
+            <div className="bg-neutral-base border-[0.5px] border-[#e6e6e6] rounded-xl p-2 mb-3">
               <p className="text-[#242527] text-base font-semibold leading-6 tracking-[0.24px] mb-2">Gender</p>
               <div className="flex items-center justify-center py-4">
                 <svg width="150" height="150" viewBox="0 0 150 150">
@@ -1197,7 +1196,7 @@ function InfluencerProfile({ influencer, isInvited, onInvite }) {
             </div>
 
             {/* Top Locations */}
-            <div className="bg-white border-[0.5px] border-[#e6e6e6] rounded-xl p-2">
+            <div className="bg-neutral-base border-[0.5px] border-[#e6e6e6] rounded-xl p-2">
               <p className="text-[#242527] text-base font-semibold leading-6 tracking-[0.24px] mb-2">Top Locations</p>
               <div className="flex gap-2">
                 <div className="flex flex-col justify-between text-[#333] text-xs py-2 text-right" style={{ minWidth: '32px' }}>
@@ -1310,7 +1309,7 @@ function InfluencerProfile({ influencer, isInvited, onInvite }) {
       </div>
 
       {/* Bottom Action Buttons - Sticky at bottom */}
-      <div className="sticky bottom-0 bg-white border-t border-gray-200 px-2 sm:px-3 md:px-4 py-2 sm:py-3 z-20 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)]">
+      <div className="sticky bottom-0 bg-neutral-base border-t border-gray-200 px-2 sm:px-3 md:px-4 py-2 sm:py-3 z-20 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)]">
         <div className="flex gap-1 sm:gap-2 md:gap-3">
           <button
             onClick={handleInvite}
@@ -1330,7 +1329,7 @@ function InfluencerProfile({ influencer, isInvited, onInvite }) {
               </>
             ) : (
               <>
-                <UserPlus className="h-3 w-3 sm:h-4 sm:w-4 md:h-5 md:w-5" />
+                <UserAddLine className="h-3 w-3 sm:h-4 sm:w-4 md:h-5 md:w-5" />
                 <span className="hidden md:inline">Invite</span>
                 <span className="md:hidden">Invite</span>
               </>
@@ -1340,7 +1339,7 @@ function InfluencerProfile({ influencer, isInvited, onInvite }) {
             onClick={() => router.push(`/brand/chat/${influencer.id}?name=${encodeURIComponent(influencer.name)}`)}
             className="flex-1 flex items-center justify-center gap-0.5 sm:gap-1 md:gap-2 px-3 sm:px-4 md:px-6 py-2 sm:py-2 md:py-3 bg-[#43573b] rounded-full text-white text-xs sm:text-sm md:text-base font-semibold hover:bg-[#374829] transition-colors tracking-[0.24px]"
           >
-            <MessageSquare className="h-3 w-3 sm:h-4 sm:w-4 md:h-5 md:w-5" />
+            <Message3Line className="h-3 w-3 sm:h-4 sm:w-4 md:h-5 md:w-5" />
             <span className="hidden md:inline">Send Message</span>
             <span className="md:hidden">Message</span>
           </button>

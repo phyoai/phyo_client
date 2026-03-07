@@ -1,12 +1,12 @@
-import { Gem } from 'lucide-react'
+import { GeminiFill } from '@phyoofficial/phyo-icon-library'
 import React from 'react'
 
 const CTA = ({ audience, headline, text }) => {
     return (
         <div className='flex flex-col gap-5 items-start bg-[#FBFBFB] px-8 py-16 md:px-[100px] md:py-[130px]'>
             <span className="relative inline-block rounded-full p-[5px] bg-gradient-to-r from-green-500 to-green-100">
-                <p className="font-bold text-[16px] border border-[color:var(--dark-green)] rounded-full flex gap-2 px-[16px] py-[12px] bg-white">
-                    <Gem color="#00674F" /> For {audience}
+                <p className="font-bold text-[16px] border border-[color:var(--dark-green)] rounded-full flex gap-2 px-[16px] py-[12px] bg-neutral-base">
+                    <GeminiFill color="#00674F" /> For {audience}
                 </p>
             </span>
             <h2 className='font-bold text-[24px] sm:text-[30px] md:text-[34px] max-w-full md:max-w-[40%]'>{headline}</h2>
