@@ -1,6 +1,6 @@
 'use client'
 import React, { useState, memo, useCallback } from 'react';
-import { LineChartLineResponsiveContainerTooltip } from 'recharts';
+import { LineChart, Line, ResponsiveContainer, Tooltip } from 'recharts';
 import { ArrowDownLine, ArrowUpLine } from '@phyoofficial/phyo-icon-library';
 
 const EngagementSection = memo(({

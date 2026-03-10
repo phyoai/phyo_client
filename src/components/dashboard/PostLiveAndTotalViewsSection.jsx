@@ -1,6 +1,6 @@
 'use client'
 import React, { useState, memo, useCallback } from "react";
-import {   PieChart,
+import { PieChart,
   Pie,
   Cell,
   ResponsiveContainer,
@@ -10,7 +10,7 @@ import {   PieChart,
   YAxis,
   Tooltip,
 } from "recharts";
-import { MoreLineArrowDownLineArrowUpLine } from "@phyoofficial/phyo-icon-library";
+import { MoreLine, ArrowDownLine, ArrowUpLine } from "@phyoofficial/phyo-icon-library";
 const PostLiveAndTotalViewsSection = memo(({
   employeeData = null,
   viewsData = null,

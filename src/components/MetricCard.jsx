@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useMemo } from 'react';
-import MoreLine from '@phyoofficial/phyo-icon-library';
+import { MoreLine } from '@phyoofficial/phyo-icon-library';
 
 const MetricCard = React.memo(({ title, value, percentage, icon: Icon, iconBg = 'bg-[#00674F]' }) => {
   const formatValue = useMemo(() => {

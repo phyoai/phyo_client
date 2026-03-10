@@ -1,10 +1,13 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation'; 
-import { ArrowLeftLine, MoreLine, DeleteBinLine, DownloadLine, AddFill } from '@phyoofficial/phyo-icon-library';
+import { useRouter } from 'next/navigation';
+import { ArrowLeftLine, MoreLine, DeleteBinLine, DownloadLine, AddLine } from '@phyoofficial/phyo-icon-library';
+import Button from '@/components/Button';
+import IconButton from '@/components/IconButton';
+import Card from '@/components/Card';
 
-export default function MyLists() {
+export default function MyListsAll() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [selectionMode, setSelectionMode] = useState(false);
@@ -131,19 +134,21 @@ export default function MyLists() {
       <div className="flex flex-col h-screen bg-neutral-base">
         {/* App Bar */}
         <div className="flex items-center justify-between px-1 py-2 bg-neutral-base shrink-0">
-          <button
+          <IconButton
+            icon={ArrowLeftLine}
+            size="lg"
+            variant="default"
             onClick={handleBack}
-            className="flex items-center justify-center w-12 h-12 rounded-3xl hover:bg-gray-100 transition-colors"
-          >
-            <ArrowLeftLine className="w-6 h-6 text-[#242527]" strokeWidth={1.5} />
-          </button>
+          />
           <div className="flex-1 px-2">
             <h1 className="text-xl font-semibold text-[#242527] leading-7 tracking-[-0.14px]">My Lists</h1>
           </div>
           <div className="flex items-center gap-2">
-            <button className="flex items-center justify-center w-12 h-12 rounded-3xl hover:bg-gray-100 transition-colors">
-              <MoreLine className="w-6 h-6 text-[#242527]" strokeWidth={1.5} />
-            </button>
+            <IconButton
+              icon={MoreLine}
+              size="lg"
+              variant="default"
+            />
           </div>
         </div>
 
@@ -161,33 +166,33 @@ export default function MyLists() {
     <div className="flex flex-col h-screen bg-neutral-base">
       {/* App Bar */}
       <div className="flex items-center justify-between px-1 py-2 bg-neutral-base shrink-0">
-        <button
+        <IconButton
+          icon={ArrowLeftLine}
+          size="lg"
+          variant="default"
           onClick={handleBack}
-          className="flex items-center justify-center w-12 h-12 rounded-3xl hover:bg-gray-100 transition-colors"
-        >
-          <ArrowLeftLine className="w-6 h-6 text-[#242527]" strokeWidth={1.5} />
-        </button>
+        />
         <div className="flex-1 px-2">
           <h1 className="text-xl font-semibold text-[#242527] leading-7 tracking-[-0.14px]">My Lists</h1>
         </div>
         <div className="flex items-center gap-2 h-12">
           {selectionMode && (
-            <button 
+            <IconButton
+              icon={DeleteBinLine}
+              size="lg"
+              variant="default"
               onClick={handleDelete}
-              className="flex items-center justify-center w-12 h-12 rounded-3xl hover:bg-gray-100 transition-colors"
-            >
-              <DeleteBinLine className="w-6 h-6 text-[#242527]" strokeWidth={1.5} />
-            </button>
+            />
           )}
-          <button
+          <IconButton
+            icon={MoreLine}
+            size="lg"
+            variant="default"
             onClick={() => {
               setSelectionMode(true);
               setSelectedItems([]);
             }}
-            className="flex items-center justify-center w-12 h-12 rounded-3xl hover:bg-gray-100 transition-colors"
-          >
-            <MoreLine className="w-6 h-6 text-[#242527]" strokeWidth={1.5} />
-          </button>
+          />
         </div>
       </div>
 
@@ -312,24 +317,24 @@ export default function MyLists() {
           {/* Button Container - Only show in selection mode */}
           {selectionMode && (
             <div className="flex gap-2 p-4 bg-neutral-base shrink-0">
-              <button 
+              <Button
+                variant="outlined"
+                size="lg"
+                icon={DownloadLine}
                 onClick={handleExport}
-                className="flex-1 flex items-center justify-center gap-2 px-8 py-4 border border-[#43573b] rounded-[32px] hover:bg-gray-50 transition-colors"
+                fullWidth
               >
-                <DownloadLine className="w-6 h-6 text-[#43573b]" strokeWidth={1.5} />
-                <span className="text-base font-semibold text-[#43573b] leading-6 tracking-[0.24px]" style={{ fontFamily: 'Work Sans, sans-serif' }}>
-                  Export
-                </span>
-              </button>
-              <button 
+                Export
+              </Button>
+              <Button
+                variant="primary"
+                size="lg"
+                icon={AddLine}
                 onClick={handleCreateNewList}
-                className="flex-1 flex items-center justify-center gap-2 px-8 py-4 bg-[#43573b] text-white rounded-[32px] hover:bg-[#3d4f36] transition-colors"
+                fullWidth
               >
-                <AddFill className="w-6 h-6" strokeWidth={1.5} />
-                <span className="text-base font-semibold leading-6 tracking-[0.24px]" style={{ fontFamily: 'Work Sans, sans-serif' }}>
-                  Create New List
-                </span>
-              </button>
+                Create New List
+              </Button>
             </div>
           )}
         </div>
@@ -338,16 +343,19 @@ export default function MyLists() {
       {/* New List Modal */}
       {showNewListModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-neutral-base rounded-3xl w-[400px] max-w-[90%] shadow-2xl overflow-hidden">
+          <Card
+            variant="default"
+            className="w-[400px] max-w-[90%] rounded-3xl overflow-hidden"
+          >
             {/* Header */}
-            <div className="px-6 py-6 border-b border-gray-100">
+            <div className="pb-4 border-b border-gray-100">
               <h2 className="text-xl font-semibold text-[#242527] text-center">
                 New List
               </h2>
             </div>
 
             {/* Content */}
-            <div className="px-6 py-6">
+            <div className="py-6">
               <input
                 type="text"
                 placeholder="New list"
@@ -360,24 +368,26 @@ export default function MyLists() {
             </div>
 
             {/* Actions */}
-            <div className="px-6 py-4 border-t border-gray-100 flex gap-3 justify-center">
-              <button
+            <Card.Footer className="mt-0 pt-0 border-t border-gray-100 flex gap-3 justify-center">
+              <Button
+                variant="outlined"
+                size="md"
                 onClick={() => {
                   setShowNewListModal(false);
                   setNewListName('');
                 }}
-                className="px-6 py-3 border border-gray-400 text-[#242527] rounded-full font-semibold hover:bg-gray-50 transition-colors"
               >
                 Cancel
-              </button>
-              <button
+              </Button>
+              <Button
+                variant="primary"
+                size="md"
                 onClick={handleCreateList}
-                className="px-6 py-3 bg-[#43573B] hover:bg-[#3d4f36] text-white rounded-full font-semibold transition-colors"
               >
                 Create
-              </button>
-            </div>
-          </div>
+              </Button>
+            </Card.Footer>
+          </Card>
         </div>
       )}
     </div>

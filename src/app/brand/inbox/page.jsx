@@ -1,5 +1,5 @@
 import React, { Suspense } from 'react';
-import InboxPage from './InboxPage'
+import InboxPage from '@/components/inbox/InboxPage'
 
 export default function BrandInbox() {
   return (

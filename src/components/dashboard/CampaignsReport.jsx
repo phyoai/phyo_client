@@ -85,7 +85,7 @@ const CampaignsReport = memo(({
       title: 'Post Live',
       value: totalLivePosts() || 50,
       percentage: '+25.5%',
-      icon: Radio,
+      icon: RadioLine,
       iconBg: 'bg-teal-600'
     },
     {
@@ -99,7 +99,7 @@ const CampaignsReport = memo(({
       title: 'Budget Spent',
       value: `${(totalBudget || 1200000).toLocaleString()}+`,
       percentage: '+25.5%',
-      icon: MoneyDollarCircleLine,
+      icon: MoneyDollarBoxLine,
       iconBg: 'bg-teal-600'
     },
     {
@@ -113,7 +113,7 @@ const CampaignsReport = memo(({
       title: 'Cost Per Engagement',
       value: `${costPerEngagement}%`,
       percentage: '+25.5%',
-      icon: Target,
+      icon: TargetLine,
       iconBg: 'bg-teal-600'
     },
     {

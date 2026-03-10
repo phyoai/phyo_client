@@ -16,7 +16,6 @@ const ChatInterface = memo(({
   const [messages, setMessages] = useState(initialMessages);
   const messagesEndRef = useRef(null);
 
-  // Default sample message for new contacts
   const defaultSampleMessage = {
     id: 1,
     content: `Hi [Influencer Name],
@@ -43,7 +42,6 @@ Warm regards,
     isOwn: false
   };
 
-  // Load messages when contact changes
   useEffect(() => {
     if (selectedContact) {
       if (initialMessages.length > 0) {
@@ -56,7 +54,6 @@ Warm regards,
     }
   }, [selectedContact, initialMessages]);
 
-  // Auto scroll to bottom
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
@@ -69,21 +66,16 @@ Warm regards,
       isOwn: true
     };
     setMessages(prev => [...prev, newMessage]);
+    if (onSendMessage) onSendMessage(content, selectedContact);
 
-    if (onSendMessage) {
-      onSendMessage(content, selectedContact);
-    }
-
-    // Simulate response
     if (autoReply && selectedContact) {
       setTimeout(() => {
-        const response = {
+        setMessages(prev => [...prev, {
           id: Date.now() + 1,
-          content: "Thank you for reaching out! I'd love to learn more about this opportunity. Could you tell me more about the brand and campaign details?",
+          content: "Thank you for reaching out! I'd love to learn more about this opportunity.",
           timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
           isOwn: false
-        };
-        setMessages(prev => [...prev, response]);
+        }]);
       }, 1000);
     }
   }, [selectedContact, autoReply, onSendMessage]);
@@ -96,23 +88,20 @@ Warm regards,
       isOwn: true
     };
     setMessages(prev => [...prev, fileMessage]);
-
-    if (onFileSelect) {
-      onFileSelect(file, selectedContact);
-    }
+    if (onFileSelect) onFileSelect(file, selectedContact);
   }, [selectedContact, onFileSelect]);
 
   if (!selectedContact) {
     return (
-      <div className="flex-1 flex items-center justify-center bg-gray-50">
+      <div className="flex-1 flex items-center justify-center bg-neutral-muted">
         <div className="text-center">
-          <div className="w-16 h-16 bg-gray-200 rounded-full mx-auto mb-4 flex items-center justify-center">
-            <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="w-16 h-16 bg-neutral-base rounded-full mx-auto mb-4 flex items-center justify-center border border-neutral-muted">
+            <svg className="w-8 h-8 text-text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
             </svg>
           </div>
-          <h3 className="text-lg font-medium text-gray-900 mb-2">{emptyTitle}</h3>
-          <p className="text-gray-500">{emptyMessage}</p>
+          <h3 className="text-base font-semibold text-text-base mb-1">{emptyTitle}</h3>
+          <p className="text-sm text-text-muted">{emptyMessage}</p>
         </div>
       </div>
     );
@@ -123,9 +112,9 @@ Warm regards,
       <ChatHeader contact={selectedContact} />
 
       {/* Messages Area */}
-      <div className="flex-1 overflow-y-auto p-6 bg-gray-50">
+      <div className="flex-1 overflow-y-auto p-6 bg-neutral-muted">
         {messages.length === 0 ? (
-          <div className="text-center text-gray-500 mt-8">
+          <div className="text-center text-text-muted mt-8 text-sm">
             <p>No messages yet. Start the conversation!</p>
           </div>
         ) : (

@@ -1,6 +1,6 @@
 'use client'
 import React, { useState, useEffect, memo, useCallback } from 'react';
-import { BarChartBarResponsiveContainerXAxisYAxisTooltipPieChartPieCell } from 'recharts';
+import { BarChart, Bar, ResponsiveContainer, XAxis, YAxis, Tooltip, PieChart, Pie, Cell } from 'recharts';
 import { ArrowDownLine, MoreLine, AddFill, SubtractLine } from '@phyoofficial/phyo-icon-library';
 
 const BudgetAndAudienceSection = memo(({

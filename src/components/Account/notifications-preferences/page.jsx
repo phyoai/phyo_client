@@ -1,10 +1,10 @@
 'use client';
 
-import  React, { useState } from 'react';
+import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { ArrowLeftSLine, MoreLine } from '@phyoofficial/phyo-icon-library';
+import AppBar from '@/components/AppBar';
 
-export default function NotificationPreferences() {
+export default function NotificationPreferencesAll() {
   const router = useRouter();
   const [preferences, setPreferences] = useState({
     smsAlerts: true,
@@ -36,23 +36,12 @@ export default function NotificationPreferences() {
 
   return (
     <div className="w-full h-full flex flex-col bg-neutral-base">
-      {/* App Bar */}
-      <div className="flex items-center justify-between px-1 py-2 border-b border-gray-100">
-        <button
-          onClick={() => router.back()}
-          className="flex items-center justify-center w-12 h-12 rounded-full hover:bg-gray-100 transition-colors"
-        >
-          <ArrowLeftLine className="w-6 h-6 text-[#242527]" />
-        </button>
-        
-        <h1 className="flex-1 text-xl font-semibold text-[#242527] px-2">
-          Notification preferences
-        </h1>
-        
-        <button className="flex items-center justify-center w-12 h-12 rounded-full hover:bg-gray-100 transition-colors">
-          <MoreLine className="w-6 h-6 text-[#242527]" />
-        </button>
-      </div>
+      <AppBar
+        title="Notification preferences"
+        onBack={() => router.back()}
+        showMenu={true}
+        onMenuClick={() => console.log('Open menu')}
+      />
 
       {/* Content */}
       <div className="flex-1 overflow-y-auto px-9 py-4">

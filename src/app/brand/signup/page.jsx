@@ -1,7 +1,7 @@
 'use client'
 import Image2Line from 'next/image'
 import React, { Suspense } from 'react'
-import FormContainer from '../components/FormContainer'
+import FormContainer from '@/components/dashboard/FormContainer'
 import { useAuth } from '../../context/AuthContext';
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';

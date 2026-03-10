@@ -1,4 +1,4 @@
-import FormContainer from '../../../app/brand/components/FormContainer'
+import FormContainer from '@/components/FormContainer'
 import Image2Line from 'next/image'
 import React, { Suspense } from 'react'
 

@@ -1,6 +1,10 @@
 'use client'
 import React, { useState, memo, useCallback } from 'react';
-import { SendPlane2FillMicLineLinkEmotionLineChat1FillUserAddFillCamera4FillMultiImageFillFileTextFillHeadphoneFill } from '@phyoofficial/phyo-icon-library'; 
+import { Chat1Fill, UserAddFill } from '@phyoofficial/phyo-icon-library';
+
+import MessagesList from './MessagesList';
+import ChatInterface from './ChatInterface';
+
 const InboxPage = memo(({
   conversations = [],
   newInvitations = [],
@@ -10,223 +14,154 @@ const InboxPage = memo(({
   onAccept = null,
   onReject = null,
   onWithdraw = null,
-  logoSrc = '/assets/phyo_logo_new.svg',
-  accentColor = '#5B7553',
-  sidebarWidth = '30%'
 }) => {
   const [activeTab, setActiveTab] = useState('messages');
   const [selectedConversation, setSelectedConversation] = useState(null);
-  const [messageInput, setMessageInput] = useState('');
-  const [showAttachments, setShowAttachments] = useState(false);
+  const [selectedInvitation, setSelectedInvitation] = useState(null);
 
-  // Default sample data
   const defaultConversations = [
-    {
-      id: 1,
-      name: 'Alcie',
-      message: 'Hey, any updates on the campaign?',
-      time: '18:09',
-      avatar: '/dummyAvatar.jpg',
-      unread: false,
-      campaign: 'Campaign Chacha'
-    },
-    {
-      id: 2,
-      name: 'Clara',
-      message: 'I spoke with the social media team,...',
-      time: '18:08',
-      avatar: '/dummyAvatar1.jpg',
-      unread: false
-    }
+    { id: 1, name: 'Alcie', message: 'Hey, any updates on the campaign?', time: '18:09', avatar: '/dummyAvatar.jpg', unread: false, campaign: 'Campaign Chacha' },
+    { id: 2, name: 'Clara', message: 'I spoke with the social media team,...', time: '18:08', avatar: '/dummyAvatar1.jpg', unread: false },
+  ];
+
+  const defaultInvitations = [
+    { id: 1, name: 'Swagdeep Singh', role: 'Lifestyle Creator', followers: '120K', platform: 'Instagram', mutual: '12 mutual connections', avatar: '/dummyAvatar.jpg',  about: 'Passionate lifestyle creator sharing travel, fashion, and wellness content with an engaged audience.' },
+    { id: 2, name: 'Priya Sharma',   role: 'Fashion Influencer', followers: '85K',  platform: 'Instagram', mutual: '5 mutual connections',  avatar: '/dummyAvatar1.jpg', about: 'Fashion and beauty enthusiast helping brands connect with style-conscious millennials.' },
+    { id: 3, name: 'Aryan Mehta',    role: 'Travel & Food Blogger', followers: '200K', platform: 'YouTube', mutual: '8 mutual connections',  avatar: '/dummyAvatar.jpg',  about: 'Documenting food trails and travel adventures across India and South-East Asia.' },
+  ];
+
+  const defaultRequests = [
+    { id: 1, name: 'Neha Kapoor', role: 'Beauty Creator', followers: '60K', platform: 'Instagram', status: 'Pending', sentAgo: '3 days ago', avatar: '/dummyAvatar1.jpg', about: 'Skincare and makeup tutorials with an authentic, relatable style.' },
+    { id: 2, name: 'Rohan Verma',  role: 'Tech Reviewer',  followers: '45K', platform: 'YouTube',   status: 'Pending', sentAgo: '1 week ago', avatar: '/dummyAvatar.jpg',  about: 'In-depth gadget reviews and unboxing videos for tech enthusiasts.' },
   ];
 
   const data = {
-    conversations: conversations.length > 0 ? conversations : defaultConversations,
-    newInvitations,
-    myRequests
+    conversations:  conversations.length  > 0 ? conversations  : defaultConversations,
+    newInvitations: newInvitations.length > 0 ? newInvitations : defaultInvitations,
+    myRequests:     myRequests.length     > 0 ? myRequests      : defaultRequests,
   };
 
-  const handleSelectConversation = useCallback((conv) => {
-    setSelectedConversation(conv);
-    if (onSelectConversation) {
-      onSelectConversation(conv);
-    }
-  }, [onSelectConversation]);
+  const contactsForList = data.conversations.map(conv => ({
+    id: conv.id, name: conv.name, avatar: conv.avatar,
+    status: conv.unread ? 'Unread' : '', action: conv.message, time: conv.time,
+  }));
 
-  const handleSendMessage = useCallback(() => {
-    if (messageInput.trim() && selectedConversation) {
-      if (onSendMessage) {
-        onSendMessage(messageInput, selectedConversation);
-      }
-      setMessageInput('');
-    }
-  }, [messageInput, selectedConversation, onSendMessage]);
+  const selectedContact = selectedConversation
+    ? { id: selectedConversation.id, name: selectedConversation.campaign || selectedConversation.name, avatar: selectedConversation.avatar }
+    : null;
 
-  const handleAccept = useCallback((id) => {
-    if (onAccept) {
-      onAccept(id);
-    }
-  }, [onAccept]);
-
-  const handleReject = useCallback((id) => {
-    if (onReject) {
-      onReject(id);
-    }
-  }, [onReject]);
-
-  const handleWithdraw = useCallback((id) => {
-    if (onWithdraw) {
-      onWithdraw(id);
-    }
-  }, [onWithdraw]);
-
-  const handleAttachmentClick = useCallback((type) => {
-    setShowAttachments(false);
-  }, []);
-
-  const attachmentOptions = [
-    { id: 'camera', label: 'Camera', icon: Camera4Fill },
-    { id: 'gallery', label: 'Gallery', icon: MultiImageFill },
-    { id: 'documents', label: 'Documents', icon: FileTextFill },
-    { id: 'audio', label: 'Audio', icon: HeadphoneFill }
-  ];
-
-  const getChatMessages = useCallback((conversationId) => {
-    if (conversationId === 1) {
-      return [
-        { id: 1, text: '', voice: true, sender: 'them', time: '18:09' },
-        { id: 2, text: '', document: true, sender: 'them', time: '18:13' },
-        { id: 3, text: 'Around 8 AM, I think.', sender: 'them', time: '18:14' },
-        { id: 4, text: 'Perfect! I will be ready.', sender: 'me', time: '18:15' }
-      ];
-    }
+  const getInitialMessages = useCallback((convId) => {
+    if (convId === 1) return [
+      { id: 1, content: 'Around 8 AM, I think.', timestamp: '18:14', isOwn: false },
+      { id: 2, content: 'Perfect! I will be ready.', timestamp: '18:15', isOwn: true },
+    ];
     return [];
   }, []);
 
-  return (
-    <div className="flex h-screen overflow-hidden bg-gray-50">
-      {/* Left Sidebar - Invitations List */}
-      <div className={`w-full sm:w-[${sidebarWidth}] bg-neutral-base border-r border-gray-200 flex flex-col overflow-hidden`}>
-        {/* Sticky Header */}
-        <div className="flex-shrink-0 bg-neutral-base border-b border-gray-200">
-          <div className="px-4 sm:px-6 py-4 sm:py-5">
-            <h1 className="text-lg sm:text-xl font-semibold text-gray-900">InboxLine</h1>
-          </div>
+  const handleSelectConversation = useCallback((contact) => {
+    const conv = data.conversations.find(c => c.id === contact.id) || contact;
+    setSelectedConversation(conv);
+    if (onSelectConversation) onSelectConversation(conv);
+  }, [data.conversations, onSelectConversation]);
 
-          {/* Tabs */}
+  const handleAccept   = useCallback((id) => { if (onAccept)   onAccept(id);   }, [onAccept]);
+  const handleReject   = useCallback((id) => { if (onReject)   onReject(id);   }, [onReject]);
+  const handleWithdraw = useCallback((id) => { if (onWithdraw) onWithdraw(id); }, [onWithdraw]);
+
+  return (
+    <div className="flex h-screen overflow-hidden bg-neutral-muted">
+
+      {/* ── Left Sidebar ── */}
+      <div className="w-full sm:w-[30%] bg-neutral-base border-r border-neutral-muted flex flex-col overflow-hidden">
+
+        {/* Header + Tabs */}
+        <div className="flex-shrink-0 bg-neutral-base border-b border-neutral-muted">
+          <div className="px-4 sm:px-6 py-4 sm:py-5">
+            <h1 className="text-lg sm:text-xl font-semibold text-text-base">Inbox</h1>
+          </div>
           <div className="flex">
             <button
               onClick={() => setActiveTab('messages')}
               className={`flex-1 py-3 px-4 text-sm font-medium flex items-center justify-center gap-2 transition-colors ${
-                activeTab === 'messages'
-                  ? 'text-gray-900 border-b-2 border-gray-900'
-                  : 'text-gray-500 hover:text-gray-700'
+                activeTab === 'messages' ? 'text-text-base border-b-2 border-gray-900' : 'text-text-muted hover:text-text-base'
               }`}
             >
               <Chat1Fill width={20} height={20} />
               Messages
             </button>
             <button
-              onClick={() => setActiveTab('invitations')}
+              onClick={() => { setActiveTab('invitations'); setSelectedInvitation(null); }}
               className={`flex-1 py-3 px-4 text-sm font-medium flex items-center justify-center gap-2 transition-colors ${
-                activeTab === 'invitations'
-                  ? 'text-[#00897B] border-b-2 border-[#00897B]'
-                  : 'text-gray-500 hover:text-gray-700'
+                activeTab === 'invitations' ? 'text-brand-base border-b-2 border-brand-base' : 'text-text-muted hover:text-text-base'
               }`}
             >
               <UserAddFill width={20} height={20} />
               Invitations
+              {data.newInvitations.length > 0 && (
+                <span className="ml-1 bg-brand-base text-white text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center">
+                  {data.newInvitations.length}
+                </span>
+              )}
             </button>
           </div>
         </div>
 
-        {/* Scrollable Content */}
-        <div className="flex-1 overflow-y-auto">
+        {/* Tab Content */}
+        <div className="flex-1 overflow-hidden flex flex-col min-h-0">
+
+          {/* Messages tab */}
           {activeTab === 'messages' && (
-            <div className="flex-1 overflow-y-auto">
-              {data.conversations.map((conversation) => (
-                <div
-                  key={conversation.id}
-                  onClick={() => handleSelectConversation(conversation)}
-                  className={`px-4 py-3 border-b border-gray-100 cursor-pointer transition-colors hover:bg-gray-50 ${
-                    selectedConversation?.id === conversation.id ? 'bg-gray-50' : ''
-                  }`}
-                >
-                  <div className="flex items-center gap-3">
-                    <img
-                      src={conversation.avatar}
-                      alt={conversation.name}
-                      className="w-11 h-11 rounded-full object-cover flex-shrink-0"
-                    />
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-baseline justify-between mb-0.5">
-                        <h3 className="text-sm font-semibold text-gray-900">
-                          {conversation.name}
-                        </h3>
-                      </div>
-                      <p className="text-xs text-gray-500 truncate">
-                        {conversation.message}
-                      </p>
-                    </div>
-                    <div className="flex items-center flex-shrink-0">
-                      <button className="text-gray-400 hover:text-gray-600">
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                        </svg>
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
+            <MessagesList
+              contacts={contactsForList}
+              selectedContact={selectedContact ? contactsForList.find(c => c.id === selectedContact.id) : null}
+              onSelectContact={handleSelectConversation}
+              searchPlaceholder="Search messages"
+              tabs={[]}
+              defaultTab=""
+              sidebarWidth="w-full"
+            />
           )}
 
+          {/* Invitations tab */}
           {activeTab === 'invitations' && (
-            <>
-              {/* New Invitations Section */}
+            <div className="flex-1 overflow-y-auto bg-neutral-muted">
+
+              {/* Pending Invitations */}
               {data.newInvitations.length > 0 && (
-                <div className="px-6 py-4">
-                  <div className="flex items-center justify-between mb-3">
-                    <h2 className="text-sm font-semibold text-gray-900">
-                      New Invitations ({data.newInvitations.length})
-                    </h2>
-                  </div>
-
+                <div className="p-4">
+                  <p className="text-xs font-semibold text-text-muted uppercase tracking-wide mb-3">
+                    {data.newInvitations.length} Pending Invitations
+                  </p>
                   <div className="space-y-3">
-                    {data.newInvitations.map((invitation) => (
+                    {data.newInvitations.map((inv) => (
                       <div
-                        key={invitation.id}
-                        className="flex items-center gap-3 py-2 hover:bg-gray-50 rounded-lg px-2 -mx-2 cursor-pointer transition-colors"
+                        key={inv.id}
+                        onClick={() => setSelectedInvitation(inv)}
+                        className={`bg-neutral-base rounded-xl border p-4 shadow-sm cursor-pointer transition-all ${
+                          selectedInvitation?.id === inv.id ? 'border-brand-base ring-1 ring-brand-base' : 'border-neutral-muted hover:border-neutral-muted'
+                        }`}
                       >
-                        <img
-                          src={invitation.avatar}
-                          alt={invitation.name}
-                          className="w-10 h-10 rounded-full object-cover flex-shrink-0"
-                        />
-                        <div className="flex-1 min-w-0">
-                          <h3 className="text-sm font-semibold text-gray-900 truncate">
-                            {invitation.name}
-                          </h3>
-                          <p className="text-xs text-gray-500 truncate">
-                            {invitation.description}
-                          </p>
+                        <div className="flex items-start gap-3">
+                          <img src={inv.avatar} alt={inv.name} className="w-14 h-14 rounded-full object-cover flex-shrink-0 border-2 border-neutral-muted" />
+                          <div className="flex-1 min-w-0">
+                            <h3 className="text-sm font-semibold text-text-base leading-tight">{inv.name}</h3>
+                            <p className="text-xs text-text-muted mt-0.5">{inv.role} · {inv.followers}</p>
+                            {inv.mutual && (
+                              <p className="text-xs text-text-muted mt-1 flex items-center gap-1">
+                                <svg className="w-3 h-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                  <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM2 8a2 2 0 114 0 2 2 0 01-4 0z"/>
+                                </svg>
+                                {inv.mutual}
+                              </p>
+                            )}
+                          </div>
                         </div>
-                        <div className="flex gap-2 flex-shrink-0">
-                          <button
-                            onClick={() => handleAccept(invitation.id)}
-                            className="w-8 h-8 flex items-center justify-center rounded-full bg-green-50 hover:bg-green-100 text-green-600 transition-colors"
-                          >
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                            </svg>
+                        <div className="flex gap-2 mt-3">
+                          <button onClick={(e) => { e.stopPropagation(); handleReject(inv.id); }} className="flex-1 py-1.5 text-xs font-semibold text-text-muted border border-neutral-muted rounded-full hover:bg-neutral-muted transition-colors">
+                            Ignore
                           </button>
-                          <button
-                            onClick={() => handleReject(invitation.id)}
-                            className="w-8 h-8 flex items-center justify-center rounded-full bg-red-50 hover:bg-red-100 text-red-600 transition-colors"
-                          >
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                            </svg>
+                          <button onClick={(e) => { e.stopPropagation(); handleAccept(inv.id); }} className="flex-1 py-1.5 text-xs font-semibold text-white bg-brand-base rounded-full hover:opacity-90 transition-colors">
+                            Accept
                           </button>
                         </div>
                       </div>
@@ -235,170 +170,150 @@ const InboxPage = memo(({
                 </div>
               )}
 
-              {/* My Requests Section */}
+              {/* Sent Requests */}
               {data.myRequests.length > 0 && (
-                <div className="px-6 py-4 border-t border-gray-100">
-                  <div className="flex items-center justify-between mb-3">
-                    <h2 className="text-sm font-semibold text-gray-900">My Requests</h2>
-                  </div>
-
+                <div className="p-4 pt-0">
+                  <p className="text-xs font-semibold text-text-muted uppercase tracking-wide mb-3">Sent Requests</p>
                   <div className="space-y-3">
-                    {data.myRequests.map((request) => (
+                    {data.myRequests.map((req) => (
                       <div
-                        key={request.id}
-                        className="flex items-center gap-3 py-2 hover:bg-gray-50 rounded-lg px-2 -mx-2 cursor-pointer transition-colors"
+                        key={req.id}
+                        onClick={() => setSelectedInvitation(req)}
+                        className={`bg-neutral-base rounded-xl border p-4 shadow-sm cursor-pointer transition-all ${
+                          selectedInvitation?.id === req.id ? 'border-brand-base ring-1 ring-brand-base' : 'border-neutral-muted hover:border-neutral-muted'
+                        }`}
                       >
-                        <img
-                          src={request.avatar}
-                          alt={request.name}
-                          className="w-10 h-10 rounded-full object-cover flex-shrink-0"
-                        />
-                        <div className="flex-1 min-w-0">
-                          <h3 className="text-sm font-semibold text-gray-900 truncate">
-                            {request.name}
-                          </h3>
-                          <p className="text-xs text-gray-500 truncate">
-                            {request.description}
-                          </p>
+                        <div className="flex items-center gap-3">
+                          <img src={req.avatar} alt={req.name} className="w-12 h-12 rounded-full object-cover flex-shrink-0 border-2 border-neutral-muted" />
+                          <div className="flex-1 min-w-0">
+                            <h3 className="text-sm font-semibold text-text-base">{req.name}</h3>
+                            <p className="text-xs text-text-muted mt-0.5 truncate">{req.role} · {req.followers}</p>
+                            <p className="text-xs text-text-muted mt-0.5">
+                              Sent {req.sentAgo} · <span className="text-yellow-600 font-medium">{req.status}</span>
+                            </p>
+                          </div>
+                          <button
+                            onClick={(e) => { e.stopPropagation(); handleWithdraw(req.id); }}
+                            className="px-3 py-1.5 text-xs font-semibold text-text-muted border border-neutral-muted rounded-full hover:bg-neutral-muted transition-colors flex-shrink-0"
+                          >
+                            Withdraw
+                          </button>
                         </div>
-                        <button
-                          onClick={() => handleWithdraw(request.id)}
-                          className="px-3 py-1.5 text-xs font-medium text-gray-700 bg-neutral-base border border-gray-300 rounded-full hover:bg-gray-50 transition-colors flex-shrink-0"
-                        >
-                          withdraw
-                        </button>
                       </div>
                     ))}
                   </div>
                 </div>
               )}
-            </>
+            </div>
           )}
         </div>
       </div>
 
-      {/* Right Side - Chat Interface or Empty State */}
-      <div className="flex-1 flex flex-col bg-neutral-base overflow-hidden">
-        {selectedConversation ? (
-          <>
-            {/* Chat Header */}
-            <div className="flex-shrink-0 px-6 py-4 border-b border-gray-200 flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <img
-                  src={selectedConversation.avatar}
-                  alt={selectedConversation.name}
-                  className="w-10 h-10 rounded-full object-cover"
-                />
-                <div>
-                  <h2 className="text-base font-semibold text-gray-900">
-                    {selectedConversation.campaign || selectedConversation.name}
-                  </h2>
-                </div>
-              </div>
-            </div>
+      {/* ── Right Panel ── */}
+      {activeTab === 'messages' ? (
+        <ChatInterface
+          selectedContact={selectedContact}
+          initialMessages={selectedConversation ? getInitialMessages(selectedConversation.id) : []}
+          onSendMessage={onSendMessage}
+          emptyTitle="No conversation selected"
+          emptyMessage="Choose a message from the list to start chatting"
+        />
+      ) : selectedInvitation ? (
+        /* Invitation Detail Panel */
+        <div className="flex-1 overflow-y-auto bg-neutral-muted">
+          <div className="max-w-xl mx-auto p-6 space-y-5">
 
-            {/* Chat Messages */}
-            <div className="flex-1 overflow-y-auto px-6 py-4 space-y-4">
-              {getChatMessages(selectedConversation.id).map((message) => (
-                <div
-                  key={message.id}
-                  className={`flex ${message.sender === 'me' ? 'justify-end' : 'justify-start'}`}
-                >
-                  <div
-                    className={`max-w-[70%] ${
-                      message.sender === 'me'
-                        ? 'bg-[#5B7553] text-white rounded-2xl rounded-br-md'
-                        : 'bg-gray-100 text-gray-900 rounded-2xl rounded-bl-md'
-                    } px-4 py-2.5`}
-                  >
-                    {!message.document && !message.voice && (
-                      <p className="text-sm">{message.text}</p>
-                    )}
-                    <p className={`text-xs mt-1 ${message.sender === 'me' ? 'text-gray-200' : 'text-gray-500'}`}>
-                      {message.time}
-                    </p>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            {/* Chat Input */}
-            <div className="flex-shrink-0 px-6 py-4 border-t border-gray-200 relative">
-              <div className="flex items-center gap-3">
-                <button className="text-gray-400 hover:text-gray-600">
-                  <EmotionLine width={24} height={24} />
-                </button>
-                <div className="flex-1 relative">
-                  <input
-                    type="text"
-                    value={messageInput}
-                    onChange={(e) => setMessageInput(e.target.value)}
-                    onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
-                    placeholder="type something here"
-                    className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:border-transparent text-sm"
-                    style={{ '--tw-ring-color': accentColor }}
+            {/* Profile Card */}
+            <div className="bg-neutral-base rounded-2xl border border-neutral-muted shadow-sm overflow-hidden">
+              {/* Cover */}
+              <div className="h-28 bg-gradient-to-r from-brand-base to-accent-base" />
+              {/* Avatar */}
+              <div className="px-6 pb-5">
+                <div className="-mt-10 mb-3">
+                  <img
+                    src={selectedInvitation.avatar}
+                    alt={selectedInvitation.name}
+                    className="w-20 h-20 rounded-full object-cover border-4 border-neutral-base shadow"
                   />
                 </div>
-
-                {/* Attachment Options Panel */}
-                {showAttachments && (
-                  <div className="absolute bottom-[calc(100%+0.5rem)] right-24 z-50">
-                    <div className="bg-neutral-base rounded-2xl shadow-xl border border-gray-200 p-3 flex items-center gap-2.5">
-                      {attachmentOptions.map((option) => {
-                        const IconComponent = option.icon;
-                        return (
-                          <div
-                            key={option.id}
-                            onClick={() => handleAttachmentClick(option.id)}
-                            className="flex flex-col items-center gap-1 cursor-pointer group transition-all duration-300"
-                          >
-                            <div className="w-14 h-14 flex items-center justify-center rounded-full hover:bg-gray-50 transition-colors">
-                              <IconComponent width={28} height={28} className="text-[#787d73]" />
-                            </div>
-                            <span className="text-xs font-semibold text-[#787d73] whitespace-nowrap">
-                              {option.label}
-                            </span>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
+                <h2 className="text-xl font-bold text-text-base">{selectedInvitation.name}</h2>
+                <p className="text-sm text-text-muted mt-0.5">{selectedInvitation.role} · {selectedInvitation.followers} followers</p>
+                {selectedInvitation.mutual && (
+                  <p className="text-xs text-text-muted mt-1 flex items-center gap-1">
+                    <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
+                      <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM2 8a2 2 0 114 0 2 2 0 01-4 0z"/>
+                    </svg>
+                    {selectedInvitation.mutual}
+                  </p>
                 )}
-
-                <button
-                  onClick={() => setShowAttachments(!showAttachments)}
-                  className={`text-gray-400 hover:text-gray-600 transition-all duration-300 ${
-                    showAttachments ? 'text-[#5B7553] rotate-45 scale-110' : ''
-                  }`}
-                >
-                  <Link width={24} height={24} />
-                </button>
-                <button className="text-gray-400 hover:text-gray-600">
-                  <MicLine width={24} height={24} />
-                </button>
-                <button
-                  onClick={handleSendMessage}
-                  className="w-10 h-10 flex items-center justify-center text-white rounded-full transition-colors hover:opacity-90"
-                  style={{ backgroundColor: accentColor }}
-                >
-                  <SendPlane2Fill width={20} height={20} />
-                </button>
+                {selectedInvitation.platform && (
+                  <span className="inline-block mt-2 px-2.5 py-0.5 text-xs font-medium bg-neutral-muted text-text-muted rounded-full">
+                    {selectedInvitation.platform}
+                  </span>
+                )}
               </div>
             </div>
-          </>
-        ) : (
-          <div className="flex-1 flex items-center justify-center">
-            <div className="text-center">
-              <img
-                src={logoSrc}
-                alt="Logo"
-                className="w-64 h-auto mx-auto opacity-20"
-              />
-              <p className="text-sm text-gray-400 mt-4 font-medium">A PyroMedia Product</p>
+
+            {/* About */}
+            {selectedInvitation.about && (
+              <div className="bg-neutral-base rounded-2xl border border-neutral-muted shadow-sm p-5">
+                <h3 className="text-sm font-semibold text-text-base mb-2">About</h3>
+                <p className="text-sm text-text-muted leading-relaxed">{selectedInvitation.about}</p>
+              </div>
+            )}
+
+            {/* Actions */}
+            <div className="bg-neutral-base rounded-2xl border border-neutral-muted shadow-sm p-5">
+              {selectedInvitation.status ? (
+                /* Sent request — show withdraw */
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-yellow-400" />
+                    <p className="text-sm text-text-muted">Invitation sent {selectedInvitation.sentAgo} and is <span className="font-semibold text-yellow-600">{selectedInvitation.status}</span>.</p>
+                  </div>
+                  <button
+                    onClick={() => handleWithdraw(selectedInvitation.id)}
+                    className="w-full py-2.5 text-sm font-semibold text-text-base border border-neutral-muted rounded-full hover:bg-neutral-muted transition-colors"
+                  >
+                    Withdraw Invitation
+                  </button>
+                </div>
+              ) : (
+                /* Incoming invite — show accept / ignore */
+                <div className="space-y-3">
+                  <p className="text-sm text-text-muted">{selectedInvitation.name} wants to collaborate with you.</p>
+                  <div className="flex gap-3">
+                    <button
+                      onClick={() => handleReject(selectedInvitation.id)}
+                      className="flex-1 py-2.5 text-sm font-semibold text-text-base border border-neutral-muted rounded-full hover:bg-neutral-muted transition-colors"
+                    >
+                      Ignore
+                    </button>
+                    <button
+                      onClick={() => handleAccept(selectedInvitation.id)}
+                      className="flex-1 py-2.5 text-sm font-semibold text-white bg-brand-base rounded-full hover:opacity-90 transition-colors"
+                    >
+                      Accept
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
+
           </div>
-        )}
-      </div>
+        </div>
+      ) : (
+        /* Empty invitations right panel */
+        <div className="flex-1 flex items-center justify-center bg-neutral-muted">
+          <div className="text-center">
+            <div className="w-16 h-16 rounded-full bg-neutral-muted flex items-center justify-center mx-auto mb-4">
+              <UserAddFill width={28} height={28} className="text-gray-300" />
+            </div>
+            <p className="text-base font-medium text-text-base">Select an invitation</p>
+            <p className="text-sm text-text-muted mt-1">Click any invitation to see their profile</p>
+          </div>
+        </div>
+      )}
     </div>
   );
 });
