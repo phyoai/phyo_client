@@ -1,9 +1,9 @@
 "use client";
-import { useFormFormProvider } from "react-hook-form"; 
+import { useForm, FormProvider } from "react-hook-form";
 import { useState, useEffect } from "react";
-import { useRouteruseSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/app/context/AuthContext';
-import { authAPIbrandAPIinfluencerAPI } from '@/utils/api'; 
+import { authAPI, brandAPI, influencerAPI } from '@/utils/api'; 
 import Lottie from 'lottie-react';
 const businessDealAnimation = require('../../public/assets/businessdeal.json');
 import TextInput from "@/components/Inputs/TextInput";

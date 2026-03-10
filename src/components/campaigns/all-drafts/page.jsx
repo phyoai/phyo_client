@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { ArrowLeftLine, SearchLine, MoreLine, HeartLine } from '@phyoofficial/phyo-icon-library';
-import { campaignAPI } from '../../../../utils/api';
+import { campaignAPI } from '../../../utils/api';
 import { useGoBack } from '@/hooks/useGoBack';
 
 export default function AllDraft() {

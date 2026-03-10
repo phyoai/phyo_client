@@ -4,6 +4,7 @@ import { usePathname } from 'next/navigation';
 import InfluencerSidebar from '../../components/InfluencerSidebar';
 import ProtectedRoute from '../../components/ProtectedRoute';
 import { SidebarProvider, useSidebar } from '../context/SidebarContext';
+import { RoleProvider } from '../context/RoleContext';
 
 function InfluencerLayoutContent({ children, pathname }) {
   const { isExpanded } = useSidebar();
@@ -69,11 +70,13 @@ export default function InfluencerLayout({ children }) {
   const pathname = usePathname();
 
   return (
-    <SidebarProvider>
-      <InfluencerLayoutContent pathname={pathname}>
-        {children}
-      </InfluencerLayoutContent>
-    </SidebarProvider>
+    <RoleProvider>
+      <SidebarProvider>
+        <InfluencerLayoutContent pathname={pathname}>
+          {children}
+        </InfluencerLayoutContent>
+      </SidebarProvider>
+    </RoleProvider>
   );
 } 
 

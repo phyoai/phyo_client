@@ -5,16 +5,10 @@ import { useTheme } from '@/app/context/ThemeContext';
 import { useGoBack } from '@/hooks/useGoBack';
 import { colors } from '@/config/colors';
 import AppBar from './AppBar';
+import AccountMenuItems from './Account/AccountMenuItems';
 import {
   UserCircleFill,
-  PencilFill,
-  FileListLine,
-  HistoryLine,
-  RocketLine,
-  PauseCircleLine,
-  DeleteBin2Line,
   MoonLine,
-  BellLine,
   TranslateLine,
   ArrowRightSLine,
 } from '@phyoofficial/phyo-icon-library';
@@ -81,17 +75,9 @@ export default function AccountPageLayout() {
   const router = useRouter();
   const goBack = useGoBack();
   const { darkMode, toggleDarkMode } = useTheme();
-  const [notificationEnabled, setNotificationEnabled] = useState(true);
 
-  const menuItems = [
-    { icon: PencilFill, label: 'Update Profile', description: null },
-    { icon: FileListLine, label: 'My Lists', description: null },
-    { icon: HistoryLine, label: 'Transactions', description: null },
-    { icon: RocketLine, label: 'Upgrade Plan', description: null },
-    { icon: PauseCircleLine, label: 'Pause Subscription', description: null },
-    { icon: DeleteBin2Line, label: 'Cancel Subscription', description: null, isDanger: true },
+  const additionalMenuItems = [
     { icon: MoonLine, label: 'Dark Theme', description: null, hasToggle: true, isActive: darkMode },
-    { icon: BellLine, label: 'Notification Preferences', description: null },
     { icon: TranslateLine, label: 'App Language', description: 'English (Default Language)' },
   ];
 
@@ -137,9 +123,14 @@ export default function AccountPageLayout() {
         </div>
       </div>
 
-        {/* Settings Menu */}
+        {/* Settings Menu - Role-based Account Pages */}
+        <div className="space-y-2 mb-4">
+          <AccountMenuItems onItemClick={() => {}} />
+        </div>
+
+        {/* Additional Settings */}
         <div className="space-y-2">
-          {menuItems.map((item, index) => (
+          {additionalMenuItems.map((item, index) => (
             <SettingMenuItem
               key={index}
               icon={item.icon}

@@ -4,6 +4,7 @@ import { usePathname } from 'next/navigation';
 import BrandSidebar from '../../components/BrandSidebar';
 import ProtectedRoute from '../../components/ProtectedRoute';
 import { SidebarProvider, useSidebar } from '../context/SidebarContext';
+import { RoleProvider } from '../context/RoleContext';
 
 function BrandLayoutContent({ children, pathname }) {
   const { isExpanded } = useSidebar();
@@ -67,13 +68,15 @@ function BrandLayoutContent({ children, pathname }) {
 
 export default function BrandLayout({ children }) {
   const pathname = usePathname();
-  
+
   return (
-    <SidebarProvider>
-      <BrandLayoutContent pathname={pathname}>
-        {children}
-      </BrandLayoutContent>
-    </SidebarProvider>
+    <RoleProvider>
+      <SidebarProvider>
+        <BrandLayoutContent pathname={pathname}>
+          {children}
+        </BrandLayoutContent>
+      </SidebarProvider>
+    </RoleProvider>
   );
 } 
 

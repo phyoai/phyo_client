@@ -1,6 +1,6 @@
 'use client'
 import React, { Suspense, useEffect } from 'react'
-import FormContainer from '../components/FormContainer'
+import FormContainer from '../../../components/FormContainer'
 import { useAuth } from '../../context/AuthContext';
 import { useRouter } from 'next/navigation';
 

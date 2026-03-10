@@ -199,7 +199,7 @@ export default function MyListsAll() {
       </div>
 
       {/* Container */}
-      <div className="flex-1 flex flex-col overflow-hidden px-9 py-4">
+      <div className="flex-1 flex flex-col overflow-hidden px-3 sm:px-4 md:px-6 lg:px-9 py-3 sm:py-4">
         <div className="flex flex-col flex-1 h-full overflow-hidden">
           {/* Chip Group - Only show when not in selection mode */}
           {!selectionMode && lists.length > 0 && (
@@ -344,10 +344,10 @@ export default function MyListsAll() {
 
       {/* New List Modal */}
       {showNewListModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <Card
             variant="default"
-            className="w-[400px] max-w-[90%] rounded-3xl overflow-hidden"
+            className="w-full sm:w-[400px] sm:max-w-[90vw] md:max-w-[400px] rounded-3xl overflow-hidden"
           >
             {/* Header */}
             <div className="pb-4 border-b border-gray-100">

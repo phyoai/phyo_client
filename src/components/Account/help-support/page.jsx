@@ -81,7 +81,7 @@ export default function HelpSupportAll() {
       />
 
       {/* Content */}
-      <div className="flex-1 overflow-y-auto px-9 relative flex flex-col">
+      <div className="flex-1 overflow-y-auto px-3 sm:px-4 md:px-6 lg:px-9 relative flex flex-col">
         {selectedFaqId ? (
           /* FAQ Detail View */
           <>
@@ -109,7 +109,7 @@ export default function HelpSupportAll() {
             </div>
 
             {/* SearchLine Box */}
-            <div className="px-4 pb-6">
+            <div className="px-3 sm:px-4 pb-4 sm:pb-6">
               <div className="relative">
                 <SearchLine className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5" style={{ color: colors.text.neutral.muted }} />
                 <input
@@ -170,7 +170,7 @@ export default function HelpSupportAll() {
             size="lg"
             icon={Message3Line}
             onClick={() => setIsModalOpen(true)}
-            className="fixed bottom-9 right-9 rounded-xl"
+            className="fixed bottom-6 sm:bottom-8 md:bottom-9 right-4 sm:right-6 md:right-9 rounded-xl"
           >
             Contact Us
           </Button>
@@ -180,12 +180,12 @@ export default function HelpSupportAll() {
       {/* Contact Us Modal */}
       {isModalOpen && (
         <div
-          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
           onClick={() => setIsModalOpen(false)}
         >
           <Card
             variant="default"
-            className="w-[400px] max-w-[90%] rounded-3xl overflow-hidden"
+            className="w-full sm:w-[400px] sm:max-w-[90vw] md:max-w-[400px] rounded-3xl overflow-hidden"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header */}
@@ -220,12 +220,12 @@ export default function HelpSupportAll() {
       {/* Language Selection Modal */}
       {isLanguageModalOpen && (
         <div
-          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
           onClick={() => setIsLanguageModalOpen(false)}
         >
           <Card
             variant="default"
-            className="w-[400px] max-w-[90%] rounded-3xl overflow-hidden"
+            className="w-full sm:w-[400px] sm:max-w-[90vw] md:max-w-[400px] rounded-3xl overflow-hidden"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header */}

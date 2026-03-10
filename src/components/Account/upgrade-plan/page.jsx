@@ -133,7 +133,7 @@ export default function UpgradePlanAll() {
  // Payment success view
 if (paymentSuccess) {
   return (
-    <div className="h-screen flex flex-col items-center justify-center px-4" style={{ backgroundColor: colors.neutral.base }}>
+    <div className="h-screen flex flex-col items-center justify-center px-3 sm:px-4 md:px-6" style={{ backgroundColor: colors.neutral.base }}>
       <style>{`
         @keyframes popScale {
           0% {
@@ -230,7 +230,7 @@ if (paymentSuccess) {
         </div>
 
         {/* Form Content */}
-        <div className="flex-1 overflow-y-auto px-6 py-6">
+        <div className="flex-1 overflow-y-auto px-4 sm:px-5 md:px-6 py-4 sm:py-5">
           <form className="space-y-6">
             {/* Contact Details Section */}
             <div>
@@ -343,7 +343,7 @@ if (paymentSuccess) {
         </div>
 
         {/* Proceed Button */}
-        <div className="sticky bottom-0 px-6 py-4 border-t flex justify-center" style={{ backgroundColor: colors.neutral.base, borderColor: colors.neutral.muted }}>
+        <div className="sticky bottom-0 px-4 sm:px-5 md:px-6 py-3 sm:py-4 border-t flex justify-center" style={{ backgroundColor: colors.neutral.base, borderColor: colors.neutral.muted }}>
           <Button
             variant="primary"
             size="lg"
@@ -367,12 +367,12 @@ if (paymentSuccess) {
       />
 
       {/* Plans Container */}
-      <div className="flex-1 px-9 py-4">
-        <div className="flex gap-3 h-full min-w-max">
+      <div className="flex-1 px-3 sm:px-4 md:px-6 lg:px-9 py-3 sm:py-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 h-auto">
           {plans.map((plan) => (
             <div
               key={plan.id}
-              className={`border-2 rounded-xl flex-1 min-w-[250px] max-w-[280px] flex flex-col py-3 transition-all hover:shadow-lg cursor-pointer`}
+              className={`border-2 rounded-xl flex flex-col py-3 transition-all hover:shadow-lg cursor-pointer`}
               style={{
                 backgroundColor: colors.neutral.muted,
                 borderColor: plan.borderColor
@@ -433,7 +433,7 @@ if (paymentSuccess) {
       </div>
 
       {/* Proceed to Billing Button */}
-      <div className="sticky bottom-0 px-9 py-4 border-t flex justify-center" style={{ backgroundColor: colors.neutral.base, borderColor: colors.neutral.muted }}>
+      <div className="sticky bottom-0 px-3 sm:px-4 md:px-6 lg:px-9 py-3 sm:py-4 border-t flex justify-center" style={{ backgroundColor: colors.neutral.base, borderColor: colors.neutral.muted }}>
         <Button
           variant="primary"
           size="lg"

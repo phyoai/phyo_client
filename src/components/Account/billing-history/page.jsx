@@ -60,7 +60,7 @@ export default function BillingHistoryAll() {
       />
 
       {/* Billing History Container */}
-      <div className="flex-1 overflow-y-auto px-9 py-4">
+      <div className="flex-1 overflow-y-auto px-3 sm:px-4 md:px-6 lg:px-9 py-3 sm:py-4">
         <div className="flex flex-col h-full">
           {billingHistory.length === 0 ? (
             /* Empty State */
