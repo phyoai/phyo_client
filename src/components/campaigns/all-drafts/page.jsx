@@ -3,9 +3,11 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { ArrowLeftLine, SearchLine, MoreLine, HeartLine } from '@phyoofficial/phyo-icon-library';
 import { campaignAPI } from '../../../../utils/api';
+import { useGoBack } from '@/hooks/useGoBack';
 
 export default function AllDraft() {
   const router = useRouter();
+  const goBack = useGoBack();
   const [drafts, setDrafts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [pagination, setPagination] = useState({

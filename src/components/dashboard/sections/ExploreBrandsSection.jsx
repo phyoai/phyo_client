@@ -1,6 +1,7 @@
 import React from 'react';
 import { useRouter } from 'next/navigation';
 import BrandCard from '@/components/cards/BrandCard';
+import { useAuth } from '@/app/context/AuthContext';
 
 /**
  * Explore Brands Section
@@ -8,7 +9,8 @@ import BrandCard from '@/components/cards/BrandCard';
  */
 export default function ExploreBrandsSection() {
   const router = useRouter();
-
+const { getUserType } = useAuth();
+  const role = (getUserType() || 'user').toLowerCase();
   // Mock data - will be replaced with API
   const brands = [
     { id: 1, name: 'Brand Name', initial: 'BN', color: 'bg-yellow-500' },
@@ -32,7 +34,7 @@ export default function ExploreBrandsSection() {
           <h2 className="text-2xl font-bold text-gray-900">Explore Brands</h2>
         </div>
         <button 
-          onClick={() => router.push('/brand/explore-brands')}
+          onClick={() => router.push(`/${role}/brand/explore-brands`)}
           className="px-4 py-1.5 border border-gray-800 text-gray-900 rounded-full font-medium text-sm hover:bg-gray-800 hover:text-white transition-colors"
         >
           More
@@ -47,7 +49,7 @@ export default function ExploreBrandsSection() {
             brandName={brand.name}
             brandInitial={brand.initial}
             bgColor={brand.color}
-            onClick={() => router.push(`/brand/brand-profile/${brand.id}`)}
+            onClick={() => router.push(`/${role}/brand/brand-profile/${brand.id}`)}
           />
         ))}
       </div>

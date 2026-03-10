@@ -2,9 +2,11 @@
 import React, { useState } from 'react';
 import { ArrowLeftLine, BellLine, MoreLine, CheckLine, CloseLine, ArrowRightLine } from '@phyoofficial/phyo-icon-library';
 import { useRouter } from 'next/navigation';
+import { useGoBack } from '@/hooks/useGoBack';
 
 function NotificationsPage() {
   const router = useRouter();
+  const goBack = useGoBack();
   const [activeFilter, setActiveFilter] = useState('All');
 
   const filters = [
@@ -92,7 +94,6 @@ function NotificationsPage() {
           {/* Right - Actions */}
           <div className="flex items-center gap-2">
             <button className="p-3 hover:bg-gray-100 rounded-full transition-colors">
-              {/* <BellLine className="h-6 w-6 text-[#242527]" /> */}
               <BellLine className="h-6 w-6 text-[#242527]" />
             </button>
             <button className="p-3 hover:bg-gray-100 rounded-full transition-colors">

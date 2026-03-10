@@ -43,16 +43,14 @@ api.interceptors.response.use(
     // Check for authentication errors (401) or token expiry/invalid (403)
     if (status === 401 || (status === 403 && (errorMessage.includes('Invalid or expired token') || errorMessage.includes('token')))) {
       // Clear all auth data
-      localStorage.removeItem('authToken');
-      localStorage.removeItem('adminToken');
-      localStorage.removeItem('adminInfo');
-      localStorage.removeItem('userInfo');
-      localStorage.removeItem('landing_search_results');
-      localStorage.removeItem('landing_search_prompt');
-      
+      ['authToken', 'token', 'adminToken', 'adminInfo', 'userData', 'userEmail', 'userInfo', 'landing_search_results', 'landing_search_prompt'].forEach((key) => localStorage.removeItem(key));
+
       if (typeof window !== 'undefined') {
         // Clear cookies
-        document.cookie = 'authToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+        ['authToken', 'userType', 'token'].forEach((name) => {
+          document.cookie = `${name}=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;`;
+          document.cookie = `${name}=; path=/; domain=${window.location.hostname}; expires=Thu, 01 Jan 1970 00:00:01 GMT;`;
+        });
         
         // Redirect based on current path
         if (window.location.pathname.startsWith('/admin')) {
@@ -256,11 +254,11 @@ export const authUtils = {
   // Logout user
   logout: () => {
     if (typeof window === 'undefined') return;
-    localStorage.removeItem('authToken');
-    localStorage.removeItem('userInfo');
-    localStorage.removeItem('landing_search_results');
-    localStorage.removeItem('landing_search_prompt');
-    document.cookie = 'authToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+    ['authToken', 'token', 'adminToken', 'adminInfo', 'userData', 'userEmail', 'userInfo', 'landing_search_results', 'landing_search_prompt'].forEach((key) => localStorage.removeItem(key));
+    ['authToken', 'userType', 'token'].forEach((name) => {
+      document.cookie = `${name}=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;`;
+      document.cookie = `${name}=; path=/; domain=${window.location.hostname}; expires=Thu, 01 Jan 1970 00:00:01 GMT;`;
+    });
   }
 };
 

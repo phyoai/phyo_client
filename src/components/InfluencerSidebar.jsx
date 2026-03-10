@@ -19,6 +19,10 @@ import {
   WalletFill,
   AccountCircleLine,
   AccountCircleFill,
+  Home4Line,
+  Home4Fill,
+  CalendarEventFill,
+  CalendarEventLine,
 } from '@phyoofficial/phyo-icon-library';
 import NavRail from './NavRail';
 import NavItem from './NavItem';
@@ -35,24 +39,28 @@ const InfluencerSidebar = () => {
   }, []);
 
   const navItemsConfig = [
-    { name: 'Dashboard', href: '/influencer/dashboard', activeIcon: Dashboard3Fill, inactiveIcon: Dashboard3Line },
-    { name: 'Inbox', href: '/influencer/inbox', activeIcon: InboxFill, inactiveIcon: InboxLine },
-    { name: 'Campaigns', href: '/influencer/campaigns', activeIcon: Dashboard3Fill, inactiveIcon: Dashboard3Line },
-    { name: 'Deals', href: '/influencer/deals', activeIcon: BriefcaseFill, inactiveIcon: BriefcaseLine },
-    { name: 'Earnings', href: '/influencer/earnings', activeIcon: WalletFill, inactiveIcon: WalletLine },
-    { name: 'Profile Management', href: '/influencer/profile-management', activeIcon: AccountCircleFill, inactiveIcon: AccountCircleLine },
+    { name: 'Home', href: '/influencer/dashboard', activeIcon: Home4Fill, inactiveIcon: Home4Line },
+    { name: 'Inbox', href: '/influencer/inbox', activeIcon: InboxFill, inactiveIcon: InboxLine, badge: 3 },
+    { name: 'Campaigns', href: '/influencer/campaigns', activeIcon: CalendarEventFill, inactiveIcon: CalendarEventLine },
+    // { name: 'Deals', href: '/influencer/deals', activeIcon: BriefcaseFill, inactiveIcon: BriefcaseLine },
+    // { name: 'Earnings', href: '/influencer/earnings', activeIcon: WalletFill, inactiveIcon: WalletLine },
+    // { name: 'Profile Management', href: '/influencer/profile-management', activeIcon: AccountCircleFill, inactiveIcon: AccountCircleLine },
     { name: 'Account', href: '/influencer/account', activeIcon: AccountCircleFill, inactiveIcon: AccountCircleLine },
-    { name: 'Settings', href: '/influencer/settings', activeIcon: FileSettingsFill, inactiveIcon: FileSettingsLine },
+    // { name: 'Settings', href: '/influencer/settings', activeIcon: FileSettingsFill, inactiveIcon: FileSettingsLine },
   ];
 
   const bottomNavItemsConfig = [
-    { name: 'Help', href: '/influencer/help', activeIcon: Information2Fill, inactiveIcon: Information2Line },
+    // { name: 'Help', href: '/influencer/help', activeIcon: Information2Fill, inactiveIcon: Information2Line },
   ];
 
   const handleLogout = () => {
-    localStorage.removeItem('authToken');
-    localStorage.removeItem('userInfo');
-    document.cookie = 'authToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+    if (typeof window !== 'undefined') {
+      ['authToken', 'userData', 'userEmail', 'userInfo', 'landing_search_results', 'landing_search_prompt'].forEach((key) => localStorage.removeItem(key));
+      ['authToken', 'userType', 'token'].forEach((name) => {
+        document.cookie = `${name}=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;`;
+        document.cookie = `${name}=; path=/; domain=${window.location.hostname}; expires=Thu, 01 Jan 1970 00:00:01 GMT;`;
+      });
+    }
     setShowLogoutModal(false);
     router.push('/login');
   };
@@ -67,53 +75,54 @@ const InfluencerSidebar = () => {
           icon={pathname === item.href ? item.activeIcon : item.inactiveIcon}
           label={item.name}
           isActive={pathname === item.href}
+          badge={item.badge}
           isExpanded={isExpanded}
         />
       ),
     })),
-    ...bottomNavItemsConfig.map((item) => ({
-      ...item,
-      isBottom: true,
-      component: (
-        <NavItem
-          key={item.name}
-          href={item.href}
-          icon={pathname === item.href ? item.activeIcon : item.inactiveIcon}
-          label={item.name}
-          isActive={pathname === item.href}
-          isExpanded={isExpanded}
-        />
-      ),
-    })),
-    {
-      name: 'Logout Account',
-      isBottom: true,
-      component: (
-        <button
-          key="logout"
-          onClick={() => setShowLogoutModal(true)}
-          className={`flex gap-[4px] items-center py-[6px] relative shrink-0 w-full transition-colors duration-300 bg-transparent border-none cursor-pointer ${
-            isExpanded ? 'rounded-[32px] px-[12px]' : 'flex-col justify-center h-[64px]'
-          }`}
-        >
-          <div className="flex items-center justify-center relative rounded-[8px] shrink-0">
-            <div className={`flex gap-[10px] items-center justify-center relative rounded-[8px] shrink-0 transition-all duration-300 ${
-              isExpanded ? 'px-[4px] py-[8px]' : 'h-[32px] p-[4px]'
-            }`}>
-              <LogoutBoxLine width={24} height={24} fill={colors.semantic.error.bold} />
-            </div>
-          </div>
-          <div
-            className={`flex flex-col font-medium justify-center leading-none relative shrink-0 text-center transition-colors duration-300 text-[14px] tracking-[0.2px] ${
-              isExpanded ? 'whitespace-nowrap' : 'w-full'
-            }`}
-            style={{ color: colors.semantic.error.bold }}
-          >
-            <p className="leading-[20px]">Logout</p>
-          </div>
-        </button>
-      ),
-    },
+    // ...bottomNavItemsConfig.map((item) => ({
+    //   ...item,
+    //   isBottom: true,
+    //   component: (
+    //     <NavItem
+    //       key={item.name}
+    //       href={item.href}
+    //       icon={pathname === item.href ? item.activeIcon : item.inactiveIcon}
+    //       label={item.name}
+    //       isActive={pathname === item.href}
+    //       isExpanded={isExpanded}
+    //     />
+    //   ),
+    // })),
+    // {
+    //   name: 'Logout Account',
+    //   isBottom: true,
+    //   component: (
+    //     <button
+    //       key="logout"
+    //       onClick={() => setShowLogoutModal(true)}
+    //       className={`flex gap-[4px] items-center py-[6px] relative shrink-0 w-full transition-colors duration-300 bg-transparent border-none cursor-pointer ${
+    //         isExpanded ? 'rounded-[32px] px-[12px]' : 'flex-col justify-center h-[64px]'
+    //       }`}
+    //     >
+    //       <div className="flex items-center justify-center relative rounded-[8px] shrink-0">
+    //         <div className={`flex gap-[10px] items-center justify-center relative rounded-[8px] shrink-0 transition-all duration-300 ${
+    //           isExpanded ? 'px-[4px] py-[8px]' : 'h-[32px] p-[4px]'
+    //         }`}>
+    //           <LogoutBoxLine width={24} height={24} fill={colors.semantic.error.bold} />
+    //         </div>
+    //       </div>
+    //       <div
+    //         className={`flex flex-col font-medium justify-center leading-none relative shrink-0 text-center transition-colors duration-300 text-[14px] tracking-[0.2px] ${
+    //           isExpanded ? 'whitespace-nowrap' : 'w-full'
+    //         }`}
+    //         style={{ color: colors.semantic.error.bold }}
+    //       >
+    //         <p className="leading-[20px]">Logout</p>
+    //       </div>
+    //     </button>
+    //   ),
+    // },
   ];
 
   return (

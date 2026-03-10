@@ -491,11 +491,14 @@ export default function AdminDashboard() {
   };
 
   const handleLogout = () => {
-    // Remove token from localStorage (adjust if you use cookies or a different key)
-    if (typeof window !== "undefined") {
-      localStorage.removeItem("token");
+    if (typeof window !== 'undefined') {
+      ['authToken', 'token', 'adminToken', 'adminInfo', 'userData', 'userEmail', 'userInfo', 'landing_search_results', 'landing_search_prompt'].forEach((key) => localStorage.removeItem(key));
+      ['authToken', 'userType', 'token'].forEach((name) => {
+        document.cookie = `${name}=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;`;
+        document.cookie = `${name}=; path=/; domain=${window.location.hostname}; expires=Thu, 01 Jan 1970 00:00:01 GMT;`;
+      });
     }
-    router.replace("/admin/login");
+    router.replace('/admin/login');
   };
 
   const requests = tab === "Brands" ? brandRequests : influencerRequests;

@@ -2,9 +2,11 @@
 import React, { useState } from 'react';
 import { ArrowLeftLine, BellLine, MoreLine, CheckLine, CloseLine, ArrowRightLine } from '@phyoofficial/phyo-icon-library';
 import { useRouter } from 'next/navigation';
+import { useGoBack } from '@/hooks/useGoBack';
 
 function NotificationsPage() {
   const router = useRouter();
+  const goBack = useGoBack();
   const [activeFilter, setActiveFilter] = useState('All');
 
   const filters = [
@@ -220,4 +222,3 @@ function NotificationsPage() {
 }
 
 export default NotificationsPage;
-

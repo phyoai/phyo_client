@@ -1,5 +1,6 @@
 import React from 'react';
 import { useRouter } from 'next/navigation';
+import { useAuth } from '@/app/context/AuthContext';
 
 /**
  * Inline Conversion Card Component
@@ -13,6 +14,8 @@ export default function InlineConversionCard({
   secondaryButtonText = "Learn more"
 }) {
   const router = useRouter();
+  const { getUserType } = useAuth();
+    const role = (getUserType() || 'user').toLowerCase();
 
   return (
     <div className="mb-8 bg-gradient-to-br from-gray-800 via-gray-900 to-black rounded-3xl p-6 sm:p-8 text-white relative overflow-hidden">
@@ -44,13 +47,13 @@ export default function InlineConversionCard({
         {/* Action Buttons */}
         <div className="flex flex-wrap gap-3">
           <button 
-            onClick={() => router.push('/brand/account/upgrade-plan')}
+            onClick={() => router.push(`/${role}/brand/account/upgrade-plan`)}
             className="px-5 py-2 bg-neutral-base text-gray-900 rounded-full font-semibold hover:bg-gray-100 transition-colors text-sm"
           >
             {primaryButtonText}
           </button>
           <button 
-            onClick={() => router.push('/brand/learn-more')}
+            onClick={() => router.push(`/${role}/brand/learn-more`)}
             className="px-5 py-2 border border-white text-white rounded-full font-semibold hover:bg-neutral-base/10 transition-colors text-sm"
           >
             {secondaryButtonText}

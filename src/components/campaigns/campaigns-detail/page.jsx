@@ -9,10 +9,12 @@ import Button from '@/components/Button';
 import IconButton from '@/components/IconButton';
 import Card from '@/components/Card';
 import { campaignAPI } from '@/utils/api';
+import { useGoBack } from '@/hooks/useGoBack';
 
 export default function CampaignDetailPage() {
   const params = useParams();
   const router = useRouter();
+  const goBack = useGoBack();
   const campaignId = params.id;
 
   const [campaign, setCampaign] = useState(null);

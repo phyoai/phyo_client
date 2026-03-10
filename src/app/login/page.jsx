@@ -173,8 +173,10 @@ function LoginForm() {
                     if (userData.email) {
                         localStorage.setItem('userEmail', userData.email);
                     }
+                    const userType = userData.type || 'USER';
+                    document.cookie = `userType=${userType}; path=/; max-age=${7 * 24 * 60 * 60}`;
                 }
-                
+
                 toast.success('Successfully signed in with Google!');
                 
                 // Determine redirect based on user type and registration status
@@ -241,8 +243,10 @@ function LoginForm() {
                 const userData = result.user || result.data?.user;
                 if (userData) {
                     localStorage.setItem('userData', JSON.stringify(userData));
+                    const userType = userData.type || 'USER';
+                    document.cookie = `userType=${userType}; path=/; max-age=${7 * 24 * 60 * 60}`;
                 }
-                
+
                 toast.success('Login successful! Welcome back!');
                 
                 // Determine redirect based on user type and registration status

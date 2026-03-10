@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { ArrowLeftLine, FileTextLine, Message3Line, MailLine, PhoneLine, CloseLine, SearchLine } from '@phyoofficial/phyo-icon-library';
+import { useGoBack } from '@/hooks/useGoBack';
 import AppBar from '@/components/AppBar';
 import Button from '@/components/Button';
 import IconButton from '@/components/IconButton';
@@ -11,6 +12,7 @@ import { colors } from '@/config/colors';
 
 export default function HelpSupportAll() {
   const router = useRouter();
+  const goBack = useGoBack();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isLanguageModalOpen, setIsLanguageModalOpen] = useState(false);
   const [selectedLanguage, setSelectedLanguage] = useState('english');

@@ -3,6 +3,7 @@ import { useRouter } from 'next/navigation';
 import SectionHeading from '@/components/SectionHeading';
 import InfluencerAvatar from '@/components/cards/InfluencerAvatar';
 import { influencerAPI } from '@/utils/api';
+import { useAuth } from '@/app/context/AuthContext';
 
 /**
  * Influencer List Section Component
@@ -14,6 +15,8 @@ export default function InfluencerListSection({
   limit = 10,
   showViewAll = true
 }) {
+  const { getUserType } = useAuth();
+  const role = (getUserType() || 'user').toLowerCase();
   const router = useRouter();
   const [influencers, setInfluencers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -30,7 +33,7 @@ export default function InfluencerListSection({
         const formattedInfluencers = influencersData
           .slice(0, limit)
           .map((influencer, index) => ({
-            id: influencer.id,
+            id: influencer.id || influencer._id || index, // fallback added
             name: influencer.name || 'Influencer',
             avatar: influencer.avatar || '/dummyAvatar.jpg',
             color: getAvatarColor(index)
@@ -49,14 +52,13 @@ export default function InfluencerListSection({
 
     fetchInfluencers();
   }, [limit]);
-
   return (
     <div className="mb-8">
       <SectionHeading
         title={title}
         eyebrow={eyebrow}
         showViewAll={showViewAll}
-        onViewAll={() => router.push('/brand/influencer-search')}
+        onViewAll={() => router.push(`/${role}/influencer-search`)}
       />
 
       {/* Loading State */}
@@ -87,7 +89,7 @@ export default function InfluencerListSection({
               name={influencer.name}
               avatar={influencer.avatar}
               bgColor={influencer.color}
-              onClick={() => router.push(`/brand/influencer/${influencer.id}`)}
+              onClick={() => router.push(`/${role}/influencers/${influencer.id || index}`)}
             />
           ))}
         </div>

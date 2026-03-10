@@ -3,12 +3,14 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { ArrowLeftLine, MoreLine, DeleteBinLine, DownloadLine, AddLine } from '@phyoofficial/phyo-icon-library';
+import { useGoBack } from '@/hooks/useGoBack';
 import Button from '@/components/Button';
 import IconButton from '@/components/IconButton';
 import Card from '@/components/Card';
 
 export default function MyListsAll() {
   const router = useRouter();
+  const goBack = useGoBack();
   const [loading, setLoading] = useState(false);
   const [selectionMode, setSelectionMode] = useState(false);
   const [selectedItems, setSelectedItems] = useState([]);

@@ -3,9 +3,11 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import AppBar from '@/components/AppBar';
+import { useGoBack } from '@/hooks/useGoBack';
 
 export default function NotificationPreferencesAll() {
   const router = useRouter();
+  const goBack = useGoBack();
   const [preferences, setPreferences] = useState({
     smsAlerts: true,
     emailAlerts: true,

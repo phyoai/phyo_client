@@ -3,6 +3,7 @@ import { useRouter } from 'next/navigation';
 import SectionHeading from '@/components/SectionHeading';
 import CampaignCard from '@/components/cards/CampaignCard';
 import { campaignAPI } from '@/utils/api';
+import { useAuth } from '@/app/context/AuthContext';
 
 /**
  * Campaign Section Component
@@ -14,6 +15,8 @@ export default function CampaignSection({
   campaignsCount = 3,
   showViewAll = true 
 }) {
+  const { getUserType } = useAuth();
+    const role = (getUserType() || 'user').toLowerCase();
   const router = useRouter();
   const [campaignsAll, setCampaigns] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -102,7 +105,7 @@ export default function CampaignSection({
         title={title}
         eyebrow={eyebrow}
         showViewAll={showViewAll}
-        onViewAll={() => router.push('/brand/campaigns')}
+        onViewAll={() => router.push(`/${role}/campaigns`)}
       />
 
       {/* Campaigns Grid - responsive */}
@@ -120,7 +123,7 @@ export default function CampaignSection({
               timeAgo={campaign.timeAgo}
               campaignImage={campaign.campaignImage}
               initialsColor={campaign.initialsColor}
-              onClick={() => router.push(`/brand/campaigns/${campaign.id}`)}
+              onClick={() => router.push(`/${role}/campaigns/${campaign.id}`)}
             />
           ))
         ) : (

@@ -14,6 +14,7 @@ function UserLayoutContent({ children, pathname }) {
   }, [pathname]);
   
   // Don't show sidebar for specific pages
+  const isAuthPage = pathname === '/user/signup' || pathname === '/user/login';
   const isCreateCampaignPage = pathname === '/user/campaigns/create-campaign';
   const isNewApplicationsPage = pathname === '/user/campaigns/new-applications';
   const isAllCampaignsPage = pathname === '/user/campaigns/all-campaigns';
@@ -34,6 +35,7 @@ function UserLayoutContent({ children, pathname }) {
   const isInboxPage = pathname === '/user/inbox';
 
   if (
+    isAuthPage ||
     isCreateCampaignPage ||
     isNewApplicationsPage ||
     isAllCampaignsPage ||

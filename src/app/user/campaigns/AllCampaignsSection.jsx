@@ -1,7 +1,7 @@
 'use client'
 import React, { useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { ArrowLeftLine, ArrowRightLine, CloseLine, UploadLine, CalendarLine, CheckLine, UserLine, MoreLine, DeleteBinLine, EditLine, SearchLine, HeartLine, LineChartLine } from '@phyoofficial/phyo-icon-library';
+import { ArrowLeftLine, ArrowRightLine, CloseLine, UploadLine, CalendarLine, CheckLine, UserLine, MoreLine, DeleteBinLine, EditLine, SearchLine, HeartLine, LineChartLine, CheckboxLine } from '@phyoofficial/phyo-icon-library';
 import { campaignAPI } from '../../../utils/api';
 import { useSidebar } from '../../context/SidebarContext';
 import { AudienceEngagement } from '@/components/AudienceEngagementGraphs';
@@ -198,7 +198,7 @@ const AllCampaignsSection = () => {
   React.useEffect(() => {
     // Set the button action to navigate to create campaign page
     setSidebarButtonAction(() => () => {
-      window.location.href = '/user/campaigns/create-campaign';
+      window.location.href = '/brand/campaigns/create-campaign';
     });
     setSidebarButtonLabel('Create Campaign');
 
@@ -273,8 +273,9 @@ const AllCampaignsSection = () => {
   // Open campaign detail modal
   const handleCampaignClick = async (campaign) => {
     // Navigate to campaign detail page instead of showing modal
-    router.push(`/user/campaigns/${campaign._id}`);
+    router.push(`/brand/campaigns/${campaign._id}`);
   };
+
   // Enable edit mode
   const handleEnableEdit = () => {
     setIsEditMode(true);
@@ -395,7 +396,7 @@ const AllCampaignsSection = () => {
       <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium
         ${status === 'completed' ? 'bg-green-600 text-white' : 
           status === 'current' ? 'bg-green-600 text-white' : 'bg-gray-200 text-gray-400'}`}>
-        {status === 'completed' ? <Check className="w-4 h-4" /> : stepNumber}
+        {status === 'completed' ? <CheckLine className="w-4 h-4" /> : stepNumber}
       </div>
       <div className="ml-3">
         <div className={`text-sm font-medium ${status === 'current' ? 'text-gray-900' : 'text-gray-500'}`}>
@@ -483,15 +484,15 @@ const AllCampaignsSection = () => {
               
               {/* Three-dot Menu */}
               <div className="relative" ref={menuRef}>
-                <button
+                <IconButton
+                  icon={MoreLine}
+                  size="sm"
+                  variant="default"
                   onClick={(e) => {
                     e.stopPropagation();
                     setOpenMenuId(openMenuId === campaign._id ? null : campaign._id);
                   }}
-                  className="p-1 hover:bg-gray-100 rounded-full transition-colors"
-                >
-                  <MoreLine className="w-4 h-4 text-gray-600" />
-                </button>
+                />
                 
                 {openMenuId === campaign._id && (
                   <div className="absolute right-0 mt-2 w-40 bg-neutral-base rounded-lg shadow-lg border border-gray-200 z-10">
@@ -1554,7 +1555,7 @@ const AllCampaignsSection = () => {
               <div className="flex items-center justify-between pt-4 mb-[14px]">
                 <h2 className="text-[18px] font-semibold text-gray-900 leading-[26px] tracking-tight">Recent Campaigns</h2>
                 <button 
-                  onClick={() => router.push('/user/campaigns/all-campaigns')}
+                  onClick={() => router.push('/brand/campaigns/all-campaigns')}
                   className="flex items-center pr-1"
                 >
                   <span className="text-[16px] font-semibold text-blue-700 leading-6 tracking-[0.24px]">view all</span>
@@ -1669,7 +1670,7 @@ const AllCampaignsSection = () => {
           <div className="flex items-center justify-between pt-4 mb-[14px]">
             <h2 className="text-[18px] font-semibold text-gray-900 leading-[26px] tracking-tight">New Applications</h2>
             <button 
-              onClick={() => router.push('/user/campaigns/new-applications')}
+              onClick={() => router.push('/brand/campaigns/new-applications')}
               className="flex items-center pr-1 hover:opacity-80 transition-opacity cursor-pointer"
             >
               <span className="text-[16px] font-semibold text-blue-700 leading-6 tracking-[0.24px]">view all</span>
@@ -1729,12 +1730,12 @@ const AllCampaignsSection = () => {
           <SpendingBudget />
         </div>
 
-        {/* Draft Campaigns Section */}
+        {/* Draft Campaigns Section  new testing*/}
         <div className="mb-8">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold text-gray-900">Draft Campaigns</h2>
             <button 
-              onClick={() => router.push('/user/campaigns/all-drafts')}
+              onClick={() => router.push('/brand/campaigns/all-drafts')}
               className="text-blue-600 text-sm font-medium hover:underline"
             >
               view all &gt;
@@ -1914,314 +1915,8 @@ const AllCampaignsSection = () => {
       )}
 
       {/* Campaign Detail/EditLine Modal */}
-      {showDetailModal && selectedCampaign && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-neutral-base rounded-lg max-w-4xl w-full max-h-[90vh] overflow-hidden">
-            {/* Modal Header */}
-            <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <h2 className="text-2xl font-bold text-gray-900">Campaign Detailss</h2>
-                <span className={`text-xs px-3 py-1 rounded-full ${
-                  selectedCampaign.status === 'Active' ? 'text-green-600 bg-green-50' :
-                  selectedCampaign.status === 'Draft' ? 'text-gray-600 bg-gray-50' :
-                  selectedCampaign.status === 'Completed' ? 'text-blue-600 bg-blue-50' :
-                  'text-orange-600 bg-orange-50'
-                }`}>
-                  {selectedCampaign.status}
-                </span>
-              </div>
-              <div className="flex items-center gap-2">
-                {!isEditMode && (
-                  <button
-                    onClick={handleEnableEdit}
-                    className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-                    title="EditLine Campaign"
-                  >
-                    <EditLine className="w-5 h-5 text-gray-600" />
-                  </button>
-                )}
-                <button 
-                  onClick={() => {
-                    setShowDetailModal(false);
-                    setIsEditMode(false);
-                    setSelectedCampaign(null);
-                  }}
-                  className="text-gray-400 hover:text-gray-600"
-                >
-                  <CloseLine className="w-6 h-6" />
-                </button>
-              </div>
-            </div>
-
-            {/* Modal Content */}
-            <div className="px-6 py-6 max-h-[70vh] overflow-y-auto">
-              <div className="space-y-6">
-                {/* Product Images */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Product Images</label>
-                  <div className="grid grid-cols-4 gap-4">
-                    {selectedCampaign.productImages?.map((img, idx) => (
-                      <div key={idx} className="aspect-square bg-gray-200 rounded-lg overflow-hidden">
-                        <img src={img} alt={`Product ${idx + 1}`} className="w-full h-full object-cover" />
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Campaign Name - EDITABLE */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Campaign Name {isEditMode && <span className="text-green-600">✎ Editable</span>}
-                  </label>
-                  {isEditMode ? (
-                    <input
-                      type="text"
-                      value={selectedCampaign.campaignName}
-                      onChange={(e) => handleUpdateField('campaignName', e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
-                    />
-                  ) : (
-                    <p className="text-gray-900">{selectedCampaign.campaignName}</p>
-                  )}
-                </div>
-
-                {/* Campaign Type - READ ONLY */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Campaign Type</label>
-                  <p className="text-gray-900 capitalize">{selectedCampaign.campaignType}</p>
-                </div>
-
-                {/* Campaign Brief - READ ONLY */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Campaign Brief</label>
-                  <p className="text-gray-900">{selectedCampaign.campaignBrief}</p>
-                </div>
-
-                {/* Status - EDITABLE */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Status {isEditMode && <span className="text-green-600">✎ Editable</span>}
-                  </label>
-                  {isEditMode ? (
-                    <select
-                      value={selectedCampaign.status}
-                      onChange={(e) => handleUpdateField('status', e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
-                    >
-                      <option value="Draft">Draft</option>
-                      <option value="Active">Active</option>
-                      <option value="Completed">Completed</option>
-                      <option value="Paused">Paused</option>
-                    </select>
-                  ) : (
-                    <p className="text-gray-900">{selectedCampaign.status}</p>
-                  )}
-                </div>
-
-                {/* Compensation - EDITABLE */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Compensation {isEditMode && <span className="text-green-600">✎ Editable</span>}
-                  </label>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-xs text-gray-600 mb-1">Type</label>
-                      {isEditMode ? (
-                        <select
-                          value={selectedCampaign.compensation.type}
-                          onChange={(e) => handleUpdateNestedField('compensation', 'type', e.target.value)}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
-                        >
-                          <option value="Monetary">Monetary</option>
-                          <option value="Barter/Gifting">Barter/Gifting</option>
-                          <option value="Affiliate/Commission">Affiliate/Commission</option>
-                        </select>
-                      ) : (
-                        <p className="text-gray-900">{selectedCampaign.compensation.type}</p>
-                      )}
-                    </div>
-                    <div>
-                      <label className="block text-xs text-gray-600 mb-1">Amount</label>
-                      {isEditMode ? (
-                        <input
-                          type="number"
-                          value={selectedCampaign.compensation.amount}
-                          onChange={(e) => handleUpdateNestedField('compensation', 'amount', parseInt(e.target.value))}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
-                        />
-                      ) : (
-                        <p className="text-gray-900">{selectedCampaign.compensation.currency} {selectedCampaign.compensation.amount}</p>
-                      )}
-                    </div>
-                    <div className="col-span-2">
-                      <label className="block text-xs text-gray-600 mb-1">Description</label>
-                      {isEditMode ? (
-                        <textarea
-                          value={selectedCampaign.compensation.description}
-                          onChange={(e) => handleUpdateNestedField('compensation', 'description', e.target.value)}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
-                          rows={2}
-                        />
-                      ) : (
-                        <p className="text-gray-900">{selectedCampaign.compensation.description}</p>
-                      )}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Budget - EDITABLE */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Budget {isEditMode && <span className="text-green-600">✎ Editable</span>}
-                  </label>
-                  {isEditMode ? (
-                    <input
-                      type="number"
-                      value={selectedCampaign.budget}
-                      onChange={(e) => handleUpdateField('budget', parseInt(e.target.value))}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
-                    />
-                  ) : (
-                    <p className="text-gray-900">{selectedCampaign.compensation?.currency || 'INR'} {selectedCampaign.budget}</p>
-                  )}
-                </div>
-
-                {/* Deliverables - EDITABLE */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Deliverables {isEditMode && <span className="text-green-600">✎ Editable</span>}
-                  </label>
-                  {isEditMode ? (
-                    <textarea
-                      value={Array.isArray(selectedCampaign.deliverables) ? selectedCampaign.deliverables.join(', ') : selectedCampaign.deliverables}
-                      onChange={(e) => handleUpdateField('deliverables', e.target.value.split(',').map(d => d.trim()))}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
-                      rows={3}
-                      placeholder="Separate deliverables with commas"
-                    />
-                  ) : (
-                    <ul className="list-disc list-inside text-gray-900">
-                      {Array.isArray(selectedCampaign.deliverables) 
-                        ? selectedCampaign.deliverables.map((d, idx) => <li key={idx}>{d}</li>)
-                        : <li>{selectedCampaign.deliverables}</li>
-                      }
-                    </ul>
-                  )}
-                </div>
-
-                {/* Timelines - READ ONLY */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Timeline</label>
-                  <div className="grid grid-cols-3 gap-4 text-sm">
-                    <div>
-                      <p className="text-gray-600">Application Deadline</p>
-                      <p className="text-gray-900">{new Date(selectedCampaign.timelines.applicationDeadline).toLocaleDateString()}</p>
-                    </div>
-                    <div>
-                      <p className="text-gray-600">Campaign Start</p>
-                      <p className="text-gray-900">{new Date(selectedCampaign.timelines.campaignStartDate).toLocaleDateString()}</p>
-                    </div>
-                    <div>
-                      <p className="text-gray-600">Campaign End</p>
-                      <p className="text-gray-900">{new Date(selectedCampaign.timelines.campaignEndDate).toLocaleDateString()}</p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Target Influencer - READ ONLY */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Target Influencer Criteria</label>
-                  <div className="bg-gray-50 p-4 rounded-lg space-y-2 text-sm">
-                    <p><span className="font-medium">Number of Influencers:</span> {selectedCampaign.targetInfluencer.numberOfInfluencers}</p>
-                    <p><span className="font-medium">Niche:</span> {selectedCampaign.targetInfluencer.targetNiche.join(', ')}</p>
-                    <p><span className="font-medium">Follower Range:</span> {selectedCampaign.targetInfluencer.followerCount.min.toLocaleString()} - {selectedCampaign.targetInfluencer.followerCount.max.toLocaleString()}</p>
-                    <p><span className="font-medium">Countries:</span> {selectedCampaign.targetInfluencer.countries.join(', ')}</p>
-                    <p><span className="font-medium">Gender:</span> {selectedCampaign.targetInfluencer.gender.join(', ')}</p>
-                    <p><span className="font-medium">Age Range:</span> {selectedCampaign.targetInfluencer.ageRange.min} - {selectedCampaign.targetInfluencer.ageRange.max}</p>
-                  </div>
-                </div>
-
-                {/* Number of Live Posts - READ ONLY */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Number of Live Posts</label>
-                  <p className="text-gray-900">{selectedCampaign.numberOfLivePosts}</p>
-                </div>
-
-                {/* Applicants & Selected Influencers */}
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Applicants</label>
-                    <p className="text-2xl font-bold text-blue-600">{selectedCampaign.applicants.length}</p>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Selected Influencers</label>
-                    <p className="text-2xl font-bold text-green-600">{selectedCampaign.selectedInfluencers.length}</p>
-                  </div>
-                </div>
-
-                {/* Suggested Influencers */}
-                {selectedCampaign.suggestedInfluencers && selectedCampaign.suggestedInfluencers.length > 0 && (
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">AI Suggested Influencers</label>
-                    <div className="space-y-2">
-                      {selectedCampaign.suggestedInfluencers.map((influencer, idx) => (
-                        <div key={idx} className="bg-green-50 p-3 rounded-lg">
-                          <div className="flex items-center justify-between mb-1">
-                            <p className="font-medium text-gray-900">@{influencer.username}</p>
-                            <span className="text-xs bg-green-600 text-white px-2 py-1 rounded">
-                              {influencer.matchScore}% Match
-                            </span>
-                          </div>
-                          <p className="text-sm text-gray-600">{influencer.reason}</p>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* Modal Footer */}
-            <div className="px-6 py-4 border-t border-gray-200 flex items-center justify-between">
-              {isEditMode ? (
-                <>
-                  <button
-                    onClick={handleCancelEdit}
-                    disabled={isUpdating}
-                    className="px-4 py-2 bg-gray-200 rounded-lg text-gray-700 hover:bg-gray-300"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    onClick={handleSaveUpdates}
-                    disabled={isUpdating}
-                    className={`px-6 py-2 rounded-lg font-medium ${
-                      isUpdating 
-                        ? 'bg-gray-400 text-white cursor-not-allowed' 
-                        : 'bg-green-600 hover:bg-green-700 text-white'
-                    }`}
-                  >
-                    {isUpdating ? 'Saving...' : 'Save Changes'}
-                  </button>
-                </>
-              ) : (
-                <button
-                  onClick={() => {
-                    setShowDetailModal(false);
-                    setSelectedCampaign(null);
-                  }}
-                  className="ml-auto px-4 py-2 bg-gray-200 rounded-lg text-gray-700 hover:bg-gray-300"
-                >
-                  Close
-                </button>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 };
 
 export default AllCampaignsSection;
-

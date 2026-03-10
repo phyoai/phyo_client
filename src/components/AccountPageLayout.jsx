@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTheme } from '@/app/context/ThemeContext';
+import { useGoBack } from '@/hooks/useGoBack';
 import { colors } from '@/config/colors';
 import AppBar from './AppBar';
 import {
@@ -78,6 +79,7 @@ const SettingMenuItem = ({ icon: Icon, label, description, onClick, isDanger = f
 
 export default function AccountPageLayout() {
   const router = useRouter();
+  const goBack = useGoBack();
   const { darkMode, toggleDarkMode } = useTheme();
   const [notificationEnabled, setNotificationEnabled] = useState(true);
 

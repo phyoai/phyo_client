@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { motion } from 'framer-motion';
+import { useGoBack } from '@/hooks/useGoBack';
 import { 
   ArrowLeftLine, 
   UserLine, 
@@ -25,6 +26,7 @@ import EngagementCard from '@/components/cards/EngagementCard';
 
 export default function InfluencerDetailsPage() {
   const router = useRouter();
+  const goBack = useGoBack();
   const params = useParams();
   const username = params?.username;
   

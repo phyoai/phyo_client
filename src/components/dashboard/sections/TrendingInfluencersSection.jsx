@@ -2,12 +2,15 @@ import React from 'react';
 import { useRouter } from 'next/navigation';
 import SectionHeading from '@/components/SectionHeading';
 import InfluencerAvatar from '@/components/cards/InfluencerAvatar';
+import { useAuth } from '@/app/context/AuthContext';
 
 /**
  * Trending Influencers Section
  * Displays a horizontal scrollable list of trending influencers
  */
-export default function TrendingInfluencersSection() {
+export default function TrendingInfluencersSection( ) {
+  const { getUserType } = useAuth();
+  const role = (getUserType() || 'user').toLowerCase();
   const router = useRouter();
 
   // Mock data - will be replaced with API
@@ -26,7 +29,8 @@ export default function TrendingInfluencersSection() {
     <div className="mb-8">
       <SectionHeading 
         title="Trending Influencers" 
-        onViewAll={() => router.push('/brand/influencers')}
+        onViewAll={() => router.push(`/${role}/influencers`)}
+        // onClick={() => router.push(`/${role.toLowerCase()}/influencers/${influencer.id}`)}
       />
 
       {/* Horizontal Scroll of Influencers */}
@@ -37,7 +41,7 @@ export default function TrendingInfluencersSection() {
             name={influencer.name}
             avatar={influencer.avatar}
             bgColor={influencer.color}
-            onClick={() => router.push(`/brand/influencers/${influencer.id}`)}
+            onClick={() => router.push(`/${role}/influencers/${influencer.id}`)}
           />
         ))}
       </div>

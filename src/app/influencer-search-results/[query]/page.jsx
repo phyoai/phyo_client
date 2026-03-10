@@ -4,9 +4,11 @@ import { useEffect, useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { UserLine, ArrowRightLine, CheckLine, LineChartLine } from '@phyoofficial/phyo-icon-library';
+import { useGoBack } from '@/hooks/useGoBack';
 
 export default function SearchResultsPage() {
   const router = useRouter();
+  const goBack = useGoBack();
   const params = useParams();
   const query = params?.query;
   

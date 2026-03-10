@@ -85,6 +85,9 @@ export const AuthProvider = ({ children }) => {
         authUtils.setToken(authToken);
         if (typeof window !== 'undefined') {
           localStorage.setItem('userData', JSON.stringify(userData));
+          // Store userType in cookie so middleware can enforce role-based routing
+          const userType = userData.type || 'USER';
+          document.cookie = `userType=${userType}; path=/; max-age=${7 * 24 * 60 * 60}`;
         }
         
         // Determine redirect path based on user type and registration status
@@ -149,18 +152,25 @@ export const AuthProvider = ({ children }) => {
   // Logout function
   const logout = () => {
     if (typeof window !== 'undefined') {
-      // Clear localStorage first
+      // Clear all localStorage keys
       localStorage.removeItem('authToken');
       localStorage.removeItem('userData');
       localStorage.removeItem('userEmail');
-      
-      // Clear cookies
-      document.cookie = 'authToken=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+      localStorage.removeItem('userInfo');
+      localStorage.removeItem('landing_search_results');
+      localStorage.removeItem('landing_search_prompt');
+
+      // Clear all auth-related cookies
+      const cookiesToClear = ['authToken', 'userType', 'token'];
+      cookiesToClear.forEach((name) => {
+        document.cookie = `${name}=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;`;
+        document.cookie = `${name}=; path=/; domain=${window.location.hostname}; expires=Thu, 01 Jan 1970 00:00:01 GMT;`;
+      });
     }
-    
-    // Clear all auth state after clearing storage
+
     setUser(null);
     setToken(null);
+    router.push('/login');
   };
 
   // Check if user is authenticated

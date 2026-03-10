@@ -76,7 +76,7 @@ const NavRail = ({
             className="absolute left-[8px] right-[8px] rounded-[12px] transition-all duration-[350ms] ease-out pointer-events-none"
             style={{
               backgroundColor: colors.accent.base,
-              top: `${indicatorStyle.top}px`,
+              top: `${indicatorStyle?.top}px`,
               // height: `${indicatorStyle.height}px`,
             }}
           />
