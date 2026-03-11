@@ -15,16 +15,24 @@ const Hero = ({ handleSubmit, token }) => {
     }
 
     useEffect(() => {
-        const savedPrompt = localStorage.getItem("searchPrompt")
-        console.log("Saved prompt:", savedPrompt);
-        
-        if (savedPrompt) {
-            console.log("Running in the if");
-            
-            setPrompt(savedPrompt)
-            localStorage.removeItem("searchPrompt")
+        try {
+            const savedPrompt = localStorage.getItem("searchPrompt")
+            console.log("Saved prompt:", savedPrompt);
+
+            if (savedPrompt) {
+                console.log("Running in the if");
+
+                setPrompt(savedPrompt)
+                try {
+                    localStorage.removeItem("searchPrompt")
+                } catch (e) {
+                    console.warn("Failed to remove searchPrompt from localStorage:", e);
+                }
+            }
+            console.log("Running out of if");
+        } catch (e) {
+            console.warn("localStorage access failed in Hero component:", e);
         }
-        console.log("Running out of if");
     }, [])
 
     return (

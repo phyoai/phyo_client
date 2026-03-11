@@ -11,9 +11,18 @@ export default function SearchLine() {
     // Restore previous search on mount
     React.useEffect(() => {
         try {
-            const savedResults = localStorage.getItem('home_search_results');
-            const savedPrompt = localStorage.getItem('home_search_prompt');
-            
+            let savedResults = null;
+            let savedPrompt = null;
+
+            // Try to get from localStorage
+            try {
+                savedResults = localStorage.getItem('home_search_results');
+                savedPrompt = localStorage.getItem('home_search_prompt');
+            } catch (e) {
+                console.warn('localStorage access failed in Search component:', e);
+                // Continue without cached results
+            }
+
             if (savedResults) {
                 const parsedResults = JSON.parse(savedResults);
                 if (Array.isArray(parsedResults) && parsedResults.length > 0) {
@@ -21,7 +30,7 @@ export default function SearchLine() {
                     setFetchingState("success");
                 }
             }
-            
+
             if (savedPrompt) {
                 setPrompt(savedPrompt);
             }
@@ -44,24 +53,37 @@ export default function SearchLine() {
             if (res.data.data.length < 1) {
                 setFetchingState("notFound")
                 // Clear localStorage if no results
-                localStorage.removeItem('home_search_results');
-                localStorage.removeItem('home_search_prompt');
+                try {
+                    localStorage.removeItem('home_search_results');
+                    localStorage.removeItem('home_search_prompt');
+                } catch (e) {
+                    console.warn('Failed to clear localStorage:', e);
+                }
             } else {
                 setInfluencers(res.data.data)
                 // Store in localStorage for persistence
-                localStorage.setItem('influencer_search_results', JSON.stringify(res.data.data))
-                localStorage.setItem('home_search_results', JSON.stringify(res.data.data))
-                localStorage.setItem('home_search_prompt', searchPrompt)
+                try {
+                    localStorage.setItem('influencer_search_results', JSON.stringify(res.data.data))
+                    localStorage.setItem('home_search_results', JSON.stringify(res.data.data))
+                    localStorage.setItem('home_search_prompt', searchPrompt)
+                } catch (e) {
+                    console.warn('Failed to store results in localStorage:', e);
+                    // Results are still displayed in memory, localStorage is just a bonus
+                }
                 setFetchingState("success")
             }
-            
+
         } catch (error) {
             alert("Could not fetch the influencers")
             setFetchingState("error")
             console.log(error);
             // Clear localStorage on error
-            localStorage.removeItem('home_search_results');
-            localStorage.removeItem('home_search_prompt');
+            try {
+                localStorage.removeItem('home_search_results');
+                localStorage.removeItem('home_search_prompt');
+            } catch (e) {
+                console.warn('Failed to clear localStorage on error:', e);
+            }
         }
     }
     return (

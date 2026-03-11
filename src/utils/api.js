@@ -15,14 +15,31 @@ api.interceptors.request.use(
     // Get token from localStorage or cookies (only in browser)
     if (typeof window !== 'undefined') {
       let token = null;
-      // Use adminToken for admin routes, else use authToken
-      if (window.location.pathname.startsWith('/admin')) {
-        token = localStorage.getItem('adminToken');
-      } else {
-        token = localStorage.getItem('authToken') || getCookie('authToken');
-      }
-      if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
+      try {
+        // Use adminToken for admin routes, else use authToken
+        if (window.location.pathname.startsWith('/admin')) {
+          if (isLocalStorageAvailable()) {
+            token = localStorage.getItem('adminToken');
+          }
+        } else {
+          if (isLocalStorageAvailable()) {
+            token = localStorage.getItem('authToken');
+          }
+          // Fallback to cookie if localStorage failed
+          if (!token) {
+            token = getCookie('authToken');
+          }
+        }
+        if (token) {
+          config.headers.Authorization = `Bearer ${token}`;
+        }
+      } catch (e) {
+        console.warn('Token retrieval failed:', e);
+        // Try to get from cookie as fallback
+        const cookieToken = getCookie('authToken');
+        if (cookieToken) {
+          config.headers.Authorization = `Bearer ${cookieToken}`;
+        }
       }
     }
     return config;
@@ -65,23 +82,43 @@ api.interceptors.response.use(
   }
 );
 
+// Helper function to detect if localStorage is available
+function isLocalStorageAvailable() {
+  try {
+    const test = '__localStorage_test__';
+    localStorage.setItem(test, 'test');
+    localStorage.removeItem(test);
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
+
 // Helper function to get cookie value
 function getCookie(name) {
   if (typeof document === 'undefined') return null;
-  
-  const value = `; ${document.cookie}`;
-  const parts = value.split(`; ${name}=`);
-  if (parts.length === 2) return parts.pop().split(';').shift();
+
+  try {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop().split(';').shift();
+  } catch (e) {
+    console.warn('Cookie access failed:', e);
+  }
   return null;
 }
 
 // Helper function to set cookie value
 function setCookie(name, value, days = 7) {
   if (typeof document === 'undefined') return;
-  
-  const expires = new Date();
-  expires.setTime(expires.getTime() + days * 24 * 60 * 60 * 1000);
-  document.cookie = `${name}=${value};expires=${expires.toUTCString()};path=/;SameSite=Lax`;
+
+  try {
+    const expires = new Date();
+    expires.setTime(expires.getTime() + days * 24 * 60 * 60 * 1000);
+    document.cookie = `${name}=${value};expires=${expires.toUTCString()};path=/;SameSite=Lax`;
+  } catch (e) {
+    console.warn('Cookie set failed:', e);
+  }
 }
 
 // User API functions
@@ -216,31 +253,67 @@ export const authUtils = {
   // Set authentication token in both localStorage and cookies
   setToken: (token) => {
     if (typeof window === 'undefined') return;
-    localStorage.setItem('authToken', token);
-    setCookie('authToken', token, 7); // Set cookie for 7 days
+    try {
+      if (isLocalStorageAvailable()) {
+        localStorage.setItem('authToken', token);
+      }
+    } catch (e) {
+      console.warn('Failed to set token in localStorage:', e);
+    }
+    // Always set in cookie as fallback
+    setCookie('authToken', token, 7);
   },
   
   // Check if user is authenticated
   isAuthenticated: () => {
     if (typeof window === 'undefined') return false;
-    const token = localStorage.getItem('authToken') || getCookie('authToken');
-    return !!token;
+    try {
+      let token = null;
+      if (isLocalStorageAvailable()) {
+        token = localStorage.getItem('authToken');
+      }
+      if (!token) {
+        token = getCookie('authToken');
+      }
+      return !!token;
+    } catch (e) {
+      console.warn('Auth check failed:', e);
+      return false;
+    }
   },
   
   // Get current user token
   getToken: () => {
     if (typeof window === 'undefined') return null;
-    return localStorage.getItem('authToken') || getCookie('authToken');
+    try {
+      let token = null;
+      if (isLocalStorageAvailable()) {
+        token = localStorage.getItem('authToken');
+      }
+      if (!token) {
+        token = getCookie('authToken');
+      }
+      return token;
+    } catch (e) {
+      console.warn('Token retrieval failed:', e);
+      return getCookie('authToken');
+    }
   },
   
   // Validate token by making a lightweight API call
   validateToken: async () => {
     if (typeof window === 'undefined') return false;
-    
-    const token = localStorage.getItem('authToken') || getCookie('authToken');
-    if (!token) return false;
-    
+
     try {
+      let token = null;
+      if (isLocalStorageAvailable()) {
+        token = localStorage.getItem('authToken');
+      }
+      if (!token) {
+        token = getCookie('authToken');
+      }
+      if (!token) return false;
+
       // Make a lightweight API call to verify token
       const response = await api.get('/auth/registration-status');
       return response.status === 200;
@@ -250,14 +323,28 @@ export const authUtils = {
       return false;
     }
   },
-  
+
   // Logout user
   logout: () => {
     if (typeof window === 'undefined') return;
-    ['authToken', 'token', 'adminToken', 'adminInfo', 'userData', 'userEmail', 'userInfo', 'landing_search_results', 'landing_search_prompt'].forEach((key) => localStorage.removeItem(key));
+
+    // Try to clear localStorage if available
+    try {
+      if (isLocalStorageAvailable()) {
+        ['authToken', 'token', 'adminToken', 'adminInfo', 'userData', 'userEmail', 'userInfo', 'landing_search_results', 'landing_search_prompt'].forEach((key) => localStorage.removeItem(key));
+      }
+    } catch (e) {
+      console.warn('Failed to clear localStorage:', e);
+    }
+
+    // Always clear cookies
     ['authToken', 'userType', 'token'].forEach((name) => {
-      document.cookie = `${name}=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;`;
-      document.cookie = `${name}=; path=/; domain=${window.location.hostname}; expires=Thu, 01 Jan 1970 00:00:01 GMT;`;
+      try {
+        document.cookie = `${name}=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;`;
+        document.cookie = `${name}=; path=/; domain=${window.location.hostname}; expires=Thu, 01 Jan 1970 00:00:01 GMT;`;
+      } catch (e) {
+        console.warn('Failed to clear cookie:', e);
+      }
     });
   }
 };

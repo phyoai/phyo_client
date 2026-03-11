@@ -28,22 +28,43 @@ export const AuthProvider = ({ children }) => {
         setLoading(false);
         return;
       }
-      
-      const storedToken = localStorage.getItem('authToken') || getCookie('authToken');
-      const storedUserData = localStorage.getItem('userData');
-      
-      if (storedToken && storedUserData) {
+
+      try {
+        let storedToken = null;
+        let storedUserData = null;
+
+        // Try to get from localStorage first
         try {
-          const userData = JSON.parse(storedUserData);
-          setToken(storedToken);
-          setUser(userData);
-        } catch (error) {
-          // If parsing fails, clear everything
-          console.error('Failed to parse user data:', error);
-          localStorage.removeItem('authToken');
-          localStorage.removeItem('userData');
-          document.cookie = 'authToken=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+          storedToken = localStorage.getItem('authToken');
+          storedUserData = localStorage.getItem('userData');
+        } catch (e) {
+          console.warn('localStorage access failed, using cookie fallback:', e);
         }
+
+        // Fallback to cookie if localStorage failed
+        if (!storedToken) {
+          storedToken = getCookie('authToken');
+        }
+
+        if (storedToken && storedUserData) {
+          try {
+            const userData = JSON.parse(storedUserData);
+            setToken(storedToken);
+            setUser(userData);
+          } catch (error) {
+            // If parsing fails, clear everything
+            console.error('Failed to parse user data:', error);
+            try {
+              localStorage.removeItem('authToken');
+              localStorage.removeItem('userData');
+            } catch (e) {
+              console.warn('Failed to clear localStorage:', e);
+            }
+            document.cookie = 'authToken=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+          }
+        }
+      } catch (error) {
+        console.error('Auth check error:', error);
       }
       setLoading(false);
     };
@@ -77,17 +98,25 @@ export const AuthProvider = ({ children }) => {
       if (response.ok) {
         const authToken = data.token;
         const userData = data.user || data.data || { email, token: authToken };
-        
+
         setToken(authToken);
         setUser(userData);
-        
+
         // Store token and user data in localStorage and cookie using authUtils
         authUtils.setToken(authToken);
         if (typeof window !== 'undefined') {
-          localStorage.setItem('userData', JSON.stringify(userData));
+          try {
+            localStorage.setItem('userData', JSON.stringify(userData));
+          } catch (e) {
+            console.warn('Failed to store userData in localStorage:', e);
+          }
           // Store userType in cookie so middleware can enforce role-based routing
           const userType = userData.type || 'USER';
-          document.cookie = `userType=${userType}; path=/; max-age=${7 * 24 * 60 * 60}`;
+          try {
+            document.cookie = `userType=${userType}; path=/; max-age=${7 * 24 * 60 * 60}`;
+          } catch (e) {
+            console.warn('Failed to set userType cookie:', e);
+          }
         }
         
         // Determine redirect path based on user type and registration status
