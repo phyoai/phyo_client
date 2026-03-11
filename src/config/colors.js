@@ -23,6 +23,7 @@ export const colors = {
     },
     muted: 'var(--color-neutral-muted)',
     base: 'var(--color-neutral-base)',
+    base1: 'var(--color-neutral-base1)',
   },
 
   // Accent Colors

@@ -21,7 +21,7 @@ const NavRail = ({
     return (
       <div
         className={`h-screen fixed left-0 top-0 flex flex-col transition-[width] duration-300 ease-in-out z-50 w-[96px] pt-[44px] pb-[56px]`}
-        style={{ backgroundColor: colors.neutral.base }}
+        style={{ backgroundColor: colors.neutral.base1 }}
       />
     );
   }
@@ -33,7 +33,7 @@ const NavRail = ({
           ? 'w-[240px] pt-[16px] pb-[16px] px-[12px]'
           : 'w-[80px] pt-[16px] pb-[16px] px-0'
       }`}
-      style={{ backgroundColor: colors.neutral.base }}
+      style={{ backgroundColor: colors.neutral.base1 }}
     >
       {/* Header Section with Toggle & Action Button */}
       <div

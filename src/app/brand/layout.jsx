@@ -57,9 +57,12 @@ function BrandLayoutContent({ children, pathname }) {
   return (
     <div className="flex min-h-screen bg-neutral-base">
       <BrandSidebar />
-      <main className={`flex-1 bg-neutral-base text-text-base border-l border-primary transition-all duration-300 ease-in-out ${
-        isExpanded ? 'ml-[240px]' : 'ml-[80px]'
-      } h-screen overflow-y-auto p-8`}>
+      <main
+        className="bg-neutral-base text-text-base border-l border-primary transition-all duration-300 ease-in-out min-h-screen w-full"
+        style={{
+          marginLeft: isExpanded ? 240 : 80,
+        }}
+      >
         {children}
       </main>
     </div>

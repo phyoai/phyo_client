@@ -13,7 +13,7 @@ export default function InfluencerAvatar({
 }) {
   const sizeClasses = {
     sm: {
-      outer: 'w-14 h-14',
+      outer: 'w-14 h-14', 
       inner: 'w-12 h-12',
       text: 'text-xs',
       width: 'w-14'

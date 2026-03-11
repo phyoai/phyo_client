@@ -1,6 +1,7 @@
 'use client'
 import React, { useState, memo, useCallback } from 'react';
-import { Chat1Fill, UserAddFill } from '@phyoofficial/phyo-icon-library';
+import { useRouter } from 'next/navigation';
+import { Chat1Fill, UserAddFill, ArrowLeftLine } from '@phyoofficial/phyo-icon-library';
 
 import MessagesList from './MessagesList';
 import ChatInterface from './ChatInterface';
@@ -15,6 +16,7 @@ const InboxPage = memo(({
   onReject = null,
   onWithdraw = null,
 }) => {
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState('messages');
   const [selectedConversation, setSelectedConversation] = useState(null);
   const [selectedInvitation, setSelectedInvitation] = useState(null);
@@ -76,7 +78,13 @@ const InboxPage = memo(({
 
         {/* Header + Tabs */}
         <div className="flex-shrink-0 bg-neutral-base border-b border-neutral-muted">
-          <div className="px-4 sm:px-6 py-4 sm:py-5">
+          <div className="px-4 sm:px-6 py-4 sm:py-5 flex items-center gap-3">
+            <button
+              onClick={() => router.back()}
+              className="p-2 hover:bg-gray-100 rounded-full transition-colors -ml-2"
+            >
+              <ArrowLeftLine className="w-5 h-5 text-gray-700" />
+            </button>
             <h1 className="text-lg sm:text-xl font-semibold text-text-base">Inbox</h1>
           </div>
           <div className="flex">

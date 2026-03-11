@@ -12,7 +12,8 @@ html.dark {
   --color-brand-text: #7DB06E;
   --color-accent-base: #2C3E27;
   --color-accent-subtle: #1E2B1A;
-  --color-neutral-base: #1E1E1E;
+  --color-neutral-base: #FFFFFF;
+  --color-neutral-base1: #1E1E1E;
   --color-neutral-muted: #2C2C2C;
   --color-neutral-inverse-muted: #A0A0A0;
   --color-neutral-inverse-icon: #555555;
@@ -57,7 +58,8 @@ html.dark body {
     --color-brand-text: #43573B;
     --color-accent-base: #D9E3CC;
     --color-accent-subtle: #E8F5E9;
-    --color-neutral-base: #F0F0F0;
+    --color-neutral-base: #FFFFFF;
+    --color-neutral-base1: #F0F0F0;
     --color-neutral-muted: #E8E8E8;
     --color-neutral-inverse-muted: #999999;
     --color-neutral-inverse-icon: #D0D0D0;

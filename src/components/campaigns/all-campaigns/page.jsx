@@ -4,12 +4,14 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { ArrowLeftLine, SearchLine, CloseLine, HeartLine } from '@phyoofficial/phyo-icon-library';
 import { campaignAPI } from '@/utils/api';
 import { useGoBack } from '@/hooks/useGoBack';
+import { useAuth } from '@/app/context/AuthContext';
 
 export default function AllCampaign() {
   const router = useRouter();
   const goBack = useGoBack();
   const searchParams = useSearchParams();
   const initialQuery = searchParams.get('q') || '';
+  const { user, isBrand, isInfluencer, loading: authLoading } = useAuth();
 
   const [campaigns, setCampaigns] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -18,15 +20,33 @@ export default function AllCampaign() {
   const [showSearch, setShowSearch] = useState(!!initialQuery);
 
   useEffect(() => {
-    fetchCampaigns(searchQuery);
-  }, [searchQuery]);
+    if (!authLoading) {
+      fetchCampaigns(searchQuery);
+    }
+  }, [searchQuery, authLoading]);
 
   const fetchCampaigns = async (query = '') => {
+    if (authLoading) return;
+
     setLoading(true);
     try {
       const params = { page: 1, limit: 20 };
       if (query) params.search = query;
-      const response = await campaignAPI.getCampaigns(params);
+
+      let response;
+
+      // Role-based campaign fetching
+      if (isBrand()) {
+        // Brands see only their own campaigns
+        response = await campaignAPI.getBrandCampaigns(params);
+      } else if (isInfluencer()) {
+        // Influencers see all active campaigns to apply to
+        response = await campaignAPI.getCampaigns(params);
+      } else {
+        // Other users see all campaigns
+        response = await campaignAPI.getCampaigns(params);
+      }
+
       const allCampaigns = response.data || [];
       const activeCampaigns = allCampaigns.filter(c => c.status === 'Active');
       setCampaigns(activeCampaigns);
@@ -89,7 +109,7 @@ export default function AllCampaign() {
                   <ArrowLeftLine className="w-5 h-5 sm:w-6 sm:h-6 text-gray-700" />
                 </button>
                 <h1 className="text-lg sm:text-xl font-semibold text-gray-900 truncate">
-                  {searchQuery ? `Results for "${searchQuery}"` : 'All Campaigns'}
+                  {searchQuery ? `Results for "${searchQuery}"` : isBrand() ? 'My Campaigns' : 'All Campaigns'}
                 </h1>
               </div>
               <button
@@ -131,7 +151,10 @@ export default function AllCampaign() {
               <div
                 key={campaign._id}
                 className="bg-gray-100 border-2 border-white rounded-xl overflow-hidden hover:shadow-lg transition-shadow flex-1 min-w-[300px] max-w-[400px] cursor-pointer"
-                onClick={() => router.push(`/influencer/campaigns/${campaign._id}`)}
+                onClick={() => {
+                  const baseRoute = isBrand() ? '/brand' : '/influencer';
+                  router.push(`${baseRoute}/campaigns/${campaign._id}`);
+                }}
               >
                 <div className="px-4 pt-4">
                   <span className="text-xs text-gray-500">{campaign.campaignType || 'Campaign'}</span>
@@ -172,9 +195,14 @@ export default function AllCampaign() {
           ) : (
             <div className="w-full text-center py-16">
               <SearchLine className="w-10 h-10 text-gray-300 mx-auto mb-3" />
-              <p className="text-gray-500 font-medium">No campaigns found</p>
+              <p className="text-gray-500 font-medium">
+                {isBrand() ? 'No campaigns created yet' : 'No campaigns found'}
+              </p>
               {searchQuery && (
                 <p className="text-sm text-gray-400 mt-1">Try a different search term</p>
+              )}
+              {!searchQuery && isBrand() && (
+                <p className="text-sm text-gray-400 mt-1">Create your first campaign to get started</p>
               )}
             </div>
           )}

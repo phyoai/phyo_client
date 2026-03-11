@@ -206,9 +206,9 @@ export default function ChatPage({ params }) {
   };
 
   return (
-    <div className="flex flex-col h-screen bg-neutral-base">
+    <div className="flex flex-col h-screen w-full bg-neutral-base overflow-hidden">
       {/* Chat Header */}
-      <div className="flex items-center justify-between px-4 sm:px-6 py-4 border-b border-gray-200 bg-neutral-base sticky top-0 z-10">
+      <div className="flex items-center justify-between px-4 sm:px-6 py-4 border-b border-gray-200 bg-neutral-base sticky top-0 z-10 flex-shrink-0">
         <div className="flex items-center gap-3 sm:gap-4">
           <button
             onClick={() => router.back()}
@@ -303,7 +303,7 @@ export default function ChatPage({ params }) {
 
       {/* Emoji Picker */}
       {showEmojiPicker && (
-        <div className="px-4 sm:px-6 py-3 border-t border-gray-200 bg-neutral-base">
+        <div className="px-4 sm:px-6 py-3 border-t border-gray-200 bg-neutral-base flex-shrink-0">
           <div className="flex flex-wrap gap-2 justify-center">
             {emojis.map((emoji, idx) => (
               <button
@@ -323,7 +323,7 @@ export default function ChatPage({ params }) {
 
       {/* Attachment Panel */}
       {showAttachments && (
-        <div className="px-4 sm:px-6 py-4 border-t border-gray-200 bg-neutral-base">
+        <div className="px-4 sm:px-6 py-4 border-t border-gray-200 bg-neutral-base flex-shrink-0">
           <div className="flex gap-4 justify-center">
             <button
               onClick={() => documentInputRef.current?.click()}
@@ -374,7 +374,7 @@ export default function ChatPage({ params }) {
 
       {/* Pending Attachment Preview */}
       {(pendingVoiceMessage || pendingAttachment) && (
-        <div className="px-4 sm:px-6 py-3 border-t border-gray-200 bg-gray-50 flex items-center justify-between">
+        <div className="px-4 sm:px-6 py-3 border-t border-gray-200 bg-gray-50 flex items-center justify-between flex-shrink-0">
           <div className="flex-1">
             {pendingVoiceMessage && (
               <div className="flex items-center gap-2">
@@ -419,7 +419,7 @@ export default function ChatPage({ params }) {
       )}
 
       {/* Message Input */}
-      <div className="px-4 sm:px-6 py-4 border-t border-gray-200 bg-neutral-base">
+      <div className="px-4 sm:px-6 py-4 border-t border-gray-200 bg-neutral-base flex-shrink-0">
         <div className="flex items-end gap-2 sm:gap-3">
           <div className="flex-1 flex items-center gap-2 bg-gray-100 rounded-full px-4 py-3">
             <button
