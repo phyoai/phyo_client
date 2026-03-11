@@ -1,79 +1,92 @@
+'use client';
+
 import React from 'react';
-import { IconHeartFill } from '@phyoofficial/phyo-icon-library';
+import { CloseLine, HeartFill } from '@phyoofficial/phyo-icon-library';
 
 /**
- * Tag Component
- * Displays a labeled tag with optional icon
- * Supports different color styles and sizes
+ * Tag Component - Labels for categorizing or filtering
+ * Variants: default, filled, outlined
+ * Colors: red, green, yellow, blue, purple, gray
  */
-export default function Tag({
-  label = 'Label',
-  icon = null,
-  showIcon = true,
-  colorStyle = 'success', // success, error, warning, info
-  size = 'large', // large, medium, small
-  className = ''
-}) {
-  const colorStyles = {
-    success: {
-      bg: 'bg-[#08a64a]',
-      border: 'border-[#067635]',
-      text: 'text-[#b2e3c7]'
+
+const Tag = React.forwardRef(({
+  children,
+  variant = 'default',
+  color = 'gray',
+  size = 'md',
+  icon: Icon,
+  onRemove,
+  removable = false,
+  className = '',
+  ...props
+}, ref) => {
+  const colorConfig = {
+    red: {
+      default: 'bg-red-light text-red-base border-red-light',
+      filled: 'bg-red-base text-white border-red-base',
+      outlined: 'border-2 border-red-base text-red-base bg-white'
     },
-    error: {
-      bg: 'bg-red-600',
-      border: 'border-red-700',
-      text: 'text-red-100'
+    green: {
+      default: 'bg-green-light text-green-base border-green-light',
+      filled: 'bg-green-base text-white border-green-base',
+      outlined: 'border-2 border-green-base text-green-base bg-white'
     },
-    warning: {
-      bg: 'bg-amber-600',
-      border: 'border-amber-700',
-      text: 'text-amber-100'
+    yellow: {
+      default: 'bg-yellow-light text-yellow-base border-yellow-light',
+      filled: 'bg-yellow-base text-white border-yellow-base',
+      outlined: 'border-2 border-yellow-base text-yellow-base bg-white'
     },
-    info: {
-      bg: 'bg-blue-600',
-      border: 'border-blue-700',
-      text: 'text-blue-100'
+    blue: {
+      default: 'bg-blue-light text-blue-base border-blue-light',
+      filled: 'bg-blue-base text-white border-blue-base',
+      outlined: 'border-2 border-blue-base text-blue-base bg-white'
+    },
+    purple: {
+      default: 'bg-purple-light text-purple-base border-purple-light',
+      filled: 'bg-purple-base text-white border-purple-base',
+      outlined: 'border-2 border-purple-base text-purple-base bg-white'
+    },
+    gray: {
+      default: 'bg-neutral-muted text-text-base border-neutral-muted',
+      filled: 'bg-text-muted text-white border-text-muted',
+      outlined: 'border-2 border-neutral-muted text-text-base bg-white'
     }
   };
 
-  const sizeStyles = {
-    large: {
-      padding: 'px-[6px] py-[4px]',
-      fontSize: 'text-[16px]',
-      iconSize: 'h-[20px] w-[20px]',
-      gap: 'gap-[4px]'
-    },
-    medium: {
-      padding: 'px-[4px] py-[2px]',
-      fontSize: 'text-[14px]',
-      iconSize: 'h-[16px] w-[16px]',
-      gap: 'gap-[3px]'
-    },
-    small: {
-      padding: 'px-[3px] py-[1px]',
-      fontSize: 'text-[12px]',
-      iconSize: 'h-[14px] w-[14px]',
-      gap: 'gap-[2px]'
-    }
+  const sizeConfig = {
+    sm: 'px-2 py-1 text-xs gap-1',
+    md: 'px-3 py-1.5 text-sm gap-2',
+    lg: 'px-4 py-2 text-base gap-2'
   };
-
-  const colors = colorStyles[colorStyle] || colorStyles.success;
-  const sizing = sizeStyles[size] || sizeStyles.large;
 
   return (
     <div
-      className={`${colors.bg} border border-solid ${colors.border} rounded-[4px] ${sizing.padding} inline-flex items-center ${sizing.gap} ${className}`}
-      data-name="Tag"
+      ref={ref}
+      className={`
+        inline-flex items-center
+        rounded-md
+        font-medium
+        transition-all
+        ${colorConfig[color][variant]}
+        ${sizeConfig[size]}
+        ${className}
+      `}
+      {...props}
     >
-      {showIcon && (
-        icon || (
-          <IconHeartFill className={`${sizing.iconSize}`} />
-        )
+      {Icon && <Icon width={16} height={16} />}
+      {children}
+      {removable && onRemove && (
+        <button
+          onClick={onRemove}
+          className="hover:opacity-70 transition-opacity flex-shrink-0"
+        >
+          <CloseLine width={14} height={14} />
+        </button>
       )}
-      <span className={`font-semibold ${sizing.fontSize} ${colors.text} whitespace-nowrap`}>
-        {label}
-      </span>
     </div>
   );
-}
+});
+
+Tag.displayName = 'Tag';
+
+export default Tag;
