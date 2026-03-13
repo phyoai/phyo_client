@@ -6,7 +6,8 @@ import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '../context/AuthContext';
 import { GoogleLogin, GoogleOAuthProvider } from '@react-oauth/google';
-import { authUtils } from '../../utils/api';
+import { authService } from '@/services';
+import { useApiMutation } from '@/hooks/useApi';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -42,12 +43,18 @@ function LoginForm() {
         formState: { errors },
     } = useForm();
 
-    const [loading, setLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
-    const [googleLoading, setGoogleLoading] = useState(false);
     const router = useRouter();
     const searchParams = useSearchParams();
-    const { isAuthenticated } = useAuth();
+    const { isAuthenticated, login: contextLogin } = useAuth();
+
+    // API mutations
+    const { submit: login, loading } = useApiMutation(
+      (creds) => contextLogin(creds.email, creds.password)
+    );
+    const { submit: googleLogin, loading: googleLoading } = useApiMutation(
+      (data) => authService.googleAuth(data)
+    );
 
     // Check for verification success message
     const verified = searchParams.get('verified');
@@ -103,116 +110,50 @@ function LoginForm() {
         }
     }, [verified]);
 
-    const loginAPI = async (email, password) => {
-        console.log('Attempting login for:', email); // Debug log
-        
-        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://api.phyo.ai/api';
-        const response = await fetch(`${apiUrl}/user/login`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI2IkpXVCJ9.eyJpZCI6IjY4OGFmODQ1Y2IzNzc4ODVhZjllZTlmMiIsImlhdCI6MTc1MzkzODA5OCwiZXhwIjoxNzU0MDI0NDk4fQ.L2HKgeVwN7GCPEDwL2T21ek_rn_Zn5UDIo1v66PpmH8'
-            },
-            body: JSON.stringify({ email, password })
-        });
-
-        const data = await response.json();
-        console.log('Login API Response:', data); // Debug log
-        console.log('Response status:', response.status); // Debug log
-        
-        if (!response.ok) {
-            throw new Error(data.message || `HTTP error! status: ${response.status}`);
-        }
-        
-        return data;
-    };
-
-    const googleLoginAPI = async (idToken) => {
-        console.log('Attempting Google login'); // Debug log
-        
-        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://api.phyo.ai/api';
-        const response = await fetch(`${apiUrl}/user/google`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ 
-                idToken,
-                type: 'USER' // Default user type, can be modified based on your needs
-            })
-        });
-
-        const data = await response.json();
-        console.log('Google Login API Response:', data); // Debug log
-        
-        if (!response.ok) {
-            throw new Error(data.message || `HTTP error! status: ${response.status}`);
-        }
-        
-        return data;
-    };
-
     const handleGoogleSuccess = async (credentialResponse) => {
-        setGoogleLoading(true);
-
         try {
-            console.log('Google credential received'); // Debug log
-            const result = await googleLoginAPI(credentialResponse.credential);
-            
-            // Handle successful login
-            if (result.token) {
-                console.log('Google login successful'); // Debug log
-                
-                // Store the authentication token in both localStorage and cookies
-                authUtils.setToken(result.token);
-                
-                // Store user data if provided
-                const userData = result.user;
-                if (userData) {
-                    localStorage.setItem('userData', JSON.stringify(userData));
-                    if (userData.email) {
-                        localStorage.setItem('userEmail', userData.email);
-                    }
-                    const userType = userData.type || 'USER';
-                    document.cookie = `userType=${userType}; path=/; max-age=${7 * 24 * 60 * 60}`;
-                }
+            const result = await googleLogin({
+                idToken: credentialResponse.credential,
+                type: 'USER'
+            });
 
-                toast.success('Successfully signed in with Google!');
-                
-                // Determine redirect based on user type and registration status
-                let redirect = searchParams.get('redirect');
-                if (!redirect) {
-                    const userType = userData?.type;
-                    
-                    if (userType === 'USER') {
-                        // Check registration status for regular users
-                        if (userData.brandRegistrationStatus === 'COMPLETED') {
-                            redirect = '/brand/dashboard';
-                        } else if (userData.influencerRegistrationStatus === 'COMPLETED') {
-                            redirect = '/influencer/dashboard';
-                        } else {
-                            // UserLine hasn't completed any registration
-                            redirect = '/user/dashboard';
-                        }
-                    } else if (userType === 'BRAND') {
+            // Handle successful login
+            const userData = result.user;
+            if (userData) {
+                localStorage.setItem('userData', JSON.stringify(userData));
+                if (userData.email) {
+                    localStorage.setItem('userEmail', userData.email);
+                }
+                const userType = userData.type || 'USER';
+                document.cookie = `userType=${userType}; path=/; max-age=${7 * 24 * 60 * 60}`;
+            }
+
+            toast.success('Successfully signed in with Google!');
+
+            // Determine redirect based on user type and registration status
+            let redirect = searchParams.get('redirect');
+            if (!redirect) {
+                const userType = userData?.type;
+
+                if (userType === 'USER') {
+                    if (userData.brandRegistrationStatus === 'COMPLETED') {
                         redirect = '/brand/dashboard';
-                    } else if (userType === 'INFLUENCER') {
+                    } else if (userData.influencerRegistrationStatus === 'COMPLETED') {
                         redirect = '/influencer/dashboard';
                     } else {
-                        redirect = '/';
+                        redirect = '/user/dashboard';
                     }
+                } else if (userType === 'BRAND') {
+                    redirect = '/brand/dashboard';
+                } else if (userType === 'INFLUENCER') {
+                    redirect = '/influencer/dashboard';
+                } else {
+                    redirect = '/';
                 }
-                setTimeout(() => router.push(redirect), 1000);
-                
-            } else {
-                console.log('Google login failed with result:', result); // Debug log
-                toast.error(result.message || 'Google login failed');
             }
+            setTimeout(() => router.push(redirect), 1000);
         } catch (error) {
-            console.error('Google login error:', error); // Debug log
             toast.error(error.message || 'Failed to sign in with Google');
-        } finally {
-            setGoogleLoading(false);
         }
     };
 
@@ -222,67 +163,19 @@ function LoginForm() {
     };
 
     const onSubmit = async (data) => {
-        setLoading(true);
-
         try {
-            console.log('Submitting login form'); // Debug log
-            const result = await loginAPI(data.email, data.password);
-            
-            // Handle successful login
-            if (result.success || result.token || result.data?.token) {
-                console.log('Login successful'); // Debug log
-                
-                // Store the authentication token in both localStorage and cookies
-                const token = result.token || result.data?.token;
-                if (token) {
-                    authUtils.setToken(token);
-                    localStorage.setItem('userEmail', data.email);
-                }
-                
-                // Store user data if provided
-                const userData = result.user || result.data?.user;
-                if (userData) {
-                    localStorage.setItem('userData', JSON.stringify(userData));
-                    const userType = userData.type || 'USER';
-                    document.cookie = `userType=${userType}; path=/; max-age=${7 * 24 * 60 * 60}`;
-                }
+            const result = await login({
+                email: data.email,
+                password: data.password
+            });
 
-                toast.success('Login successful! Welcome back!');
-                
-                // Determine redirect based on user type and registration status
-                let redirect = searchParams.get('redirect');
-                if (!redirect) {
-                    const userType = userData?.type;
-                    
-                    if (userType === 'USER') {
-                        // Check registration status for regular users
-                        if (userData.brandRegistrationStatus === 'COMPLETED') {
-                            redirect = '/brand/dashboard';
-                        } else if (userData.influencerRegistrationStatus === 'COMPLETED') {
-                            redirect = '/influencer/dashboard';
-                        } else {
-                            // UserLine hasn't completed any registration
-                            redirect = '/user/dashboard';
-                        }
-                    } else if (userType === 'BRAND') {
-                        redirect = '/brand/dashboard';
-                    } else if (userType === 'INFLUENCER') {
-                        redirect = '/influencer/dashboard';
-                    } else {
-                        redirect = '/';
-                    }
-                }
-                setTimeout(() => router.push(redirect), 1000);
-                
-            } else {
-                console.log('Login failed with result:', result); // Debug log
-                toast.error(result.message || 'Login failed');
-            }
+            toast.success('Login successful! Welcome back!');
+
+            // Use redirect path from AuthContext, or fallback to query param or home
+            let redirect = result.redirectPath || searchParams.get('redirect') || '/';
+            setTimeout(() => router.push(redirect), 1000);
         } catch (error) {
-            console.error('Login error:', error); // Debug log
-            toast.error(error.message || 'An unexpected error occurred');
-        } finally {
-            setLoading(false);
+            toast.error(error.message || 'Login failed');
         }
     };
 

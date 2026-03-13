@@ -2,7 +2,7 @@
 import React, { useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { ArrowLeftLine, ArrowRightLine, CloseLine, UploadLine, CalendarLine, CheckLine, UserLine, MoreLine, DeleteBinLine, EditLine, SearchLine, HeartLine, LineChartLine, CheckboxLine } from '@phyoofficial/phyo-icon-library';
-import { campaignAPI } from '../../../utils/api';
+import { campaignAPI, influencerAPI } from '../../../utils/api';
 import { useSidebar } from '../../context/SidebarContext';
 import { AudienceEngagement } from '@/components/AudienceEngagementGraphs';
 import { SpendingBudget } from '@/components/SpendingBudgetGraph';
@@ -36,6 +36,8 @@ const AllCampaignsSection = () => {
     hasNext: false,
     hasPrev: false
   });
+  const [influencers, setInfluencersState] = useState([]);
+  const [influencersLoading, setInfluencersLoading] = useState(false);
   const [formData, setFormData] = useState({
     // Campaign Details
     campaignName: '',
@@ -68,7 +70,7 @@ const AllCampaignsSection = () => {
 
   // Campaign data will be fetched from API
 
-  const mockInfluencers = [
+  const influencersDataBackup = [
     {
       id: 1,
       name: 'Andrew Power',
@@ -182,6 +184,36 @@ const AllCampaignsSection = () => {
   // Load campaigns on component mount
   React.useEffect(() => {
     fetchCampaigns();
+  }, []);
+
+  // Load influencers on component mount
+  React.useEffect(() => {
+    const fetchInfluencers = async () => {
+      setInfluencersLoading(true);
+      try {
+        const response = await influencerAPI.getInfluencers({ page: 1, limit: 20 });
+        const influencersData = response.data || [];
+
+        // Transform influencer data for display
+        const formattedInfluencers = influencersData.map((influencer, index) => ({
+          id: influencer._id || influencer.id || index,
+          name: influencer.name || 'Unknown',
+          followers: influencer.followers ? `${(influencer.followers / 1000).toFixed(1)}K` : '0K',
+          engagement: influencer.engagement ? `${(influencer.engagement * 100).toFixed(1)}%` : '0%',
+          tags: influencer.categories || ['Influencer'],
+          image: influencer.avatar || '/api/placeholder/80/80'
+        }));
+
+        setInfluencersState(formattedInfluencers);
+      } catch (error) {
+        console.error('Error fetching influencers:', error);
+        setInfluencersState([]);
+      } finally {
+        setInfluencersLoading(false);
+      }
+    };
+
+    fetchInfluencers();
   }, []);
 
   // Helper function to get active campaigns
@@ -1077,7 +1109,7 @@ const AllCampaignsSection = () => {
                 Influencer Suggestions based on your Requirements
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {mockInfluencers.map((influencer) => (
+                {influencers.map((influencer) => (
                   <InfluencerCard key={influencer.id} influencer={influencer} />
                 ))}
               </div>
@@ -1682,7 +1714,7 @@ const AllCampaignsSection = () => {
 
           {/* List Items - Figma: white background, full width */}
           <div className="bg-neutral-base">
-            {mockInfluencers.slice(0, 5).map((influencer, index) => (
+            {influencers.slice(0, 5).map((influencer, index) => (
               <div key={influencer.id} className="relative">
                 <div className="flex items-center">
                   {/* Leading Avatar - Figma: px-4, py-1.5 (6px), 48x48 */}
@@ -1712,7 +1744,7 @@ const AllCampaignsSection = () => {
                 </div>
                 
                 {/* Divider - Figma: 1px gray line */}
-                {index < mockInfluencers.slice(0, 5).length - 1 && (
+                {index < influencers.slice(0, 5).length - 1 && (
                   <div className="h-px bg-gray-200"></div>
                 )}
               </div>

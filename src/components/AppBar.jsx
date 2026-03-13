@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { MenuLine, SearchLine, BellLine, MoreVerticalLine } from '@phyoofficial/phyo-icon-library';
+import { MenuLine, SearchLine, BellLine, MoreVerticalLine, ArrowLeftLine } from '@phyoofficial/phyo-icon-library';
 
 /**
  * AppBar Component - Top navigation bar
@@ -12,6 +12,7 @@ const AppBar = React.forwardRef(({
   title,
   subtitle,
   onMenuClick,
+  onBack,
   onSearchChange,
   showSearch = false,
   searchPlaceholder = 'Search...',
@@ -28,6 +29,11 @@ const AppBar = React.forwardRef(({
     onSearchChange?.(e.target.value);
   };
 
+  // Filter out function props that shouldn't be on DOM elements
+  const domProps = Object.fromEntries(
+    Object.entries(props).filter(([key]) => !key.startsWith('on'))
+  );
+
   return (
     <div
       ref={ref}
@@ -39,11 +45,20 @@ const AppBar = React.forwardRef(({
         z-40
         ${className}
       `}
-      {...props}
+      {...domProps}
     >
       <div className="flex items-center justify-between">
         {/* Left Content */}
         <div className="flex items-center gap-4 flex-1">
+          {onBack && (
+            <button
+              onClick={onBack}
+              className="p-2 hover:bg-neutral-muted rounded-lg transition-colors"
+            >
+              <ArrowLeftLine width={24} height={24} className="text-text-base" />
+            </button>
+          )}
+
           {onMenuClick && (
             <button
               onClick={onMenuClick}

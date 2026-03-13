@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
-import { influencerAPI, brandAPI } from "@/utils/api";
+import { adminAPI } from "@/utils/api";
 import { useRouter } from "next/navigation";
 import Button from '@/components/Button';
 import IconButton from '@/components/IconButton';
@@ -422,15 +422,29 @@ export default function AdminDashboard() {
   const [actionLoading, setActionLoading] = useState(false);
   const router = useRouter();
 
+  const is404Error = (err) => {
+    const status = err?.response?.status;
+    const message = err?.message || err?.toString() || "";
+    return status === 404 || message.includes("Cannot GET") || message.includes("Cannot POST") || message.includes("Cannot PUT");
+  };
+
   const fetchBrandRequests = async () => {
     setLoading(true);
     setError("");
     try {
-      const data = await brandAPI.admin.getRequests();
-      setBrandRequests(data.requests || data);
+      const data = await adminAPI.getRequests();
+      setBrandRequests(data.requests || data || []);
     } catch (err) {
-      setError("Failed to fetch brand requests");
-      console.error(err);
+      const is404 = is404Error(err);
+      const errorMsg = is404
+        ? "Brand requests endpoint not available"
+        : "Failed to fetch brand requests";
+      setError(errorMsg);
+      setBrandRequests([]);
+      // Only log non-404 errors to console
+      if (!is404) {
+        console.error(err);
+      }
     }
     setLoading(false);
   };
@@ -439,11 +453,19 @@ export default function AdminDashboard() {
     setLoading(true);
     setError("");
     try {
-      const data = await influencerAPI.admin.getRequests();
-      setInfluencerRequests(data.requests || data);
+      const data = await adminAPI.getInfluencerRequests();
+      setInfluencerRequests(data.requests || data || []);
     } catch (err) {
-      setError("Failed to fetch influencer requests");
-      console.error(err);
+      const is404 = is404Error(err);
+      const errorMsg = is404
+        ? "Influencer requests endpoint not available"
+        : "Failed to fetch influencer requests";
+      setError(errorMsg);
+      setInfluencerRequests([]);
+      // Only log non-404 errors to console
+      if (!is404) {
+        console.error(err);
+      }
     }
     setLoading(false);
   };
@@ -458,10 +480,10 @@ export default function AdminDashboard() {
     setActionLoading(true);
     try {
       if (tab === "Brands") {
-        await brandAPI.admin.approveRequest(id);
+        await adminAPI.approveBrand(id);
         fetchBrandRequests();
       } else {
-        await influencerAPI.admin.approveRequest(id);
+        await adminAPI.approveInfluencer(id);
         fetchInfluencerRequests();
       }
       setSelectedRequest(null);
@@ -475,11 +497,10 @@ export default function AdminDashboard() {
   const handleReject = async (id) => {
     setActionLoading(true);
     try {
+      await adminAPI.rejectRequest(id);
       if (tab === "Brands") {
-        await brandAPI.admin.rejectRequest(id);
         fetchBrandRequests();
       } else {
-        await influencerAPI.admin.rejectRequest(id);
         fetchInfluencerRequests();
       }
       setSelectedRequest(null);
@@ -588,6 +609,14 @@ export default function AdminDashboard() {
               <div className="text-green-600 text-center py-16 text-xl font-semibold flex flex-col items-center gap-4">
                 <LoadingSpinner />
                 <span>Loading requests...</span>
+              </div>
+            ) : error && error.includes("not available") ? (
+              <div className="text-gray-600 text-center py-16 flex flex-col items-center gap-4">
+                <div className="text-5xl">🔄</div>
+                <div className="text-2xl font-semibold">Coming Soon</div>
+                <div className="text-gray-500 max-w-md">
+                  {error}. This feature is being developed and will be available soon.
+                </div>
               </div>
             ) : requests.length === 0 ? (
               <div className="text-gray-500 text-center py-16 text-xl font-semibold">

@@ -1,5 +1,49 @@
-import React, { Suspense } from 'react';
+'use client'
+import React, { Suspense, useState, useEffect } from 'react';
 import InboxPage from '@/components/inbox/InboxPage'
+import { messagingService } from '@/services';
+import { useApiQuery } from '@/hooks/useApi';
+import { useSocket } from '@/app/context/SocketContext';
+
+function BrandInboxContent() {
+  const [conversations, setConversations] = useState([]);
+  const { socket, onMessage } = useSocket();
+
+  // Fetch conversations
+  const { data: conversationsData, loading } = useApiQuery(
+    () => messagingService.getConversations({ page: 1, limit: 50 }),
+    []
+  );
+
+  useEffect(() => {
+    if (conversationsData?.data) {
+      setConversations(conversationsData.data);
+    }
+  }, [conversationsData]);
+
+  // Real-time message updates via socket
+  useEffect(() => {
+    if (!socket || conversations.length === 0) return;
+
+    const unsubscribers = [];
+    conversations.forEach(conv => {
+      const unsub = onMessage(conv._id || conv.id, (message) => {
+        setConversations(prev =>
+          prev.map(c =>
+            (c._id || c.id) === (conv._id || conv.id)
+              ? { ...c, lastMessage: message.content, timestamp: new Date().toLocaleTimeString() }
+              : c
+          )
+        );
+      });
+      unsubscribers.push(unsub);
+    });
+
+    return () => unsubscribers.forEach(unsub => unsub?.());
+  }, [socket, conversations, onMessage]);
+
+  return <InboxPage conversations={conversations} />;
+}
 
 export default function BrandInbox() {
   return (
@@ -52,8 +96,8 @@ export default function BrandInbox() {
           </div>
         </div>
       }>
-        <InboxPage/>
+        <BrandInboxContent/>
       </Suspense>
     </div>
   );
-} 
+}

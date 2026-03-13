@@ -3,6 +3,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { ArrowLeftLine, MoreLine, BookmarkLine, YoutubeFill, InstagramFill, TwitterXLine, UserAddLine, Message3Line, FacebookCircleFill } from '@phyoofficial/phyo-icon-library';
 import { useRouter, useParams } from 'next/navigation';
 import Image2Line from 'next/image';
+import { authAPI } from '@/utils/api';
 
 const influencersData = [
   {
@@ -149,6 +150,9 @@ const TopInfluencersPageDetails = () => {
   const [showSaveModal, setShowSaveModal] = useState(false);
   const [showNewListModal, setShowNewListModal] = useState(false);
   const [newListName, setNewListName] = useState('');
+  const [displayInfluencer, setDisplayInfluencer] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const moreMenuRef = useRef(null);
 
   // Sample lists data
@@ -157,24 +161,50 @@ const TopInfluencersPageDetails = () => {
     { id: 2, name: 'Campaign 1', initials: 'AB', color: '#0066ff' }
   ]);
 
-  // Get influencer from URL param
-  const influencerId = parseInt(params?.id);
-  const influencer = influencersData.find(inf => inf.id === influencerId);
+  // Fetch influencer from API by ID
+  useEffect(() => {
+    const fetchInfluencer = async () => {
+      if (!params?.id) {
+        setError('No influencer ID provided');
+        setLoading(false);
+        return;
+      }
 
-  // Transform influencer data to match InfluencerProfile expected format
-  const displayInfluencer = influencer ? {
-    id: influencer.id,
-    name: influencer.name,
-    username: influencer.username,
-    followers: influencer.stats.followers,
-    following: influencer.stats.following,
-    posts: influencer.stats.posts,
-    location: 'Delhi, India',
-    age: '34',
-    about: influencer.bio,
-    likes: '9.2K',
-    views: '9.2K'
-  } : null;
+      try {
+        setLoading(true);
+        setError(null);
+
+        const response = await authAPI.getInfluencerById(params.id);
+        const influencer = response.data || response;
+
+        // Transform API response to match component's expected format
+        const transformed = {
+          id: influencer._id || influencer.id,
+          name: influencer.username || influencer.name || 'Unknown',
+          username: `@${influencer.username || 'user'}`,
+          followers: influencer.followers ? `${(influencer.followers / 1000).toFixed(1)}k` : '0k',
+          following: influencer.following ? `${(influencer.following / 1000).toFixed(1)}k` : '0k',
+          posts: influencer.posts || '0',
+          location: influencer.location || 'Unknown',
+          age: influencer.age || 'N/A',
+          about: influencer.bio || influencer.description || '',
+          likes: influencer.likes ? `${(influencer.likes / 1000).toFixed(1)}K` : '0K',
+          views: influencer.views ? `${(influencer.views / 1000).toFixed(1)}K` : '0K',
+          avatar: influencer.avatar || influencer.profileImage || '/dummyAvatar.jpg'
+        };
+
+        setDisplayInfluencer(transformed);
+      } catch (err) {
+        console.error('Error fetching influencer:', err);
+        setError('Failed to load influencer data');
+        setDisplayInfluencer(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchInfluencer();
+  }, [params?.id]);
 
   const handleBack = () => {
     router.push('/brand/dashboard');
@@ -224,7 +254,32 @@ const TopInfluencersPageDetails = () => {
     console.log('Invite:', displayInfluencer?.username);
   };
 
-  if (!displayInfluencer) {
+  // Loading state
+  if (loading) {
+    return (
+      <div className="bg-neutral-base h-screen flex flex-col overflow-hidden">
+        <div className="bg-neutral-base flex items-center justify-between px-4 py-2 border-b border-gray-100 shrink-0">
+          <button
+            onClick={handleBack}
+            className="flex items-center justify-center w-12 h-12 rounded-full hover:bg-gray-100 transition-colors"
+          >
+            <ArrowLeftLine className="w-6 h-6 text-gray-700" />
+          </button>
+          <h1 className="text-xl font-semibold text-[#242527] flex-1 px-2">Loading...</h1>
+          <div className="w-12"></div>
+        </div>
+        <div className="flex-1 flex items-center justify-center">
+          <div className="flex flex-col items-center gap-3">
+            <div className="animate-spin rounded-full h-10 w-10 border-3 border-green-600 border-t-transparent"></div>
+            <p className="text-gray-500">Loading influencer data...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Error or not found state
+  if (!displayInfluencer || error) {
     return (
       <div className="bg-neutral-base h-screen flex flex-col overflow-hidden">
         <div className="bg-neutral-base flex items-center justify-between px-4 py-2 border-b border-gray-100 shrink-0">
@@ -238,7 +293,15 @@ const TopInfluencersPageDetails = () => {
           <div className="w-12"></div>
         </div>
         <div className="flex-1 flex items-center justify-center">
-          <p className="text-gray-500">The influencer you're looking for doesn't exist.</p>
+          <div className="text-center">
+            <p className="text-gray-500 mb-4">{error || "The influencer you're looking for doesn't exist."}</p>
+            <button
+              onClick={handleBack}
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              Go Back
+            </button>
+          </div>
         </div>
       </div>
     );

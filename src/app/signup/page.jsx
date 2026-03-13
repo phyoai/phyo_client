@@ -6,6 +6,8 @@ import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '../context/AuthContext';
 import { GoogleLogin, GoogleOAuthProvider } from '@react-oauth/google';
+import { authService } from '@/services';
+import { useApiMutation } from '@/hooks/useApi';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -64,17 +66,25 @@ function SignupForm() {
         getValues
     } = useForm();
 
-    const [loading, setLoading] = useState(false);
     const [showOTP, setShowOTP] = useState(false);
     const [otp, setOtp] = useState(['', '', '', '', '', '']);
-    const [otpLoading, setOtpLoading] = useState(false);
     const [signupData, setSignupData] = useState(null);
-    const [googleLoading, setGoogleLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
-    
+
     const router = useRouter();
     const searchParams = useSearchParams();
     const { isAuthenticated } = useAuth();
+
+    // API mutations
+    const { submit: signup, loading } = useApiMutation(
+      (data) => authService.signup(data)
+    );
+    const { submit: verifyOtp, loading: otpLoading } = useApiMutation(
+      (data) => authService.verifyOtp(data)
+    );
+    const { submit: googleLogin, loading: googleLoadingState } = useApiMutation(
+      (data) => authService.googleLogin(data)
+    );
 
     // Check if user is already authenticated
     useEffect(() => {
@@ -84,116 +94,29 @@ function SignupForm() {
         }
     }, [isAuthenticated, router, searchParams]);
 
-    const signupAPI = async (userData) => {
-        console.log('Sending signup data:', userData); // Debug log
-        
-        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://api.phyo.ai/api';
-        const response = await fetch(`${apiUrl}/user/signup`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4ODlhY2E1YTA0MTM5NjE0ODM4OWNmNSIsImlhdCI6MTc1Mzg1MzIyNiwiZXhwIjoxNzUzOTM5NjI2fQ.lep_xGBaaSJDUH68SCspcrudeybsmtwBpeRkJolKlBY'
-            },
-            body: JSON.stringify(userData)
-        });
-
-        const data = await response.json();
-        console.log('API Response:', data); // Debug log
-        console.log('Response status:', response.status); // Debug log
-        
-        if (!response.ok) {
-            throw new Error(data.message || `HTTP error! status: ${response.status}`);
-        }
-        
-        return data;
-    };
-
-    const verifyOTPAPI = async (email, otpCode) => {
-        console.log('Verifying OTP for:', email, 'with code:', otpCode); // Debug log
-        
-        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://api.phyo.ai/api';
-        const response = await fetch(`${apiUrl}/user/verify-otp`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4ODlhY2E1YTA0MTM5NjE0ODM4OWNmNSIsImlhdCI6MTc1Mzg1MzIyNiwiZXhwIjoxNzUzOTM5NjI2fQ.lep_xGBaaSJDUH68SCspcrudeybsmtwBpeRkJolKlBY'
-            },
-            body: JSON.stringify({ email, otp: otpCode })
-        });
-
-        const data = await response.json();
-        console.log('OTP Verification Response:', data); // Debug log
-        console.log('OTP Response status:', response.status); // Debug log
-        
-        if (!response.ok) {
-            throw new Error(data.message || `HTTP error! status: ${response.status}`);
-        }
-        
-        return data;
-    };
-
-    const googleSignupAPI = async (idToken) => {
-        console.log('Attempting Google signup'); // Debug log
-        
-        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://api.phyo.ai/api';
-        const response = await fetch(`${apiUrl}/user/google`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ 
-                idToken,
-                type: 'USER' // Default user type
-            })
-        });
-
-        const data = await response.json();
-        console.log('Google Signup API Response:', data); // Debug log
-        
-        if (!response.ok) {
-            throw new Error(data.message || `HTTP error! status: ${response.status}`);
-        }
-        
-        return data;
-    };
-
     const handleGoogleSuccess = async (credentialResponse) => {
-        setGoogleLoading(true);
-
         try {
-            console.log('Google credential received'); // Debug log
-            const result = await googleSignupAPI(credentialResponse.credential);
-            
-            // Handle successful signup/login
-            if (result.token) {
-                console.log('Google signup successful'); // Debug log
-                
-                // Store the authentication token
-                localStorage.setItem('authToken', result.token);
-                
-                // Store user data if provided
-                if (result.user) {
-                    localStorage.setItem('userData', JSON.stringify(result.user));
-                    if (result.user.email) {
-                        localStorage.setItem('userEmail', result.user.email);
-                    }
+            const result = await googleLogin({
+                idToken: credentialResponse.credential,
+                type: 'USER'
+            });
+
+            // Store user data if provided
+            const userData = result.user || result.data?.user;
+            if (userData) {
+                localStorage.setItem('userData', JSON.stringify(userData));
+                if (userData.email) {
+                    localStorage.setItem('userEmail', userData.email);
                 }
-                
-                toast.success('🎉 Successfully signed up with Google!');
-                
-                // Redirect to dashboard or requested page
-                const redirect = searchParams.get('redirect') || '/';
-                setTimeout(() => router.push(redirect), 1000);
-                
-            } else {
-                console.log('Google signup failed with result:', result); // Debug log
-                toast.error(result.message || 'Google signup failed');
             }
+
+            toast.success('🎉 Successfully signed up with Google!');
+
+            // Redirect to dashboard or requested page
+            const redirect = searchParams.get('redirect') || '/';
+            setTimeout(() => router.push(redirect), 1000);
         } catch (error) {
-            console.error('Google signup error:', error); // Debug log
             toast.error(error.message || 'Failed to sign up with Google');
-        } finally {
-            setGoogleLoading(false);
         }
     };
 
@@ -203,36 +126,19 @@ function SignupForm() {
     };
 
     const onSubmit = async (data) => {
-        setLoading(true);
-
         try {
             const userData = {
                 ...data,
-                type: 'USER' // Set to USER as requested
+                type: 'USER'
             };
 
-            console.log('Submitting form with data:', userData); // Debug log
-            const result = await signupAPI(userData);
-            console.log('Signup result:', result); // Debug log
-            
-            // More flexible response handling
-            if (result.success || result.message?.includes('OTP') || result.status === 'success' || result.data) {
-                console.log('OTP should be sent, showing OTP screen'); // Debug log
-                toast.success('📧 OTP sent to your email! Please check your inbox.');
-                setSignupData(userData);
-                setShowOTP(true);
-            } else {
-                console.log('Unexpected response format:', result); // Debug log
-                // Still show OTP screen if we got a response (assuming OTP was sent)
-                toast.success('📧 OTP sent to your email! Please check your inbox.');
-                setSignupData(userData);
-                setShowOTP(true);
-            }
+            await signup(userData);
+
+            toast.success('📧 OTP sent to your email! Please check your inbox.');
+            setSignupData(userData);
+            setShowOTP(true);
         } catch (error) {
-            console.error('Signup error:', error); // Debug log
             toast.error(error.message || 'An unexpected error occurred');
-        } finally {
-            setLoading(false);
         }
     };
 
@@ -256,60 +162,29 @@ function SignupForm() {
             return;
         }
 
-        setOtpLoading(true);
-
         try {
-            console.log('Attempting OTP verification...'); // Debug log
-            const result = await verifyOTPAPI(signupData.email, otpCode);
-            console.log('OTP verification result:', result); // Debug log
-            
-            // More flexible success handling
-            if (result.success || result.message?.includes('verified') || result.status === 'success' || result.verified) {
-                console.log('OTP verified successfully, redirecting to login...'); // Debug log
-                
-                // Store token if provided
-                if (result.token) {
-                    localStorage.setItem('authToken', result.token);
-                }
-                
-                toast.success('✅ Email verified successfully! Redirecting to login...');
-                
-                // Small delay to show success, then redirect
-                setTimeout(() => {
-                    router.push('/login?verified=true');
-                }, 1500);
-                
-            } else {
-                console.log('OTP verification failed with result:', result); // Debug log
-                toast.error(result.message || 'OTP verification failed');
-            }
+            await verifyOtp({
+                email: signupData.email,
+                otp: otpCode
+            });
+
+            toast.success('✅ Email verified successfully! Redirecting to login...');
+            setTimeout(() => {
+                router.push('/login?verified=true');
+            }, 1500);
         } catch (error) {
-            console.error('OTP verification error:', error); // Debug log
-            
-            // If the error message indicates success, still redirect
-            if (error.message?.includes('verified') || error.message?.includes('success')) {
-                console.log('Error message indicates success, redirecting anyway...'); // Debug log
-                toast.success('✅ Email verified successfully! Redirecting to login...');
-                setTimeout(() => {
-                    router.push('/login?verified=true');
-                }, 1500);
-            } else {
-                toast.error(error.message || 'OTP verification failed');
-            }
-        } finally {
-            setOtpLoading(false);
+            toast.error(error.message || 'OTP verification failed');
         }
     };
 
     const resendOTP = async () => {
         if (!signupData) return;
-        
+
         try {
-            await signupAPI(signupData);
-            setError('');
-            // Show success message or toast
+            await signup(signupData);
+            toast.success('📧 OTP resent to your email!');
         } catch (error) {
-            setError('Failed to resend OTP');
+            toast.error(error.message || 'Failed to resend OTP');
         }
     };
 

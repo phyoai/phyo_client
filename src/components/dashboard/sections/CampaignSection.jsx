@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import SectionHeading from '@/components/SectionHeading';
 import CampaignCard from '@/components/cards/CampaignCard';
-import { campaignAPI } from '@/utils/api';
+import { dashboardService } from '@/services';
 import { useAuth } from '@/app/context/AuthContext';
 
 /**
@@ -73,14 +73,18 @@ export default function CampaignSection({
 
   useEffect(() => {
     fetchCampaigns();
-  }, []);
+  }, [role]);
    const fetchCampaigns = async (page = 1, limit = 20) => {
     setLoading(true);
     try {
-      const response = await campaignAPI.getCampaigns({ page, limit });
+      // Use role-based API - different endpoints for different roles
+      const response = await dashboardService.getCampaignsByRole(role, { page, limit });
       const allCampaigns = response.data || [];
-      // Filter only active campaigns (non-draft)
-      const activeCampaigns = allCampaigns.filter(campaign => campaign.status === 'Active');
+      // Filter out draft campaigns (be flexible with status values)
+      const activeCampaigns = allCampaigns.filter(campaign => {
+        const status = (campaign.status || '').toLowerCase();
+        return status !== 'draft' && campaign._id; // Exclude drafts and invalid campaigns
+      });
       setCampaigns(activeCampaigns);
       setPagination(response.pagination || {
         currentPage: 1,
@@ -90,7 +94,7 @@ export default function CampaignSection({
         hasNext: false,
         hasPrev: false
       });
-      // console.log('Fetched campaigns:', activeCampaigns);
+      // console.log('Fetched campaigns for role:', role, 'Total:', allCampaigns.length, 'Active:', activeCampaigns.length);
     } catch (error) {
       console.error('Error fetching campaigns:', error);
       setCampaigns([]);

@@ -1,8 +1,8 @@
 'use client'
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { ArrowLeftLine, ArrowRightLine, CloseLine, UploadLine, CalendarLine, CheckLine, UserLine, MoreLine, DeleteBinLine, EditLine, SearchLine, HeartLine, LineChartLine, CheckboxLine } from '@phyoofficial/phyo-icon-library';
-import { campaignAPI } from '../../../utils/api';
+import { campaignAPI, influencerAPI } from '../../../utils/api';
 import { useSidebar } from '../../context/SidebarContext';
 import { AudienceEngagement } from '@/components/AudienceEngagementGraphs';
 import { SpendingBudget } from '@/components/SpendingBudgetGraph';
@@ -65,59 +65,41 @@ const AllCampaignsSection = () => {
   });
 
   const fileInputRef = useRef(null);
+  const [influencers, setInfluencers] = useState([]);
+  const [influencersLoading, setInfluencersLoading] = useState(false);
 
-  // Campaign data will be fetched from API
+  // Fetch influencers for campaign applications
+  useEffect(() => {
+    const fetchInfluencers = async () => {
+      setInfluencersLoading(true);
+      try {
+        const response = await influencerAPI.getInfluencers({
+          page: 1,
+          limit: 6
+        });
+        const influencersData = response.data || [];
 
-  const mockInfluencers = [
-    {
-      id: 1,
-      name: 'Andrew Power',
-      followers: '12.5K',
-      engagement: '4.2%',
-      tags: ['Lifestyle', 'Fitness', 'Food', 'Travel'],
-      image: '/api/placeholder/80/80'
-    },
-    {
-      id: 2,
-      name: 'Andrew Power',
-      followers: '8.7K',
-      engagement: '3.8%',
-      tags: ['Beauty', 'Skincare', 'Wellness'],
-      image: '/api/placeholder/80/80'
-    },
-    {
-      id: 3,
-      name: 'Andrew Power',
-      followers: '15.2K',
-      engagement: '5.1%',
-      tags: ['Fashion', 'Lifestyle', 'Travel'],
-      image: '/api/placeholder/80/80'
-    },
-    {
-      id: 4,
-      name: 'Andrew Power',
-      followers: '22.1K',
-      engagement: '6.3%',
-      tags: ['Health', 'Fitness', 'Nutrition'],
-      image: '/api/placeholder/80/80'
-    },
-    {
-      id: 5,
-      name: 'Andrew Power',
-      followers: '9.8K',
-      engagement: '4.7%',
-      tags: ['Tech', 'Gaming', 'Reviews'],
-      image: '/api/placeholder/80/80'
-    },
-    {
-      id: 6,
-      name: 'Andrew Power',
-      followers: '18.3K',
-      engagement: '5.9%',
-      tags: ['Food', 'Cooking', 'Recipes'],
-      image: '/api/placeholder/80/80'
-    }
-  ];
+        // Format influencer data for display
+        const formattedInfluencers = influencersData.slice(0, 6).map(influencer => ({
+          id: influencer._id || influencer.id,
+          name: influencer.name || 'Influencer',
+          followers: influencer.followers ? `${(influencer.followers / 1000).toFixed(1)}K` : '0K',
+          engagement: influencer.engagement ? `${(influencer.engagement * 100).toFixed(1)}%` : '0%',
+          tags: influencer.categories || [],
+          image: influencer.avatar || '/api/placeholder/80/80'
+        }));
+
+        setInfluencers(formattedInfluencers);
+      } catch (error) {
+        console.error('Error fetching influencers:', error);
+        setInfluencers([]);
+      } finally {
+        setInfluencersLoading(false);
+      }
+    };
+
+    fetchInfluencers();
+  }, []);
 
   const handleInputChange = (field, value) => {
     setFormData(prev => ({
@@ -1682,41 +1664,55 @@ const AllCampaignsSection = () => {
 
           {/* List Items - Figma: white background, full width */}
           <div className="bg-neutral-base">
-            {mockInfluencers.slice(0, 5).map((influencer, index) => (
-              <div key={influencer.id} className="relative">
-                <div className="flex items-center">
-                  {/* Leading Avatar - Figma: px-4, py-1.5 (6px), 48x48 */}
-                  <div className="px-4 py-1.5">
-                    <div className="w-12 h-12 bg-gradient-to-br from-pink-400 to-purple-500 rounded-full"></div>
+            {influencers.length > 0 ? (
+              influencers.slice(0, 5).map((influencer, index) => (
+                <div key={influencer.id} className="relative">
+                  <div className="flex items-center">
+                    {/* Leading Avatar - Figma: px-4, py-1.5 (6px), 48x48 */}
+                    <div className="px-4 py-1.5">
+                      {influencer.image ? (
+                        <img
+                          src={influencer.image}
+                          alt={influencer.name}
+                          className="w-12 h-12 bg-gradient-to-br from-pink-400 to-purple-500 rounded-full object-cover"
+                        />
+                      ) : (
+                        <div className="w-12 h-12 bg-gradient-to-br from-pink-400 to-purple-500 rounded-full"></div>
+                      )}
+                    </div>
+
+                    {/* Content - Figma: flex-1, pr-4, py-3 (12px) */}
+                    <div className="flex-1 min-w-0 pr-4 py-3">
+                      <h3 className="text-[16px] font-semibold text-gray-900 leading-6 tracking-[0.24px] mb-0.5">
+                        {influencer.name}
+                      </h3>
+                      <p className="text-[14px] text-gray-500 leading-5 tracking-[0px] truncate">
+                        {influencer.tags && influencer.tags.length > 0
+                          ? influencer.tags.slice(0, 3).join(' • ')
+                          : `${influencer.followers} followers • ${influencer.engagement} engagement`
+                        }
+                      </p>
+                    </div>
+
+                    {/* Trailing Button - Figma: px-4, py-3.5 (14px) */}
+                    <div className="px-4 py-3.5">
+                      <Button variant="outlined" size="sm">
+                        portfolio
+                      </Button>
+                    </div>
                   </div>
 
-                  {/* Content - Figma: flex-1, pr-4, py-3 (12px) */}
-                  <div className="flex-1 min-w-0 pr-4 py-3">
-                    <h3 className="text-[16px] font-semibold text-gray-900 leading-6 tracking-[0.24px] mb-0.5">
-                      {influencer.name}
-                    </h3>
-                    <p className="text-[14px] text-gray-500 leading-5 tracking-[0px] truncate">
-                      {influencer.tags 
-                        ? influencer.tags.slice(0, 3).join(' • ') 
-                        : 'An innovative web developer skilled in HTML, CSS, and JavaScript. He thrives on solving complex problems and bringing ideas to life through code.'
-                      }
-                    </p>
-                  </div>
-
-                  {/* Trailing Button - Figma: px-4, py-3.5 (14px) */}
-                  <div className="px-4 py-3.5">
-                    <Button variant="outlined" size="sm">
-                      portfolio
-                    </Button>
-                  </div>
+                  {/* Divider - Figma: 1px gray line */}
+                  {index < influencers.slice(0, 5).length - 1 && (
+                    <div className="h-px bg-gray-200"></div>
+                  )}
                 </div>
-                
-                {/* Divider - Figma: 1px gray line */}
-                {index < mockInfluencers.slice(0, 5).length - 1 && (
-                  <div className="h-px bg-gray-200"></div>
-                )}
+              ))
+            ) : (
+              <div className="px-4 py-6 text-center text-gray-500">
+                {influencersLoading ? 'Loading influencers...' : 'No new applications yet'}
               </div>
-            ))}
+            )}
           </div>
         </div>
 

@@ -1,8 +1,9 @@
 'use client'
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { ArrowLeftLine, SearchLine, CloseLine, HeartLine } from '@phyoofficial/phyo-icon-library';
-import { campaignAPI } from '@/utils/api';
+import { campaignService } from '@/services';
+import { useApiQuery } from '@/hooks/useApi';
 import { useGoBack } from '@/hooks/useGoBack';
 import { useAuth } from '@/app/context/AuthContext';
 
@@ -13,50 +14,22 @@ export default function AllCampaign() {
   const initialQuery = searchParams.get('q') || '';
   const { user, isBrand, isInfluencer, loading: authLoading } = useAuth();
 
-  const [campaigns, setCampaigns] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState(initialQuery);
   const [inputValue, setInputValue] = useState(initialQuery);
   const [showSearch, setShowSearch] = useState(!!initialQuery);
 
-  useEffect(() => {
-    if (!authLoading) {
-      fetchCampaigns(searchQuery);
-    }
-  }, [searchQuery, authLoading]);
-
-  const fetchCampaigns = async (query = '') => {
-    if (authLoading) return;
-
-    setLoading(true);
-    try {
+  // Fetch campaigns based on user role
+  const { data: campaignsData, loading } = useApiQuery(
+    () => {
+      if (authLoading) return null;
       const params = { page: 1, limit: 20 };
-      if (query) params.search = query;
+      if (searchQuery) params.search = searchQuery;
+      return campaignService.getCampaigns(params);
+    },
+    [searchQuery, authLoading]
+  );
 
-      let response;
-
-      // Role-based campaign fetching
-      if (isBrand()) {
-        // Brands see only their own campaigns
-        response = await campaignAPI.getBrandCampaigns(params);
-      } else if (isInfluencer()) {
-        // Influencers see all active campaigns to apply to
-        response = await campaignAPI.getCampaigns(params);
-      } else {
-        // Other users see all campaigns
-        response = await campaignAPI.getCampaigns(params);
-      }
-
-      const allCampaigns = response.data || [];
-      const activeCampaigns = allCampaigns.filter(c => c.status === 'Active');
-      setCampaigns(activeCampaigns);
-    } catch (error) {
-      console.error('Error fetching campaigns:', error);
-      setCampaigns([]);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const campaigns = campaignsData?.data?.filter(c => c.status === 'Active' || c.status === 'active') || [];
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -66,6 +39,7 @@ export default function AllCampaign() {
   const handleClear = () => {
     setInputValue('');
     setSearchQuery('');
+    setShowSearch(false);
   };
 
   return (

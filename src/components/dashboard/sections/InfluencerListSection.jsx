@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import SectionHeading from '@/components/SectionHeading';
 import InfluencerAvatar from '@/components/cards/InfluencerAvatar';
-import { influencerAPI } from '@/utils/api';
+import { dashboardService } from '@/services';
 import { useAuth } from '@/app/context/AuthContext';
 
 /**
@@ -26,7 +26,8 @@ export default function InfluencerListSection({
     const fetchInfluencers = async () => {
       setLoading(true);
       try {
-        const response = await influencerAPI.getInfluencers({ page: 1, limit });
+        // Use role-based API - different endpoints for different roles
+        const response = await dashboardService.getInfluencersByRole(role, { page: 1, limit });
         const influencersData = response.data || [];
 
         // Format and slice to limit
@@ -51,7 +52,7 @@ export default function InfluencerListSection({
     };
 
     fetchInfluencers();
-  }, [limit]);
+  }, [limit, role]);
   return (
     <div className="mb-8">
       <SectionHeading

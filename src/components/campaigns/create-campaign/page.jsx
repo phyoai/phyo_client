@@ -4,12 +4,17 @@ import { useRouter } from 'next/navigation';
 import { ArrowLeftLine, MoreLine, CloseLine, UploadLine, CalendarLine, CheckLine, UserLine } from '@phyoofficial/phyo-icon-library';
 import Button from '@/components/Button';
 import IconButton from '@/components/IconButton';
-import { campaignAPI } from '@/utils/api';
+import { campaignService } from '@/services';
+import { useApiMutation } from '@/hooks/useApi';
 
 const CreateCampaignPages = () => {
   const router = useRouter();
   const [currentStep, setCurrentStep] = useState(1);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // API mutation for creating campaign
+  const { submit: createCampaign, loading: isSubmitting } = useApiMutation(
+    (data) => campaignService.createCampaign(data)
+  );
   const [selectedCampaignTypes, setSelectedCampaignTypes] = useState(['Brand Awareness']);
   const [formData, setFormData] = useState({
     // Campaign Details
@@ -928,8 +933,6 @@ const CreateCampaignPages = () => {
       return;
     }
 
-    setIsSubmitting(true);
-
     try {
       // Build deliverables array
       const deliverables = [];
@@ -980,16 +983,13 @@ const CreateCampaignPages = () => {
         status: 'Draft'
       };
 
-      const response = await campaignAPI.createCampaign(transformedData);
-      
+      await createCampaign(transformedData);
+
       alert('Campaign created successfully!');
       router.push('/brand/campaigns');
-      
     } catch (error) {
       console.error('Error submitting campaign:', error);
       alert(`Failed to create campaign: ${error.message || 'Unknown error'}`);
-    } finally {
-      setIsSubmitting(false);
     }
   };
 

@@ -7,8 +7,9 @@ import RejectionModal from '@/components/RejectionModal';
 import NewApplicationsSkeleton from '@/components/NewApplicationsSkeleton';
 import Button from '@/components/Button';
 import IconButton from '@/components/IconButton';
+import { influencerAPI } from '@/utils/api';
 
-const applicationsData = [
+const mockApplicationsData = [
   {
     id: 1,
     name: 'Michael Smith',
@@ -228,20 +229,76 @@ const applicationsData = [
 
 const NewApplicationsPages = () => {
   const router = useRouter();
+  const [applications, setApplications] = useState([]);
   const [selectedApplication, setSelectedApplication] = useState(null);
   const [activeTab, setActiveTab] = useState('info');
   const [showRejectionModal, setShowRejectionModal] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Simulate data loading
+  // Fetch applications from API
   useEffect(() => {
-    // Simulate API call or data fetching
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 1500); // 1.5 seconds loading time
+    const fetchApplications = async () => {
+      setIsLoading(true);
+      try {
+        const response = await influencerAPI.getInfluencers({ page: 1, limit: 20 });
+        const influencersData = response.data || [];
 
-    return () => clearTimeout(timer);
+        // Transform influencer data to applications format
+        const formattedApplications = influencersData.map((influencer, index) => ({
+          id: influencer._id || influencer.id || index,
+          name: influencer.name || 'Unknown',
+          username: `@${(influencer.name || 'user').toLowerCase().replace(/\s/g, '')}`,
+          bio: influencer.bio || 'Professional influencer',
+          avatar: influencer.avatar || '/dummyAvatar.jpg',
+          coverImage: '/world-bg.png',
+          stats: {
+            brandCollaborations: influencer.collaborations || 0,
+            instagramFollowers: influencer.instagramFollowers || '0',
+            linkedinFollowers: influencer.linkedinFollowers || '0',
+            xFollowers: influencer.xFollowers || '0',
+            youtubeSubscribers: influencer.youtubeSubscribers || '0'
+          },
+          pricing: {
+            instagram: {
+              reel: '$500',
+              story: '$200',
+              post: '$350',
+              carousel: '$400'
+            },
+            youtube: {
+              video: '$1000',
+              short: '$300',
+              integration: '$800'
+            },
+            x: {
+              post: '$150'
+            },
+            linkedin: {
+              post: '$250'
+            }
+          },
+          socials: {
+            instagram: influencer.instagram || '',
+            youtube: influencer.youtube || '',
+            x: influencer.x || '',
+            linkedin: influencer.linkedin || '',
+            website: influencer.website || ''
+          },
+          memberSince: influencer.createdAt ? new Date(influencer.createdAt).toLocaleDateString() : 'Recently',
+          availabilityStatus: 'Available Now'
+        }));
+
+        setApplications(formattedApplications);
+      } catch (error) {
+        console.error('Error fetching applications:', error);
+        setApplications([]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchApplications();
   }, []);
 
   const handleBack = () => {
@@ -307,7 +364,8 @@ const NewApplicationsPages = () => {
       <div className="flex flex-1 gap-8 overflow-hidden px-9 py-4">
         {/* Applications List */}
         <div className="flex flex-col w-full max-w-[450px] overflow-y-auto">
-          {applicationsData.map((application) => (
+          {applications.length > 0 ? (
+          applications.map((application) => (
             <div
               key={application.id}
               className="bg-neutral-base flex items-center py-3 border-b border-gray-100"
@@ -345,7 +403,12 @@ const NewApplicationsPages = () => {
                 </button>
               </div>
             </div>
-          ))}
+          ))
+          ) : (
+            <div className="flex items-center justify-center h-full text-gray-500">
+              <p>No applications found</p>
+            </div>
+          )}
         </div>
 
         {/* Divider */}

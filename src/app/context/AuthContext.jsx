@@ -1,7 +1,7 @@
 'use client'
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { authUtils } from '../../utils/api';
+import { authAPI, authUtils } from '../../utils/api';
 
 const AuthContext = createContext();
 
@@ -84,97 +84,76 @@ export const AuthProvider = ({ children }) => {
   // Login function
   const login = async (email, password) => {
     try {
-      const response = await fetch('https://api.phyo.ai/api/user/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, password }),
-      });
-
-      const data = await response.json();
+      const data = await authAPI.login({ email, password });
       console.log('Login API Response:', data); // Debug log
 
-      if (response.ok) {
-        const authToken = data.token;
-        const userData = data.user || data.data || { email, token: authToken };
+      const authToken = data.token;
+      const userData = data.user || data.data || { email, token: authToken };
 
-        setToken(authToken);
-        setUser(userData);
+      setToken(authToken);
+      setUser(userData);
 
-        // Store token and user data in localStorage and cookie using authUtils
-        authUtils.setToken(authToken);
-        if (typeof window !== 'undefined') {
-          try {
-            localStorage.setItem('userData', JSON.stringify(userData));
-          } catch (e) {
-            console.warn('Failed to store userData in localStorage:', e);
-          }
-          // Store userType in cookie so middleware can enforce role-based routing
-          const userType = userData.type || 'USER';
-          try {
-            document.cookie = `userType=${userType}; path=/; max-age=${7 * 24 * 60 * 60}`;
-          } catch (e) {
-            console.warn('Failed to set userType cookie:', e);
-          }
+      // Store token and user data in localStorage and cookie using authUtils
+      authUtils.setToken(authToken);
+      if (typeof window !== 'undefined') {
+        try {
+          localStorage.setItem('userData', JSON.stringify(userData));
+        } catch (e) {
+          console.warn('Failed to store userData in localStorage:', e);
         }
-        
-        // Determine redirect path based on user type and registration status
-        let redirectPath = '/';
-        
-        if (userData.type === 'USER') {
-          // Regular user - check if they need to complete registration
-          if (userData.brandRegistrationStatus === 'COMPLETED') {
-            redirectPath = '/brand/dashboard';
-          } else if (userData.influencerRegistrationStatus === 'COMPLETED') {
-            redirectPath = '/influencer/dashboard';
-          } else {
-            // UserLine hasn't completed any registration
-            redirectPath = '/user/dashboard';
-          }
-        } else if (userData.type === 'BRAND') {
-          redirectPath = '/brand/dashboard';
-        } else if (userData.type === 'INFLUENCER') {
-          redirectPath = '/influencer/dashboard';
+        // Store userType in cookie so middleware can enforce role-based routing
+        const userType = userData.type || 'USER';
+        try {
+          document.cookie = `userType=${userType}; path=/; max-age=${7 * 24 * 60 * 60}`;
+        } catch (e) {
+          console.warn('Failed to set userType cookie:', e);
         }
-        
-        return { success: true, data, redirectPath };
-      } else {
-        return { success: false, error: data.message || 'Login failed' };
       }
+
+      // Determine redirect path based on user type and registration status
+      let redirectPath = '/';
+
+      if (userData.type === 'USER') {
+        // Regular user - check if they need to complete registration
+        if (userData.brandRegistrationStatus === 'COMPLETED') {
+          redirectPath = '/brand/dashboard';
+        } else if (userData.influencerRegistrationStatus === 'COMPLETED') {
+          redirectPath = '/influencer/dashboard';
+        } else {
+          // UserLine hasn't completed any registration
+          redirectPath = '/user/dashboard';
+        }
+      } else if (userData.type === 'BRAND') {
+        redirectPath = '/brand/dashboard';
+      } else if (userData.type === 'INFLUENCER') {
+        redirectPath = '/influencer/dashboard';
+      }
+
+      return { success: true, data, redirectPath };
     } catch (error) {
       console.error('Login error:', error);
-      return { success: false, error: 'Network error' };
+      const errorMessage = typeof error === 'object' && error.message ? error.message : 'Network error';
+      return { success: false, error: errorMessage };
     }
   };
 
   // Signup function
   const signup = async (userData) => {
     try {
-      const response = await fetch('https://api.phyo.ai/api/user/signup', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(userData),
-      });
+      const data = await authAPI.signup(userData);
 
-      const data = await response.json();
+      const authToken = data.token;
+      setToken(authToken);
+      setUser(data.data || data.user || { email: userData.email, token: authToken });
 
-      if (response.ok) {
-        const authToken = data.token;
-        setToken(authToken);
-        setUser(data.data || data.user || { email: userData.email, token: authToken });
-        
-        // Store token in localStorage and cookie using authUtils
-        authUtils.setToken(authToken);
-        
-        return { success: true, data };
-      } else {
-        return { success: false, error: data.message || 'Signup failed' };
-      }
+      // Store token in localStorage and cookie using authUtils
+      authUtils.setToken(authToken);
+
+      return { success: true, data };
     } catch (error) {
-      return { success: false, error: 'Network error' };
+      console.error('Signup error:', error);
+      const errorMessage = typeof error === 'object' && error.message ? error.message : 'Network error';
+      return { success: false, error: errorMessage };
     }
   };
 

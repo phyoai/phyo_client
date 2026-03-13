@@ -1,6 +1,8 @@
 'use client'
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { authService } from '@/services';
+import { useApiMutation } from '@/hooks/useApi';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -10,35 +12,34 @@ const ForgotPassword = () => {
   const [verificationCode, setVerificationCode] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmNewPassword, setConfirmNewPassword] = useState('');
-  const [loading, setLoading] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const router = useRouter();
+
+  const { submit: forgotPassword, loading: forgotLoading } = useApiMutation(
+    (data) => authService.forgotPassword(data.email)
+  );
+  const { submit: verifyCodeMutation, loading: verifyLoading } = useApiMutation(
+    (data) => authService.verifyCode(data.email, data.code)
+  );
+  const { submit: resetPasswordMutation, loading: resetLoading } = useApiMutation(
+    (data) => authService.resetPassword(data)
+  );
+
+  const loading = forgotLoading || verifyLoading || resetLoading;
 
   const sendForgotPasswordEmail = async () => {
     if (!email) {
       toast.error('Please enter your email address');
       return;
     }
-    setLoading(true);
     try {
-      const response = await fetch('https://api.phyo.ai/api/user/forgot-password', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email }),
-      });
-      const result = await response.json();
-      if (response.ok) {
-        toast.success('📧 Verification code sent to your email!');
-        setStep(2);
-      } else {
-        toast.error(result.message || 'Failed to send verification code');
-      }
-    } catch {
-      toast.error('Network error. Please try again.');
-    } finally {
-      setLoading(false);
+      await forgotPassword({ email });
+      toast.success('📧 Verification code sent to your email!');
+      setStep(2);
+    } catch (error) {
+      toast.error(error?.message || 'Failed to send verification code');
     }
   };
 
@@ -47,24 +48,12 @@ const ForgotPassword = () => {
       toast.error('Please enter the verification code');
       return;
     }
-    setLoading(true);
     try {
-      const response = await fetch('https://api.phyo.ai/api/user/verify-code', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, code: verificationCode }),
-      });
-      const result = await response.json();
-      if (response.ok) {
-        toast.success('✅ Code verified successfully!');
-        setStep(3);
-      } else {
-        toast.error(result.message || 'Invalid verification code');
-      }
-    } catch {
-      toast.error('Network error. Please try again.');
-    } finally {
-      setLoading(false);
+      await verifyCodeMutation({ email, code: verificationCode });
+      toast.success('✅ Code verified successfully!');
+      setStep(3);
+    } catch (error) {
+      toast.error(error?.message || 'Invalid verification code');
     }
   };
 
@@ -81,26 +70,14 @@ const ForgotPassword = () => {
       toast.error('Password must be at least 6 characters long');
       return;
     }
-    setLoading(true);
     try {
-      const response = await fetch('https://api.phyo.ai/api/user/reset-password', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, newPassword }),
-      });
-      const result = await response.json();
-      if (response.ok) {
-        toast.success('✅ Password reset successfully! Redirecting to login...');
-        setTimeout(() => {
-          router.replace('/login');
-        }, 2000);
-      } else {
-        toast.error(result.message || 'Failed to reset password');
-      }
-    } catch {
-      toast.error('Network error. Please try again.');
-    } finally {
-      setLoading(false);
+      await resetPasswordMutation({ email, newPassword });
+      toast.success('✅ Password reset successfully! Redirecting to login...');
+      setTimeout(() => {
+        router.replace('/login');
+      }, 2000);
+    } catch (error) {
+      toast.error(error?.message || 'Failed to reset password');
     }
   };
 

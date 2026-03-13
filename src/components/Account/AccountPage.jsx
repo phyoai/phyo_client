@@ -4,7 +4,9 @@ export const dynamic = 'force-dynamic';
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { userService } from '@/services';
 import { userAPI } from '@/utils/api';
+import { useApiQuery } from '@/hooks/useApi';
 import { useTheme } from '@/app/context/ThemeContext';
 import { useLanguage } from '@/app/context/LanguageContext';
 import { useRoleContext } from '@/app/context/RoleContext';
@@ -46,6 +48,23 @@ export default function AccountPage() {
   const { darkMode, toggleDarkMode } = useTheme();
   const { t, language, changeLanguage, currentLanguage, languages } = useLanguage();
 
+  // Fetch user profile
+  const { data: profileData, loading: profileLoading } = useApiQuery(
+    () => userService.getProfile(),
+    []
+  );
+
+  useEffect(() => {
+    if (profileData) {
+      setUser(profileData);
+      setLoading(false);
+    }
+  }, [profileData]);
+
+  useEffect(() => {
+    setLoading(profileLoading);
+  }, [profileLoading]);
+
   // Icon map for account menu items
   const ICON_MAP = {
     AccountCircleFill, // Used for user profile
@@ -58,25 +77,6 @@ export default function AccountPage() {
     Notification2Line,
     QuestionLine,
   };
-
-  useEffect(() => {
-    fetchUserProfile();
-  }, []);
-
-
-  const fetchUserProfile = async () => {
-    try {
-      const response = await userAPI.getUserProfile();
-      // Extract user data from response.data or response.user or response itself
-      const userData = response.data || response.user || response;
-      setUser(userData);
-    } catch (error) {
-      console.error('Error fetching user profile:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-console.log('UserLine profile data:', user);
 
   const getInitials = (name) => {
     if (!name) return 'J';
@@ -302,7 +302,7 @@ console.log('UserLine profile data:', user);
     }
     setIsSaving(true);
     try {
-      await userAPI.updateUserProfile({
+      await userService.changePassword({
         currentPassword: editFormData.currentPassword,
         newPassword: editFormData.newPassword,
       });
@@ -336,7 +336,7 @@ console.log('UserLine profile data:', user);
     try {
       const formData = new FormData();
       brandImageFiles.forEach(({ file }) => formData.append('brand_images', file));
-      await userAPI.updateUserProfile(formData, true);
+      await userAPI.updateUserProfile(formData);
       await fetchUserProfile();
       setBrandImageFiles([]);
       setActiveEditTab(null);
@@ -354,7 +354,7 @@ console.log('UserLine profile data:', user);
     try {
       const formData = new FormData();
       formData.append('company_logo', file);
-      await userAPI.updateUserProfile(formData, true);
+      await userAPI.updateUserProfile(formData);
       await fetchUserProfile();
     } catch (err) {
       console.error('Avatar upload error:', err);

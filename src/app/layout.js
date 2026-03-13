@@ -1,6 +1,7 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "./context/AuthContext";
+import { SocketProvider } from "./context/SocketContext";
 import { ThemeProvider } from "./context/ThemeContext";
 import { LanguageProvider } from "./context/LanguageContext";
 
@@ -29,7 +30,9 @@ export default function RootLayout({ children }) {
         <ThemeProvider>
           <LanguageProvider>
             <AuthProvider>
-              {children}
+              <SocketProvider>
+                {children}
+              </SocketProvider>
             </AuthProvider>
           </LanguageProvider>
         </ThemeProvider>

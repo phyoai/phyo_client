@@ -10,7 +10,7 @@ class PaymentService {
   // Get all available subscription plans
   async getPlans() {
     try {
-      const response = await api.get('/payment/plans');
+      const response = await api.get('/payments/plans');
       return response.data;
     } catch (error) {
       throw error.response?.data || error.message;
@@ -18,19 +18,24 @@ class PaymentService {
   }
 
   // Get user's current plan
-  async getUserPlan() {
+  async getCurrentPlan() {
     try {
-      const response = await api.get('/payment/user-plan');
+      const response = await api.get('/payments/current-plan');
       return response.data;
     } catch (error) {
       throw error.response?.data || error.message;
     }
   }
 
+  // Legacy: Get user's current plan (backward compatibility)
+  async getUserPlan() {
+    return this.getCurrentPlan();
+  }
+
   // Get user's credit information
   async getCredits() {
     try {
-      const response = await api.get('/payment/credits');
+      const response = await api.get('/payments/credits');
       return response.data;
     } catch (error) {
       throw error.response?.data || error.message;
@@ -40,7 +45,22 @@ class PaymentService {
   // Create payment order
   async createOrder(planId, interval = 'MONTHLY') {
     try {
-      const response = await api.post('/payment/create-order', {
+      // Map plan names to tier endpoints
+      let tier = 'silver';
+      if (typeof planId === 'string') {
+        if (planId.toLowerCase().includes('gold')) {
+          tier = 'gold';
+        } else if (planId.toLowerCase().includes('premium')) {
+          tier = 'premium';
+        }
+      } else if (typeof planId === 'number') {
+        // Assume: 1=silver, 2=gold, 3=premium
+        if (planId === 2) tier = 'gold';
+        else if (planId === 3) tier = 'premium';
+      }
+
+      const endpoint = `/payments/order/${tier}`;
+      const response = await api.post(endpoint, {
         planId,
         interval
       });
@@ -50,10 +70,40 @@ class PaymentService {
     }
   }
 
+  // Create Silver plan order
+  async createSilverOrder(data = {}) {
+    try {
+      const response = await api.post('/payments/order/silver', data);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error.message;
+    }
+  }
+
+  // Create Gold plan order
+  async createGoldOrder(data = {}) {
+    try {
+      const response = await api.post('/payments/order/gold', data);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error.message;
+    }
+  }
+
+  // Create Premium plan order
+  async createPremiumOrder(data = {}) {
+    try {
+      const response = await api.post('/payments/order/premium', data);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error.message;
+    }
+  }
+
   // Verify payment
   async verifyPayment(razorpayOrderId, razorpayPaymentId, razorpaySignature, planId) {
     try {
-      const response = await api.post('/payment/verify-payment', {
+      const response = await api.post('/payments/verify', {
         razorpayOrderId,
         razorpayPaymentId,
         razorpaySignature,
@@ -68,7 +118,7 @@ class PaymentService {
   // Get payment history
   async getPaymentHistory(page = 1, limit = 10) {
     try {
-      const response = await api.get('/payment/history', {
+      const response = await api.get('/payments/history', {
         params: { page, limit }
       });
       return response.data;
@@ -80,7 +130,7 @@ class PaymentService {
   // Cancel subscription
   async cancelSubscription() {
     try {
-      const response = await api.post('/payment/cancel-subscription');
+      const response = await api.post('/payments/cancel');
       return response.data;
     } catch (error) {
       throw error.response?.data || error.message;
@@ -91,7 +141,7 @@ class PaymentService {
   initializeRazorpay(orderData, onSuccess, onFailure) {
     // Prefer razorpayKey from API response, fallback to environment variable
     const razorpayKey = orderData.razorpayKey || this.razorpayKey;
-    
+
     if (!razorpayKey) {
       throw new Error('Razorpay key not found. Please check NEXT_PUBLIC_RAZORPAY_KEY_ID environment variable or ensure the API returns razorpayKey.');
     }
