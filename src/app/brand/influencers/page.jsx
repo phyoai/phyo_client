@@ -186,21 +186,23 @@ const TopInfluencersPage = () => {
   };
 
   const handleInfluencerClick = (influencer) => {
-    // Transform the data to match the profile component's expected format
-    const transformedInfluencer = {
+    // Pass influencer data through URL params (no API calls on detail page)
+    const influencerData = {
       id: influencer.id,
       name: influencer.name,
       username: influencer.username,
-      followers: influencer.stats.followers,
-      following: influencer.stats.following,
-      posts: influencer.stats.posts,
-      location: 'Delhi, India',
-      age: '34',
-      about: influencer.bio,
+      followers: influencer.stats?.followers || '0',
+      following: influencer.stats?.following || '0',
+      posts: influencer.stats?.posts || '0',
+      bio: influencer.bio,
+      avatar: influencer.avatar,
+      location: influencer.location || 'Delhi, India',
+      age: influencer.age || '34',
       likes: '9.2K',
       views: '9.2K'
     };
-    setSelectedInfluencer(transformedInfluencer);
+    // Navigate to detail page with influencer data encoded in URL
+    router.push(`/${role}/influencers/${influencer.id}?influencer=${encodeURIComponent(JSON.stringify(influencerData))}`);
   };
 
   const handleCloseProfile = () => {

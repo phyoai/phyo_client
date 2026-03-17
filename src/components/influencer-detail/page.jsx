@@ -1,10 +1,9 @@
 'use client'
 import React, { useState, useRef, useEffect } from 'react';
 import { ArrowLeftLine, MoreLine, BookmarkLine, YoutubeFill, InstagramFill, TwitterXLine, UserAddLine, Message3Line, FacebookCircleFill } from '@phyoofficial/phyo-icon-library';
-import { useRouter, useParams } from 'next/navigation';
+import { useRouter, useParams, useSearchParams } from 'next/navigation';
 import { useRoleContext } from '@/app/context/RoleContext';
 import Image2Line from 'next/image';
-import { useInfluencers } from '@/hooks/useInfluencers';
 
 const influencersData = [
   {
@@ -147,6 +146,7 @@ const categories = ['All', 'Fitness', 'Comedy', 'Lifestyle', 'Infra', 'Real Esta
 const TopInfluencersPageDetails = () => {
   const router = useRouter();
   const params = useParams();
+  const searchParams = useSearchParams();
   const { role } = useRoleContext();
   const [showMoreMenu, setShowMoreMenu] = useState(false);
   const [showSaveModal, setShowSaveModal] = useState(false);
@@ -156,58 +156,50 @@ const TopInfluencersPageDetails = () => {
   const [error, setError] = useState(null);
   const moreMenuRef = useRef(null);
 
-  // Redux influencers hook
-  const { selectedInfluencer, loading, fetchInfluencerById } = useInfluencers();
-
   // Sample lists data
   const [savedLists, setSavedLists] = useState([
     { id: 1, name: 'Favorties', initials: 'AB', color: '#0066ff' },
     { id: 2, name: 'Campaign 1', initials: 'AB', color: '#0066ff' }
   ]);
 
-  // Fetch influencer from Redux by ID
+  // Get influencer data from URL params (passed from onClick)
+  // NO API CALLS - data is passed through URL
   useEffect(() => {
-    if (!params?.id) {
-      setError('No influencer ID provided');
+    const influencerParam = searchParams?.get('influencer');
+
+    if (!influencerParam) {
+      setError('No influencer data provided');
       return;
     }
 
     try {
+      // Decode influencer data from URL
+      const influencer = JSON.parse(decodeURIComponent(influencerParam));
+
+      // Transform to display format
+      const transformed = {
+        id: influencer._id || influencer.id || params?.id,
+        name: influencer.username || influencer.name || 'Unknown',
+        username: `@${influencer.username || influencer.name || 'user'}`,
+        followers: influencer.followers ? `${(influencer.followers / 1000).toFixed(1)}k` : '0k',
+        following: influencer.following ? `${(influencer.following / 1000).toFixed(1)}k` : '0k',
+        posts: influencer.posts || influencer.postsCount || '0',
+        location: influencer.location || 'Unknown',
+        age: influencer.age || 'N/A',
+        about: influencer.bio || influencer.description || 'No bio available',
+        likes: influencer.likes ? `${(influencer.likes / 1000).toFixed(1)}K` : '0K',
+        views: influencer.views ? `${(influencer.views / 1000).toFixed(1)}K` : '0K',
+        avatar: influencer.avatar || influencer.profileImage || influencer.profile_pic || '/dummyAvatar.jpg'
+      };
+
+      setDisplayInfluencer(transformed);
       setError(null);
-      // Fetch influencer using Redux hook
-      fetchInfluencerById(params.id);
     } catch (err) {
-      console.error('Error fetching influencer:', err);
-      setError('Failed to load influencer data');
-    }
-  }, [params?.id, fetchInfluencerById]);
-
-  // Transform Redux selected influencer to display format
-  useEffect(() => {
-    if (selectedInfluencer) {
-      const influencer = selectedInfluencer;
-
-        // Transform API response to match component's expected format
-        const transformed = {
-          id: influencer._id || influencer.id,
-          name: influencer.username || influencer.name || 'Unknown',
-          username: `@${influencer.username || 'user'}`,
-          followers: influencer.followers ? `${(influencer.followers / 1000).toFixed(1)}k` : '0k',
-          following: influencer.following ? `${(influencer.following / 1000).toFixed(1)}k` : '0k',
-          posts: influencer.posts || '0',
-          location: influencer.location || 'Unknown',
-          age: influencer.age || 'N/A',
-          about: influencer.bio || influencer.description || '',
-          likes: influencer.likes ? `${(influencer.likes / 1000).toFixed(1)}K` : '0K',
-          views: influencer.views ? `${(influencer.views / 1000).toFixed(1)}K` : '0K',
-          avatar: influencer.avatar || influencer.profileImage || '/dummyAvatar.jpg'
-        };
-
-        setDisplayInfluencer(transformed);
-    } else {
+      console.error('Error parsing influencer data:', err);
+      setError('Invalid influencer data provided');
       setDisplayInfluencer(null);
     }
-  }, [selectedInfluencer]);
+  }, [searchParams, params?.id]);
 
   const handleBack = () => {
     router.push(`/${role}/dashboard`);
@@ -257,29 +249,6 @@ const TopInfluencersPageDetails = () => {
     console.log('Invite:', displayInfluencer?.username);
   };
 
-  // Loading state
-  if (loading) {
-    return (
-      <div className="bg-neutral-base h-screen flex flex-col overflow-hidden">
-        <div className="bg-neutral-base flex items-center justify-between px-4 py-2 border-b border-gray-100 shrink-0">
-          <button
-            onClick={handleBack}
-            className="flex items-center justify-center w-12 h-12 rounded-full hover:bg-gray-100 transition-colors"
-          >
-            <ArrowLeftLine className="w-6 h-6 text-gray-700" />
-          </button>
-          <h1 className="text-xl font-semibold text-[#242527] flex-1 px-2">Loading...</h1>
-          <div className="w-12"></div>
-        </div>
-        <div className="flex-1 flex items-center justify-center">
-          <div className="flex flex-col items-center gap-3">
-            <div className="animate-spin rounded-full h-10 w-10 border-3 border-green-600 border-t-transparent"></div>
-            <p className="text-gray-500">Loading influencer data...</p>
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   // Error or not found state
   if (!displayInfluencer || error) {

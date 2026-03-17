@@ -4,11 +4,13 @@ export const dynamic = 'force-dynamic';
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { useSelector, useDispatch } from 'react-redux';
 import { useTheme } from '@/app/context/ThemeContext';
 import { useLanguage } from '@/app/context/LanguageContext';
 import { useRoleContext } from '@/app/context/RoleContext';
 import { useAccountPages } from '@/hooks/useAccountPages';
 import { useUser } from '@/hooks';
+import { getUserPlan } from '@/store/slices/paymentSlice';
 import { getVisibleAccountPages } from '@/config/accountPagesConfig';
 import {
   AccountCircleFill,
@@ -25,6 +27,7 @@ import {
 
 export default function AccountPage() {
   const router = useRouter();
+  const dispatch = useDispatch();
   const { role } = useRoleContext();
   const { visiblePages } = useAccountPages();
   const [user, setUser] = useState(null);
@@ -46,11 +49,13 @@ export default function AccountPage() {
   const { darkMode, toggleDarkMode } = useTheme();
   const { t, language, changeLanguage, currentLanguage, languages } = useLanguage();
   const { profile, loading: profileLoading, fetchProfile, updateProfile } = useUser();
+  const { userPlan } = useSelector((state) => state.payment);
 
-  // Fetch user profile on component mount
+  // Fetch user profile and plan on component mount
   useEffect(() => {
     fetchProfile();
-  }, []);
+    dispatch(getUserPlan());
+  }, [dispatch]);
 
   useEffect(() => {
     if (profile) {
@@ -957,7 +962,7 @@ const RightPanelCategories = () => {
               {user?.name || 'User'}
             </h2>
             <span className="inline-flex items-center px-2 py-1 text-xs font-medium text-[#666] dark:text-gray-400 bg-[#f0f0f0] dark:bg-[#2a2a2a] rounded-md">
-              {user?.currentPlan || user?.plan || 'BRONZE'}
+              {userPlan?.planName || user?.currentPlan || user?.plan || user?.subscription || user?.planType || user?.tier || 'BRONZE'}
             </span>
           </div>
           <div className="flex items-center gap-1.5 bg-black dark:bg-[#1a1a1a] text-white px-3 py-1.5 rounded-full">
