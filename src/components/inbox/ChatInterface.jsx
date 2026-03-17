@@ -59,6 +59,9 @@ Warm regards,
   }, [messages]);
 
   const handleSendMessage = useCallback((content) => {
+    if (!content.trim() || !selectedContact) return;
+
+    // Add message to local state immediately for UI feedback
     const newMessage = {
       id: Date.now(),
       content,
@@ -66,19 +69,12 @@ Warm regards,
       isOwn: true
     };
     setMessages(prev => [...prev, newMessage]);
-    if (onSendMessage) onSendMessage(content, selectedContact);
 
-    if (autoReply && selectedContact) {
-      setTimeout(() => {
-        setMessages(prev => [...prev, {
-          id: Date.now() + 1,
-          content: "Thank you for reaching out! I'd love to learn more about this opportunity.",
-          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-          isOwn: false
-        }]);
-      }, 1000);
+    // Send via Redux to API
+    if (onSendMessage) {
+      onSendMessage(content, selectedContact);
     }
-  }, [selectedContact, autoReply, onSendMessage]);
+  }, [selectedContact, onSendMessage]);
 
   const handleFileSelect = useCallback((file) => {
     const fileMessage = {

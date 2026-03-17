@@ -1,4 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import api from '@/utils/api';
 
 interface FileMetadata {
   key: string;
@@ -16,8 +17,6 @@ interface FileState {
   error: string | null;
 }
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://api.phyo.ai/api';
-
 // Async thunks
 export const uploadChatImage = createAsyncThunk(
   'file/uploadChatImage',
@@ -30,20 +29,13 @@ export const uploadChatImage = createAsyncThunk(
       formData.append('image', file);
       formData.append('conversationId', conversationId);
 
-      const response = await fetch(`${API_BASE}/upload/chat-image`, {
-        method: 'POST',
+      const response = await api.post('/upload/chat-image', formData, {
         headers: {
-          Authorization: `Bearer ${localStorage.getItem('auth_token')}`,
+          'Content-Type': 'multipart/form-data',
         },
-        body: formData,
       });
 
-      if (!response.ok) {
-        return rejectWithValue('Failed to upload image');
-      }
-
-      const data = await response.json();
-      return data.data;
+      return response.data?.data || response.data;
     } catch (error) {
       return rejectWithValue((error as Error).message);
     }
@@ -54,18 +46,7 @@ export const deleteChatImage = createAsyncThunk(
   'file/deleteChatImage',
   async (key: string, { rejectWithValue }) => {
     try {
-      const response = await fetch(`${API_BASE}/upload/chat-image/${key}`, {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('auth_token')}`,
-        },
-      });
-
-      if (!response.ok) {
-        return rejectWithValue('Failed to delete image');
-      }
-
+      await api.delete(`/upload/chat-image/${key}`);
       return key;
     } catch (error) {
       return rejectWithValue((error as Error).message);

@@ -1,4 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import api from '@/utils/api';
 
 interface Project {
   _id: string;
@@ -38,8 +39,6 @@ interface ProjectState {
   };
 }
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://api.phyo.ai/api';
-
 // Async thunks
 export const getProjects = createAsyncThunk(
   'project/getProjects',
@@ -48,25 +47,12 @@ export const getProjects = createAsyncThunk(
     { rejectWithValue }
   ) => {
     try {
-      const params = new URLSearchParams();
-      if (status) params.append('status', status);
-      params.append('page', String(page));
-      params.append('limit', String(limit));
+      const params: any = { page, limit };
+      if (status) params.status = status;
 
-      const response = await fetch(`${API_BASE}/projects?${params.toString()}`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('auth_token')}`,
-        },
-      });
-
-      if (!response.ok) {
-        return { data: [], pagination: { page, limit, total: 0 } };
-      }
-
-      const data = await response.json();
-      return { data: data.data || [], pagination: data.pagination || { page, limit, total: 0 } };
+      const response = await api.get('/projects', { params });
+      const data = response.data?.data || response.data;
+      return { data: Array.isArray(data) ? data : [], pagination: response.data?.pagination || { page, limit, total: 0 } };
     } catch (error) {
       return { data: [], pagination: { page, limit, total: 0 } };
     }
@@ -77,20 +63,8 @@ export const getProjectById = createAsyncThunk(
   'project/getProjectById',
   async (id: string, { rejectWithValue }) => {
     try {
-      const response = await fetch(`${API_BASE}/projects/${id}`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('auth_token')}`,
-        },
-      });
-
-      if (!response.ok) {
-        return rejectWithValue('Project not found');
-      }
-
-      const data = await response.json();
-      return data.data;
+      const response = await api.get(`/projects/${id}`);
+      return response.data?.data || response.data;
     } catch (error) {
       return rejectWithValue((error as Error).message);
     }
@@ -110,21 +84,8 @@ export const createProject = createAsyncThunk(
     { rejectWithValue }
   ) => {
     try {
-      const response = await fetch(`${API_BASE}/projects`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('auth_token')}`,
-        },
-        body: JSON.stringify(projectData),
-      });
-
-      if (!response.ok) {
-        return rejectWithValue('Failed to create project');
-      }
-
-      const data = await response.json();
-      return data.data;
+      const response = await api.post('/projects', projectData);
+      return response.data?.data || response.data;
     } catch (error) {
       return rejectWithValue((error as Error).message);
     }
@@ -138,21 +99,8 @@ export const updateProject = createAsyncThunk(
     { rejectWithValue }
   ) => {
     try {
-      const response = await fetch(`${API_BASE}/projects/${id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('auth_token')}`,
-        },
-        body: JSON.stringify(projectData),
-      });
-
-      if (!response.ok) {
-        return rejectWithValue('Failed to update project');
-      }
-
-      const data = await response.json();
-      return data.data;
+      const response = await api.put(`/projects/${id}`, projectData);
+      return response.data?.data || response.data;
     } catch (error) {
       return rejectWithValue((error as Error).message);
     }
@@ -163,18 +111,7 @@ export const deleteProject = createAsyncThunk(
   'project/deleteProject',
   async (id: string, { rejectWithValue }) => {
     try {
-      const response = await fetch(`${API_BASE}/projects/${id}`, {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('auth_token')}`,
-        },
-      });
-
-      if (!response.ok) {
-        return rejectWithValue('Failed to delete project');
-      }
-
+      await api.delete(`/projects/${id}`);
       return id;
     } catch (error) {
       return rejectWithValue((error as Error).message);
@@ -186,20 +123,8 @@ export const getProjectStats = createAsyncThunk(
   'project/getProjectStats',
   async (_, { rejectWithValue }) => {
     try {
-      const response = await fetch(`${API_BASE}/projects/stats`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('auth_token')}`,
-        },
-      });
-
-      if (!response.ok) {
-        return rejectWithValue('Failed to fetch stats');
-      }
-
-      const data = await response.json();
-      return data.data;
+      const response = await api.get('/projects/stats');
+      return response.data?.data || response.data;
     } catch (error) {
       return rejectWithValue((error as Error).message);
     }

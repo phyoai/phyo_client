@@ -2,6 +2,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { ArrowLeftLine, MoreLine, CloseLine, UploadLine, CalendarLine, CheckLine, UserLine } from '@phyoofficial/phyo-icon-library';
+import { useRoleContext } from '@/app/context/RoleContext';
 import Button from '@/components/ui/Button';
 import IconButton from '@/components/ui/IconButton';
 
@@ -9,6 +10,7 @@ import { useApiMutation } from '@/hooks/useApi';
 
 const CreateCampaignPages = () => {
   const router = useRouter();
+  const { role } = useRoleContext();
   const [currentStep, setCurrentStep] = useState(1);
 
   // API mutation for creating campaign
@@ -111,11 +113,11 @@ const CreateCampaignPages = () => {
   };
 
   const handleClose = () => {
-    router.push('/brand/campaigns');
+    router.push(`/${role}/campaigns`);
   };
 
   const handleBack = () => {
-    router.push('/brand/campaigns');
+    router.push(`/${role}/campaigns`);
   };
 
   const handleToggleCampaignType = (type) => {
@@ -986,7 +988,7 @@ const CreateCampaignPages = () => {
       await createCampaign(transformedData);
 
       alert('Campaign created successfully!');
-      router.push('/brand/campaigns');
+      router.push(`/${role}/campaigns`);
     } catch (error) {
       console.error('Error submitting campaign:', error);
       alert(`Failed to create campaign: ${error.message || 'Unknown error'}`);

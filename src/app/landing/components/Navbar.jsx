@@ -83,10 +83,18 @@ const Navbar = () => {
 
   const handleDashboardClick = () => {
     // Check which type of user is approved and redirect accordingly
-    if (registrationStatus.brandRegistrationStatus === 'APPROVED') {
+    if (registrationStatus.userType === 'BRAND' || registrationStatus.brandRegistrationStatus === 'APPROVED') {
       router.push('/brand/dashboard');
-    } else if (registrationStatus.influencerRegistrationStatus === 'APPROVED') {
+    } else if (registrationStatus.userType === 'INFLUENCER' || registrationStatus.influencerRegistrationStatus === 'APPROVED') {
       router.push('/influencer/dashboard');
+    } else if (registrationStatus.userType === 'USER') {
+      router.push('/user/dashboard');
+    } else if (userType === 'BRAND') {
+      router.push('/brand/dashboard');
+    } else if (userType === 'INFLUENCER') {
+      router.push('/influencer/dashboard');
+    } else if (userType === 'USER') {
+      router.push('/user/dashboard');
     }
   };
 

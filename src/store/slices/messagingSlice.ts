@@ -1,6 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://api.phyo.ai/api';
+import api from '@/utils/api';
 
 interface Message {
   id: string;
@@ -43,19 +42,10 @@ export const getConversations = createAsyncThunk(
   'messaging/getConversations',
   async (_, { rejectWithValue }) => {
     try {
-      const response = await fetch(`${API_BASE}/conversation`, {
-        method: 'GET',
-        headers: { 'Content-Type': 'application/json' },
-      });
-
-      if (!response.ok) {
-        return rejectWithValue('Failed to fetch conversations');
-      }
-
-      const data = await response.json();
-      return data.data;
+      const response = await api.get('/conversation');
+      return response.data || response;
     } catch (error: any) {
-      return rejectWithValue(error.message);
+      return rejectWithValue(error.message || 'Failed to fetch conversations');
     }
   }
 );
@@ -64,20 +54,10 @@ export const createConversation = createAsyncThunk(
   'messaging/createConversation',
   async (participantId: string, { rejectWithValue }) => {
     try {
-      const response = await fetch(`${API_BASE}/conversation`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ participantId }),
-      });
-
-      if (!response.ok) {
-        return rejectWithValue('Failed to create conversation');
-      }
-
-      const data = await response.json();
-      return data.data;
+      const response = await api.post('/conversation', { participantId });
+      return response.data || response;
     } catch (error: any) {
-      return rejectWithValue(error.message);
+      return rejectWithValue(error.message || 'Failed to create conversation');
     }
   }
 );
@@ -86,19 +66,10 @@ export const getMessages = createAsyncThunk(
   'messaging/getMessages',
   async (conversationId: string, { rejectWithValue }) => {
     try {
-      const response = await fetch(`${API_BASE}/messages/${conversationId}`, {
-        method: 'GET',
-        headers: { 'Content-Type': 'application/json' },
-      });
-
-      if (!response.ok) {
-        return rejectWithValue('Failed to fetch messages');
-      }
-
-      const data = await response.json();
-      return data.data;
+      const response = await api.get(`/messages/${conversationId}`);
+      return response.data || response;
     } catch (error: any) {
-      return rejectWithValue(error.message);
+      return rejectWithValue(error.message || 'Failed to fetch messages');
     }
   }
 );
@@ -110,24 +81,14 @@ export const sendMessage = createAsyncThunk(
     { rejectWithValue }
   ) => {
     try {
-      const response = await fetch(`${API_BASE}/messages`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          conversationId,
-          content,
-          messageType: messageType || 'text',
-        }),
+      const response = await api.post('/messages', {
+        conversationId,
+        content,
+        messageType: messageType || 'text',
       });
-
-      if (!response.ok) {
-        return rejectWithValue('Failed to send message');
-      }
-
-      const data = await response.json();
-      return data.data;
+      return response.data || response;
     } catch (error: any) {
-      return rejectWithValue(error.message);
+      return rejectWithValue(error.message || 'Failed to send message');
     }
   }
 );
@@ -136,19 +97,10 @@ export const markAsRead = createAsyncThunk(
   'messaging/markAsRead',
   async (messageId: string, { rejectWithValue }) => {
     try {
-      const response = await fetch(`${API_BASE}/messages/${messageId}/read`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-      });
-
-      if (!response.ok) {
-        return rejectWithValue('Failed to mark as read');
-      }
-
-      const data = await response.json();
-      return data.data;
+      const response = await api.patch(`/messages/${messageId}/read`);
+      return response.data || response;
     } catch (error: any) {
-      return rejectWithValue(error.message);
+      return rejectWithValue(error.message || 'Failed to mark as read');
     }
   }
 );
@@ -157,18 +109,10 @@ export const deleteMessage = createAsyncThunk(
   'messaging/deleteMessage',
   async (messageId: string, { rejectWithValue }) => {
     try {
-      const response = await fetch(`${API_BASE}/messages/${messageId}`, {
-        method: 'DELETE',
-        headers: { 'Content-Type': 'application/json' },
-      });
-
-      if (!response.ok) {
-        return rejectWithValue('Failed to delete message');
-      }
-
+      await api.delete(`/messages/${messageId}`);
       return { success: true, messageId };
     } catch (error: any) {
-      return rejectWithValue(error.message);
+      return rejectWithValue(error.message || 'Failed to delete message');
     }
   }
 );
@@ -177,18 +121,10 @@ export const deleteConversation = createAsyncThunk(
   'messaging/deleteConversation',
   async (conversationId: string, { rejectWithValue }) => {
     try {
-      const response = await fetch(`${API_BASE}/conversation/${conversationId}`, {
-        method: 'DELETE',
-        headers: { 'Content-Type': 'application/json' },
-      });
-
-      if (!response.ok) {
-        return rejectWithValue('Failed to delete conversation');
-      }
-
+      await api.delete(`/conversation/${conversationId}`);
       return { success: true, conversationId };
     } catch (error: any) {
-      return rejectWithValue(error.message);
+      return rejectWithValue(error.message || 'Failed to delete conversation');
     }
   }
 );

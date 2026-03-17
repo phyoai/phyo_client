@@ -428,7 +428,7 @@ function DashboardContent() {
               style={{ backgroundColor: colors.brand.base }}
               onClick={() => {
                 setShowUpgradeModal(false);
-                router.push('/user/account/upgrade-plan');
+                router.push(`/${role}/account/upgrade-plan`);
               }}
             >
               Upgrade Plan

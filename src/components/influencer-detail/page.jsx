@@ -2,6 +2,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { ArrowLeftLine, MoreLine, BookmarkLine, YoutubeFill, InstagramFill, TwitterXLine, UserAddLine, Message3Line, FacebookCircleFill } from '@phyoofficial/phyo-icon-library';
 import { useRouter, useParams } from 'next/navigation';
+import { useRoleContext } from '@/app/context/RoleContext';
 import Image2Line from 'next/image';
 import { useInfluencers } from '@/hooks/useInfluencers';
 
@@ -146,6 +147,7 @@ const categories = ['All', 'Fitness', 'Comedy', 'Lifestyle', 'Infra', 'Real Esta
 const TopInfluencersPageDetails = () => {
   const router = useRouter();
   const params = useParams();
+  const { role } = useRoleContext();
   const [showMoreMenu, setShowMoreMenu] = useState(false);
   const [showSaveModal, setShowSaveModal] = useState(false);
   const [showNewListModal, setShowNewListModal] = useState(false);
@@ -208,7 +210,7 @@ const TopInfluencersPageDetails = () => {
   }, [selectedInfluencer]);
 
   const handleBack = () => {
-    router.push('/brand/dashboard');
+    router.push(`/${role}/dashboard`);
   };
 
   // Close menu when clicking outside

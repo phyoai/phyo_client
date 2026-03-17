@@ -1,4 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import api from '@/utils/api';
 
 interface PortfolioClient {
   _id: string;
@@ -48,27 +49,14 @@ interface PortfolioState {
   };
 }
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://api.phyo.ai/api';
-
 // Async thunks
 export const getPortfolioItems = createAsyncThunk(
   'portfolio/getPortfolioItems',
   async ({ page = 1, limit = 10 }: { page?: number; limit?: number } = {}, { rejectWithValue }) => {
     try {
-      const response = await fetch(`${API_BASE}/portfolios?page=${page}&limit=${limit}`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('auth_token')}`,
-        },
-      });
-
-      if (!response.ok) {
-        return { data: [], pagination: { page, limit, total: 0 } };
-      }
-
-      const data = await response.json();
-      return { data: data.data || [], pagination: data.pagination || { page, limit, total: 0 } };
+      const response = await api.get('/portfolios', { params: { page, limit } });
+      const data = response.data?.data || response.data;
+      return { data: Array.isArray(data) ? data : [], pagination: response.data?.pagination || { page, limit, total: 0 } };
     } catch (error) {
       return { data: [], pagination: { page, limit, total: 0 } };
     }
@@ -79,20 +67,8 @@ export const getPortfolioItem = createAsyncThunk(
   'portfolio/getPortfolioItem',
   async (id: string, { rejectWithValue }) => {
     try {
-      const response = await fetch(`${API_BASE}/portfolios/${id}`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('auth_token')}`,
-        },
-      });
-
-      if (!response.ok) {
-        return rejectWithValue('Portfolio not found');
-      }
-
-      const data = await response.json();
-      return data.data;
+      const response = await api.get(`/portfolios/${id}`);
+      return response.data?.data || response.data;
     } catch (error) {
       return rejectWithValue((error as Error).message);
     }
@@ -106,21 +82,8 @@ export const createPortfolioItem = createAsyncThunk(
     { rejectWithValue }
   ) => {
     try {
-      const response = await fetch(`${API_BASE}/portfolios`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('auth_token')}`,
-        },
-        body: JSON.stringify(itemData),
-      });
-
-      if (!response.ok) {
-        return rejectWithValue('Failed to create portfolio');
-      }
-
-      const data = await response.json();
-      return data.data;
+      const response = await api.post('/portfolios', itemData);
+      return response.data?.data || response.data;
     } catch (error) {
       return rejectWithValue((error as Error).message);
     }
@@ -134,21 +97,8 @@ export const updatePortfolioItem = createAsyncThunk(
     { rejectWithValue }
   ) => {
     try {
-      const response = await fetch(`${API_BASE}/portfolios/${id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('auth_token')}`,
-        },
-        body: JSON.stringify(itemData),
-      });
-
-      if (!response.ok) {
-        return rejectWithValue('Failed to update portfolio');
-      }
-
-      const data = await response.json();
-      return data.data;
+      const response = await api.put(`/portfolios/${id}`, itemData);
+      return response.data?.data || response.data;
     } catch (error) {
       return rejectWithValue((error as Error).message);
     }
@@ -159,18 +109,7 @@ export const deletePortfolioItem = createAsyncThunk(
   'portfolio/deletePortfolioItem',
   async (id: string, { rejectWithValue }) => {
     try {
-      const response = await fetch(`${API_BASE}/portfolios/${id}`, {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('auth_token')}`,
-        },
-      });
-
-      if (!response.ok) {
-        return rejectWithValue('Failed to delete portfolio');
-      }
-
+      await api.delete(`/portfolios/${id}`);
       return id;
     } catch (error) {
       return rejectWithValue((error as Error).message);
@@ -185,21 +124,8 @@ export const addClientToPortfolio = createAsyncThunk(
     { rejectWithValue }
   ) => {
     try {
-      const response = await fetch(`${API_BASE}/portfolios/${portfolioId}/clients`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('auth_token')}`,
-        },
-        body: JSON.stringify(clientData),
-      });
-
-      if (!response.ok) {
-        return rejectWithValue('Failed to add client');
-      }
-
-      const data = await response.json();
-      return data.data;
+      const response = await api.post(`/portfolios/${portfolioId}/clients`, clientData);
+      return response.data?.data || response.data;
     } catch (error) {
       return rejectWithValue((error as Error).message);
     }
@@ -217,24 +143,8 @@ export const updatePortfolioClient = createAsyncThunk(
     { rejectWithValue }
   ) => {
     try {
-      const response = await fetch(
-        `${API_BASE}/portfolios/${portfolioId}/clients/${clientId}`,
-        {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${localStorage.getItem('auth_token')}`,
-          },
-          body: JSON.stringify(clientData),
-        }
-      );
-
-      if (!response.ok) {
-        return rejectWithValue('Failed to update client');
-      }
-
-      const data = await response.json();
-      return data.data;
+      const response = await api.put(`/portfolios/${portfolioId}/clients/${clientId}`, clientData);
+      return response.data?.data || response.data;
     } catch (error) {
       return rejectWithValue((error as Error).message);
     }
@@ -248,21 +158,7 @@ export const removePortfolioClient = createAsyncThunk(
     { rejectWithValue }
   ) => {
     try {
-      const response = await fetch(
-        `${API_BASE}/portfolios/${portfolioId}/clients/${clientId}`,
-        {
-          method: 'DELETE',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${localStorage.getItem('auth_token')}`,
-          },
-        }
-      );
-
-      if (!response.ok) {
-        return rejectWithValue('Failed to remove client');
-      }
-
+      await api.delete(`/portfolios/${portfolioId}/clients/${clientId}`);
       return { portfolioId, clientId };
     } catch (error) {
       return rejectWithValue((error as Error).message);
@@ -274,20 +170,8 @@ export const getPortfolioStats = createAsyncThunk(
   'portfolio/getPortfolioStats',
   async (_, { rejectWithValue }) => {
     try {
-      const response = await fetch(`${API_BASE}/portfolios/stats`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('auth_token')}`,
-        },
-      });
-
-      if (!response.ok) {
-        return rejectWithValue('Failed to fetch stats');
-      }
-
-      const data = await response.json();
-      return data.data;
+      const response = await api.get('/portfolios/stats');
+      return response.data?.data || response.data;
     } catch (error) {
       return rejectWithValue((error as Error).message);
     }

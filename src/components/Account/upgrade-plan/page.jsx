@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { ArrowLeftLine } from '@phyoofficial/phyo-icon-library';
+import { useRoleContext } from '@/app/context/RoleContext';
 import AppBar from '@/components/ui/AppBar';
 import Button from '@/components/ui/Button';
 import IconButton from '@/components/ui/IconButton';
@@ -32,8 +33,52 @@ const RadioButton = ({ selected = false, disabled = false, onChange }) => {
   );
 };
 
+// Map feature keys to readable names
+const featureLabels = {
+  creatorSearch: 'Creator Search',
+  creatorInsights: 'Creator Insights',
+  advancedFilters: 'Advanced Filters',
+  audienceBasedSearch: 'Audience Based Search',
+  historicalCost: 'Historical Cost Data',
+  preCuratedList: 'Pre-Curated Lists',
+  brandAnalysis: 'Brand Analysis',
+  costingInsights: 'Costing Insights',
+  openAccessInfluencerDatabase: 'Open Access Influencer Database',
+  campaignReports: 'Campaign Reports',
+  roleBasedAccess: 'Role-Based Access',
+  volumeBasedDiscount: 'Volume Based Discounts',
+  platformTraining: 'Platform Training',
+  dedicatedCustomerSuccess: 'Dedicated Customer Success',
+  credits: 'Credits/Month'
+};
+
+// Plan color mapping
+const planColors = {
+  'BRONZE': {
+    tag: 'bg-[#E6E6E6] border-[#4D4D4D]',
+    text: 'text-[#242527]',
+    border: 'border-[#E6E6E6]'
+  },
+  'SILVER': {
+    tag: 'bg-[#08A64A] border-[#067635]',
+    text: 'text-[#B2E3C7]',
+    border: 'border-[#067635]'
+  },
+  'GOLD': {
+    tag: 'bg-[#0B4FD9] border-[#0A48C5]',
+    text: 'text-[#B3C8F3]',
+    border: 'border-[#08389A]'
+  },
+  'PREMIUM': {
+    tag: 'bg-[#FAB70C] border-[#B28209]',
+    text: 'text-[#8A6507]',
+    border: 'border-[#B28209]'
+  }
+};
+
 export default function UpgradePlanAll() {
   const router = useRouter();
+  const { role } = useRoleContext();
   const {
     plans: reduxPlans,
     userPlan,
@@ -45,7 +90,7 @@ export default function UpgradePlanAll() {
     createNewPaymentOrder
   } = usePayment();
 
-  const [selectedPlan, setSelectedPlan] = useState('free');
+  const [selectedPlan, setSelectedPlan] = useState(null);
   const [selectedBillingCycle, setSelectedBillingCycle] = useState('MONTHLY');
   const [showBillingForm, setShowBillingForm] = useState(false);
   const [paymentSuccess, setPaymentSuccess] = useState(false);
@@ -66,96 +111,51 @@ export default function UpgradePlanAll() {
     fetchCreditInfo();
   }, [fetchSubscriptionPlans, fetchUserPlan, fetchCreditInfo]);
 
-  // Use Redux plans or fallback to default plans
-  const plans = reduxPlans && reduxPlans.length > 0 ? reduxPlans : [
-    {
-      id: 'free',
-      name: 'Free',
-      price: '₹0',
-      tagColor: 'bg-[#E6E6E6] border-[#4D4D4D]',
-      textColor: 'text-[#242527]',
-      borderColor: 'border-[#E6E6E6]',
-      isCurrent: true,
-      benefits: [
-        '10 Credits/month',
-        '5 Influencer Searches',
-        'Creator Insights (Basic)',
-        'Access to All Supported Platforms',
-        'Limited AI Report Access (Preview mode)',
-        'Credit Validity: 45 Days'
-      ]
-    },
-    {
-      id: 'basic',
-      name: 'Basic',
-      price: '₹199',
-      tagColor: 'bg-[#08A64A] border-[#067635]',
-      textColor: 'text-[#B2E3C7]',
-      borderColor: 'border-[#067635]',
-      isCurrent: false,
-      benefits: [
-        '50 Credits/month',
-        '10 Advanced Searches',
-        '4 Campaign Reports',
-        'Creator Insights (Advanced)',
-        'AI-Powered Report Analyzer',
-        'Add Up to 2 Team Members',
-        'Historical Data Access (Up to 3 months)',
-        'Access to All Platforms',
-        'Email Support'
-      ]
-    },
-    {
-      id: 'professional',
-      name: 'Professional',
-      price: '₹799',
-      tagColor: 'bg-[#0B4FD9] border-[#0A48C5]',
-      textColor: 'text-[#B3C8F3]',
-      borderColor: 'border-[#08389A]',
-      isCurrent: false,
-      benefits: [
-        '250 Credits/month',
-        '20 Deep Searches',
-        '10 AI-Powered Campaign Reports',
-        'Dedicated Chat Support',
-        'AI optimizes campaigns',
-        'Unlimited UserLine',
-        'Historical Data (Up to 6 months)',
-        'Exportable Analytics (CSV/ PDF)',
-        'AI Smart Creators, Niche, Region, Top',
-        'Multi-Platform Aggregated Creator Profiles'
-      ]
-    },
-    {
-      id: 'enterprise',
-      name: 'Enterprise',
-      price: '₹1999',
-      tagColor: 'bg-[#FAB70C] border-[#B28209]',
-      textColor: 'text-[#8A6507]',
-      borderColor: 'border-[#B28209]',
-      isCurrent: false,
-      benefits: [
-        'Unlimited Credits/month',
-        '100 Smart Searches',
-        'AI Competitor Analysis (Track 5 competitors)',
-        'Trend Analyzer (5 trends/ month)',
-        'Campaign Auto-Optimization Insights',
-        'Reusable Campaign Templates',
-        'Dedicated Account Workspace',
-        'Priority Access to New Features',
-        'Team Analytics Dashboard',
-        'Global Creator Index Access',
-        '24/7 Priority Support'
-      ]
-    }
-  ];
+  // Transform API plans to UI format
+  const transformedPlans = (reduxPlans || []).map((plan) => {
+    const planName = plan.name || 'UNKNOWN';
+    const colors = planColors[planName] || planColors['BRONZE'];
 
-  // Set current plan from userPlan
+    // Generate benefits from features
+    const benefits = [];
+    if (plan.features) {
+      Object.entries(plan.features).forEach(([key, value]) => {
+        if (value === true) {
+          benefits.push(featureLabels[key] || key);
+        } else if (value && typeof value === 'string') {
+          benefits.push(`${featureLabels[key] || key}: ${value}`);
+        } else if (typeof value === 'number' && value > 0) {
+          benefits.push(`${featureLabels[key] || key}: ${value}`);
+        }
+      });
+    }
+
+    return {
+      id: plan.id || plan.name.toLowerCase(),
+      name: planName,
+      displayName: plan.displayName,
+      price: `₹${plan.price}`,
+      priceNumber: plan.price,
+      currency: plan.currency || 'INR',
+      ...colors,
+      isActive: plan.isActive,
+      benefits: benefits.length > 0 ? benefits : ['No features available'],
+      rawData: plan
+    };
+  });
+
+  // Use transformed plans or empty array
+  const plans = transformedPlans.length > 0 ? transformedPlans : [];
+
+  // Initialize selected plan and set from userPlan
   useEffect(() => {
+    if (plans.length > 0 && !selectedPlan) {
+      setSelectedPlan(plans[0].id);
+    }
     if (userPlan && userPlan.planId) {
       setSelectedPlan(userPlan.planId);
     }
-  }, [userPlan]);
+  }, [userPlan, plans.length]);
 
   // Error state
   if (error && !loading) {
@@ -163,7 +163,7 @@ export default function UpgradePlanAll() {
       <div className="h-screen flex flex-col" style={{ backgroundColor: colors.neutral.base }}>
         <AppBar
           title="Plans & Billings"
-          onBack={() => router.push('/brand/account')}
+          onBack={() => router.push(`/${role}/account`)}
         />
         <div className="flex-1 flex flex-col items-center justify-center px-4">
           <p className="text-lg font-semibold mb-4" style={{ color: colors.semantic.error.bold }}>
@@ -194,7 +194,7 @@ export default function UpgradePlanAll() {
       <div className="h-screen flex flex-col" style={{ backgroundColor: colors.neutral.base }}>
         <AppBar
           title="Plans & Billings"
-          onBack={() => router.push('/brand/account')}
+          onBack={() => router.push(`/${role}/account`)}
         />
         <div className="flex-1 flex items-center justify-center">
           <div className="flex flex-col items-center gap-4">
@@ -257,7 +257,7 @@ export default function UpgradePlanAll() {
           icon={ArrowLeftLine}
           size="lg"
           variant="default"
-          onClick={() => router.push('/brand/account')}
+          onClick={() => router.push(`/${role}/account`)}
           className="absolute top-4 left-4"
         />
 
@@ -281,7 +281,7 @@ export default function UpgradePlanAll() {
           <Button
             variant="primary"
             size="lg"
-            onClick={() => router.push('/brand/dashboard')}
+            onClick={() => router.push(`/${role}/dashboard`)}
           >
             Go to home
           </Button>
@@ -452,53 +452,31 @@ export default function UpgradePlanAll() {
     <div className="h-screen flex flex-col" style={{ backgroundColor: colors.neutral.base }}>
       <AppBar
         title="Plans & Billings"
-        onBack={() => router.push('/brand/account')}
+        onBack={() => router.push(`/${role}/account`)}
         showMenu={true}
         onMenuClick={() => console.log('Open menu')}
       />
-
-      {/* Billing Cycle Toggle */}
-      <div className="px-3 sm:px-4 md:px-6 lg:px-9 py-3 sm:py-4 border-b" style={{ borderColor: colors.neutral.muted }}>
-        <div className="flex items-center justify-center gap-4">
-          <label className="flex items-center gap-2 cursor-pointer">
-            <input
-              type="radio"
-              name="billingCycle"
-              value="MONTHLY"
-              checked={selectedBillingCycle === 'MONTHLY'}
-              onChange={(e) => setSelectedBillingCycle(e.target.value)}
-              className="w-4 h-4"
-            />
-            <span style={{ color: colors.text.neutral.base }}>Monthly</span>
-          </label>
-          <label className="flex items-center gap-2 cursor-pointer">
-            <input
-              type="radio"
-              name="billingCycle"
-              value="ANNUAL"
-              checked={selectedBillingCycle === 'ANNUAL'}
-              onChange={(e) => setSelectedBillingCycle(e.target.value)}
-              className="w-4 h-4"
-            />
-            <span style={{ color: colors.text.neutral.base }}>Annual</span>
-          </label>
-        </div>
-      </div>
 
       {/* Plans Container */}
       <div className="flex-1 px-3 sm:px-4 md:px-6 lg:px-9 py-3 sm:py-4">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 h-auto">
           {plans.map((plan) => {
             const isCurrentPlan = userPlan && userPlan.planId === plan.id;
+            const isInactive = !plan.isActive;
+
             return (
             <div
               key={plan.id}
-              className={`border-2 rounded-xl flex flex-col py-3 transition-all hover:shadow-lg cursor-pointer`}
+              className={`border-2 rounded-xl flex flex-col py-3 transition-all hover:shadow-lg ${isInactive ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
               style={{
                 backgroundColor: colors.neutral.muted,
-                borderColor: plan.borderColor || colors.neutral.muted
+                borderColor: plan.name === 'BRONZE' ? '#E6E6E6' :
+                            plan.name === 'SILVER' ? '#067635' :
+                            plan.name === 'GOLD' ? '#0A48C5' :
+                            plan.name === 'PREMIUM' ? '#B28209' :
+                            colors.neutral.muted
               }}
-              onClick={() => !isCurrentPlan && setSelectedPlan(plan.id)}
+              onClick={() => !isCurrentPlan && !isInactive && setSelectedPlan(plan.id)}
             >
               {/* Current Plan Label */}
               {isCurrentPlan && (
@@ -509,17 +487,26 @@ export default function UpgradePlanAll() {
                 </div>
               )}
 
+              {/* Inactive Badge */}
+              {isInactive && (
+                <div className="px-4 mb-3">
+                  <p className="text-xs tracking-wide font-semibold" style={{ color: '#999', fontFamily: 'Inter, sans-serif' }}>
+                    Inactive
+                  </p>
+                </div>
+              )}
+
               {/* Tag & Radio Button */}
               <div className="flex items-center justify-between pl-4 mb-5">
-                <div className={`${plan.tagColor || 'bg-gray-200 border-gray-400'} border rounded px-1.5 py-0.5`}>
-                  <span className={`${plan.textColor || 'text-gray-800'} text-xs font-medium tracking-wide`} style={{ fontFamily: 'Work Sans, sans-serif' }}>
-                    {plan.name}
+                <div className={`${plan.tag || 'bg-gray-200 border-gray-400'} border rounded px-1.5 py-0.5`}>
+                  <span className={`${plan.text || 'text-gray-800'} text-xs font-medium tracking-wide`} style={{ fontFamily: 'Work Sans, sans-serif' }}>
+                    {plan.displayName || plan.name}
                   </span>
                 </div>
                 <RadioButton
                   selected={selectedPlan === plan.id}
-                  disabled={isCurrentPlan}
-                  onChange={() => !isCurrentPlan && setSelectedPlan(plan.id)}
+                  disabled={isCurrentPlan || isInactive}
+                  onChange={() => !isCurrentPlan && !isInactive && setSelectedPlan(plan.id)}
                 />
               </div>
 
@@ -532,18 +519,18 @@ export default function UpgradePlanAll() {
                 </div>
                 <div className="px-4">
                   <p className="text-xl font-semibold" style={{ color: colors.text.neutral.base, fontFamily: 'Manrope, sans-serif' }}>
-                    {plan.name}
+                    {plan.displayName || plan.name}
                   </p>
                 </div>
               </div>
 
               {/* Benefits */}
               <div className="flex-1 px-4 overflow-y-auto">
-                <ul className="text-base space-y-1" style={{ color: colors.text.neutral.base, fontFamily: 'Work Sans, sans-serif' }}>
-                  {(plan.benefits || []).map((benefit, index) => (
-                    <li key={index} className="flex items-start leading-6">
-                      <span className="mr-2">•</span>
-                      <span>{benefit}</span>
+                <ul className="text-sm space-y-1" style={{ color: colors.text.neutral.base, fontFamily: 'Work Sans, sans-serif' }}>
+                  {(plan.benefits || []).slice(0, 10).map((benefit, index) => (
+                    <li key={index} className="flex items-start leading-5">
+                      <span className="mr-2 flex-shrink-0">•</span>
+                      <span className="text-xs">{benefit}</span>
                     </li>
                   ))}
                 </ul>
@@ -560,10 +547,10 @@ export default function UpgradePlanAll() {
           variant="primary"
           size="lg"
           onClick={handleUpgradeClick}
-          disabled={selectedPlan === 'free' || loading}
+          disabled={!selectedPlan || selectedPlan === plans[0]?.id || loading || plans.length === 0}
           loading={loading}
         >
-          {selectedPlan === 'free' ? 'Select a plan to proceed' : 'Proceed to billing'}
+          {!selectedPlan || selectedPlan === plans[0]?.id || plans.length === 0 ? 'Select a plan to proceed' : 'Proceed to billing'}
         </Button>
       </div>
     </div>

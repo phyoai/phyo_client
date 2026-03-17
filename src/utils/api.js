@@ -266,9 +266,15 @@ export const userAPI = {
   },
 
   // Update user profile
-  updateUserProfile: async (userData) => {
+  updateUserProfile: async (userData, isFormData = false) => {
     try {
-      const response = await api.patch('/users/profile', userData);
+      const config = isFormData ? {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        }
+      } : {};
+
+      const response = await api.patch('/users/profile', userData, config);
       return response.data;
     } catch (error) {
       throw error.response?.data || error.message;

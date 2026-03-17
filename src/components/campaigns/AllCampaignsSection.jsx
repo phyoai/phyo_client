@@ -32,6 +32,7 @@ import {
   CheckboxLine,
 } from '@phyoofficial/phyo-icon-library';
 import { useSidebar } from '@/app/context/SidebarContext';
+import { useRoleContext } from '@/app/context/RoleContext';
 import { AudienceEngagement } from '@/components/AudienceEngagementGraphs';
 import { SpendingBudget } from '@/components/SpendingBudgetGraph';
 import Button from '@/components/ui/Button';
@@ -42,6 +43,7 @@ import { useInfluencers } from '@/hooks/useInfluencers';
 
 const AllCampaignsSection = () => {
   const router = useRouter();
+  const { role } = useRoleContext();
   const { setSidebarButtonAction, setSidebarButtonLabel } = useSidebar();
   const fileInputRef = useRef(null);
 
@@ -112,7 +114,7 @@ const AllCampaignsSection = () => {
   // Register sidebar button action
   useEffect(() => {
     setSidebarButtonAction(() => () => {
-      router.push('/brand/campaigns/create-campaign');
+      router.push(`/${role}/campaigns/create-campaign`);
     });
     setSidebarButtonLabel('Create Campaign');
 
@@ -120,7 +122,7 @@ const AllCampaignsSection = () => {
       setSidebarButtonAction(null);
       setSidebarButtonLabel('Button');
     };
-  }, [setSidebarButtonAction, setSidebarButtonLabel, router]);
+  }, [setSidebarButtonAction, setSidebarButtonLabel, router, role]);
 
   // Handle campaign creation
   const handleCreateCampaign = async () => {
@@ -285,7 +287,7 @@ const AllCampaignsSection = () => {
               <Card
                 key={campaign.id || campaign._id}
                 className="p-4 hover:shadow-lg transition-shadow cursor-pointer"
-                onClick={() => router.push(`/brand/campaigns/${campaign._id || campaign.id}`)}
+                onClick={() => router.push(`/${role}/campaigns/${campaign._id || campaign.id}`)}
               >
                 <div className="flex justify-between items-start">
                   <div className="flex-1">

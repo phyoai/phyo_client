@@ -1,4 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import api from '@/utils/api';
 
 interface Plan {
   id: string;
@@ -61,27 +62,13 @@ interface PaymentState {
   };
 }
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://api.phyo.ai/api';
-
 // Async thunks
 export const getSubscriptionPlans = createAsyncThunk(
   'payment/getSubscriptionPlans',
   async (_, { rejectWithValue }) => {
     try {
-      const response = await fetch(`${API_BASE}/payment/plans`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('auth_token')}`,
-        },
-      });
-
-      if (!response.ok) {
-        return rejectWithValue('Failed to fetch subscription plans');
-      }
-
-      const data = await response.json();
-      return data.data;
+      const response = await api.get('/payment/plans');
+      return response.data?.data || response.data;
     } catch (error) {
       return rejectWithValue((error as Error).message);
     }
@@ -92,20 +79,8 @@ export const getUserPlan = createAsyncThunk(
   'payment/getUserPlan',
   async (_, { rejectWithValue }) => {
     try {
-      const response = await fetch(`${API_BASE}/payment/user-plan`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('auth_token')}`,
-        },
-      });
-
-      if (!response.ok) {
-        return { planId: 'free', planName: 'Free', credits: 0, creditsUsed: 0, status: 'active', startDate: '', endDate: '', features: [] };
-      }
-
-      const data = await response.json();
-      return data.data;
+      const response = await api.get('/payment/user-plan');
+      return response.data?.data || response.data;
     } catch (error) {
       return { planId: 'free', planName: 'Free', credits: 0, creditsUsed: 0, status: 'active', startDate: '', endDate: '', features: [] };
     }
@@ -116,20 +91,8 @@ export const getCreditInfo = createAsyncThunk(
   'payment/getCreditInfo',
   async (_, { rejectWithValue }) => {
     try {
-      const response = await fetch(`${API_BASE}/payment/credits`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('auth_token')}`,
-        },
-      });
-
-      if (!response.ok) {
-        return { totalCredits: 0, remainingCredits: 0, usedCredits: 0, resetDate: '', monthlyLimit: 0 };
-      }
-
-      const data = await response.json();
-      return data.data;
+      const response = await api.get('/payment/credits');
+      return response.data?.data || response.data;
     } catch (error) {
       return { totalCredits: 0, remainingCredits: 0, usedCredits: 0, resetDate: '', monthlyLimit: 0 };
     }
@@ -140,21 +103,8 @@ export const createPaymentOrder = createAsyncThunk(
   'payment/createPaymentOrder',
   async ({ planId, interval }: { planId: string; interval: string }, { rejectWithValue }) => {
     try {
-      const response = await fetch(`${API_BASE}/payment/create-order`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('auth_token')}`,
-        },
-        body: JSON.stringify({ planId, interval }),
-      });
-
-      if (!response.ok) {
-        return rejectWithValue('Failed to create payment order');
-      }
-
-      const data = await response.json();
-      return data.data;
+      const response = await api.post('/payment/create-order', { planId, interval });
+      return response.data?.data || response.data;
     } catch (error) {
       return rejectWithValue((error as Error).message);
     }
@@ -178,26 +128,13 @@ export const verifyPayment = createAsyncThunk(
     { rejectWithValue }
   ) => {
     try {
-      const response = await fetch(`${API_BASE}/payment/verify-payment`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('auth_token')}`,
-        },
-        body: JSON.stringify({
-          razorpayOrderId,
-          razorpayPaymentId,
-          razorpaySignature,
-          planId,
-        }),
+      const response = await api.post('/payment/verify-payment', {
+        razorpayOrderId,
+        razorpayPaymentId,
+        razorpaySignature,
+        planId,
       });
-
-      if (!response.ok) {
-        return rejectWithValue('Payment verification failed');
-      }
-
-      const data = await response.json();
-      return data.data;
+      return response.data?.data || response.data;
     } catch (error) {
       return rejectWithValue((error as Error).message);
     }
@@ -208,23 +145,9 @@ export const getPaymentHistory = createAsyncThunk(
   'payment/getPaymentHistory',
   async ({ page = 1, limit = 10 }: { page?: number; limit?: number } = {}, { rejectWithValue }) => {
     try {
-      const response = await fetch(
-        `${API_BASE}/payment/history?page=${page}&limit=${limit}`,
-        {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${localStorage.getItem('auth_token')}`,
-          },
-        }
-      );
-
-      if (!response.ok) {
-        return { history: [], pagination: { page, limit, total: 0 } };
-      }
-
-      const data = await response.json();
-      return { history: data.data, pagination: data.pagination || { page, limit, total: 0 } };
+      const response = await api.get('/payment/history', { params: { page, limit } });
+      const data = response.data?.data || response.data;
+      return { history: data, pagination: response.data?.pagination || { page, limit, total: 0 } };
     } catch (error) {
       return { history: [], pagination: { page, limit, total: 0 } };
     }
@@ -235,20 +158,8 @@ export const cancelSubscription = createAsyncThunk(
   'payment/cancelSubscription',
   async (_, { rejectWithValue }) => {
     try {
-      const response = await fetch(`${API_BASE}/payment/cancel-subscription`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('auth_token')}`,
-        },
-      });
-
-      if (!response.ok) {
-        return rejectWithValue('Failed to cancel subscription');
-      }
-
-      const data = await response.json();
-      return data.data;
+      const response = await api.post('/payment/cancel-subscription', {});
+      return response.data?.data || response.data;
     } catch (error) {
       return rejectWithValue((error as Error).message);
     }

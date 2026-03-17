@@ -1,26 +1,15 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://api.phyo.ai/api';
+import api from '@/utils/api';
 
 // Async thunks for user management
 export const fetchUserProfile = createAsyncThunk(
   'user/fetchUserProfile',
   async (_, { rejectWithValue }) => {
     try {
-      const response = await fetch(`${API_BASE}/users/profile`, {
-        method: 'GET',
-        headers: { 'Content-Type': 'application/json' },
-      });
-
-      if (!response.ok) {
-        const error = await response.json();
-        return rejectWithValue(error.message || 'Failed to fetch profile');
-      }
-
-      const data = await response.json();
-      return data.data;
+      const response = await api.get('/users/profile');
+      return response.data || response;
     } catch (error) {
-      return rejectWithValue(error.message);
+      return rejectWithValue(error.message || 'Failed to fetch profile');
     }
   }
 );
@@ -29,21 +18,19 @@ export const updateUserProfile = createAsyncThunk(
   'user/updateUserProfile',
   async (profileData, { rejectWithValue }) => {
     try {
-      const response = await fetch(`${API_BASE}/users/profile`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(profileData),
-      });
+      // Determine if it's FormData (for file uploads) or JSON
+      const isFormData = profileData instanceof FormData;
 
-      if (!response.ok) {
-        const error = await response.json();
-        return rejectWithValue(error.message || 'Failed to update profile');
+      const config = {};
+      if (isFormData) {
+        // For FormData, let axios/fetch handle the Content-Type
+        config.headers = { 'Content-Type': 'multipart/form-data' };
       }
 
-      const data = await response.json();
-      return data.data;
+      const response = await api.patch('/users/profile', profileData, config);
+      return response.data || response;
     } catch (error) {
-      return rejectWithValue(error.message);
+      return rejectWithValue(error.message || 'Failed to update profile');
     }
   }
 );
@@ -52,26 +39,17 @@ export const searchUsers = createAsyncThunk(
   'user/searchUsers',
   async ({ q, type, page = 1, limit = 20 }, { rejectWithValue }) => {
     try {
-      const params = new URLSearchParams({
+      const params = {
         q,
         ...(type && { type }),
         page,
         limit,
-      });
+      };
 
-      const response = await fetch(`${API_BASE}/users/search?${params}`, {
-        method: 'GET',
-        headers: { 'Content-Type': 'application/json' },
-      });
-
-      if (!response.ok) {
-        return rejectWithValue('Failed to search users');
-      }
-
-      const data = await response.json();
-      return data.data;
+      const response = await api.get('/users/search', { params });
+      return response.data || response;
     } catch (error) {
-      return rejectWithValue(error.message);
+      return rejectWithValue(error.message || 'Failed to search users');
     }
   }
 );
@@ -80,19 +58,10 @@ export const getUserById = createAsyncThunk(
   'user/getUserById',
   async (userId, { rejectWithValue }) => {
     try {
-      const response = await fetch(`${API_BASE}/users/${userId}`, {
-        method: 'GET',
-        headers: { 'Content-Type': 'application/json' },
-      });
-
-      if (!response.ok) {
-        return rejectWithValue('User not found');
-      }
-
-      const data = await response.json();
-      return data.data;
+      const response = await api.get(`/users/${userId}`);
+      return response.data || response;
     } catch (error) {
-      return rejectWithValue(error.message);
+      return rejectWithValue(error.message || 'User not found');
     }
   }
 );
@@ -101,18 +70,10 @@ export const deleteAccount = createAsyncThunk(
   'user/deleteAccount',
   async (_, { rejectWithValue }) => {
     try {
-      const response = await fetch(`${API_BASE}/users/profile`, {
-        method: 'DELETE',
-        headers: { 'Content-Type': 'application/json' },
-      });
-
-      if (!response.ok) {
-        return rejectWithValue('Failed to delete account');
-      }
-
+      const response = await api.delete('/users/profile');
       return { success: true };
     } catch (error) {
-      return rejectWithValue(error.message);
+      return rejectWithValue(error.message || 'Failed to delete account');
     }
   }
 );

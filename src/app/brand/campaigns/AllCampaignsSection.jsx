@@ -26,6 +26,7 @@ import {
   CheckboxLine,
 } from '@phyoofficial/phyo-icon-library';
 import { useSidebar } from '@/app/context/SidebarContext';
+import { useRoleContext } from '@/app/context/RoleContext';
 import { AudienceEngagement } from '@/components/AudienceEngagementGraphs';
 import { SpendingBudget } from '@/components/SpendingBudgetGraph';
 import Button from '@/components/ui/Button';
@@ -95,9 +96,11 @@ const AllCampaignsSection = () => {
   }, []);
 
   // Register sidebar button
+  const { role } = useRoleContext();
+
   useEffect(() => {
     setSidebarButtonAction(() => () => {
-      router.push('/brand/campaigns/create-campaign');
+      router.push(`/${role}/campaigns/create-campaign`);
     });
     setSidebarButtonLabel('Create Campaign');
 
@@ -224,86 +227,204 @@ const AllCampaignsSection = () => {
 
   if (error) {
     return (
-      <div className="p-4 bg-red-100 border border-red-400 text-red-700 rounded">
-        <p>Error loading campaigns: {error}</p>
-        <button
-          onClick={() => fetchMyCampaigns()}
-          className="mt-2 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
-        >
-          Retry
-        </button>
+      <div className="flex flex-col items-start w-full max-w-[1280px] min-w-[1024px] pt-4 bg-white dark:bg-[#121212] px-6">
+        <div className="p-4 bg-red-100 dark:bg-red-900/20 border border-red-400 dark:border-red-600 text-red-700 dark:text-red-300 rounded-lg w-full">
+          <p className="font-semibold mb-2">Error loading campaigns</p>
+          <p className="text-sm mb-4">{error}</p>
+          <button
+            onClick={() => fetchMyCampaigns()}
+            className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+          >
+            Retry
+          </button>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="w-full space-y-6">
+    <div className="flex flex-col items-start w-full max-w-[1280px] min-w-[1024px] pt-4 bg-white dark:bg-[#121212] space-y-6">
       {/* Header */}
-      <div className="flex justify-between items-center">
+      <div className="flex justify-between items-center w-full px-6">
         <h2 className="text-2xl font-bold">My Campaigns</h2>
         <Button
-          onClick={() => router.push('/brand/campaigns/create-campaign')}
+          onClick={() => router.push(`/${role}/campaigns/create-campaign`)}
           className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
         >
           Create Campaign
         </Button>
       </div>
 
-      {/* Campaigns List */}
-      <div className="space-y-3">
-        {myCampaigns && myCampaigns.length > 0 ? (
-          <>
-            {myCampaigns.slice(0, showAllCampaigns ? myCampaigns.length : 10).map((campaign) => (
-              <Card
-                key={campaign.id || campaign._id}
-                className="p-4 hover:shadow-lg transition-shadow cursor-pointer"
-                onClick={() => router.push(`/brand/campaigns/${campaign._id || campaign.id}`)}
-              >
-                <div className="flex justify-between items-start">
-                  <div className="flex-1">
-                    <h3 className="text-lg font-semibold">{campaign.campaignName}</h3>
-                    <p className="text-gray-600 text-sm">{campaign.campaignBrief}</p>
-                    <div className="flex gap-4 mt-2 text-xs text-gray-500">
-                      <span>Budget: ${campaign.budget}</span>
-                      <span>Status: {campaign.status || 'Draft'}</span>
+      {/* Campaigns Grid */}
+      {myCampaigns && myCampaigns.length > 0 ? (
+        <>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 w-full px-6">
+            {myCampaigns.slice(0, showAllCampaigns ? myCampaigns.length : 12).map((campaign) => {
+              const brandInitials = campaign.campaignName?.substring(0, 1).toUpperCase() || 'C';
+              const statusColors = {
+                'Active': 'bg-green-100 text-green-800',
+                'Draft': 'bg-gray-100 text-gray-800',
+                'Completed': 'bg-blue-100 text-blue-800',
+                'Paused': 'bg-yellow-100 text-yellow-800',
+              };
+              const statusColor = statusColors[campaign.status] || 'bg-gray-100 text-gray-800';
+
+              return (
+                <div
+                  key={campaign.id || campaign._id}
+                  className="bg-white dark:bg-[#1e1e1e] rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700 hover:shadow-lg transition-shadow"
+                  onClick={() => router.push(`/brand/campaigns/${campaign._id || campaign.id}`)}
+                >
+                  {/* Card Header with Brand Info */}
+                  <div className="p-4 flex items-center justify-between">
+                    <div className="flex items-center gap-3 flex-1">
+                      {/* Brand Avatar */}
+                      <div className="w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center flex-shrink-0">
+                        <span className="text-white font-bold text-lg">{brandInitials}</span>
+                      </div>
+                      {/* Brand Name and Time */}
+                      <div>
+                        <h4 className="font-semibold text-gray-900 dark:text-white truncate">
+                          {campaign.campaignName}
+                        </h4>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">3d ago</p>
+                      </div>
                     </div>
                   </div>
-                  <div className="flex gap-2">
-                    <IconButton
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        openCampaignDetails(campaign);
-                      }}
+
+                  {/* Campaign Image/Visual */}
+                  <div className="bg-gradient-to-br from-green-700 to-green-900 h-48 flex items-center justify-center relative overflow-hidden">
+                    {campaign.campaignImage || campaign.productImages?.[0] ? (
+                      <img
+                        src={campaign.campaignImage || campaign.productImages?.[0]}
+                        alt={campaign.campaignName}
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          e.target.style.display = 'none';
+                          e.target.nextElementSibling.style.display = 'flex';
+                        }}
+                      />
+                    ) : null}
+                    <div
+                      className="text-white text-center px-4 absolute inset-0 flex items-center justify-center"
+                      style={{ display: campaign.campaignImage || campaign.productImages?.[0] ? 'none' : 'flex' }}
                     >
-                      <EditLine size={20} />
-                    </IconButton>
-                    <IconButton
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setSelectedCampaign(campaign);
-                        setShowDeleteModal(true);
-                      }}
-                    >
-                      <DeleteBinLine size={20} />
-                    </IconButton>
+                      <div>
+                        <p className="font-bold text-2xl mb-2 line-clamp-3">{campaign.campaignBrief || campaign.campaignName}</p>
+                        <p className="text-sm opacity-90">Campaign: {campaign.campaignType || 'General'}</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Card Footer with Status and Actions */}
+                  <div className="p-4">
+                    <div className="flex justify-between items-center mb-3">
+                      <span className={`text-xs font-semibold px-2 py-1 rounded ${statusColor}`}>
+                        {campaign.status || 'Draft'}
+                      </span>
+                      <span className="text-xs text-gray-600 dark:text-gray-400">
+                        ${campaign.budget || '0'}
+                      </span>
+                    </div>
                   </div>
                 </div>
-              </Card>
-            ))}
-            {myCampaigns.length > 10 && !showAllCampaigns && (
+              );
+            })}
+          </div>
+
+          {myCampaigns.length > 12 && !showAllCampaigns && (
+            <div className="w-full px-6">
               <button
                 onClick={() => setShowAllCampaigns(true)}
-                className="mt-4 text-blue-600 hover:text-blue-700 font-medium w-full py-2"
+                className="mt-6 text-green-600 hover:text-green-700 font-medium w-full py-3 border border-green-600 rounded-lg hover:bg-green-50 dark:hover:bg-green-900/20"
               >
-                View All ({myCampaigns.length})
+                View All ({myCampaigns.length}) Campaigns
               </button>
-            )}
-          </>
-        ) : (
-          <div className="text-center py-8 text-gray-500">
-            <p>No campaigns yet. Create one to get started!</p>
-          </div>
-        )}
+            </div>
+          )}
+        </>
+      ) : (
+        <div className="text-center py-12 text-gray-500 w-full">
+          <p className="text-lg">No campaigns yet. Create one to get started!</p>
+        </div>
+      )}
+
+      {/* New Applications Section */}
+      <div className="w-full px-6 space-y-4">
+        <div className="flex justify-between items-center">
+          <h3 className="text-xl font-bold">New Applications</h3>
+          <button
+            onClick={() => router.push(`/${role}/campaigns/new-applications`)}
+            className="text-blue-600 hover:text-blue-700 font-semibold transition-colors"
+          >
+            view all &gt;
+          </button>
+        </div>
+
+        {/* Applications List */}
+        <div className="space-y-3">
+          {[
+            {
+              id: 1,
+              name: 'Michael Smith',
+              description: 'An innovative web developer skilled in HTML, CSS, and JavaScript. He thrives on solving complex problems and bringing ideas t...',
+              avatar: 'MS',
+              avatarColor: 'bg-green-500',
+            },
+            {
+              id: 2,
+              name: 'Sarah Lee',
+              description: 'A UX researcher dedicated to understanding user behavior and needs. She utilizes qualitative and quantitative methods to infor...',
+              avatar: 'SL',
+              avatarColor: 'bg-red-500',
+            },
+            {
+              id: 3,
+              name: 'David Chen',
+              description: 'A digital marketer with a focus on brand strategy and social media engagement. He enjoys crafting compelling narratives that r...',
+              avatar: 'DC',
+              avatarColor: 'bg-teal-500',
+            },
+            {
+              id: 4,
+              name: 'Emma Garcia',
+              description: 'A product manager with a strong background in agile methodologies. She excels at aligning cross-functional teams to deliver e...',
+              avatar: 'EG',
+              avatarColor: 'bg-red-400',
+            },
+          ].map((applicant) => (
+            <div
+              key={applicant.id}
+              onClick={() => {
+                const applicantData = JSON.stringify(applicant);
+                router.push(`/brand/campaigns/new-applications?applicant=${encodeURIComponent(applicantData)}`);
+              }}
+              className="flex items-center justify-between p-4 bg-white dark:bg-[#1e1e1e] border border-gray-200 dark:border-gray-700 rounded-lg hover:shadow-md hover:cursor-pointer transition-shadow"
+            >
+              <div className="flex items-center gap-4 flex-1">
+                {/* Avatar */}
+                <div className={`w-12 h-12 rounded-full ${applicant.avatarColor} flex items-center justify-center flex-shrink-0`}>
+                  <span className="text-white font-bold text-sm">{applicant.avatar}</span>
+                </div>
+
+                {/* Applicant Info */}
+                <div className="flex-1 min-w-0">
+                  <h4 className="font-semibold text-gray-900 dark:text-white text-sm">
+                    {applicant.name}
+                  </h4>
+                  <p className="text-gray-600 dark:text-gray-400 text-xs line-clamp-2">
+                    {applicant.description}
+                  </p>
+                </div>
+              </div>
+
+              {/* Portfolio Button */}
+              <button onClick={(e) => e.stopPropagation()} className="ml-4 px-4 py-2 border border-gray-400 dark:border-gray-600 rounded-full text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors flex-shrink-0">
+                portfolio
+              </button>
+            </div>
+          ))}
+        </div>
       </div>
 
       {/* Delete Modal */}

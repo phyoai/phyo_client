@@ -3,6 +3,7 @@
  */
 
 import { useRoleContext } from '@/app/context/RoleContext';
+import { useUser } from '@/hooks';
 import { getVisibleAccountPages, hasAccessToAccountPage, getAccountPageById } from '@/config/accountPagesConfig';
 import type { AccountPageConfig } from '@/config/accountPagesConfig';
 
@@ -19,7 +20,12 @@ export interface UseAccountPagesReturn {
 export const useAccountPages = (): UseAccountPagesReturn => {
   try {
     const { role } = useRoleContext();
-    const visiblePages = getVisibleAccountPages(role);
+    const { profile } = useUser();
+
+    // Check if user has an active subscription/plan
+    const hasSubscription = !!(profile?.currentPlan || profile?.plan);
+
+    const visiblePages = getVisibleAccountPages(role, hasSubscription);
 
     return {
       visiblePages,

@@ -45,7 +45,7 @@ export default function AccountPage() {
   const [mobileView, setMobileView] = useState('list');
   const { darkMode, toggleDarkMode } = useTheme();
   const { t, language, changeLanguage, currentLanguage, languages } = useLanguage();
-  const { profile, loading: profileLoading, fetchProfile } = useUser();
+  const { profile, loading: profileLoading, fetchProfile, updateProfile } = useUser();
 
   // Fetch user profile on component mount
   useEffect(() => {
@@ -120,8 +120,8 @@ export default function AccountPage() {
         break;
       case 'phone':
         setEditFormData({
-          // first_name: user?.contact?.first_name || '',
-          // last_name: user?.contact?.last_name || '',
+          first_name: user?.contact?.first_name || '',
+          last_name: user?.contact?.last_name || '',
           mobileNumber: user?.mobileNumber || ''
         });
         break;
@@ -227,8 +227,8 @@ export default function AccountPage() {
       const field = otpType === 'email'
         ? { email: editFormData.email }
         : { mobileNumber: editFormData.mobileNumber };
-      await userAPI.updateUserProfile(field);
-      await fetchUserProfile();
+      await updateProfile(field);
+      await fetchProfile();
       setShowOTPModal(false);
       setOtpValue('');
       setActiveEditTab(null);
@@ -283,8 +283,8 @@ export default function AccountPage() {
         default:
           break;
       }
-      await userAPI.updateUserProfile(payload);
-      await fetchUserProfile();
+      await updateProfile(payload);
+      await fetchProfile();
       setActiveEditTab(null);
     } catch (err) {
       console.error('Save error:', err);
@@ -300,7 +300,7 @@ export default function AccountPage() {
     }
     setIsSaving(true);
     try {
-      await userAPI.changePassword({
+      await updateProfile({
         currentPassword: editFormData.currentPassword,
         newPassword: editFormData.newPassword,
       });
@@ -334,8 +334,8 @@ export default function AccountPage() {
     try {
       const formData = new FormData();
       brandImageFiles.forEach(({ file }) => formData.append('brand_images', file));
-      await userAPI.updateUserProfile(formData);
-      await fetchUserProfile();
+      await updateProfile(formData);
+      await fetchProfile();
       setBrandImageFiles([]);
       setActiveEditTab(null);
     } catch (err) {
@@ -352,8 +352,8 @@ export default function AccountPage() {
     try {
       const formData = new FormData();
       formData.append('company_logo', file);
-      await userAPI.updateUserProfile(formData);
-      await fetchUserProfile();
+      await updateProfile(formData);
+      await fetchProfile();
     } catch (err) {
       console.error('Avatar upload error:', err);
     } finally {
@@ -949,20 +949,20 @@ const RightPanelCategories = () => {
         <div className="flex items-center gap-4 mb-4 sm:mb-6">
           <div className="w-14 h-14 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center flex-shrink-0 shadow-sm">
             <span className="text-xl font-bold text-white">
-              {getInitials(user?.companyName || user?.contact?.first_name || user?.email || '')}
+              {getInitials(user?.name || user?.email || '')}
             </span>
           </div>
           <div className="flex-1">
             <h2 className="text-xl font-semibold text-[#242527] dark:text-white mb-1 truncate">
-              {user?.contact?.first_name || user?.agencyName || user?.name || 'UserLine'}
+              {user?.name || 'User'}
             </h2>
             <span className="inline-flex items-center px-2 py-1 text-xs font-medium text-[#666] dark:text-gray-400 bg-[#f0f0f0] dark:bg-[#2a2a2a] rounded-md">
-              {user?.plan || user?.subscription || 'Free'}
+              {user?.currentPlan || user?.plan || 'BRONZE'}
             </span>
           </div>
           <div className="flex items-center gap-1.5 bg-black dark:bg-[#1a1a1a] text-white px-3 py-1.5 rounded-full">
             <img src="/assets/phyo_coin.svg" alt="Phyo coin" className="w-4 h-4" />
-            <span className="text-sm font-semibold">3/3</span>
+            <span className="text-sm font-semibold">{user?.creditsRemaining || 0}/{user?.creditsRemaining || 0}</span>
           </div>
         </div>
 
@@ -1003,6 +1003,64 @@ const RightPanelCategories = () => {
             })}
 
             {visiblePages.length > 0 && <div className="h-px bg-[#e6e6e6] dark:bg-gray-700 mx-4"></div>}
+
+            {/* Plan-Based Menu Items */}
+            {user?.currentPlan && (
+              <>
+                {/* Upgrade Plan - visible if has active plan */}
+                <button
+                  className="w-full"
+                  onClick={() => router.push(`/${role}/account/upgrade-plan`)}
+                >
+                  <MenuItem
+                    icon={RocketLine}
+                    label={t('upgrade_plan')}
+                  />
+                </button>
+                <div className="h-px bg-[#e6e6e6] dark:bg-gray-700 mx-4"></div>
+
+                {/* Pause Subscription - only if has active plan */}
+                <button
+                  className="w-full"
+                  onClick={() => setShowPauseModal(true)}
+                >
+                  <MenuItem
+                    icon={PauseCircleLine}
+                    label={t('pause_subscription')}
+                  />
+                </button>
+                <div className="h-px bg-[#e6e6e6] dark:bg-gray-700 mx-4"></div>
+
+                {/* Cancel Subscription - only if has active plan */}
+                <button
+                  className="w-full"
+                  onClick={() => setShowCancelModal(true)}
+                >
+                  <MenuItem
+                    icon={DeleteBin2Line}
+                    label={t('cancel_subscription')}
+                    textColor="text-[#bf3709]"
+                  />
+                </button>
+                <div className="h-px bg-[#e6e6e6] dark:bg-gray-700 mx-4"></div>
+              </>
+            )}
+
+            {/* Upgrade Plan Button - visible if NO active plan */}
+            {!user?.currentPlan && (
+              <>
+                <button
+                  className="w-full"
+                  onClick={() => router.push(`/${role}/account/upgrade-plan`)}
+                >
+                  <MenuItem
+                    icon={RocketLine}
+                    label={t('upgrade_plan')}
+                  />
+                </button>
+                <div className="h-px bg-[#e6e6e6] dark:bg-gray-700 mx-4"></div>
+              </>
+            )}
 
             {/* Dark Theme Toggle */}
             <button className="w-full" onClick={toggleDarkMode}>
@@ -1179,8 +1237,8 @@ const RightPanelCategories = () => {
                     tab: 'phone',
                     icon: PhoneLine,
                     label: 'Contact',
-                    subtitle: user?.contact?.mobileNumber && user?.contact?.mobileNumber.length >= 10
-                      ? '+91 ******' + user.contact.mobileNumber.slice(-4)
+                    subtitle: user?.mobileNumber && user.mobileNumber.length >= 10
+                      ? '+91 ******' + user.mobileNumber.slice(-4)
                       : 'Add contact info',
                   },
                   {
@@ -1196,8 +1254,8 @@ const RightPanelCategories = () => {
                     icon: UserCommunityLine,
                     label: 'Socials',
                     subtitle: [
-                      user?.social_media?.instagram && 'InstagramFill',
-                      user?.social_media?.linkedin && 'LinkedinFill',
+                      user?.social_media?.instagram && 'Instagram',
+                      user?.social_media?.linkedin && 'LinkedIn',
                     ].filter(Boolean).join(', ') || 'Add social links',
                   },
                   {
@@ -1222,7 +1280,7 @@ const RightPanelCategories = () => {
                     tab: 'password',
                     icon: LockLine,
                     label: 'Password',
-                    subtitle: '',
+                    subtitle: 'Change your password',
                   },
                 ].map(({ tab, icon: Icon, label, subtitle }) => (
                   <div key={tab}>

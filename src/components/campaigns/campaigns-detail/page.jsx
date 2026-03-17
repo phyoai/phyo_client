@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { Image2Line as Image2Line, CalendarLine,ArrowLeftLine, LineChartLine, UserLine, BarChartLine, MoneyDollarBoxLine, DownloadLine, FileTextLine, MoreLine, AddLine, SearchLine, VideoLine } from '@phyoofficial/phyo-icon-library';
+import { useRoleContext } from '@/app/context/RoleContext';
 import { SpendingBudgetGraph } from '@/components/SpendingBudgetGraph';
 import { LineChartGraph } from '@/components/AudienceEngagementGraphs';
 import Button from '@/components/ui/Button';
@@ -15,6 +16,7 @@ export default function CampaignDetailPage() {
   const params = useParams();
   const router = useRouter();
   const goBack = useGoBack();
+  const { role } = useRoleContext();
   const campaignId = params.id;
 
   const { selectedCampaign, loading, fetchCampaignById } = useCampaigns();
@@ -289,7 +291,7 @@ export default function CampaignDetailPage() {
                                 size="sm"
                                 onClick={() => {
                                   setResponded(!responded);
-                                  router.push('/brand/campaigns/influencer-counter-offer');
+                                  router.push(`/${role}/campaigns/influencer-counter-offer`);
                                 }}
                                 className="self-center"
                               >
@@ -348,7 +350,7 @@ export default function CampaignDetailPage() {
                                 size="sm"
                                 onClick={() => {
                                   setResponded(!responded);
-                                  router.push('/brand/campaigns/influencer-detail-deliverables');
+                                  router.push(`/${role}/campaigns/influencer-detail-deliverables`);
                                 }}
                                 className="self-center mt-auto"
                               >
@@ -399,7 +401,7 @@ export default function CampaignDetailPage() {
                     </div>
 
                     {/* Boost This Campaign Section */}
-                    <div className="border-2 border-gray-300 rounded-2xl bg-gradient-to-r from-green-700 to-green-600 p-8 cursor-pointer" onClick={() => router.push('/brand/campaigns/boost-campaign')}>
+                    <div className="border-2 border-gray-300 rounded-2xl bg-gradient-to-r from-green-700 to-green-600 p-8 cursor-pointer" onClick={() => router.push(`/${role}/campaigns/boost-campaign`)}>
                       <div className="flex items-start gap-4">
                         {/* Icon Circle */}
                         <div className="w-12 h-12 bg-neutral-base rounded-full flex items-center justify-center flex-shrink-0">
@@ -612,7 +614,7 @@ export default function CampaignDetailPage() {
                         size="md"
                         fullWidth
                         icon={FileTextLine}
-                        onClick={() => router.push('/brand/campaigns/campaign-summary')}
+                        onClick={() => router.push(`/${role}/campaigns/campaign-summary`)}
                       >
                         Summarize
                       </Button>

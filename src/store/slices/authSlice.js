@@ -1,28 +1,15 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://api.phyo.ai/api';
+import api from '@/utils/api';
 
 // Async thunks for authentication
 export const signupUser = createAsyncThunk(
   'auth/signupUser',
   async ({ email, password, type, name, username }, { rejectWithValue }) => {
     try {
-      const response = await fetch(`${API_BASE}/user/signup`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password, type, name, username }),
-      });
-
-      if (!response.ok) {
-        const error = await response.json();
-        return rejectWithValue(error.message || 'Signup failed');
-      }
-
-      const data = await response.json();
-      // API returns user data directly
-      return data.data || data.user || data;
+      const response = await api.post('/user/signup', { email, password, type, name, username });
+      return response.data || response;
     } catch (error) {
-      return rejectWithValue(error.message);
+      return rejectWithValue(error.message || 'Signup failed');
     }
   }
 );
@@ -31,25 +18,14 @@ export const loginUser = createAsyncThunk(
   'auth/loginUser',
   async ({ email, password }, { rejectWithValue }) => {
     try {
-      const response = await fetch(`${API_BASE}/user/login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
-      });
-
-      if (!response.ok) {
-        const error = await response.json();
-        return rejectWithValue(error.message || 'Login failed');
-      }
-
-      const data = await response.json();
-      // API returns { message, token, user } directly
+      const response = await api.post('/user/login', { email, password });
+      const data = response.data || response;
       return {
         token: data.token || data.data?.token,
         user: data.user || data.data?.user,
       };
     } catch (error) {
-      return rejectWithValue(error.message);
+      return rejectWithValue(error.message || 'Login failed');
     }
   }
 );
@@ -58,19 +34,10 @@ export const forgotPassword = createAsyncThunk(
   'auth/forgotPassword',
   async ({ email }, { rejectWithValue }) => {
     try {
-      const response = await fetch(`${API_BASE}/user/forgot-password`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email }),
-      });
-
-      if (!response.ok) {
-        return rejectWithValue('Failed to send reset email');
-      }
-
+      await api.post('/user/forgot-password', { email });
       return { success: true, email };
     } catch (error) {
-      return rejectWithValue(error.message);
+      return rejectWithValue(error.message || 'Failed to send reset email');
     }
   }
 );
@@ -79,20 +46,10 @@ export const verifyResetCode = createAsyncThunk(
   'auth/verifyResetCode',
   async ({ email, code }, { rejectWithValue }) => {
     try {
-      const response = await fetch(`${API_BASE}/user/verify-code`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, code }),
-      });
-
-      if (!response.ok) {
-        return rejectWithValue('Invalid or expired code');
-      }
-
-      const data = await response.json();
+      await api.post('/user/verify-code', { email, code });
       return { success: true, email };
     } catch (error) {
-      return rejectWithValue(error.message);
+      return rejectWithValue(error.message || 'Invalid or expired code');
     }
   }
 );
@@ -101,19 +58,10 @@ export const resetPassword = createAsyncThunk(
   'auth/resetPassword',
   async ({ email, newPassword }, { rejectWithValue }) => {
     try {
-      const response = await fetch(`${API_BASE}/user/reset-password`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, newPassword }),
-      });
-
-      if (!response.ok) {
-        return rejectWithValue('Failed to reset password');
-      }
-
+      await api.post('/user/reset-password', { email, newPassword });
       return { success: true };
     } catch (error) {
-      return rejectWithValue(error.message);
+      return rejectWithValue(error.message || 'Failed to reset password');
     }
   }
 );
@@ -122,24 +70,14 @@ export const verifyEmailOtp = createAsyncThunk(
   'auth/verifyEmailOtp',
   async ({ email, otp }, { rejectWithValue }) => {
     try {
-      const response = await fetch(`${API_BASE}/user/verify-otp`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, otp }),
-      });
-
-      if (!response.ok) {
-        return rejectWithValue('Invalid OTP');
-      }
-
-      const data = await response.json();
-      // API may return { token, user } or nested structure
+      const response = await api.post('/user/verify-otp', { email, otp });
+      const data = response.data || response;
       return {
         token: data.token || data.data?.token,
         user: data.user || data.data?.user,
       };
     } catch (error) {
-      return rejectWithValue(error.message);
+      return rejectWithValue(error.message || 'Invalid OTP');
     }
   }
 );
@@ -148,19 +86,10 @@ export const resendEmailOtp = createAsyncThunk(
   'auth/resendEmailOtp',
   async ({ email }, { rejectWithValue }) => {
     try {
-      const response = await fetch(`${API_BASE}/user/resend-otp`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email }),
-      });
-
-      if (!response.ok) {
-        return rejectWithValue('Failed to resend OTP');
-      }
-
+      await api.post('/user/resend-otp', { email });
       return { success: true, email };
     } catch (error) {
-      return rejectWithValue(error.message);
+      return rejectWithValue(error.message || 'Failed to resend OTP');
     }
   }
 );
@@ -185,25 +114,14 @@ export const googleOAuth = createAsyncThunk(
         ...(profilePicture && { profilePicture }),
       };
 
-      const response = await fetch(`${API_BASE}/user/google`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body),
-      });
-
-      if (!response.ok) {
-        const error = await response.json();
-        return rejectWithValue(error.message || 'Google OAuth failed');
-      }
-
-      const data = await response.json();
-      // API returns { token, user } directly
+      const response = await api.post('/user/google', body);
+      const data = response.data || response;
       return {
         token: data.token || data.data?.token,
         user: data.user || data.data?.user,
       };
     } catch (error) {
-      return rejectWithValue(error.message);
+      return rejectWithValue(error.message || 'Google OAuth failed');
     }
   }
 );

@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { ArrowLeftLine, MoreLine } from '@phyoofficial/phyo-icon-library';
 import { useRouter } from 'next/navigation';
 import Image2Line from 'next/image';
+import { useRoleContext } from '@/app/context/RoleContext';
 import RejectionModal from '@/components/RejectionModal';
 import NewApplicationsSkeleton from '@/components/NewApplicationsSkeleton';
 import Button from '@/components/ui/Button';
@@ -229,6 +230,7 @@ const mockApplicationsData = [
 
 const NewApplicationsPages = () => {
   const router = useRouter();
+  const { role } = useRoleContext();
   const { influencers: reduxInfluencers, loading, fetchInfluencers } = useInfluencers();
   const [selectedApplication, setSelectedApplication] = useState(null);
   const [activeTab, setActiveTab] = useState('info');
@@ -286,7 +288,7 @@ const NewApplicationsPages = () => {
   }, []);
 
   const handleBack = () => {
-    router.push('/brand/campaigns');
+    router.push(`/${role}/campaigns`);
   };
 
   const handlePortfolioClick = (application) => {

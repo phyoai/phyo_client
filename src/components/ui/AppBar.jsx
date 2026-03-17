@@ -20,6 +20,7 @@ const AppBar = React.forwardRef(({
   leftContent,
   rightContent,
   className = '',
+  showMenu, // Add this to prevent it from being spread to DOM
   ...props
 }, ref) => {
   const [searchValue, setSearchValue] = React.useState('');

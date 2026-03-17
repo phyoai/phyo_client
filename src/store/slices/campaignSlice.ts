@@ -55,12 +55,28 @@ export const getMyCampaigns = createAsyncThunk(
   'campaign/getMyCampaigns',
   async (params: any = {}, { rejectWithValue }) => {
     try {
-      const response = await apiClient.get('/campaigns/mine', { params });
-      return response.data;
+      // Try /campaigns first, then /campaigns/mine as fallback
+      let response;
+      try {
+        response = await apiClient.get('/campaigns', { params: { ...params, mine: true } });
+      } catch (err: any) {
+        // If that fails, try the mine endpoint
+        if (err.response?.status === 404 || err.response?.status === 405) {
+          response = await apiClient.get('/campaigns/mine', { params });
+        } else {
+          throw err;
+        }
+      }
+      return response.data || { data: [] };
     } catch (error: any) {
-      console.error('Error fetching my campaigns:', error.response?.status, error.message);
-      // Return empty data instead of rejecting to prevent crash
-      return { data: [] };
+      console.error('Error fetching my campaigns:', {
+        status: error.response?.status,
+        message: error.message,
+        url: error.config?.url,
+        data: error.response?.data
+      });
+      // Return error so UI can show proper error message
+      return rejectWithValue(error.response?.data?.message || error.message || 'Failed to fetch campaigns');
     }
   }
 );

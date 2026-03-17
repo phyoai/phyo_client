@@ -4,6 +4,7 @@ import { ArrowLeftLine, MoreLine, BookmarkLine, YoutubeFill, InstagramFill, Twit
 import { useRouter } from 'next/navigation';
 import Image2Line from 'next/image';
 import { useInfluencers } from '@/hooks/useInfluencers';
+import { useRoleContext } from '@/app/context/RoleContext';
 
 const mockInfluencersData = [
   {
@@ -178,8 +179,10 @@ const TopInfluencersPage = () => {
     fetchInfluencers({ page: 1, limit: 20 });
   }, []);
 
+  const { role } = useRoleContext();
+
   const handleBack = () => {
-    router.push('/brand/dashboard');
+    router.push(`/${role}/dashboard`);
   };
 
   const handleInfluencerClick = (influencer) => {

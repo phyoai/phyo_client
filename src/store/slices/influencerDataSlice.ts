@@ -1,4 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import api from '@/utils/api';
 
 interface SocialMediaData {
   followers: number;
@@ -57,27 +58,14 @@ interface InfluencerDataState {
   };
 }
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://api.phyo.ai/api';
-
 // Async thunks
 export const getAllInfluencers = createAsyncThunk(
   'influencerData/getAllInfluencers',
   async ({ page = 1, limit = 10 }: { page?: number; limit?: number } = {}, { rejectWithValue }) => {
     try {
-      const response = await fetch(
-        `${API_BASE}/influencers?page=${page}&limit=${limit}`,
-        {
-          method: 'GET',
-          headers: { 'Content-Type': 'application/json' },
-        }
-      );
-
-      if (!response.ok) {
-        return { data: [], pagination: { page, limit, total: 0 } };
-      }
-
-      const data = await response.json();
-      return { data: data.data || [], pagination: data.pagination || { page, limit, total: 0 } };
+      const response = await api.get('/auth/influencers', { params: { page, limit } });
+      const data = response.data?.data || response.data;
+      return { data: Array.isArray(data) ? data : [], pagination: response.data?.pagination || { page, limit, total: 0 } };
     } catch (error) {
       return { data: [], pagination: { page, limit, total: 0 } };
     }
@@ -95,20 +83,9 @@ export const searchInfluencers = createAsyncThunk(
     { rejectWithValue }
   ) => {
     try {
-      const response = await fetch(
-        `${API_BASE}/influencers?search=${query}&page=${page}&limit=${limit}`,
-        {
-          method: 'GET',
-          headers: { 'Content-Type': 'application/json' },
-        }
-      );
-
-      if (!response.ok) {
-        return { data: [], pagination: { page, limit, total: 0 } };
-      }
-
-      const data = await response.json();
-      return { data: data.data || [], pagination: data.pagination || { page, limit, total: 0 } };
+      const response = await api.get('/auth/influencers', { params: { search: query, page, limit } });
+      const data = response.data?.data || response.data;
+      return { data: Array.isArray(data) ? data : [], pagination: response.data?.pagination || { page, limit, total: 0 } };
     } catch (error) {
       return { data: [], pagination: { page, limit, total: 0 } };
     }
@@ -131,26 +108,11 @@ export const advancedSearchInfluencers = createAsyncThunk(
     { rejectWithValue }
   ) => {
     try {
-      const params = new URLSearchParams();
-      Object.entries(filters).forEach(([key, value]) => {
-        if (value !== undefined && value !== null) {
-          params.append(key, String(value));
-        }
-      });
-
-      const response = await fetch(`${API_BASE}/influencers?${params.toString()}`, {
-        method: 'GET',
-        headers: { 'Content-Type': 'application/json' },
-      });
-
-      if (!response.ok) {
-        return { data: [], pagination: { page: filters.page || 1, limit: filters.limit || 10, total: 0 } };
-      }
-
-      const data = await response.json();
+      const response = await api.get('/auth/influencers', { params: filters });
+      const data = response.data?.data || response.data;
       return {
-        data: data.data || [],
-        pagination: data.pagination || {
+        data: Array.isArray(data) ? data : [],
+        pagination: response.data?.pagination || {
           page: filters.page || 1,
           limit: filters.limit || 10,
           total: 0,
@@ -166,17 +128,8 @@ export const getInfluencerById = createAsyncThunk(
   'influencerData/getInfluencerById',
   async (id: string, { rejectWithValue }) => {
     try {
-      const response = await fetch(`${API_BASE}/influencers/${id}`, {
-        method: 'GET',
-        headers: { 'Content-Type': 'application/json' },
-      });
-
-      if (!response.ok) {
-        return rejectWithValue('Influencer not found');
-      }
-
-      const data = await response.json();
-      return data.data;
+      const response = await api.get(`/auth/influencers/${id}`);
+      return response.data?.data || response.data;
     } catch (error) {
       return rejectWithValue((error as Error).message);
     }
@@ -187,17 +140,8 @@ export const getInfluencerByUsername = createAsyncThunk(
   'influencerData/getInfluencerByUsername',
   async (username: string, { rejectWithValue }) => {
     try {
-      const response = await fetch(`${API_BASE}/influencers/username/${username}`, {
-        method: 'GET',
-        headers: { 'Content-Type': 'application/json' },
-      });
-
-      if (!response.ok) {
-        return rejectWithValue('Influencer not found');
-      }
-
-      const data = await response.json();
-      return data.data;
+      const response = await api.get(`/auth/influencers/username/${username}`);
+      return response.data?.data || response.data;
     } catch (error) {
       return rejectWithValue((error as Error).message);
     }
@@ -208,17 +152,8 @@ export const getInfluencerStats = createAsyncThunk(
   'influencerData/getInfluencerStats',
   async (_, { rejectWithValue }) => {
     try {
-      const response = await fetch(`${API_BASE}/influencers/stats`, {
-        method: 'GET',
-        headers: { 'Content-Type': 'application/json' },
-      });
-
-      if (!response.ok) {
-        return rejectWithValue('Failed to fetch stats');
-      }
-
-      const data = await response.json();
-      return data.data;
+      const response = await api.get('/auth/influencers/stats');
+      return response.data?.data || response.data;
     } catch (error) {
       return rejectWithValue((error as Error).message);
     }

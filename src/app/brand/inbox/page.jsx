@@ -6,14 +6,7 @@ import { useSocket } from '@/app/context/SocketContext';
 
 function BrandInboxContent() {
   const { socket, onMessage } = useSocket();
-
-  // Redux messaging hook
-  const { conversations, loading, fetchConversations } = useMessaging();
-
-  // Fetch conversations on mount
-  useEffect(() => {
-    fetchConversations();
-  }, []);
+  const { conversations } = useMessaging();
 
   // Real-time message updates via socket
   useEffect(() => {
@@ -31,7 +24,7 @@ function BrandInboxContent() {
     return () => unsubscribers.forEach(unsub => unsub?.());
   }, [socket, conversations, onMessage]);
 
-  return <InboxPage conversations={conversations} />;
+  return <InboxPage />;
 }
 
 export default function BrandInbox() {

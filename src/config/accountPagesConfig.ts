@@ -51,7 +51,7 @@ export const ACCOUNT_PAGES: AccountPageConfig[] = [
     label: 'upgrade_plan',
     icon: 'RocketLine',
     description: 'Upgrade your subscription plan',
-    requiredRoles: ['admin', 'brand'],
+    requiredRoles: ['admin', 'brand', 'user', 'influencer'],
   },
   {
     id: 'pause-subscription',
@@ -60,7 +60,8 @@ export const ACCOUNT_PAGES: AccountPageConfig[] = [
     label: 'pause_subscription',
     icon: 'PauseCircleLine',
     description: 'Pause your active subscription',
-    requiredRoles: ['brand'],
+    requiredRoles: ['brand', 'user', 'influencer'],
+    requiresSubscription: true,
   },
   {
     id: 'cancel-subscription',
@@ -69,7 +70,8 @@ export const ACCOUNT_PAGES: AccountPageConfig[] = [
     label: 'cancel_subscription',
     icon: 'DeleteBin2Line',
     description: 'Cancel your subscription',
-    requiredRoles: ['brand'],
+    requiredRoles: ['brand', 'user', 'influencer'],
+    requiresSubscription: true,
   },
   {
     id: 'billing-history',
@@ -78,7 +80,7 @@ export const ACCOUNT_PAGES: AccountPageConfig[] = [
     label: 'billing_history',
     icon: 'WalletLine',
     description: 'View your billing and transaction history',
-    requiredRoles: ['admin', 'brand'],
+    requiredRoles: ['admin', 'brand', 'user', 'influencer'],
     requiresSubscription: true,
   },
   {
@@ -104,10 +106,19 @@ export const ACCOUNT_PAGES: AccountPageConfig[] = [
 /**
  * Get visible account pages for a specific role
  * @param role - The user role
+ * @param hasSubscription - Whether the user has an active subscription
  * @returns Array of visible account pages for that role
  */
-export const getVisibleAccountPages = (role: UserRole): AccountPageConfig[] => {
-  return ACCOUNT_PAGES.filter((page) => page.requiredRoles.includes(role));
+export const getVisibleAccountPages = (role: UserRole, hasSubscription: boolean = false): AccountPageConfig[] => {
+  return ACCOUNT_PAGES.filter((page) => {
+    // Check if role has access
+    if (!page.requiredRoles.includes(role)) return false;
+
+    // Check subscription requirement - if page requires subscription and user doesn't have one, hide it
+    if (page.requiresSubscription && !hasSubscription) return false;
+
+    return true;
+  });
 };
 
 /**

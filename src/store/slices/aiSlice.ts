@@ -1,6 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://api.phyo.ai/api';
+import api from '@/utils/api';
 
 interface AIState {
   aiResults: any[];
@@ -23,20 +22,10 @@ export const searchWithAI = createAsyncThunk(
   'ai/searchWithAI',
   async ({ prompt }: { prompt: string }, { rejectWithValue }) => {
     try {
-      const response = await fetch(`${API_BASE}/ask`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt }),
-      });
-
-      if (!response.ok) {
-        return rejectWithValue('AI search failed');
-      }
-
-      const data = await response.json();
-      return data.data || data;
+      const response = await api.post('/ask', { prompt });
+      return response.data || response;
     } catch (error: any) {
-      return rejectWithValue(error.message);
+      return rejectWithValue(error.message || 'AI search failed');
     }
   }
 );
@@ -45,19 +34,10 @@ export const getInfluencerDetails = createAsyncThunk(
   'ai/getInfluencerDetails',
   async (userName: string, { rejectWithValue }) => {
     try {
-      const response = await fetch(`${API_BASE}/ask/details?userName=${encodeURIComponent(userName)}`, {
-        method: 'GET',
-        headers: { 'Content-Type': 'application/json' },
-      });
-
-      if (!response.ok) {
-        return rejectWithValue('Failed to fetch influencer details');
-      }
-
-      const data = await response.json();
-      return data.data || data;
+      const response = await api.get(`/ask/details?userName=${encodeURIComponent(userName)}`);
+      return response.data || response;
     } catch (error: any) {
-      return rejectWithValue(error.message);
+      return rejectWithValue(error.message || 'Failed to fetch influencer details');
     }
   }
 );
@@ -66,20 +46,10 @@ export const fetchInstagramReelData = createAsyncThunk(
   'ai/fetchInstagramReelData',
   async ({ reelUrl }: { reelUrl: string }, { rejectWithValue }) => {
     try {
-      const response = await fetch(`${API_BASE}/ask/reel`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ reelUrl }),
-      });
-
-      if (!response.ok) {
-        return rejectWithValue('Failed to fetch reel data');
-      }
-
-      const data = await response.json();
-      return data.data || data;
+      const response = await api.post('/ask/reel', { reelUrl });
+      return response.data || response;
     } catch (error: any) {
-      return rejectWithValue(error.message);
+      return rejectWithValue(error.message || 'Failed to fetch reel data');
     }
   }
 );
