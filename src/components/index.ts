@@ -17,7 +17,6 @@ export { default as OTPInput } from './ui/OTPInput';
 // Section Components
 export { default as TopInfluencersSection } from './TopInfluencersSection';
 export { default as PostTimelineSection } from './PostTimelineSection';
-export { default as AllCampaignsSection } from './AllCampaignsSection';
 export { default as AccountPage } from './AccountPage';
 
 // Shared utilities & other components
