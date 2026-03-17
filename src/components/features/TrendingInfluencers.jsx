@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { influencerService } from '@/services';
+
 import { Loader } from 'lucide-react';
 import PlanRestrictedError from '@/components/PlanRestrictedError';
 

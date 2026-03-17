@@ -24,8 +24,8 @@ import {
   CalendarEventFill,
   CalendarEventLine,
 } from '@phyoofficial/phyo-icon-library';
-import NavRail from './NavRail';
-import NavItem from './NavItem';
+import NavRail from './ui/NavRail';
+import NavItem from './ui/NavItem';
 
 const InfluencerSidebar = () => {
   const pathname = usePathname();

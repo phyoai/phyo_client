@@ -1,0 +1,335 @@
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+
+interface Project {
+  _id: string;
+  name: string;
+  description: string;
+  progressPercentage: number;
+  date: string;
+  status: 'Not Started' | 'In Progress' | 'Completed' | 'On Hold';
+}
+
+interface ProjectStats {
+  totalProjects: number;
+  inProgressProjects: number;
+  completedProjects: number;
+  averageProgress: number;
+  statusBreakdown: {
+    notStarted: number;
+    inProgress: number;
+    completed: number;
+    onHold: number;
+  };
+}
+
+interface ProjectState {
+  projects: Project[];
+  selectedProject: Project | null;
+  projectStats: ProjectStats | null;
+  loading: boolean;
+  error: string | null;
+  filters: {
+    status?: string;
+  };
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+  };
+}
+
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+
+// Async thunks
+export const getProjects = createAsyncThunk(
+  'project/getProjects',
+  async (
+    { status, page = 1, limit = 10 }: { status?: string; page?: number; limit?: number } = {},
+    { rejectWithValue }
+  ) => {
+    try {
+      const params = new URLSearchParams();
+      if (status) params.append('status', status);
+      params.append('page', String(page));
+      params.append('limit', String(limit));
+
+      const response = await fetch(`${API_BASE}/api/projects?${params.toString()}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('auth_token')}`,
+        },
+      });
+
+      if (!response.ok) {
+        return { data: [], pagination: { page, limit, total: 0 } };
+      }
+
+      const data = await response.json();
+      return { data: data.data || [], pagination: data.pagination || { page, limit, total: 0 } };
+    } catch (error) {
+      return { data: [], pagination: { page, limit, total: 0 } };
+    }
+  }
+);
+
+export const getProjectById = createAsyncThunk(
+  'project/getProjectById',
+  async (id: string, { rejectWithValue }) => {
+    try {
+      const response = await fetch(`${API_BASE}/api/projects/${id}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('auth_token')}`,
+        },
+      });
+
+      if (!response.ok) {
+        return rejectWithValue('Project not found');
+      }
+
+      const data = await response.json();
+      return data.data;
+    } catch (error) {
+      return rejectWithValue((error as Error).message);
+    }
+  }
+);
+
+export const createProject = createAsyncThunk(
+  'project/createProject',
+  async (
+    projectData: {
+      name: string;
+      description: string;
+      progressPercentage?: number;
+      date?: string;
+      status?: string;
+    },
+    { rejectWithValue }
+  ) => {
+    try {
+      const response = await fetch(`${API_BASE}/api/projects`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('auth_token')}`,
+        },
+        body: JSON.stringify(projectData),
+      });
+
+      if (!response.ok) {
+        return rejectWithValue('Failed to create project');
+      }
+
+      const data = await response.json();
+      return data.data;
+    } catch (error) {
+      return rejectWithValue((error as Error).message);
+    }
+  }
+);
+
+export const updateProject = createAsyncThunk(
+  'project/updateProject',
+  async (
+    { id, projectData }: { id: string; projectData: Partial<Project> },
+    { rejectWithValue }
+  ) => {
+    try {
+      const response = await fetch(`${API_BASE}/api/projects/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('auth_token')}`,
+        },
+        body: JSON.stringify(projectData),
+      });
+
+      if (!response.ok) {
+        return rejectWithValue('Failed to update project');
+      }
+
+      const data = await response.json();
+      return data.data;
+    } catch (error) {
+      return rejectWithValue((error as Error).message);
+    }
+  }
+);
+
+export const deleteProject = createAsyncThunk(
+  'project/deleteProject',
+  async (id: string, { rejectWithValue }) => {
+    try {
+      const response = await fetch(`${API_BASE}/api/projects/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('auth_token')}`,
+        },
+      });
+
+      if (!response.ok) {
+        return rejectWithValue('Failed to delete project');
+      }
+
+      return id;
+    } catch (error) {
+      return rejectWithValue((error as Error).message);
+    }
+  }
+);
+
+export const getProjectStats = createAsyncThunk(
+  'project/getProjectStats',
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await fetch(`${API_BASE}/api/projects/stats`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('auth_token')}`,
+        },
+      });
+
+      if (!response.ok) {
+        return rejectWithValue('Failed to fetch stats');
+      }
+
+      const data = await response.json();
+      return data.data;
+    } catch (error) {
+      return rejectWithValue((error as Error).message);
+    }
+  }
+);
+
+const initialState: ProjectState = {
+  projects: [],
+  selectedProject: null,
+  projectStats: null,
+  loading: false,
+  error: null,
+  filters: {},
+  pagination: {
+    page: 1,
+    limit: 10,
+    total: 0,
+  },
+};
+
+const projectSlice = createSlice({
+  name: 'project',
+  initialState,
+  reducers: {
+    setFilters: (state, action) => {
+      state.filters = action.payload;
+    },
+    selectProject: (state, action) => {
+      state.selectedProject = action.payload;
+    },
+    clearProjects: (state) => {
+      state.projects = [];
+      state.selectedProject = null;
+    },
+  },
+  extraReducers: (builder) => {
+    builder
+      // Get Projects
+      .addCase(getProjects.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(getProjects.fulfilled, (state, action) => {
+        state.loading = false;
+        state.projects = action.payload.data;
+        state.pagination = action.payload.pagination;
+      })
+      .addCase(getProjects.rejected, (state) => {
+        state.loading = false;
+        state.projects = [];
+      })
+
+      // Get by ID
+      .addCase(getProjectById.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(getProjectById.fulfilled, (state, action) => {
+        state.loading = false;
+        state.selectedProject = action.payload;
+      })
+      .addCase(getProjectById.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      })
+
+      // Create
+      .addCase(createProject.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(createProject.fulfilled, (state, action) => {
+        state.loading = false;
+        state.projects.unshift(action.payload);
+      })
+      .addCase(createProject.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      })
+
+      // Update
+      .addCase(updateProject.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(updateProject.fulfilled, (state, action) => {
+        state.loading = false;
+        const index = state.projects.findIndex((p) => p._id === action.payload._id);
+        if (index !== -1) {
+          state.projects[index] = action.payload;
+        }
+        if (state.selectedProject?._id === action.payload._id) {
+          state.selectedProject = action.payload;
+        }
+      })
+      .addCase(updateProject.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      })
+
+      // Delete
+      .addCase(deleteProject.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(deleteProject.fulfilled, (state, action) => {
+        state.loading = false;
+        state.projects = state.projects.filter((p) => p._id !== action.payload);
+        if (state.selectedProject?._id === action.payload) {
+          state.selectedProject = null;
+        }
+      })
+      .addCase(deleteProject.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      })
+
+      // Get Stats
+      .addCase(getProjectStats.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(getProjectStats.fulfilled, (state, action) => {
+        state.loading = false;
+        state.projectStats = action.payload;
+      })
+      .addCase(getProjectStats.rejected, (state) => {
+        state.loading = false;
+      });
+  },
+});
+
+export const { setFilters, selectProject, clearProjects } = projectSlice.actions;
+export default projectSlice.reducer;

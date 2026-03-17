@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import AppBar from '@/components/AppBar';
+import AppBar from '@/components/ui/AppBar';
 import { useGoBack } from '@/hooks/useGoBack';
 
 export default function NotificationPreferencesAll() {

@@ -3,7 +3,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { ArrowLeftLine, MoreLine, BookmarkLine, YoutubeFill, InstagramFill, TwitterXLine, UserAddLine, Message3Line, FacebookCircleFill } from '@phyoofficial/phyo-icon-library';
 import { useRouter } from 'next/navigation';
 import Image2Line from 'next/image';
-import { influencerAPI } from '@/utils/api';
+import { useInfluencers } from '@/hooks/useInfluencers';
 
 const mockInfluencersDataBackup = [
   {
@@ -144,54 +144,38 @@ const categories = ['All', 'Fitness', 'Comedy', 'Lifestyle', 'Infra', 'Real Esta
 
 const TopInfluencersPage = () => {
   const router = useRouter();
-  const [influencers, setInfluencers] = useState([]);
+  const { influencers: reduxInfluencers, loading, fetchInfluencers } = useInfluencers();
   const [selectedInfluencer, setSelectedInfluencer] = useState(null);
   const [activeCategory, setActiveCategory] = useState('All');
-  const [isLoading, setIsLoading] = useState(true);
   const categoriesScrollRef = useRef(null);
 
-  // Fetch influencers from API
+  // Transform influencers for display
+  const influencers = reduxInfluencers.map((influencer, index) => ({
+    id: influencer._id || influencer.id || index,
+    name: influencer.name || 'Unknown',
+    username: `@${(influencer.name || 'user').toLowerCase().replace(/\s/g, '')}`,
+    followers: `${influencer.followers || 0} followers`,
+    avatar: influencer.avatar || '/dummyAvatar.jpg',
+    coverImage: '/world-bg.png',
+    coverColor: ['from-yellow-400 to-yellow-500', 'from-blue-400 to-blue-600', 'from-green-400 to-green-600', 'from-orange-400 to-red-500', 'from-pink-400 to-purple-500'][index % 5],
+    bio: influencer.bio || 'Professional influencer',
+    tags: influencer.categories || ['Influencer'],
+    stats: {
+      followers: influencer.followers ? `${(influencer.followers / 1000).toFixed(1)}k` : '0',
+      following: '0',
+      posts: influencer.posts || '0',
+      engagement: influencer.engagement ? `${(influencer.engagement * 100).toFixed(1)}%` : '0%'
+    },
+    platforms: {
+      instagram: influencer.instagramFollowers || '0',
+      youtube: influencer.youtubeSubscribers || '0',
+      twitter: influencer.xFollowers || '0'
+    }
+  }));
+
+  // Fetch influencers on mount
   useEffect(() => {
-    const fetchInfluencers = async () => {
-      setIsLoading(true);
-      try {
-        const response = await influencerAPI.getInfluencers({ page: 1, limit: 20 });
-        const influencersData = response.data || [];
-
-        // Transform influencer data for display
-        const formattedInfluencers = influencersData.map((influencer, index) => ({
-          id: influencer._id || influencer.id || index,
-          name: influencer.name || 'Unknown',
-          username: `@${(influencer.name || 'user').toLowerCase().replace(/\s/g, '')}`,
-          followers: `${influencer.followers || 0} followers`,
-          avatar: influencer.avatar || '/dummyAvatar.jpg',
-          coverImage: '/world-bg.png',
-          coverColor: ['from-yellow-400 to-yellow-500', 'from-blue-400 to-blue-600', 'from-green-400 to-green-600', 'from-orange-400 to-red-500', 'from-pink-400 to-purple-500'][index % 5],
-          bio: influencer.bio || 'Professional influencer',
-          tags: influencer.categories || ['Influencer'],
-          stats: {
-            followers: influencer.followers ? `${(influencer.followers / 1000).toFixed(1)}k` : '0',
-            following: '0',
-            posts: influencer.posts || '0',
-            engagement: influencer.engagement ? `${(influencer.engagement * 100).toFixed(1)}%` : '0%'
-          },
-          platforms: {
-            instagram: influencer.instagramFollowers || '0',
-            youtube: influencer.youtubeSubscribers || '0',
-            twitter: influencer.xFollowers || '0'
-          }
-        }));
-
-        setInfluencers(formattedInfluencers);
-      } catch (error) {
-        console.error('Error fetching influencers:', error);
-        setInfluencers([]);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchInfluencers();
+    fetchInfluencers({ page: 1, limit: 20 });
   }, []);
 
   const handleBack = () => {
@@ -330,7 +314,7 @@ const TopInfluencersPage = () => {
 
             {/* Influencers List */}
             <div className="px-6 space-y-3">
-              {isLoading ? (
+              {loading ? (
                 <div className="flex items-center justify-center py-8">
                   <p className="text-gray-500">Loading influencers...</p>
                 </div>

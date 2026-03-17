@@ -4,6 +4,7 @@ import { AuthProvider } from "./context/AuthContext";
 import { SocketProvider } from "./context/SocketContext";
 import { ThemeProvider } from "./context/ThemeContext";
 import { LanguageProvider } from "./context/LanguageContext";
+import { ReduxProvider } from "@/store/ReduxProvider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -16,8 +17,18 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata = {
-  title: "Phyo Ai",
-  description: "Influencer Marketing Platform",
+  title: "Phyo Ai - Influencer Marketing Platform",
+  description: "Connect with top influencers and run successful marketing campaigns on Phyo Ai",
+  keywords: "influencer marketing, campaigns, brand collaboration, social media",
+  authors: [{ name: "Phyo Team" }],
+  ogImage: "https://phyo.ai/og-image.png",
+};
+
+export const viewport = {
+  width: "device-width",
+  initialScale: 1.0,
+  maximumScale: 5.0,
+  userScalable: true,
 };
 
 export default function RootLayout({ children }) {
@@ -27,15 +38,17 @@ export default function RootLayout({ children }) {
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         suppressHydrationWarning={true}
       >
-        <ThemeProvider>
-          <LanguageProvider>
-            <AuthProvider>
-              <SocketProvider>
-                {children}
-              </SocketProvider>
-            </AuthProvider>
-          </LanguageProvider>
-        </ThemeProvider>
+        <ReduxProvider>
+          <ThemeProvider>
+            <LanguageProvider>
+              <AuthProvider>
+                <SocketProvider>
+                  {children}
+                </SocketProvider>
+              </AuthProvider>
+            </LanguageProvider>
+          </ThemeProvider>
+        </ReduxProvider>
       </body>
     </html>
   );

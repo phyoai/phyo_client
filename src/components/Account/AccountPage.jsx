@@ -4,13 +4,11 @@ export const dynamic = 'force-dynamic';
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { userService } from '@/services';
-import { userAPI } from '@/utils/api';
-import { useApiQuery } from '@/hooks/useApi';
 import { useTheme } from '@/app/context/ThemeContext';
 import { useLanguage } from '@/app/context/LanguageContext';
 import { useRoleContext } from '@/app/context/RoleContext';
 import { useAccountPages } from '@/hooks/useAccountPages';
+import { useUser } from '@/hooks';
 import { getVisibleAccountPages } from '@/config/accountPagesConfig';
 import {
   AccountCircleFill,
@@ -47,19 +45,19 @@ export default function AccountPage() {
   const [mobileView, setMobileView] = useState('list');
   const { darkMode, toggleDarkMode } = useTheme();
   const { t, language, changeLanguage, currentLanguage, languages } = useLanguage();
+  const { profile, loading: profileLoading, fetchProfile } = useUser();
 
-  // Fetch user profile
-  const { data: profileData, loading: profileLoading } = useApiQuery(
-    () => userService.getProfile(),
-    []
-  );
+  // Fetch user profile on component mount
+  useEffect(() => {
+    fetchProfile();
+  }, []);
 
   useEffect(() => {
-    if (profileData) {
-      setUser(profileData);
+    if (profile) {
+      setUser(profile);
       setLoading(false);
     }
-  }, [profileData]);
+  }, [profile]);
 
   useEffect(() => {
     setLoading(profileLoading);
@@ -302,7 +300,7 @@ export default function AccountPage() {
     }
     setIsSaving(true);
     try {
-      await userService.changePassword({
+      await userAPI.changePassword({
         currentPassword: editFormData.currentPassword,
         newPassword: editFormData.newPassword,
       });

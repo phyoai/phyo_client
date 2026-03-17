@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { campaignService } from '@/services';
+
 import { Loader, ArrowRight } from 'lucide-react';
 import PlanRestrictedError from '@/components/PlanRestrictedError';
 

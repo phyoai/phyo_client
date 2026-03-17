@@ -9,9 +9,9 @@ import { useSidebar } from '@/app/context/SidebarContext';
 
 // Design System Components
 import { colors } from '@/config/colors';
-import { Heading, Caption } from '@/components/Typography';
+import { Heading, Caption } from '@/components/ui/Typography';
 import { spacing } from '@/components/Spacing';
-import IconButton from '@/components/IconButton';
+import IconButton from '@/components/ui/IconButton';
 
 // Dashboard Section Components
 import TrendingInfluencersSection from './sections/TrendingInfluencersSection';

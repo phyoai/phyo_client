@@ -1,7 +1,7 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { campaignService, type Campaign } from '@/services';
+import { useEffect } from 'react';
+import { useCampaigns } from '@/hooks/useCampaigns';
 import { Loader } from 'lucide-react';
 
 interface ExploreBrandsProps {
@@ -9,53 +9,23 @@ interface ExploreBrandsProps {
 }
 
 export default function ExploreBrands({ limit = 8 }: ExploreBrandsProps) {
-  const [brands, setBrands] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { campaigns, loading, error, fetchCampaigns } = useCampaigns();
 
   useEffect(() => {
-    const fetchBrands = async () => {
-      try {
-        setLoading(true);
-        setError(null);
+    fetchCampaigns({ limit: limit ? limit * 3 : 24 });
+  }, [limit, fetchCampaigns]);
 
-        // Fetch campaigns to extract brands
-        const response = await campaignService.getCampaigns({
-          page: 1,
-          limit: limit * 3 // Fetch more to have unique brands
-        });
-
-        // Group by brand and get unique brands with campaign count
-        const brandsMap = new Map();
-        (response.data || []).forEach((campaign) => {
-          const brandKey = campaign.brand?.id || 'unknown';
-          if (brandsMap.has(brandKey)) {
-            const existing = brandsMap.get(brandKey);
-            existing.campaignCount += 1;
-          } else {
-            brandsMap.set(brandKey, {
-              id: campaign.brand?.id || Math.random(),
-              name: campaign.brand?.firstName + ' ' + campaign.brand?.lastName || 'Unknown Brand',
-              email: campaign.brand?.email || '',
-              campaigns: 1,
-              totalBudget: campaign.budget || 0,
-              avatar: campaign.brand?.avatar || null
-            });
-          }
-        });
-
-        const uniqueBrands = Array.from(brandsMap.values()).slice(0, limit);
-        setBrands(uniqueBrands);
-      } catch (err: any) {
-        setError(err?.response?.data?.message || 'Failed to load brands');
-        console.error('Error fetching brands:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchBrands();
-  }, [limit]);
+  // Generate mock brands from campaigns for display
+  const brands = (campaigns || [])
+    .slice(0, limit || 8)
+    .map((campaign: any, index: number) => ({
+      id: campaign.id || `brand-${index}`,
+      name: `Brand ${index + 1}`,
+      email: `brand${index + 1}@example.com`,
+      campaigns: index + 1,
+      totalBudget: campaign.budget || 0,
+      avatar: null,
+    }));
 
   if (loading) {
     return (

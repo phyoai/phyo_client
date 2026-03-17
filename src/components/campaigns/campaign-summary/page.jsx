@@ -1,9 +1,9 @@
 'use client'
 import React from 'react';
 import { ArrowLeftLine, MoreLine, Share2Line, DownloadLine, MoneyDollarBoxLine, UserLine, FileTextLine, CalendarLine, AddLine, PlayLine, User2 } from '@phyoofficial/phyo-icon-library';
-import Button from '@/components/Button';
-import IconButton from '@/components/IconButton';
-import Card from '@/components/Card';
+import Button from '@/components/ui/Button';
+import IconButton from '@/components/ui/IconButton';
+import Card from '@/components/ui/Card';
 
 export default function CampaignSummarys() {
   return (

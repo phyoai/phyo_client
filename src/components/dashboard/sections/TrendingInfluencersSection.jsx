@@ -3,52 +3,34 @@ import { useRouter } from 'next/navigation';
 import SectionHeading from '@/components/SectionHeading';
 import InfluencerAvatar from '@/components/cards/InfluencerAvatar';
 import { useAuth } from '@/app/context/AuthContext';
-import { dashboardService } from '@/services';
+import { useInfluencers } from '@/hooks/useInfluencers';
 
 /**
  * Trending Influencers Section
  * Displays a horizontal scrollable list of trending influencers
  */
-export default function TrendingInfluencersSection( ) {
+export default function TrendingInfluencersSection() {
   const { getUserType } = useAuth();
   const role = (getUserType() || 'user').toLowerCase();
   const router = useRouter();
-  const [trendingInfluencers, setTrendingInfluencers] = useState([]);
-  const [loading, setLoading] = useState(true);
+
+  // Redux influencers hook
+  const { influencers, loading, fetchTrendingInfluencers } = useInfluencers();
+
+  // Format influencers with color coding
+  const trendingInfluencers = (influencers || []).slice(0, 10).map((influencer, index) => ({
+    id: influencer._id || influencer.id || index,
+    name: influencer.name || 'Influencer',
+    avatar: influencer.avatar || '/dummyAvatar.jpg',
+    color: [
+      'bg-pink-500', 'bg-purple-600', 'bg-blue-500', 'bg-green-500',
+      'bg-yellow-500', 'bg-red-500', 'bg-indigo-600', 'bg-teal-500',
+      'bg-orange-500', 'bg-cyan-500'
+    ][index % 10]
+  }));
 
   useEffect(() => {
-    const fetchTrendingInfluencers = async () => {
-      setLoading(true);
-      try {
-        const response = await dashboardService.getInfluencersByRole(role, {
-          page: 1,
-          limit: 10
-        });
-        const influencersData = response.data || [];
-
-        // Format and map influencers with color coding
-        const formattedInfluencers = influencersData.map((influencer, index) => ({
-          id: influencer._id || influencer.id || index,
-          name: influencer.name || 'Influencer',
-          avatar: influencer.avatar || '/dummyAvatar.jpg',
-          color: [
-            'bg-pink-500', 'bg-purple-600', 'bg-blue-500', 'bg-green-500',
-            'bg-yellow-500', 'bg-red-500', 'bg-indigo-600', 'bg-teal-500',
-            'bg-orange-500', 'bg-cyan-500'
-          ][index % 10]
-        }));
-
-        setTrendingInfluencers(formattedInfluencers);
-      } catch (error) {
-        console.error('Error fetching trending influencers:', error);
-        // Fallback to empty array
-        setTrendingInfluencers([]);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchTrendingInfluencers();
+    fetchTrendingInfluencers({ limit: 10 });
   }, [role]);
 
   return (

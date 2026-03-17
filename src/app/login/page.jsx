@@ -4,10 +4,8 @@ import { useForm } from 'react-hook-form';
 import { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '@/hooks';
 import { GoogleLogin, GoogleOAuthProvider } from '@react-oauth/google';
-import { authService } from '@/services';
-import { useApiMutation } from '@/hooks/useApi';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -46,15 +44,7 @@ function LoginForm() {
     const [showPassword, setShowPassword] = useState(false);
     const router = useRouter();
     const searchParams = useSearchParams();
-    const { isAuthenticated, login: contextLogin } = useAuth();
-
-    // API mutations
-    const { submit: login, loading } = useApiMutation(
-      (creds) => contextLogin(creds.email, creds.password)
-    );
-    const { submit: googleLogin, loading: googleLoading } = useApiMutation(
-      (data) => authService.googleAuth(data)
-    );
+    const { isAuthenticated, login, googleLogin, loading, user, error } = useAuth();
 
     // Check for verification success message
     const verified = searchParams.get('verified');
@@ -63,43 +53,44 @@ function LoginForm() {
 
     // Check if user is already authenticated
     useEffect(() => {
-        if (isAuthenticated()) {
-            let redirect = searchParams.get('redirect');
-            if (!redirect) {
-                // Check user type from localStorage
+        if (!isAuthenticated) {
+            return;
+        }
+
+        // User is authenticated, determine redirect
+        let redirect = searchParams.get('redirect') || searchParams.get('from');
+
+        if (!redirect) {
+            // Determine redirect from user data
+            try {
                 const userDataStr = localStorage.getItem('userData');
                 if (userDataStr) {
-                    try {
-                        const userData = JSON.parse(userDataStr);
-                        if (userData.type === 'USER') {
-                            // Check registration status for regular users
-                            if (userData.brandRegistrationStatus === 'COMPLETED') {
-                                redirect = '/brand/dashboard';
-                            } else if (userData.influencerRegistrationStatus === 'COMPLETED') {
-                                redirect = '/influencer/dashboard';
-                            } else {
-                                redirect = '/user/dashboard';
-                            }
-                        } else if (userData.type === 'BRAND') {
+                    const userData = JSON.parse(userDataStr);
+                    if (userData.type === 'USER') {
+                        if (userData.brandRegistrationStatus === 'COMPLETED') {
                             redirect = '/brand/dashboard';
-                        } else if (userData.type === 'INFLUENCER') {
+                        } else if (userData.influencerRegistrationStatus === 'COMPLETED') {
                             redirect = '/influencer/dashboard';
                         } else {
-                            redirect = '/';
+                            redirect = '/user/dashboard';
                         }
-                    } catch (e) {
-                        redirect = '/';
+                    } else if (userData.type === 'BRAND') {
+                        redirect = '/brand/dashboard';
+                    } else if (userData.type === 'INFLUENCER') {
+                        redirect = '/influencer/dashboard';
+                    } else if (userData.type === 'ADMIN') {
+                        redirect = '/admin/dashboard';
+                    } else {
+                        redirect = '/user/dashboard';
                     }
-                } else {
-                    redirect = '/';
                 }
+            } catch (e) {
+                redirect = '/user/dashboard';
             }
-            
-            // Only redirect if we're not already on the login page with a redirect param
-            // This prevents infinite loops
-            if (redirect) {
-                router.push(redirect);
-            }
+        }
+
+        if (redirect) {
+            router.push(redirect);
         }
     }, [isAuthenticated, router, searchParams]);
 
@@ -110,51 +101,11 @@ function LoginForm() {
         }
     }, [verified]);
 
-    const handleGoogleSuccess = async (credentialResponse) => {
-        try {
-            const result = await googleLogin({
-                idToken: credentialResponse.credential,
-                type: 'USER'
-            });
-
-            // Handle successful login
-            const userData = result.user;
-            if (userData) {
-                localStorage.setItem('userData', JSON.stringify(userData));
-                if (userData.email) {
-                    localStorage.setItem('userEmail', userData.email);
-                }
-                const userType = userData.type || 'USER';
-                document.cookie = `userType=${userType}; path=/; max-age=${7 * 24 * 60 * 60}`;
-            }
-
-            toast.success('Successfully signed in with Google!');
-
-            // Determine redirect based on user type and registration status
-            let redirect = searchParams.get('redirect');
-            if (!redirect) {
-                const userType = userData?.type;
-
-                if (userType === 'USER') {
-                    if (userData.brandRegistrationStatus === 'COMPLETED') {
-                        redirect = '/brand/dashboard';
-                    } else if (userData.influencerRegistrationStatus === 'COMPLETED') {
-                        redirect = '/influencer/dashboard';
-                    } else {
-                        redirect = '/user/dashboard';
-                    }
-                } else if (userType === 'BRAND') {
-                    redirect = '/brand/dashboard';
-                } else if (userType === 'INFLUENCER') {
-                    redirect = '/influencer/dashboard';
-                } else {
-                    redirect = '/';
-                }
-            }
-            setTimeout(() => router.push(redirect), 1000);
-        } catch (error) {
-            toast.error(error.message || 'Failed to sign in with Google');
-        }
+    const handleGoogleSuccess = (credentialResponse) => {
+        googleLogin({
+            idToken: credentialResponse.credential,
+            type: 'USER'
+        });
     };
 
     const handleGoogleError = () => {
@@ -162,25 +113,61 @@ function LoginForm() {
         toast.error('Google Sign-In was unsuccessful. Please try again.');
     };
 
-    const onSubmit = async (data) => {
-        try {
-            const result = await login({
-                email: data.email,
-                password: data.password
-            });
-
-            toast.success('Login successful! Welcome back!');
-
-            // Use redirect path from AuthContext, or fallback to query param or home
-            let redirect = result.redirectPath || searchParams.get('redirect') || '/';
-            setTimeout(() => router.push(redirect), 1000);
-        } catch (error) {
-            toast.error(error.message || 'Login failed');
-        }
+    const onSubmit = (data) => {
+        login({
+            email: data.email,
+            password: data.password
+        });
     };
 
+    // Monitor Redux state for login success
+    useEffect(() => {
+        if (isAuthenticated && user) {
+            toast.success('Login successful! Welcome back!');
+
+            // Store user data
+            localStorage.setItem('userData', JSON.stringify(user));
+            if (user.email) {
+                localStorage.setItem('userEmail', user.email);
+            }
+            const userType = user.type || 'USER';
+            document.cookie = `userType=${userType}; path=/; max-age=${7 * 24 * 60 * 60}`;
+
+            // Determine redirect
+            let redirect = searchParams.get('redirect') || searchParams.get('from');
+            if (!redirect) {
+                if (user.type === 'BRAND') {
+                    redirect = '/brand/dashboard';
+                } else if (user.type === 'INFLUENCER') {
+                    redirect = '/influencer/dashboard';
+                } else if (user.type === 'USER') {
+                    if (user.brandRegistrationStatus === 'COMPLETED') {
+                        redirect = '/brand/dashboard';
+                    } else if (user.influencerRegistrationStatus === 'COMPLETED') {
+                        redirect = '/influencer/dashboard';
+                    } else {
+                        redirect = '/user/dashboard';
+                    }
+                } else if (user.type === 'ADMIN') {
+                    redirect = '/admin/dashboard';
+                } else {
+                    redirect = '/user/dashboard';
+                }
+            }
+
+            setTimeout(() => router.push(redirect || '/user/dashboard'), 500);
+        }
+    }, [isAuthenticated, user, router, searchParams]);
+
+    // Monitor Redux state for errors
+    useEffect(() => {
+        if (error) {
+            toast.error(error);
+        }
+    }, [error]);
+
     // Show loading if checking authentication
-    if (isAuthenticated()) {
+    if (isAuthenticated) {
         return (
             <div className="min-h-screen flex items-center justify-center bg-neutral-base">
                 <div className="animate-spin rounded-full h-16 w-16 border-4 border-[#00897B] border-t-transparent"></div>
@@ -282,8 +269,8 @@ function LoginForm() {
                             </label>
                         </div>
 
-                        <button 
-                            type="submit" 
+                        <button
+                            type="submit"
                             disabled={loading}
                             className="w-full bg-[#43573B] hover:bg-[#2d4a3a] text-white font-semibold py-3 rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed mt-4"
                         >

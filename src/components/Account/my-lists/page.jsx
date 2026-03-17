@@ -4,9 +4,9 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { ArrowLeftLine, MoreLine, DeleteBinLine, DownloadLine, AddLine } from '@phyoofficial/phyo-icon-library';
 import { useGoBack } from '@/hooks/useGoBack';
-import Button from '@/components/Button';
-import IconButton from '@/components/IconButton';
-import Card from '@/components/Card';
+import Button from '@/components/ui/Button';
+import IconButton from '@/components/ui/IconButton';
+import Card from '@/components/ui/Card';
 
 export default function MyListsAll() {
   const router = useRouter();

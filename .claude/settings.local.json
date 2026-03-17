@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(wc -l /c/Phyo/phyo_client/src/components/Account/*/page.jsx)",
+      "Bash(ls -lh /c/Phyo/phyo_client/src/components/influencer-search/*.jsx /c/Phyo/phyo_client/src/app/influencer-search/advanced/page.jsx)",
+      "Read(//c/Phyo/phyo_client/.claude/worktrees/agent-a34e22a5/**)"
+    ]
+  }
+}

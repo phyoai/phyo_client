@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import SectionHeading from '@/components/SectionHeading';
 import InfluencerAvatar from '@/components/cards/InfluencerAvatar';
-import { dashboardService } from '@/services';
 import { useAuth } from '@/app/context/AuthContext';
+import { useInfluencers } from '@/hooks/useInfluencers';
 
 /**
  * Influencer List Section Component
@@ -18,40 +18,22 @@ export default function InfluencerListSection({
   const { getUserType } = useAuth();
   const role = (getUserType() || 'user').toLowerCase();
   const router = useRouter();
-  const [influencers, setInfluencers] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+
+  // Redux influencers hook
+  const { influencers: allInfluencers, loading, error, fetchInfluencers } = useInfluencers();
+
+  // Format and slice to limit
+  const influencers = (allInfluencers || [])
+    .slice(0, limit)
+    .map((influencer, index) => ({
+      id: influencer.id || influencer._id || index,
+      name: influencer.name || 'Influencer',
+      avatar: influencer.avatar || '/dummyAvatar.jpg',
+      color: getAvatarColor(index)
+    }));
 
   useEffect(() => {
-    const fetchInfluencers = async () => {
-      setLoading(true);
-      try {
-        // Use role-based API - different endpoints for different roles
-        const response = await dashboardService.getInfluencersByRole(role, { page: 1, limit });
-        const influencersData = response.data || [];
-
-        // Format and slice to limit
-        const formattedInfluencers = influencersData
-          .slice(0, limit)
-          .map((influencer, index) => ({
-            id: influencer.id || influencer._id || index, // fallback added
-            name: influencer.name || 'Influencer',
-            avatar: influencer.avatar || '/dummyAvatar.jpg',
-            color: getAvatarColor(index)
-          }));
-
-        setInfluencers(formattedInfluencers);
-        setError(null);
-      } catch (err) {
-        console.error('Error fetching influencers:', err);
-        setError('Failed to load influencers');
-        setInfluencers([]);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchInfluencers();
+    fetchInfluencers({ limit });
   }, [limit, role]);
   return (
     <div className="mb-8">

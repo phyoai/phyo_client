@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import BrandCard from '@/components/cards/BrandCard';
 import { useAuth } from '@/app/context/AuthContext';
-import { campaignService } from '@/services';
+import { useCampaigns } from '@/hooks/useCampaigns';
 
 /**
  * Explore Brands Section
@@ -12,59 +12,44 @@ export default function ExploreBrandsSection() {
   const router = useRouter();
   const { getUserType } = useAuth();
   const role = (getUserType() || 'user').toLowerCase();
-  const [brands, setBrands] = useState([]);
-  const [loading, setLoading] = useState(true);
+
+  // Redux campaigns hook
+  const { campaigns, loading, fetchCampaigns } = useCampaigns();
+
+  // Extract unique brands from campaigns
+  const brands = (() => {
+    const brandsMap = new Map();
+    (campaigns || []).forEach((campaign) => {
+      const brandKey = campaign.brand?.id || 'unknown';
+      if (!brandsMap.has(brandKey)) {
+        brandsMap.set(brandKey, {
+          id: campaign.brand?.id || Math.random(),
+          name: `${campaign.brand?.firstName || ''} ${campaign.brand?.lastName || 'Unknown Brand'}`.trim(),
+          companyName: campaign.brand?.companyName || '',
+          campaigns: 0,
+          totalBudget: 0
+        });
+      }
+      const brand = brandsMap.get(brandKey);
+      brand.campaigns += 1;
+      brand.totalBudget += campaign.budget || 0;
+    });
+
+    // Format brands with color coding
+    const colorOptions = [
+      'bg-yellow-500', 'bg-green-600', 'bg-blue-600', 'bg-red-600',
+      'bg-red-700', 'bg-yellow-500', 'bg-green-600', 'bg-blue-600'
+    ];
+
+    return Array.from(brandsMap.values()).slice(0, 8).map((brand, index) => ({
+      ...brand,
+      initial: (brand.name || brand.companyName || 'B').split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2),
+      color: colorOptions[index % colorOptions.length]
+    }));
+  })();
 
   useEffect(() => {
-    const fetchBrands = async () => {
-      setLoading(true);
-      try {
-        // Get campaigns and extract unique brands
-        const response = await campaignService.getCampaigns({
-          page: 1,
-          limit: 24
-        });
-
-        const brandsMap = new Map();
-        (response.data || []).forEach((campaign) => {
-          const brandKey = campaign.brand?.id || 'unknown';
-          if (!brandsMap.has(brandKey)) {
-            brandsMap.set(brandKey, {
-              id: campaign.brand?.id || Math.random(),
-              name: `${campaign.brand?.firstName || ''} ${campaign.brand?.lastName || 'Unknown Brand'}`.trim(),
-              companyName: campaign.brand?.companyName || '',
-              campaigns: 0,
-              totalBudget: 0
-            });
-          }
-          const brand = brandsMap.get(brandKey);
-          brand.campaigns += 1;
-          brand.totalBudget += campaign.budget || 0;
-        });
-
-        // Format brands with color coding
-        const colorOptions = [
-          'bg-yellow-500', 'bg-green-600', 'bg-blue-600', 'bg-red-600',
-          'bg-red-700', 'bg-yellow-500', 'bg-green-600', 'bg-blue-600'
-        ];
-
-        const formattedBrands = Array.from(brandsMap.values()).slice(0, 8).map((brand, index) => ({
-          ...brand,
-          initial: (brand.name || brand.companyName || 'B').split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2),
-          color: colorOptions[index % colorOptions.length]
-        }));
-
-        setBrands(formattedBrands);
-      } catch (error) {
-        console.error('Error fetching brands:', error);
-        // Fallback to empty array
-        setBrands([]);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchBrands();
+    fetchCampaigns({ limit: 24 });
   }, []);
 
   return (
@@ -107,7 +92,7 @@ export default function ExploreBrandsSection() {
                 brandName={brand.name}
                 brandInitial={brand.initial}
                 bgColor={brand.color}
-                onClick={() => router.push(`/${role}/brand/brand-profile/${brand.id}`)}
+                onClick={() => router.push(`/${role}/brand-profile/${brand.id}`)}
               />
             ))
           ) : (

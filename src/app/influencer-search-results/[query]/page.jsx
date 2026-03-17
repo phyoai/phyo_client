@@ -5,55 +5,31 @@ import { useRouter, useParams } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { UserLine, ArrowRightLine, CheckLine, LineChartLine } from '@phyoofficial/phyo-icon-library';
 import { useGoBack } from '@/hooks/useGoBack';
+import { useAI } from '@/hooks';
 
 export default function SearchResultsPage() {
   const router = useRouter();
   const goBack = useGoBack();
   const params = useParams();
   const query = params?.query;
-  
-  const [data, setData] = useState(null);
-  const [loading, setLoading] = useState(true);
+
   const [error, setError] = useState(null);
+  const { aiResults, search, loading } = useAI();
 
   useEffect(() => {
     if (query) {
-      fetchInfluencers(decodeURIComponent(query));
+      search(decodeURIComponent(query));
     }
   }, [query]);
 
-  const fetchInfluencers = async (searchQuery) => {
-    try {
-      setLoading(true);
-      setError(null);
-      
-      const res = await fetch('https://api.phyo.ai/api/ask', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt: searchQuery }),
-      });
-      
-      if (!res.ok) throw new Error('Failed to fetch');
-      
-      const result = await res.json();
-      
-      if (result.success && result.data) {
-        setData(result.data);
-        // Store in localStorage for the detail page
-        if (typeof window !== 'undefined') {
-          localStorage.setItem('influencer_search_results', JSON.stringify(result.data));
-        }
-      } else {
-        throw new Error(result.message || 'No data found');
+  useEffect(() => {
+    // Store in localStorage when results change
+    if (aiResults && aiResults.length > 0) {
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('influencer_search_results', JSON.stringify(aiResults));
       }
-      
-    } catch (err) {
-      console.error('Error fetching influencers:', err);
-      setError(err.message);
-    } finally {
-      setLoading(false);
     }
-  };
+  }, [aiResults]);
 
   const handleInfluencerClick = (username) => {
     router.push(`/influencer-details/${username}`);
@@ -110,15 +86,15 @@ export default function SearchResultsPage() {
             SearchLine Results
           </h1>
           <p className="text-gray-600">
-            Found <span className="font-bold text-green-600">{data?.length || 0}</span> influencer(s) for: 
+            Found <span className="font-bold text-green-600">{aiResults?.length || 0}</span> influencer(s) for:
             <span className="font-semibold ml-2">"{decodeURIComponent(query)}"</span>
           </p>
         </motion.div>
 
         {/* Results Grid */}
-        {data && data.length > 0 ? (
+        {aiResults && aiResults.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {data.map((influencer, index) => (
+            {aiResults.map((influencer, index) => (
               <InfluencerCard
                 key={influencer.username}
                 influencer={influencer}

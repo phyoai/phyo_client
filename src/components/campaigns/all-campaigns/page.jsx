@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { ArrowLeftLine, SearchLine, CloseLine, HeartLine } from '@phyoofficial/phyo-icon-library';
-import { campaignService } from '@/services';
+
 import { useApiQuery } from '@/hooks/useApi';
 import { useGoBack } from '@/hooks/useGoBack';
 import { useAuth } from '@/app/context/AuthContext';

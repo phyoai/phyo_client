@@ -3,7 +3,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { ArrowLeftLine, MoreLine, BookmarkLine, YoutubeFill, InstagramFill, TwitterXLine, UserAddLine, Message3Line, FacebookCircleFill } from '@phyoofficial/phyo-icon-library';
 import { useRouter, useParams } from 'next/navigation';
 import Image2Line from 'next/image';
-import { authAPI } from '@/utils/api';
+import { useInfluencers } from '@/hooks/useInfluencers';
 
 const influencersData = [
   {
@@ -151,9 +151,11 @@ const TopInfluencersPageDetails = () => {
   const [showNewListModal, setShowNewListModal] = useState(false);
   const [newListName, setNewListName] = useState('');
   const [displayInfluencer, setDisplayInfluencer] = useState(null);
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const moreMenuRef = useRef(null);
+
+  // Redux influencers hook
+  const { selectedInfluencer, loading, fetchInfluencerById } = useInfluencers();
 
   // Sample lists data
   const [savedLists, setSavedLists] = useState([
@@ -161,21 +163,27 @@ const TopInfluencersPageDetails = () => {
     { id: 2, name: 'Campaign 1', initials: 'AB', color: '#0066ff' }
   ]);
 
-  // Fetch influencer from API by ID
+  // Fetch influencer from Redux by ID
   useEffect(() => {
-    const fetchInfluencer = async () => {
-      if (!params?.id) {
-        setError('No influencer ID provided');
-        setLoading(false);
-        return;
-      }
+    if (!params?.id) {
+      setError('No influencer ID provided');
+      return;
+    }
 
-      try {
-        setLoading(true);
-        setError(null);
+    try {
+      setError(null);
+      // Fetch influencer using Redux hook
+      fetchInfluencerById(params.id);
+    } catch (err) {
+      console.error('Error fetching influencer:', err);
+      setError('Failed to load influencer data');
+    }
+  }, [params?.id, fetchInfluencerById]);
 
-        const response = await authAPI.getInfluencerById(params.id);
-        const influencer = response.data || response;
+  // Transform Redux selected influencer to display format
+  useEffect(() => {
+    if (selectedInfluencer) {
+      const influencer = selectedInfluencer;
 
         // Transform API response to match component's expected format
         const transformed = {
@@ -194,17 +202,10 @@ const TopInfluencersPageDetails = () => {
         };
 
         setDisplayInfluencer(transformed);
-      } catch (err) {
-        console.error('Error fetching influencer:', err);
-        setError('Failed to load influencer data');
-        setDisplayInfluencer(null);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchInfluencer();
-  }, [params?.id]);
+    } else {
+      setDisplayInfluencer(null);
+    }
+  }, [selectedInfluencer]);
 
   const handleBack = () => {
     router.push('/brand/dashboard');

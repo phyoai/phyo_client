@@ -2,50 +2,20 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { ArrowLeftLine, SearchLine, MoreLine, HeartLine } from '@phyoofficial/phyo-icon-library';
-import { campaignAPI } from '../../../utils/api';
+import { useCampaigns } from '@/hooks/useCampaigns';
 import { useGoBack } from '@/hooks/useGoBack';
 
 export default function AllDraft() {
   const router = useRouter();
   const goBack = useGoBack();
-  const [drafts, setDrafts] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [pagination, setPagination] = useState({
-    currentPage: 1,
-    totalPages: 1,
-    totalItems: 0,
-    itemsPerPage: 10,
-    hasNext: false,
-    hasPrev: false
-  });
+  const { campaigns, loading, pagination, fetchCampaigns } = useCampaigns();
+
+  // Filter draft campaigns from Redux state
+  const drafts = campaigns.filter(campaign => campaign.status === 'Draft');
 
   useEffect(() => {
-    fetchDrafts();
+    fetchCampaigns({ page: 1, limit: 20 });
   }, []);
-
-  const fetchDrafts = async (page = 1, limit = 20) => {
-    setLoading(true);
-    try {
-      const response = await campaignAPI.getCampaigns({ page, limit });
-      const allCampaigns = response.data || [];
-      // Filter only draft campaigns
-      const draftCampaigns = allCampaigns.filter(campaign => campaign.status === 'Draft');
-      setDrafts(draftCampaigns);
-      setPagination(response.pagination || {
-        currentPage: 1,
-        totalPages: 1,
-        totalItems: 0,
-        itemsPerPage: 20,
-        hasNext: false,
-        hasPrev: false
-      });
-    } catch (error) {
-      console.error('Error fetching drafts:', error);
-      setDrafts([]);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleDraftClick = (draft) => {
     console.log('Draft clicked:', draft);

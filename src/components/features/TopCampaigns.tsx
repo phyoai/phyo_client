@@ -1,7 +1,7 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { campaignService, type Campaign } from '@/services';
+import { useEffect } from 'react';
+import { useCampaigns } from '@/hooks/useCampaigns';
 import { Loader, ArrowRight } from 'lucide-react';
 
 interface TopCampaignsProps {
@@ -11,41 +11,44 @@ interface TopCampaignsProps {
 }
 
 export default function TopCampaigns({ limit = 6, category, type = 'active' }: TopCampaignsProps) {
-  const [campaigns, setCampaigns] = useState<Campaign[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { campaigns, loading, error, fetchCampaigns } = useCampaigns();
 
   useEffect(() => {
-    const fetchCampaigns = async () => {
-      try {
-        setLoading(true);
-        setError(null);
+    fetchCampaigns({ limit: limit ? limit * 2 : 12 });
+  }, [limit, fetchCampaigns]);
 
-        const response = await campaignService.getCampaigns({
-          page: 1,
-          limit: limit * 2 // Fetch more to filter
-        });
-
-        let filteredCampaigns = response.data || [];
-
-        // Filter by status
-        if (type === 'active') {
-          filteredCampaigns = filteredCampaigns.filter((c) => c.status === 'active');
-        } else if (type === 'trending') {
-          filteredCampaigns = filteredCampaigns.sort((a, b) => b.budget - a.budget);
-        }
-
-        setCampaigns(filteredCampaigns.slice(0, limit));
-      } catch (err: any) {
-        setError(err?.response?.data?.message || 'Failed to load campaigns');
-        console.error('Error fetching campaigns:', err);
-      } finally {
-        setLoading(false);
+  const filteredCampaigns = (campaigns || [])
+    .filter((c: any) => {
+      if (type === 'active') {
+        return c.status === 'Active' || c.status === 'active';
+      } else if (type === 'trending') {
+        return true; // All for trending, will sort
       }
-    };
+      return true;
+    })
+    .sort((a: any, b: any) => {
+      if (type === 'trending') {
+        return (b.budget || 0) - (a.budget || 0);
+      }
+      return 0;
+    })
+    .slice(0, limit || 6);
 
-    fetchCampaigns();
-  }, [limit, category, type]);
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <Loader className="animate-spin" />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
+        <p className="text-red-600 dark:text-red-400">{error}</p>
+      </div>
+    );
+  }
 
   if (loading) {
     return (
@@ -65,7 +68,7 @@ export default function TopCampaigns({ limit = 6, category, type = 'active' }: T
 
   return (
     <div className="w-full space-y-4">
-      {campaigns.map((campaign, index) => (
+      {filteredCampaigns.map((campaign: any, index: number) => (
         <div
           key={campaign.id}
           className="bg-white dark:bg-[#1a1a1a] rounded-lg border border-gray-200 dark:border-gray-800 p-4 hover:shadow-lg transition-all duration-300 cursor-pointer group"
@@ -83,7 +86,7 @@ export default function TopCampaigns({ limit = 6, category, type = 'active' }: T
               <div className="flex items-start justify-between gap-2">
                 <div>
                   <h3 className="font-semibold text-lg truncate group-hover:text-blue-600 transition-colors">
-                    {campaign.title}
+                    {campaign.name}
                   </h3>
                   <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2 mt-1">
                     {campaign.description}
@@ -96,29 +99,29 @@ export default function TopCampaigns({ limit = 6, category, type = 'active' }: T
               <div className="flex flex-wrap gap-4 mt-3 text-sm">
                 <div>
                   <span className="text-gray-600 dark:text-gray-400">Budget: </span>
-                  <span className="font-semibold text-green-600">${campaign.budget.toLocaleString()}</span>
-                </div>
-                <div>
-                  <span className="text-gray-600 dark:text-gray-400">Influencers: </span>
-                  <span className="font-semibold">{campaign.influencerCount}</span>
+                  <span className="font-semibold text-green-600">
+                    ${campaign.budget ? campaign.budget.toLocaleString() : '0'}
+                  </span>
                 </div>
                 <div>
                   <span className="text-gray-600 dark:text-gray-400">Status: </span>
                   <span
                     className={`font-semibold px-2 py-1 rounded text-xs ${
-                      campaign.status === 'active'
+                      campaign.status === 'Active' || campaign.status === 'active'
                         ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
                         : 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300'
                     }`}
                   >
-                    {campaign.status}
+                    {campaign.status || 'Active'}
                   </span>
                 </div>
               </div>
 
-              {/* Dates */}
+              {/* Created Date */}
               <div className="mt-2 text-xs text-gray-500">
-                {new Date(campaign.startDate).toLocaleDateString()} - {new Date(campaign.endDate).toLocaleDateString()}
+                {campaign.createdAt
+                  ? new Date(campaign.createdAt).toLocaleDateString()
+                  : 'Recently created'}
               </div>
             </div>
           </div>
@@ -135,7 +138,7 @@ export default function TopCampaigns({ limit = 6, category, type = 'active' }: T
         </div>
       ))}
 
-      {campaigns.length === 0 && (
+      {filteredCampaigns.length === 0 && (
         <div className="text-center py-12">
           <p className="text-gray-500 dark:text-gray-400">No campaigns found</p>
         </div>

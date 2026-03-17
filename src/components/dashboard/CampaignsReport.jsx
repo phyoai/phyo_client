@@ -1,6 +1,6 @@
 'use client'
 import React, { useEffect, useState, memo, useCallback } from 'react';
-import SearchBar from '@/components/SearchBar';
+import SearchBar from '@/components/ui/SearchBar';
 import UserProfile from '@/components/UserProfile';
 import MetricCard from '@/components/MetricCard';
 import {

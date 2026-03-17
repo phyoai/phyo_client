@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { campaignService } from '@/services';
+
 import { Loader } from 'lucide-react';
 
 export default function CategoryCampaigns({

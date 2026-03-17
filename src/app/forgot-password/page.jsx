@@ -1,8 +1,7 @@
 'use client'
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { authService } from '@/services';
-import { useApiMutation } from '@/hooks/useApi';
+import { useAuth } from '@/hooks';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -16,48 +15,42 @@ const ForgotPassword = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const router = useRouter();
+  const { forgotPass, verifyCode: verifyCodeAction, resetPass, loading, error, resetCodeVerified } = useAuth();
 
-  const { submit: forgotPassword, loading: forgotLoading } = useApiMutation(
-    (data) => authService.forgotPassword(data.email)
-  );
-  const { submit: verifyCodeMutation, loading: verifyLoading } = useApiMutation(
-    (data) => authService.verifyCode(data.email, data.code)
-  );
-  const { submit: resetPasswordMutation, loading: resetLoading } = useApiMutation(
-    (data) => authService.resetPassword(data)
-  );
+  // Monitor error notifications
+  useEffect(() => {
+    if (error) {
+      toast.error(error);
+    }
+  }, [error]);
 
-  const loading = forgotLoading || verifyLoading || resetLoading;
+  // Monitor step progression
+  useEffect(() => {
+    if (resetCodeVerified) {
+      setStep(3);
+    }
+  }, [resetCodeVerified]);
 
-  const sendForgotPasswordEmail = async () => {
+  const sendForgotPasswordEmail = () => {
     if (!email) {
       toast.error('Please enter your email address');
       return;
     }
-    try {
-      await forgotPassword({ email });
-      toast.success('📧 Verification code sent to your email!');
-      setStep(2);
-    } catch (error) {
-      toast.error(error?.message || 'Failed to send verification code');
-    }
+    forgotPass(email);
+    toast.success('📧 Verification code sent to your email!');
+    setStep(2);
   };
 
-  const verifyCode = async () => {
+  const verifyCode = () => {
     if (!verificationCode) {
       toast.error('Please enter the verification code');
       return;
     }
-    try {
-      await verifyCodeMutation({ email, code: verificationCode });
-      toast.success('✅ Code verified successfully!');
-      setStep(3);
-    } catch (error) {
-      toast.error(error?.message || 'Invalid verification code');
-    }
+    verifyCodeAction(email, verificationCode);
+    toast.success('✅ Code verified successfully!');
   };
 
-  const resetPassword = async () => {
+  const resetPassword = () => {
     if (!newPassword || !confirmNewPassword) {
       toast.error('Please fill in all password fields');
       return;
@@ -70,15 +63,11 @@ const ForgotPassword = () => {
       toast.error('Password must be at least 6 characters long');
       return;
     }
-    try {
-      await resetPasswordMutation({ email, newPassword });
-      toast.success('✅ Password reset successfully! Redirecting to login...');
-      setTimeout(() => {
-        router.replace('/login');
-      }, 2000);
-    } catch (error) {
-      toast.error(error?.message || 'Failed to reset password');
-    }
+    resetPass(email, newPassword);
+    toast.success('✅ Password reset successfully! Redirecting to login...');
+    setTimeout(() => {
+      router.replace('/login');
+    }, 2000);
   };
 
   return (

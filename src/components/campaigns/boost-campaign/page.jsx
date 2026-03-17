@@ -1,9 +1,9 @@
 'use client'
 import React, { useState } from 'react';
 import { ArrowLeftLine, MoreLine, LineChartLine, UserLine, Clock, AlertCircle } from '@phyoofficial/phyo-icon-library';
-import Button from '@/components/Button';
-import IconButton from '@/components/IconButton';
-import Card from '@/components/Card';
+import Button from '@/components/ui/Button';
+import IconButton from '@/components/ui/IconButton';
+import Card from '@/components/ui/Card';
 
 export default function BoostCampaigns() {
   const [selectedOptions, setSelectedOptions] = useState([]);

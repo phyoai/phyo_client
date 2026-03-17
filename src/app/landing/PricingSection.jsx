@@ -9,6 +9,7 @@ const PricingSection = () => {
   const [loading, setLoading] = useState(false);
   const [processingPlan, setProcessingPlan] = useState(null);
   const [userPlan, setUserPlan] = useState(null);
+  const [planLoading, setPlanLoading] = useState(false);
   const { isAuthenticated } = useAuth();
   const router = useRouter();
 
@@ -28,13 +29,18 @@ const PricingSection = () => {
   }, [isAuthenticated]);
 
   const checkUserPlan = async () => {
+    setPlanLoading(true);
     try {
       const response = await paymentService.getUserPlan();
-      if (response.success) {
-        setUserPlan(response.data.currentPlan);
+      if (response && response.success) {
+        setUserPlan(response.data?.currentPlan);
       }
     } catch (error) {
-      console.error('Error fetching user plan:', error);
+      // Handle missing endpoint gracefully - default to no plan
+      console.warn('Could not fetch user plan:', error?.message || error);
+      setUserPlan(null);
+    } finally {
+      setPlanLoading(false);
     }
   };
 

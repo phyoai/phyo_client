@@ -2,24 +2,25 @@ import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import SectionHeading from '@/components/SectionHeading';
 import CampaignCard from '@/components/cards/CampaignCard';
-import { dashboardService } from '@/services';
 import { useAuth } from '@/app/context/AuthContext';
+import { useCampaigns } from '@/hooks/useCampaigns';
 
 /**
  * Campaign Section Component
  * Reusable component for displaying campaign grids with custom titles
  */
-export default function CampaignSection({ 
-  title, 
+export default function CampaignSection({
+  title,
   eyebrow,
   campaignsCount = 3,
-  showViewAll = true 
+  showViewAll = true
 }) {
   const { getUserType } = useAuth();
-    const role = (getUserType() || 'user').toLowerCase();
+  const role = (getUserType() || 'user').toLowerCase();
   const router = useRouter();
-  const [campaignsAll, setCampaigns] = useState([]);
-  const [loading, setLoading] = useState(true);
+
+  // Redux campaigns hook
+  const { campaigns: campaignsAll, loading, fetchCampaigns } = useCampaigns();
 
   // Helper function to calculate time ago
   const getTimeAgo = (date) => {
@@ -62,46 +63,10 @@ export default function CampaignSection({
     campaignImage: campaign.productImages?.[0] || '/dummyAvatar.jpg',
     initialsColor: getInitialsColor(campaign._id)
   }));
-   const [pagination, setPagination] = useState({
-    currentPage: 1,
-    totalPages: 1,
-    totalItems: 0,
-    itemsPerPage: 10,
-    hasNext: false,
-    hasPrev: false
-  });
-
+  // Load campaigns on mount
   useEffect(() => {
     fetchCampaigns();
   }, [role]);
-   const fetchCampaigns = async (page = 1, limit = 20) => {
-    setLoading(true);
-    try {
-      // Use role-based API - different endpoints for different roles
-      const response = await dashboardService.getCampaignsByRole(role, { page, limit });
-      const allCampaigns = response.data || [];
-      // Filter out draft campaigns (be flexible with status values)
-      const activeCampaigns = allCampaigns.filter(campaign => {
-        const status = (campaign.status || '').toLowerCase();
-        return status !== 'draft' && campaign._id; // Exclude drafts and invalid campaigns
-      });
-      setCampaigns(activeCampaigns);
-      setPagination(response.pagination || {
-        currentPage: 1,
-        totalPages: 1,
-        totalItems: 0,
-        itemsPerPage: 20,
-        hasNext: false,
-        hasPrev: false
-      });
-      // console.log('Fetched campaigns for role:', role, 'Total:', allCampaigns.length, 'Active:', activeCampaigns.length);
-    } catch (error) {
-      console.error('Error fetching campaigns:', error);
-      setCampaigns([]);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   return (
     <div className="mb-8">

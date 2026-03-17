@@ -1,11 +1,12 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { ArrowLeftLine } from '@phyoofficial/phyo-icon-library';
-import AppBar from '@/components/AppBar';
-import Button from '@/components/Button';
-import IconButton from '@/components/IconButton';
+import AppBar from '@/components/ui/AppBar';
+import Button from '@/components/ui/Button';
+import IconButton from '@/components/ui/IconButton';
+import { usePayment } from '@/hooks';
 import { colors } from '@/config/colors';
 
 const RadioButton = ({ selected = false, disabled = false, onChange }) => {
@@ -33,7 +34,19 @@ const RadioButton = ({ selected = false, disabled = false, onChange }) => {
 
 export default function UpgradePlanAll() {
   const router = useRouter();
+  const {
+    plans: reduxPlans,
+    userPlan,
+    loading,
+    error,
+    fetchSubscriptionPlans,
+    fetchUserPlan,
+    fetchCreditInfo,
+    createNewPaymentOrder
+  } = usePayment();
+
   const [selectedPlan, setSelectedPlan] = useState('free');
+  const [selectedBillingCycle, setSelectedBillingCycle] = useState('MONTHLY');
   const [showBillingForm, setShowBillingForm] = useState(false);
   const [paymentSuccess, setPaymentSuccess] = useState(false);
   const [billingData, setBillingData] = useState({
@@ -46,7 +59,15 @@ export default function UpgradePlanAll() {
     state: ''
   });
 
-  const plans = [
+  // Fetch data on mount
+  useEffect(() => {
+    fetchSubscriptionPlans();
+    fetchUserPlan();
+    fetchCreditInfo();
+  }, [fetchSubscriptionPlans, fetchUserPlan, fetchCreditInfo]);
+
+  // Use Redux plans or fallback to default plans
+  const plans = reduxPlans && reduxPlans.length > 0 ? reduxPlans : [
     {
       id: 'free',
       name: 'Free',
@@ -129,12 +150,70 @@ export default function UpgradePlanAll() {
     }
   ];
 
+  // Set current plan from userPlan
+  useEffect(() => {
+    if (userPlan && userPlan.planId) {
+      setSelectedPlan(userPlan.planId);
+    }
+  }, [userPlan]);
+
+  // Error state
+  if (error && !loading) {
+    return (
+      <div className="h-screen flex flex-col" style={{ backgroundColor: colors.neutral.base }}>
+        <AppBar
+          title="Plans & Billings"
+          onBack={() => router.push('/brand/account')}
+        />
+        <div className="flex-1 flex flex-col items-center justify-center px-4">
+          <p className="text-lg font-semibold mb-4" style={{ color: colors.semantic.error.bold }}>
+            Error loading plans
+          </p>
+          <p className="text-sm text-center mb-6" style={{ color: colors.text.neutral.muted }}>
+            {error}
+          </p>
+          <Button
+            variant="primary"
+            size="lg"
+            onClick={() => {
+              fetchSubscriptionPlans();
+              fetchUserPlan();
+              fetchCreditInfo();
+            }}
+          >
+            Retry
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  // Loading state
+  if (loading) {
+    return (
+      <div className="h-screen flex flex-col" style={{ backgroundColor: colors.neutral.base }}>
+        <AppBar
+          title="Plans & Billings"
+          onBack={() => router.push('/brand/account')}
+        />
+        <div className="flex-1 flex items-center justify-center">
+          <div className="flex flex-col items-center gap-4">
+            <svg className="animate-spin h-8 w-8" style={{ color: colors.brand.base }} fill="none" viewBox="0 0 24 24">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+            </svg>
+            <p style={{ color: colors.text.neutral.muted }}>Loading plans...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   // Payment success view
- // Payment success view
-if (paymentSuccess) {
-  return (
-    <div className="h-screen flex flex-col items-center justify-center px-3 sm:px-4 md:px-6" style={{ backgroundColor: colors.neutral.base }}>
-      <style>{`
+  if (paymentSuccess) {
+    return (
+      <div className="h-screen flex flex-col items-center justify-center px-3 sm:px-4 md:px-6" style={{ backgroundColor: colors.neutral.base }}>
+        <style>{`
         @keyframes popScale {
           0% {
             transform: scale(0);
@@ -174,42 +253,54 @@ if (paymentSuccess) {
         }
       `}</style>
 
-      <IconButton
-        icon={ArrowLeftLine}
-        size="lg"
-        variant="default"
-        onClick={() => router.push('/brand/account')}
-        className="absolute top-4 left-4"
-      />
-
-      <div className="flex flex-col items-center gap-6">
-        <div className="pop-scale">
-          <svg width="150" height="150" viewBox="0 0 150 150" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <rect width="150" height="150" fill={colors.accent.subtle}/>
-            <circle cx="75" cy="75" r="60" fill={colors.brand.base}/>
-            <path d="M55 75L68 88L95 60" stroke="white" strokeWidth="8" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
-          </svg>
-        </div>
-
-        <h1 className="text-3xl font-bold text-center" style={{ color: colors.text.neutral.base }}>
-          Payment successful
-        </h1>
-
-        <p className="text-lg text-center max-w-md" style={{ color: colors.text.neutral.muted }}>
-          Your plan has been updated and all features are now unlocked.
-        </p>
-
-        <Button
-          variant="primary"
+        <IconButton
+          icon={ArrowLeftLine}
           size="lg"
-          onClick={() => router.push('/brand/dashboard')}
-        >
-          Go to home
-        </Button>
+          variant="default"
+          onClick={() => router.push('/brand/account')}
+          className="absolute top-4 left-4"
+        />
+
+        <div className="flex flex-col items-center gap-6">
+          <div className="pop-scale">
+            <svg width="150" height="150" viewBox="0 0 150 150" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect width="150" height="150" fill={colors.accent.subtle} />
+              <circle cx="75" cy="75" r="60" fill={colors.brand.base} />
+              <path d="M55 75L68 88L95 60" stroke="white" strokeWidth="8" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+            </svg>
+          </div>
+
+          <h1 className="text-3xl font-bold text-center" style={{ color: colors.text.neutral.base }}>
+            Payment successful
+          </h1>
+
+          <p className="text-lg text-center max-w-md" style={{ color: colors.text.neutral.muted }}>
+            Your plan has been updated and all features are now unlocked.
+          </p>
+
+          <Button
+            variant="primary"
+            size="lg"
+            onClick={() => router.push('/brand/dashboard')}
+          >
+            Go to home
+          </Button>
+        </div>
       </div>
-    </div>
-  );
-}
+    );
+  }
+
+  // Handle plan upgrade
+  const handleUpgradeClick = async () => {
+    if (selectedPlan === 'free' || !selectedPlan) return;
+
+    try {
+      await createNewPaymentOrder(selectedPlan, selectedBillingCycle);
+      setShowBillingForm(true);
+    } catch (err) {
+      console.error('Payment order creation failed:', err);
+    }
+  };
 
   // Billing form view
   if (showBillingForm) {
@@ -366,23 +457,53 @@ if (paymentSuccess) {
         onMenuClick={() => console.log('Open menu')}
       />
 
+      {/* Billing Cycle Toggle */}
+      <div className="px-3 sm:px-4 md:px-6 lg:px-9 py-3 sm:py-4 border-b" style={{ borderColor: colors.neutral.muted }}>
+        <div className="flex items-center justify-center gap-4">
+          <label className="flex items-center gap-2 cursor-pointer">
+            <input
+              type="radio"
+              name="billingCycle"
+              value="MONTHLY"
+              checked={selectedBillingCycle === 'MONTHLY'}
+              onChange={(e) => setSelectedBillingCycle(e.target.value)}
+              className="w-4 h-4"
+            />
+            <span style={{ color: colors.text.neutral.base }}>Monthly</span>
+          </label>
+          <label className="flex items-center gap-2 cursor-pointer">
+            <input
+              type="radio"
+              name="billingCycle"
+              value="ANNUAL"
+              checked={selectedBillingCycle === 'ANNUAL'}
+              onChange={(e) => setSelectedBillingCycle(e.target.value)}
+              className="w-4 h-4"
+            />
+            <span style={{ color: colors.text.neutral.base }}>Annual</span>
+          </label>
+        </div>
+      </div>
+
       {/* Plans Container */}
       <div className="flex-1 px-3 sm:px-4 md:px-6 lg:px-9 py-3 sm:py-4">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 h-auto">
-          {plans.map((plan) => (
+          {plans.map((plan) => {
+            const isCurrentPlan = userPlan && userPlan.planId === plan.id;
+            return (
             <div
               key={plan.id}
               className={`border-2 rounded-xl flex flex-col py-3 transition-all hover:shadow-lg cursor-pointer`}
               style={{
                 backgroundColor: colors.neutral.muted,
-                borderColor: plan.borderColor
+                borderColor: plan.borderColor || colors.neutral.muted
               }}
-              onClick={() => !plan.isCurrent && setSelectedPlan(plan.id)}
+              onClick={() => !isCurrentPlan && setSelectedPlan(plan.id)}
             >
-              {/* Current Plan Label (only for free plan) */}
-              {plan.isCurrent && (
+              {/* Current Plan Label */}
+              {isCurrentPlan && (
                 <div className="px-4 mb-3">
-                  <p className="text-xs tracking-wide" style={{ color: colors.text.neutral.muted, fontFamily: 'Inter, sans-serif' }}>
+                  <p className="text-xs tracking-wide font-semibold" style={{ color: colors.brand.base, fontFamily: 'Inter, sans-serif' }}>
                     Current Plan
                   </p>
                 </div>
@@ -390,15 +511,15 @@ if (paymentSuccess) {
 
               {/* Tag & Radio Button */}
               <div className="flex items-center justify-between pl-4 mb-5">
-                <div className={`${plan.tagColor} border rounded px-1.5 py-0.5`}>
-                  <span className={`${plan.textColor} text-xs font-medium tracking-wide`} style={{ fontFamily: 'Work Sans, sans-serif' }}>
+                <div className={`${plan.tagColor || 'bg-gray-200 border-gray-400'} border rounded px-1.5 py-0.5`}>
+                  <span className={`${plan.textColor || 'text-gray-800'} text-xs font-medium tracking-wide`} style={{ fontFamily: 'Work Sans, sans-serif' }}>
                     {plan.name}
                   </span>
                 </div>
                 <RadioButton
                   selected={selectedPlan === plan.id}
-                  disabled={plan.isCurrent}
-                  onChange={() => !plan.isCurrent && setSelectedPlan(plan.id)}
+                  disabled={isCurrentPlan}
+                  onChange={() => !isCurrentPlan && setSelectedPlan(plan.id)}
                 />
               </div>
 
@@ -406,7 +527,7 @@ if (paymentSuccess) {
               <div className="flex flex-col gap-0 mb-5">
                 <div className="px-4">
                   <p className="text-4xl font-bold leading-tight" style={{ color: colors.text.neutral.base, fontFamily: 'Manrope, sans-serif' }}>
-                    {plan.price}
+                    {plan.price || '₹0'}
                   </p>
                 </div>
                 <div className="px-4">
@@ -419,7 +540,7 @@ if (paymentSuccess) {
               {/* Benefits */}
               <div className="flex-1 px-4 overflow-y-auto">
                 <ul className="text-base space-y-1" style={{ color: colors.text.neutral.base, fontFamily: 'Work Sans, sans-serif' }}>
-                  {plan.benefits.map((benefit, index) => (
+                  {(plan.benefits || []).map((benefit, index) => (
                     <li key={index} className="flex items-start leading-6">
                       <span className="mr-2">•</span>
                       <span>{benefit}</span>
@@ -428,7 +549,8 @@ if (paymentSuccess) {
                 </ul>
               </div>
             </div>
-          ))}
+            );
+          })}
         </div>
       </div>
 
@@ -437,8 +559,9 @@ if (paymentSuccess) {
         <Button
           variant="primary"
           size="lg"
-          onClick={() => setShowBillingForm(true)}
-          disabled={selectedPlan === 'free'}
+          onClick={handleUpgradeClick}
+          disabled={selectedPlan === 'free' || loading}
+          loading={loading}
         >
           {selectedPlan === 'free' ? 'Select a plan to proceed' : 'Proceed to billing'}
         </Button>

@@ -4,10 +4,10 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { ArrowLeftLine, FileTextLine, Message3Line, MailLine, PhoneLine, CloseLine, SearchLine } from '@phyoofficial/phyo-icon-library';
 import { useGoBack } from '@/hooks/useGoBack';
-import AppBar from '@/components/AppBar';
-import Button from '@/components/Button';
-import IconButton from '@/components/IconButton';
-import Card from '@/components/Card';
+import AppBar from '@/components/ui/AppBar';
+import Button from '@/components/ui/Button';
+import IconButton from '@/components/ui/IconButton';
+import Card from '@/components/ui/Card';
 import { colors } from '@/config/colors';
 
 export default function HelpSupportAll() {

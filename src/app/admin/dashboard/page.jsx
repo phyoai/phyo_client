@@ -2,9 +2,9 @@
 import { useState, useEffect } from "react";
 import { adminAPI } from "@/utils/api";
 import { useRouter } from "next/navigation";
-import Button from '@/components/Button';
-import IconButton from '@/components/IconButton';
-import Card from '@/components/Card';
+import Button from '@/components/ui/Button';
+import IconButton from '@/components/ui/IconButton';
+import Card from '@/components/ui/Card';
 
 const TABS = ["Brands", "Influencers"];
 

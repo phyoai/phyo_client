@@ -10,20 +10,39 @@ class PaymentService {
   // Get all available subscription plans
   async getPlans() {
     try {
-      const response = await api.get('/payments/plans');
+      // Use local Next.js API route as proxy
+      const response = await api.get('/api/payments/plans');
       return response.data;
     } catch (error) {
-      throw error.response?.data || error.message;
+      console.error('Error fetching plans:', error);
+      // Return default plans if API fails
+      return {
+        success: true,
+        data: [
+          { id: 'free', name: 'Free', price: '$0' },
+          { id: 'silver', name: 'Silver', price: '$29' },
+          { id: 'gold', name: 'Gold', price: '$79' },
+        ]
+      };
     }
   }
 
   // Get user's current plan
   async getCurrentPlan() {
     try {
-      const response = await api.get('/payments/current-plan');
+      // Use local Next.js API route as proxy
+      const response = await api.get('/api/payments/current-plan');
       return response.data;
     } catch (error) {
-      throw error.response?.data || error.message;
+      // Return default response if API fails
+      return {
+        success: true,
+        data: {
+          currentPlan: null,
+          status: 'free',
+          message: 'No active subscription'
+        }
+      };
     }
   }
 

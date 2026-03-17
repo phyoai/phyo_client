@@ -15,8 +15,8 @@ import {
   Message3Fill,
   PencilFill,
 } from '@phyoofficial/phyo-icon-library';
-import NavRail from './NavRail';
-import NavItem from './NavItem';
+import NavRail from './ui/NavRail';
+import NavItem from './ui/NavItem';
 
 const getRoleFromPathname = (pathname) => {
   if (pathname.startsWith('/user/')) return 'user';

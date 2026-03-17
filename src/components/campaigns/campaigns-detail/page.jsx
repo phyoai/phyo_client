@@ -1,14 +1,14 @@
 'use client'
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { Image2Line as Image2Line, CalendarLine,ArrowLeftLine, LineChartLine, UserLine, BarChartLine, MoneyDollarBoxLine, DownloadLine, FileTextLine, MoreLine, AddLine, SearchLine, VideoLine } from '@phyoofficial/phyo-icon-library';
 import { SpendingBudgetGraph } from '@/components/SpendingBudgetGraph';
 import { LineChartGraph } from '@/components/AudienceEngagementGraphs';
-import Button from '@/components/Button';
-import IconButton from '@/components/IconButton';
-import Card from '@/components/Card';
-import { campaignAPI } from '@/utils/api';
+import Button from '@/components/ui/Button';
+import IconButton from '@/components/ui/IconButton';
+import Card from '@/components/ui/Card';
+import { useCampaigns } from '@/hooks/useCampaigns';
 import { useGoBack } from '@/hooks/useGoBack';
 
 export default function CampaignDetailPage() {
@@ -17,31 +17,18 @@ export default function CampaignDetailPage() {
   const goBack = useGoBack();
   const campaignId = params.id;
 
-  const [campaign, setCampaign] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const { selectedCampaign, loading, fetchCampaignById } = useCampaigns();
   const [activeTab, setActiveTab] = useState('overview');
   const [responded, setResponded] = useState(false);
   const [images, setImages] = useState([]); // This will hide the images section
 
-
-
-  React.useEffect(() => {
+  useEffect(() => {
     if (campaignId) {
-      fetchCampaignDetails();
+      fetchCampaignById(campaignId);
     }
-  }, [campaignId]);
+  }, [campaignId, fetchCampaignById]);
 
-  const fetchCampaignDetails = async () => {
-    setLoading(true);
-    try {
-      const response = await campaignAPI.getCampaignById(campaignId);
-      setCampaign(response.data || response);
-    } catch (error) {
-      console.error('Error fetching campaign details:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const campaign = selectedCampaign;
 
   if (loading) {
     return (

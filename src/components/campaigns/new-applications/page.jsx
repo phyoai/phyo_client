@@ -5,9 +5,9 @@ import { useRouter } from 'next/navigation';
 import Image2Line from 'next/image';
 import RejectionModal from '@/components/RejectionModal';
 import NewApplicationsSkeleton from '@/components/NewApplicationsSkeleton';
-import Button from '@/components/Button';
-import IconButton from '@/components/IconButton';
-import { influencerAPI } from '@/utils/api';
+import Button from '@/components/ui/Button';
+import IconButton from '@/components/ui/IconButton';
+import { useInfluencers } from '@/hooks/useInfluencers';
 
 const mockApplicationsData = [
   {
@@ -229,76 +229,60 @@ const mockApplicationsData = [
 
 const NewApplicationsPages = () => {
   const router = useRouter();
-  const [applications, setApplications] = useState([]);
+  const { influencers: reduxInfluencers, loading, fetchInfluencers } = useInfluencers();
   const [selectedApplication, setSelectedApplication] = useState(null);
   const [activeTab, setActiveTab] = useState('info');
   const [showRejectionModal, setShowRejectionModal] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
 
-  // Fetch applications from API
-  useEffect(() => {
-    const fetchApplications = async () => {
-      setIsLoading(true);
-      try {
-        const response = await influencerAPI.getInfluencers({ page: 1, limit: 20 });
-        const influencersData = response.data || [];
-
-        // Transform influencer data to applications format
-        const formattedApplications = influencersData.map((influencer, index) => ({
-          id: influencer._id || influencer.id || index,
-          name: influencer.name || 'Unknown',
-          username: `@${(influencer.name || 'user').toLowerCase().replace(/\s/g, '')}`,
-          bio: influencer.bio || 'Professional influencer',
-          avatar: influencer.avatar || '/dummyAvatar.jpg',
-          coverImage: '/world-bg.png',
-          stats: {
-            brandCollaborations: influencer.collaborations || 0,
-            instagramFollowers: influencer.instagramFollowers || '0',
-            linkedinFollowers: influencer.linkedinFollowers || '0',
-            xFollowers: influencer.xFollowers || '0',
-            youtubeSubscribers: influencer.youtubeSubscribers || '0'
-          },
-          pricing: {
-            instagram: {
-              reel: '$500',
-              story: '$200',
-              post: '$350',
-              carousel: '$400'
-            },
-            youtube: {
-              video: '$1000',
-              short: '$300',
-              integration: '$800'
-            },
-            x: {
-              post: '$150'
-            },
-            linkedin: {
-              post: '$250'
-            }
-          },
-          socials: {
-            instagram: influencer.instagram || '',
-            youtube: influencer.youtube || '',
-            x: influencer.x || '',
-            linkedin: influencer.linkedin || '',
-            website: influencer.website || ''
-          },
-          memberSince: influencer.createdAt ? new Date(influencer.createdAt).toLocaleDateString() : 'Recently',
-          availabilityStatus: 'Available Now'
-        }));
-
-        setApplications(formattedApplications);
-      } catch (error) {
-        console.error('Error fetching applications:', error);
-        setApplications([]);
-      } finally {
-        setIsLoading(false);
+  // Transform influencer data to applications format
+  const applications = reduxInfluencers.map((influencer, index) => ({
+    id: influencer._id || influencer.id || index,
+    name: influencer.name || 'Unknown',
+    username: `@${(influencer.name || 'user').toLowerCase().replace(/\s/g, '')}`,
+    bio: influencer.bio || 'Professional influencer',
+    avatar: influencer.avatar || '/dummyAvatar.jpg',
+    coverImage: '/world-bg.png',
+    stats: {
+      brandCollaborations: influencer.collaborations || 0,
+      instagramFollowers: influencer.instagramFollowers || '0',
+      linkedinFollowers: influencer.linkedinFollowers || '0',
+      xFollowers: influencer.xFollowers || '0',
+      youtubeSubscribers: influencer.youtubeSubscribers || '0'
+    },
+    pricing: {
+      instagram: {
+        reel: '$500',
+        story: '$200',
+        post: '$350',
+        carousel: '$400'
+      },
+      youtube: {
+        video: '$1000',
+        short: '$300',
+        integration: '$800'
+      },
+      x: {
+        post: '$150'
+      },
+      linkedin: {
+        post: '$250'
       }
-    };
+    },
+    socials: {
+      instagram: influencer.instagram || '',
+      youtube: influencer.youtube || '',
+      x: influencer.x || '',
+      linkedin: influencer.linkedin || '',
+      website: influencer.website || ''
+    },
+    memberSince: influencer.createdAt ? new Date(influencer.createdAt).toLocaleDateString() : 'Recently',
+    availabilityStatus: 'Available Now'
+  }));
 
-    fetchApplications();
+  // Fetch influencers on mount
+  useEffect(() => {
+    fetchInfluencers({ page: 1, limit: 20 });
   }, []);
 
   const handleBack = () => {
@@ -334,7 +318,7 @@ const NewApplicationsPages = () => {
   };
 
   // Show skeleton while loading
-  if (isLoading) {
+  if (loading) {
     return <NewApplicationsSkeleton />;
   }
 

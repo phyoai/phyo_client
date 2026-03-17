@@ -20,8 +20,8 @@ import {
   Information2Fill,
   LogoutBoxLine,
 } from '@phyoofficial/phyo-icon-library';
-import NavRail from './NavRail';
-import NavItem from './NavItem';
+import NavRail from './ui/NavRail';
+import NavItem from './ui/NavItem';
 
 const ServiceProviderSidebar = () => {
   const pathname = usePathname();
@@ -93,21 +93,18 @@ const ServiceProviderSidebar = () => {
         <button
           key="logout"
           onClick={() => setShowLogoutModal(true)}
-          className={`flex gap-[4px] items-center py-[6px] relative shrink-0 w-full transition-colors duration-300 bg-transparent border-none cursor-pointer ${
-            isExpanded ? 'rounded-[32px] px-[12px]' : 'flex-col justify-center h-[64px]'
-          }`}
+          className={`flex gap-[4px] items-center py-[6px] relative shrink-0 w-full transition-colors duration-300 bg-transparent border-none cursor-pointer ${isExpanded ? 'rounded-[32px] px-[12px]' : 'flex-col justify-center h-[64px]'
+            }`}
         >
           <div className="flex items-center justify-center relative rounded-[8px] shrink-0">
-            <div className={`flex gap-[10px] items-center justify-center relative rounded-[8px] shrink-0 transition-all duration-300 ${
-              isExpanded ? 'px-[4px] py-[8px]' : 'h-[32px] p-[4px]'
-            }`}>
+            <div className={`flex gap-[10px] items-center justify-center relative rounded-[8px] shrink-0 transition-all duration-300 ${isExpanded ? 'px-[4px] py-[8px]' : 'h-[32px] p-[4px]'
+              }`}>
               <LogoutBoxLine width={24} height={24} fill={colors.semantic.error.bold} />
             </div>
           </div>
           <div
-            className={`flex flex-col font-medium justify-center leading-none relative shrink-0 text-center transition-colors duration-300 text-[14px] tracking-[0.2px] ${
-              isExpanded ? 'whitespace-nowrap' : 'w-full'
-            }`}
+            className={`flex flex-col font-medium justify-center leading-none relative shrink-0 text-center transition-colors duration-300 text-[14px] tracking-[0.2px] ${isExpanded ? 'whitespace-nowrap' : 'w-full'
+              }`}
             style={{ color: colors.semantic.error.bold }}
           >
             <p className="leading-[20px]">Logout</p>
