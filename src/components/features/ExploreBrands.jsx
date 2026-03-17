@@ -1,8 +1,10 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-
 import { Loader } from 'lucide-react';
+import PlanRestrictedError from '@/components/PlanRestrictedError';
+import campaignService from '@/services/campaign.service';
+import { getPlanRestrictionDetails } from '@/utils/planAccess';
 
 export default function ExploreBrands({ limit = 8 }) {
   const [brands, setBrands] = useState([]);
@@ -41,7 +43,21 @@ export default function ExploreBrands({ limit = 8 }) {
         const uniqueBrands = Array.from(brandsMap.values()).slice(0, limit);
         setBrands(uniqueBrands);
       } catch (err) {
-        setError(err?.response?.data?.message || 'Failed to load brands');
+        const planDetails = getPlanRestrictionDetails(err);
+
+        if (planDetails) {
+          setError({
+            message: planDetails.message,
+            upgradeRequired: true,
+            requiredPlans: planDetails.requiredPlans,
+            currentPlan: planDetails.currentPlan
+          });
+        } else {
+          setError({
+            message: err?.message || err?.error || 'Failed to load brands',
+            upgradeRequired: false
+          });
+        }
         console.error('Error fetching brands:', err);
       } finally {
         setLoading(false);
@@ -60,9 +76,23 @@ export default function ExploreBrands({ limit = 8 }) {
   }
 
   if (error) {
+    if (error.upgradeRequired) {
+      return (
+        <PlanRestrictedError
+          message={error.message}
+          currentPlan={error.currentPlan || 'BRONZE'}
+          requiredPlans={error.requiredPlans}
+          onUpgradeClick={() => {
+            window.location.href = '/settings/upgrade';
+          }}
+          variant="info"
+        />
+      );
+    }
+
     return (
       <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
-        <p className="text-red-600 dark:text-red-400">{error}</p>
+        <p className="text-red-600 dark:text-red-400">{error.message}</p>
       </div>
     );
   }

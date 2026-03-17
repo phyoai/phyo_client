@@ -44,7 +44,7 @@ function LoginForm() {
     const [showPassword, setShowPassword] = useState(false);
     const router = useRouter();
     const searchParams = useSearchParams();
-    const { isAuthenticated, login, googleLogin, loading, user, error } = useAuth();
+    const { isAuthenticated, login, googleLogin, loading, user, error, token } = useAuth();
 
     // Check for verification success message
     const verified = searchParams.get('verified');
@@ -125,10 +125,13 @@ function LoginForm() {
         if (isAuthenticated && user) {
             toast.success('Login successful! Welcome back!');
 
-            // Store user data
+            // Store user data and token for persistence across page reloads
             localStorage.setItem('userData', JSON.stringify(user));
             if (user.email) {
                 localStorage.setItem('userEmail', user.email);
+            }
+            if (token) {
+                localStorage.setItem('authToken', token);
             }
             const userType = user.type || 'USER';
             document.cookie = `userType=${userType}; path=/; max-age=${7 * 24 * 60 * 60}`;

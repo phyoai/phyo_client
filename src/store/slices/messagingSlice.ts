@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://api.phyo.ai/api';
 
 interface Message {
   id: string;
@@ -43,7 +43,7 @@ export const getConversations = createAsyncThunk(
   'messaging/getConversations',
   async (_, { rejectWithValue }) => {
     try {
-      const response = await fetch(`${API_BASE}/api/conversation`, {
+      const response = await fetch(`${API_BASE}/conversation`, {
         method: 'GET',
         headers: { 'Content-Type': 'application/json' },
       });
@@ -64,7 +64,7 @@ export const createConversation = createAsyncThunk(
   'messaging/createConversation',
   async (participantId: string, { rejectWithValue }) => {
     try {
-      const response = await fetch(`${API_BASE}/api/conversation`, {
+      const response = await fetch(`${API_BASE}/conversation`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ participantId }),
@@ -86,7 +86,7 @@ export const getMessages = createAsyncThunk(
   'messaging/getMessages',
   async (conversationId: string, { rejectWithValue }) => {
     try {
-      const response = await fetch(`${API_BASE}/api/messages/${conversationId}`, {
+      const response = await fetch(`${API_BASE}/messages/${conversationId}`, {
         method: 'GET',
         headers: { 'Content-Type': 'application/json' },
       });
@@ -110,7 +110,7 @@ export const sendMessage = createAsyncThunk(
     { rejectWithValue }
   ) => {
     try {
-      const response = await fetch(`${API_BASE}/api/messages`, {
+      const response = await fetch(`${API_BASE}/messages`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -136,7 +136,7 @@ export const markAsRead = createAsyncThunk(
   'messaging/markAsRead',
   async (messageId: string, { rejectWithValue }) => {
     try {
-      const response = await fetch(`${API_BASE}/api/messages/${messageId}/read`, {
+      const response = await fetch(`${API_BASE}/messages/${messageId}/read`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
       });
@@ -157,7 +157,7 @@ export const deleteMessage = createAsyncThunk(
   'messaging/deleteMessage',
   async (messageId: string, { rejectWithValue }) => {
     try {
-      const response = await fetch(`${API_BASE}/api/messages/${messageId}`, {
+      const response = await fetch(`${API_BASE}/messages/${messageId}`, {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
       });
@@ -177,7 +177,7 @@ export const deleteConversation = createAsyncThunk(
   'messaging/deleteConversation',
   async (conversationId: string, { rejectWithValue }) => {
     try {
-      const response = await fetch(`${API_BASE}/api/conversation/${conversationId}`, {
+      const response = await fetch(`${API_BASE}/conversation/${conversationId}`, {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
       });

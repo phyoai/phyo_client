@@ -16,7 +16,7 @@ interface FileState {
   error: string | null;
 }
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://api.phyo.ai/api';
 
 // Async thunks
 export const uploadChatImage = createAsyncThunk(
@@ -30,7 +30,7 @@ export const uploadChatImage = createAsyncThunk(
       formData.append('image', file);
       formData.append('conversationId', conversationId);
 
-      const response = await fetch(`${API_BASE}/api/upload/chat-image`, {
+      const response = await fetch(`${API_BASE}/upload/chat-image`, {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${localStorage.getItem('auth_token')}`,
@@ -54,7 +54,7 @@ export const deleteChatImage = createAsyncThunk(
   'file/deleteChatImage',
   async (key: string, { rejectWithValue }) => {
     try {
-      const response = await fetch(`${API_BASE}/api/upload/chat-image/${key}`, {
+      const response = await fetch(`${API_BASE}/upload/chat-image/${key}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',

@@ -1,8 +1,10 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-
 import { Loader } from 'lucide-react';
+import PlanRestrictedError from '@/components/PlanRestrictedError';
+import campaignService from '@/services/campaign.service';
+import { getPlanRestrictionDetails } from '@/utils/planAccess';
 
 export default function CategoryCampaigns({
   category,
@@ -31,7 +33,21 @@ export default function CategoryCampaigns({
 
         setCampaigns(filtered);
       } catch (err) {
-        setError(err?.response?.data?.message || `Failed to load ${categoryLabel} campaigns`);
+        const planDetails = getPlanRestrictionDetails(err);
+
+        if (planDetails) {
+          setError({
+            message: planDetails.message,
+            upgradeRequired: true,
+            requiredPlans: planDetails.requiredPlans,
+            currentPlan: planDetails.currentPlan
+          });
+        } else {
+          setError({
+            message: err?.message || err?.error || `Failed to load ${categoryLabel} campaigns`,
+            upgradeRequired: false
+          });
+        }
         console.error('Error fetching campaigns:', err);
       } finally {
         setLoading(false);
@@ -63,9 +79,23 @@ export default function CategoryCampaigns({
       </div>
 
       {error && (
-        <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4 mb-4">
-          <p className="text-red-600 dark:text-red-400">{error}</p>
-        </div>
+        <>
+          {error.upgradeRequired ? (
+            <PlanRestrictedError
+              message={error.message}
+              currentPlan={error.currentPlan || 'BRONZE'}
+              requiredPlans={error.requiredPlans}
+              onUpgradeClick={() => {
+                window.location.href = '/settings/upgrade';
+              }}
+              variant="info"
+            />
+          ) : (
+            <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4 mb-4">
+              <p className="text-red-600 dark:text-red-400">{error.message}</p>
+            </div>
+          )}
+        </>
       )}
 
       {/* Campaign Grid */}

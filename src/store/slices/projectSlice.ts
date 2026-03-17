@@ -38,7 +38,7 @@ interface ProjectState {
   };
 }
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://api.phyo.ai/api';
 
 // Async thunks
 export const getProjects = createAsyncThunk(
@@ -53,7 +53,7 @@ export const getProjects = createAsyncThunk(
       params.append('page', String(page));
       params.append('limit', String(limit));
 
-      const response = await fetch(`${API_BASE}/api/projects?${params.toString()}`, {
+      const response = await fetch(`${API_BASE}/projects?${params.toString()}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -77,7 +77,7 @@ export const getProjectById = createAsyncThunk(
   'project/getProjectById',
   async (id: string, { rejectWithValue }) => {
     try {
-      const response = await fetch(`${API_BASE}/api/projects/${id}`, {
+      const response = await fetch(`${API_BASE}/projects/${id}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -110,7 +110,7 @@ export const createProject = createAsyncThunk(
     { rejectWithValue }
   ) => {
     try {
-      const response = await fetch(`${API_BASE}/api/projects`, {
+      const response = await fetch(`${API_BASE}/projects`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -138,7 +138,7 @@ export const updateProject = createAsyncThunk(
     { rejectWithValue }
   ) => {
     try {
-      const response = await fetch(`${API_BASE}/api/projects/${id}`, {
+      const response = await fetch(`${API_BASE}/projects/${id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -163,7 +163,7 @@ export const deleteProject = createAsyncThunk(
   'project/deleteProject',
   async (id: string, { rejectWithValue }) => {
     try {
-      const response = await fetch(`${API_BASE}/api/projects/${id}`, {
+      const response = await fetch(`${API_BASE}/projects/${id}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
@@ -186,7 +186,7 @@ export const getProjectStats = createAsyncThunk(
   'project/getProjectStats',
   async (_, { rejectWithValue }) => {
     try {
-      const response = await fetch(`${API_BASE}/api/projects/stats`, {
+      const response = await fetch(`${API_BASE}/projects/stats`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',

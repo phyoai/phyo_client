@@ -48,14 +48,14 @@ interface PortfolioState {
   };
 }
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://api.phyo.ai/api';
 
 // Async thunks
 export const getPortfolioItems = createAsyncThunk(
   'portfolio/getPortfolioItems',
   async ({ page = 1, limit = 10 }: { page?: number; limit?: number } = {}, { rejectWithValue }) => {
     try {
-      const response = await fetch(`${API_BASE}/api/portfolios?page=${page}&limit=${limit}`, {
+      const response = await fetch(`${API_BASE}/portfolios?page=${page}&limit=${limit}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -79,7 +79,7 @@ export const getPortfolioItem = createAsyncThunk(
   'portfolio/getPortfolioItem',
   async (id: string, { rejectWithValue }) => {
     try {
-      const response = await fetch(`${API_BASE}/api/portfolios/${id}`, {
+      const response = await fetch(`${API_BASE}/portfolios/${id}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -106,7 +106,7 @@ export const createPortfolioItem = createAsyncThunk(
     { rejectWithValue }
   ) => {
     try {
-      const response = await fetch(`${API_BASE}/api/portfolios`, {
+      const response = await fetch(`${API_BASE}/portfolios`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -134,7 +134,7 @@ export const updatePortfolioItem = createAsyncThunk(
     { rejectWithValue }
   ) => {
     try {
-      const response = await fetch(`${API_BASE}/api/portfolios/${id}`, {
+      const response = await fetch(`${API_BASE}/portfolios/${id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -159,7 +159,7 @@ export const deletePortfolioItem = createAsyncThunk(
   'portfolio/deletePortfolioItem',
   async (id: string, { rejectWithValue }) => {
     try {
-      const response = await fetch(`${API_BASE}/api/portfolios/${id}`, {
+      const response = await fetch(`${API_BASE}/portfolios/${id}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
@@ -185,7 +185,7 @@ export const addClientToPortfolio = createAsyncThunk(
     { rejectWithValue }
   ) => {
     try {
-      const response = await fetch(`${API_BASE}/api/portfolios/${portfolioId}/clients`, {
+      const response = await fetch(`${API_BASE}/portfolios/${portfolioId}/clients`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -218,7 +218,7 @@ export const updatePortfolioClient = createAsyncThunk(
   ) => {
     try {
       const response = await fetch(
-        `${API_BASE}/api/portfolios/${portfolioId}/clients/${clientId}`,
+        `${API_BASE}/portfolios/${portfolioId}/clients/${clientId}`,
         {
           method: 'PUT',
           headers: {
@@ -249,7 +249,7 @@ export const removePortfolioClient = createAsyncThunk(
   ) => {
     try {
       const response = await fetch(
-        `${API_BASE}/api/portfolios/${portfolioId}/clients/${clientId}`,
+        `${API_BASE}/portfolios/${portfolioId}/clients/${clientId}`,
         {
           method: 'DELETE',
           headers: {
@@ -274,7 +274,7 @@ export const getPortfolioStats = createAsyncThunk(
   'portfolio/getPortfolioStats',
   async (_, { rejectWithValue }) => {
     try {
-      const response = await fetch(`${API_BASE}/api/portfolios/stats`, {
+      const response = await fetch(`${API_BASE}/portfolios/stats`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',

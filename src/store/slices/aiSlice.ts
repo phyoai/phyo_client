@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://api.phyo.ai/api';
 
 interface AIState {
   aiResults: any[];
@@ -23,7 +23,7 @@ export const searchWithAI = createAsyncThunk(
   'ai/searchWithAI',
   async ({ prompt }: { prompt: string }, { rejectWithValue }) => {
     try {
-      const response = await fetch(`${API_BASE}/api/ask`, {
+      const response = await fetch(`${API_BASE}/ask`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ prompt }),
@@ -45,7 +45,7 @@ export const getInfluencerDetails = createAsyncThunk(
   'ai/getInfluencerDetails',
   async (userName: string, { rejectWithValue }) => {
     try {
-      const response = await fetch(`${API_BASE}/api/ask/details?userName=${encodeURIComponent(userName)}`, {
+      const response = await fetch(`${API_BASE}/ask/details?userName=${encodeURIComponent(userName)}`, {
         method: 'GET',
         headers: { 'Content-Type': 'application/json' },
       });
@@ -66,7 +66,7 @@ export const fetchInstagramReelData = createAsyncThunk(
   'ai/fetchInstagramReelData',
   async ({ reelUrl }: { reelUrl: string }, { rejectWithValue }) => {
     try {
-      const response = await fetch(`${API_BASE}/api/ask/reel`, {
+      const response = await fetch(`${API_BASE}/ask/reel`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ reelUrl }),

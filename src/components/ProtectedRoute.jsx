@@ -1,10 +1,10 @@
 'use client'
 import React, { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useAuth } from '../app/context/AuthContext';
+import { useAuth } from '@/hooks';
 
 const ProtectedRoute = ({ children, userType, fallback }) => {
-  const { isAuthenticated, getUserType } = useAuth();
+  const { isAuthenticated, user } = useAuth();
   const [loading, setLoading] = useState(true);
   const [authorized, setAuthorized] = useState(false);
   const router = useRouter();
@@ -12,33 +12,37 @@ const ProtectedRoute = ({ children, userType, fallback }) => {
 
   useEffect(() => {
     const checkAuth = async () => {
-      console.log('ProtectedRoute: Starting auth check');
+      console.log('ProtectedRoute: Starting auth check, isAuthenticated =', isAuthenticated);
       try {
-        const authenticated = isAuthenticated();
-        console.log('ProtectedRoute: isAuthenticated =', authenticated);
-        
-        if (!authenticated) {
-          // Only redirect if we're not already on the signup page
+        if (!isAuthenticated) {
+          // Not authenticated, redirect to login
           const currentPath = window.location.pathname;
           console.log('ProtectedRoute: Not authenticated, current path =', currentPath);
-          if (currentPath !== '/brand/signup') {
-            const signupUrl = `/brand/signup?redirect=${encodeURIComponent(currentPath)}`;
-            console.log('ProtectedRoute: Redirecting to', signupUrl);
-            router.push(signupUrl);
+          if (!currentPath.includes('/login') && !currentPath.includes('/signup')) {
+            const loginUrl = `/login?redirect=${encodeURIComponent(currentPath)}`;
+            console.log('ProtectedRoute: Redirecting to', loginUrl);
+            router.push(loginUrl);
             return;
           }
         }
 
         // If user type is specified, check if user has the required type
-        if (userType && authenticated) {
-          const currentUserType = getUserType();
+        if (userType && isAuthenticated && user) {
+          const currentUserType = user.type;
           console.log('ProtectedRoute: Checking user type, required =', userType, 'current =', currentUserType);
           if (currentUserType !== userType) {
-            // Redirect to brand signup if user type doesn't match
+            // Redirect to appropriate dashboard based on actual user type
             const currentPath = window.location.pathname;
-            const signupUrl = `/brand/signup?redirect=${encodeURIComponent(currentPath)}`;
-            console.log('ProtectedRoute: UserLine type mismatch, redirecting to', signupUrl);
-            router.push(signupUrl);
+            let redirectUrl = '/login';
+            if (currentUserType === 'BRAND') {
+              redirectUrl = '/brand/dashboard';
+            } else if (currentUserType === 'INFLUENCER') {
+              redirectUrl = '/influencer/dashboard';
+            } else if (currentUserType === 'USER') {
+              redirectUrl = '/user/dashboard';
+            }
+            console.log('ProtectedRoute: User type mismatch, redirecting to', redirectUrl);
+            router.push(redirectUrl);
             return;
           }
         }
@@ -47,20 +51,14 @@ const ProtectedRoute = ({ children, userType, fallback }) => {
         setAuthorized(true);
       } catch (error) {
         console.error('ProtectedRoute: Auth check failed:', error);
-        // Only redirect on error if not already on signup page
-        const currentPath = window.location.pathname;
-        if (currentPath !== '/brand/signup') {
-          const signupUrl = `/brand/signup?redirect=${encodeURIComponent(currentPath)}`;
-          console.log('ProtectedRoute: Error occurred, redirecting to', signupUrl);
-          router.push(signupUrl);
-        }
+        setAuthorized(false);
       } finally {
         setLoading(false);
       }
     };
 
     checkAuth();
-  }, [isAuthenticated, getUserType, userType, router]);
+  }, [isAuthenticated, user, userType, router]);
 
   console.log('ProtectedRoute: Render state - loading =', loading, 'authorized =', authorized);
 

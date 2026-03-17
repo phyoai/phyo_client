@@ -61,14 +61,14 @@ interface PaymentState {
   };
 }
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://api.phyo.ai/api';
 
 // Async thunks
 export const getSubscriptionPlans = createAsyncThunk(
   'payment/getSubscriptionPlans',
   async (_, { rejectWithValue }) => {
     try {
-      const response = await fetch(`${API_BASE}/api/payment/plans`, {
+      const response = await fetch(`${API_BASE}/payment/plans`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -92,7 +92,7 @@ export const getUserPlan = createAsyncThunk(
   'payment/getUserPlan',
   async (_, { rejectWithValue }) => {
     try {
-      const response = await fetch(`${API_BASE}/api/payment/user-plan`, {
+      const response = await fetch(`${API_BASE}/payment/user-plan`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -116,7 +116,7 @@ export const getCreditInfo = createAsyncThunk(
   'payment/getCreditInfo',
   async (_, { rejectWithValue }) => {
     try {
-      const response = await fetch(`${API_BASE}/api/payment/credits`, {
+      const response = await fetch(`${API_BASE}/payment/credits`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -140,7 +140,7 @@ export const createPaymentOrder = createAsyncThunk(
   'payment/createPaymentOrder',
   async ({ planId, interval }: { planId: string; interval: string }, { rejectWithValue }) => {
     try {
-      const response = await fetch(`${API_BASE}/api/payment/create-order`, {
+      const response = await fetch(`${API_BASE}/payment/create-order`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -178,7 +178,7 @@ export const verifyPayment = createAsyncThunk(
     { rejectWithValue }
   ) => {
     try {
-      const response = await fetch(`${API_BASE}/api/payment/verify-payment`, {
+      const response = await fetch(`${API_BASE}/payment/verify-payment`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -209,7 +209,7 @@ export const getPaymentHistory = createAsyncThunk(
   async ({ page = 1, limit = 10 }: { page?: number; limit?: number } = {}, { rejectWithValue }) => {
     try {
       const response = await fetch(
-        `${API_BASE}/api/payment/history?page=${page}&limit=${limit}`,
+        `${API_BASE}/payment/history?page=${page}&limit=${limit}`,
         {
           method: 'GET',
           headers: {
@@ -235,7 +235,7 @@ export const cancelSubscription = createAsyncThunk(
   'payment/cancelSubscription',
   async (_, { rejectWithValue }) => {
     try {
-      const response = await fetch(`${API_BASE}/api/payment/cancel-subscription`, {
+      const response = await fetch(`${API_BASE}/payment/cancel-subscription`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -1,13 +1,13 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://api.phyo.ai/api';
 
 // Async thunks for authentication
 export const signupUser = createAsyncThunk(
   'auth/signupUser',
   async ({ email, password, type, name, username }, { rejectWithValue }) => {
     try {
-      const response = await fetch(`${API_BASE}/api/user/signup`, {
+      const response = await fetch(`${API_BASE}/user/signup`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password, type, name, username }),
@@ -19,7 +19,8 @@ export const signupUser = createAsyncThunk(
       }
 
       const data = await response.json();
-      return data.data;
+      // API returns user data directly
+      return data.data || data.user || data;
     } catch (error) {
       return rejectWithValue(error.message);
     }
@@ -30,7 +31,7 @@ export const loginUser = createAsyncThunk(
   'auth/loginUser',
   async ({ email, password }, { rejectWithValue }) => {
     try {
-      const response = await fetch(`${API_BASE}/api/user/login`, {
+      const response = await fetch(`${API_BASE}/user/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
@@ -42,7 +43,11 @@ export const loginUser = createAsyncThunk(
       }
 
       const data = await response.json();
-      return data.data;
+      // API returns { message, token, user } directly
+      return {
+        token: data.token || data.data?.token,
+        user: data.user || data.data?.user,
+      };
     } catch (error) {
       return rejectWithValue(error.message);
     }
@@ -53,7 +58,7 @@ export const forgotPassword = createAsyncThunk(
   'auth/forgotPassword',
   async ({ email }, { rejectWithValue }) => {
     try {
-      const response = await fetch(`${API_BASE}/api/user/forgot-password`, {
+      const response = await fetch(`${API_BASE}/user/forgot-password`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email }),
@@ -74,7 +79,7 @@ export const verifyResetCode = createAsyncThunk(
   'auth/verifyResetCode',
   async ({ email, code }, { rejectWithValue }) => {
     try {
-      const response = await fetch(`${API_BASE}/api/user/verify-code`, {
+      const response = await fetch(`${API_BASE}/user/verify-code`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, code }),
@@ -96,7 +101,7 @@ export const resetPassword = createAsyncThunk(
   'auth/resetPassword',
   async ({ email, newPassword }, { rejectWithValue }) => {
     try {
-      const response = await fetch(`${API_BASE}/api/user/reset-password`, {
+      const response = await fetch(`${API_BASE}/user/reset-password`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, newPassword }),
@@ -117,7 +122,7 @@ export const verifyEmailOtp = createAsyncThunk(
   'auth/verifyEmailOtp',
   async ({ email, otp }, { rejectWithValue }) => {
     try {
-      const response = await fetch(`${API_BASE}/api/user/verify-otp`, {
+      const response = await fetch(`${API_BASE}/user/verify-otp`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, otp }),
@@ -128,7 +133,11 @@ export const verifyEmailOtp = createAsyncThunk(
       }
 
       const data = await response.json();
-      return data.data;
+      // API may return { token, user } or nested structure
+      return {
+        token: data.token || data.data?.token,
+        user: data.user || data.data?.user,
+      };
     } catch (error) {
       return rejectWithValue(error.message);
     }
@@ -139,7 +148,7 @@ export const resendEmailOtp = createAsyncThunk(
   'auth/resendEmailOtp',
   async ({ email }, { rejectWithValue }) => {
     try {
-      const response = await fetch(`${API_BASE}/api/user/resend-otp`, {
+      const response = await fetch(`${API_BASE}/user/resend-otp`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email }),
@@ -176,7 +185,7 @@ export const googleOAuth = createAsyncThunk(
         ...(profilePicture && { profilePicture }),
       };
 
-      const response = await fetch(`${API_BASE}/api/user/google`, {
+      const response = await fetch(`${API_BASE}/user/google`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),
@@ -188,7 +197,11 @@ export const googleOAuth = createAsyncThunk(
       }
 
       const data = await response.json();
-      return data.data;
+      // API returns { token, user } directly
+      return {
+        token: data.token || data.data?.token,
+        user: data.user || data.data?.user,
+      };
     } catch (error) {
       return rejectWithValue(error.message);
     }
@@ -257,9 +270,14 @@ const authSlice = createSlice({
       })
       .addCase(loginUser.fulfilled, (state, action) => {
         state.loading = false;
-        state.isAuthenticated = true;
-        state.token = action.payload.token;
-        state.user = action.payload.user;
+        if (action.payload?.token) {
+          state.isAuthenticated = true;
+          state.token = action.payload.token;
+          state.user = action.payload.user || null;
+          state.error = null;
+        } else {
+          state.error = 'Invalid login response: no token received';
+        }
       })
       .addCase(loginUser.rejected, (state, action) => {
         state.loading = false;
@@ -320,11 +338,16 @@ const authSlice = createSlice({
       })
       .addCase(verifyEmailOtp.fulfilled, (state, action) => {
         state.loading = false;
-        state.isAuthenticated = true;
-        state.token = action.payload.token;
-        state.user = action.payload.user;
-        state.otpVerified = true;
-        state.otpSent = false;
+        if (action.payload?.token) {
+          state.isAuthenticated = true;
+          state.token = action.payload.token;
+          state.user = action.payload.user || null;
+          state.otpVerified = true;
+          state.otpSent = false;
+          state.error = null;
+        } else {
+          state.error = 'Invalid OTP verification response';
+        }
       })
       .addCase(verifyEmailOtp.rejected, (state, action) => {
         state.loading = false;
@@ -354,9 +377,14 @@ const authSlice = createSlice({
       })
       .addCase(googleOAuth.fulfilled, (state, action) => {
         state.loading = false;
-        state.isAuthenticated = true;
-        state.token = action.payload.token;
-        state.user = action.payload.user;
+        if (action.payload?.token) {
+          state.isAuthenticated = true;
+          state.token = action.payload.token;
+          state.user = action.payload.user || null;
+          state.error = null;
+        } else {
+          state.error = 'Invalid Google OAuth response: no token received';
+        }
       })
       .addCase(googleOAuth.rejected, (state, action) => {
         state.loading = false;

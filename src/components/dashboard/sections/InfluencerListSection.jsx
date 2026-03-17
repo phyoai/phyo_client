@@ -2,8 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import SectionHeading from '@/components/SectionHeading';
 import InfluencerAvatar from '@/components/cards/InfluencerAvatar';
+import PlanRestrictedError from '@/components/PlanRestrictedError';
 import { useAuth } from '@/app/context/AuthContext';
 import { useInfluencers } from '@/hooks/useInfluencers';
+import { getPlanRestrictionDetails } from '@/utils/planAccess';
 
 /**
  * Influencer List Section Component
@@ -21,6 +23,9 @@ export default function InfluencerListSection({
 
   // Redux influencers hook
   const { influencers: allInfluencers, loading, error, fetchInfluencers } = useInfluencers();
+
+  // Check for plan restriction error
+  const planError = getPlanRestrictionDetails(error);
 
   // Format and slice to limit
   const influencers = (allInfluencers || [])
@@ -58,9 +63,21 @@ export default function InfluencerListSection({
 
       {/* Error State */}
       {error && !loading && (
-        <div className="text-center py-4">
-          <p className="text-red-500 text-sm">{error}</p>
-        </div>
+        <>
+          {planError ? (
+            <PlanRestrictedError
+              message={planError.message}
+              currentPlan={planError.currentPlan}
+              requiredPlans={planError.requiredPlans}
+              onUpgradeClick={() => router.push(`/${role}/account/upgrade-plan`)}
+              variant="info"
+            />
+          ) : (
+            <div className="text-center py-4">
+              <p className="text-red-500 text-sm">{error}</p>
+            </div>
+          )}
+        </>
       )}
 
       {/* Horizontal Scroll of Influencers */}

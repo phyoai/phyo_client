@@ -57,7 +57,7 @@ interface InfluencerDataState {
   };
 }
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://api.phyo.ai/api';
 
 // Async thunks
 export const getAllInfluencers = createAsyncThunk(
@@ -65,7 +65,7 @@ export const getAllInfluencers = createAsyncThunk(
   async ({ page = 1, limit = 10 }: { page?: number; limit?: number } = {}, { rejectWithValue }) => {
     try {
       const response = await fetch(
-        `${API_BASE}/api/influencers?page=${page}&limit=${limit}`,
+        `${API_BASE}/influencers?page=${page}&limit=${limit}`,
         {
           method: 'GET',
           headers: { 'Content-Type': 'application/json' },
@@ -96,7 +96,7 @@ export const searchInfluencers = createAsyncThunk(
   ) => {
     try {
       const response = await fetch(
-        `${API_BASE}/api/influencers?search=${query}&page=${page}&limit=${limit}`,
+        `${API_BASE}/influencers?search=${query}&page=${page}&limit=${limit}`,
         {
           method: 'GET',
           headers: { 'Content-Type': 'application/json' },
@@ -138,7 +138,7 @@ export const advancedSearchInfluencers = createAsyncThunk(
         }
       });
 
-      const response = await fetch(`${API_BASE}/api/influencers?${params.toString()}`, {
+      const response = await fetch(`${API_BASE}/influencers?${params.toString()}`, {
         method: 'GET',
         headers: { 'Content-Type': 'application/json' },
       });
@@ -166,7 +166,7 @@ export const getInfluencerById = createAsyncThunk(
   'influencerData/getInfluencerById',
   async (id: string, { rejectWithValue }) => {
     try {
-      const response = await fetch(`${API_BASE}/api/influencers/${id}`, {
+      const response = await fetch(`${API_BASE}/influencers/${id}`, {
         method: 'GET',
         headers: { 'Content-Type': 'application/json' },
       });
@@ -187,7 +187,7 @@ export const getInfluencerByUsername = createAsyncThunk(
   'influencerData/getInfluencerByUsername',
   async (username: string, { rejectWithValue }) => {
     try {
-      const response = await fetch(`${API_BASE}/api/influencers/username/${username}`, {
+      const response = await fetch(`${API_BASE}/influencers/username/${username}`, {
         method: 'GET',
         headers: { 'Content-Type': 'application/json' },
       });
@@ -208,7 +208,7 @@ export const getInfluencerStats = createAsyncThunk(
   'influencerData/getInfluencerStats',
   async (_, { rejectWithValue }) => {
     try {
-      const response = await fetch(`${API_BASE}/api/influencers/stats`, {
+      const response = await fetch(`${API_BASE}/influencers/stats`, {
         method: 'GET',
         headers: { 'Content-Type': 'application/json' },
       });

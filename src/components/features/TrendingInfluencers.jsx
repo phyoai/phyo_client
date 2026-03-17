@@ -1,9 +1,10 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-
 import { Loader } from 'lucide-react';
 import PlanRestrictedError from '@/components/PlanRestrictedError';
+import influencerService from '@/services/influencer.service';
+import { getPlanRestrictionDetails } from '@/utils/planAccess';
 
 export default function TrendingInfluencers({ limit = 8, category }) {
   const [influencers, setInfluencers] = useState([]);
@@ -23,21 +24,22 @@ export default function TrendingInfluencers({ limit = 8, category }) {
           ...(category && { category })
         });
 
-        setInfluencers(response.data.slice(0, limit));
+        setInfluencers(response.data?.slice(0, limit) || []);
       } catch (err) {
-        const errorData = err?.response?.data;
+        const planDetails = getPlanRestrictionDetails(err);
 
         // Check if it's a plan tier restriction error
-        if (errorData?.upgradeRequired && errorData?.requiredPlans) {
+        if (planDetails) {
           setError({
-            message: errorData.message || 'This feature requires a higher plan',
+            message: planDetails.message,
             upgradeRequired: true,
-            requiredPlans: errorData.requiredPlans,
-            currentPlan: errorData.currentPlan
+            requiredPlans: planDetails.requiredPlans,
+            currentPlan: planDetails.currentPlan
           });
         } else {
+          const errorMessage = err?.message || err?.error || 'Failed to load trending influencers';
           setError({
-            message: errorData?.message || 'Failed to load trending influencers',
+            message: errorMessage,
             upgradeRequired: false
           });
         }

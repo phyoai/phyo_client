@@ -1,13 +1,13 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://api.phyo.ai/api';
 
 // Async thunks for user management
 export const fetchUserProfile = createAsyncThunk(
   'user/fetchUserProfile',
   async (_, { rejectWithValue }) => {
     try {
-      const response = await fetch(`${API_BASE}/api/users/profile`, {
+      const response = await fetch(`${API_BASE}/users/profile`, {
         method: 'GET',
         headers: { 'Content-Type': 'application/json' },
       });
@@ -29,7 +29,7 @@ export const updateUserProfile = createAsyncThunk(
   'user/updateUserProfile',
   async (profileData, { rejectWithValue }) => {
     try {
-      const response = await fetch(`${API_BASE}/api/users/profile`, {
+      const response = await fetch(`${API_BASE}/users/profile`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(profileData),
@@ -59,7 +59,7 @@ export const searchUsers = createAsyncThunk(
         limit,
       });
 
-      const response = await fetch(`${API_BASE}/api/users/search?${params}`, {
+      const response = await fetch(`${API_BASE}/users/search?${params}`, {
         method: 'GET',
         headers: { 'Content-Type': 'application/json' },
       });
@@ -80,7 +80,7 @@ export const getUserById = createAsyncThunk(
   'user/getUserById',
   async (userId, { rejectWithValue }) => {
     try {
-      const response = await fetch(`${API_BASE}/api/users/${userId}`, {
+      const response = await fetch(`${API_BASE}/users/${userId}`, {
         method: 'GET',
         headers: { 'Content-Type': 'application/json' },
       });
@@ -101,7 +101,7 @@ export const deleteAccount = createAsyncThunk(
   'user/deleteAccount',
   async (_, { rejectWithValue }) => {
     try {
-      const response = await fetch(`${API_BASE}/api/users/profile`, {
+      const response = await fetch(`${API_BASE}/users/profile`, {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
       });
