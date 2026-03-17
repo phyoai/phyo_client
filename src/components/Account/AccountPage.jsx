@@ -1007,18 +1007,6 @@ const RightPanelCategories = () => {
             {/* Plan-Based Menu Items */}
             {user?.currentPlan && (
               <>
-                {/* Upgrade Plan - visible if has active plan */}
-                <button
-                  className="w-full"
-                  onClick={() => router.push(`/${role}/account/upgrade-plan`)}
-                >
-                  <MenuItem
-                    icon={RocketLine}
-                    label={t('upgrade_plan')}
-                  />
-                </button>
-                <div className="h-px bg-[#e6e6e6] dark:bg-gray-700 mx-4"></div>
-
                 {/* Pause Subscription - only if has active plan */}
                 <button
                   className="w-full"
@@ -1040,22 +1028,6 @@ const RightPanelCategories = () => {
                     icon={DeleteBin2Line}
                     label={t('cancel_subscription')}
                     textColor="text-[#bf3709]"
-                  />
-                </button>
-                <div className="h-px bg-[#e6e6e6] dark:bg-gray-700 mx-4"></div>
-              </>
-            )}
-
-            {/* Upgrade Plan Button - visible if NO active plan */}
-            {!user?.currentPlan && (
-              <>
-                <button
-                  className="w-full"
-                  onClick={() => router.push(`/${role}/account/upgrade-plan`)}
-                >
-                  <MenuItem
-                    icon={RocketLine}
-                    label={t('upgrade_plan')}
                   />
                 </button>
                 <div className="h-px bg-[#e6e6e6] dark:bg-gray-700 mx-4"></div>
