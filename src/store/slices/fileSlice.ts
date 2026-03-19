@@ -17,7 +17,7 @@ interface FileState {
   error: string | null;
 }
 
-// Async thunks
+// Async thunks - Upload to AWS S3 via backend API
 export const uploadChatImage = createAsyncThunk(
   'file/uploadChatImage',
   async (
@@ -25,28 +25,46 @@ export const uploadChatImage = createAsyncThunk(
     { rejectWithValue }
   ) => {
     try {
+      // Validate file
+      if (!file.type.startsWith('image/')) {
+        throw new Error('Only image files are allowed');
+      }
+      if (file.size > 5 * 1024 * 1024) {
+        throw new Error('File size must be less than 5MB');
+      }
+
+      // Upload to backend API which handles S3 upload
       const formData = new FormData();
-      formData.append('image', file);
+      formData.append('file', file);
       formData.append('conversationId', conversationId);
 
-      const response = await api.post('/upload/chat-image', formData, {
+      const response = await api.post('/files/upload', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
       });
 
-      return response.data?.data || response.data;
+      // Return file metadata from backend response
+      return {
+        key: response.data.key || `chat/${conversationId}/${file.name}`,
+        url: response.data.url,
+        fileName: file.name,
+        fileSize: file.size,
+        uploadedAt: new Date().toISOString(),
+      };
     } catch (error) {
       return rejectWithValue((error as Error).message);
     }
   }
 );
 
+// Delete from AWS S3 via backend API
 export const deleteChatImage = createAsyncThunk(
   'file/deleteChatImage',
   async (key: string, { rejectWithValue }) => {
     try {
-      await api.delete(`/upload/chat-image/${key}`);
+      // Delete file from backend API which handles S3 deletion
+      await api.delete(`/files/${key}`);
       return key;
     } catch (error) {
       return rejectWithValue((error as Error).message);
