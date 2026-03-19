@@ -58,6 +58,7 @@ api.interceptors.response.use(
 
     // Check for authentication errors (401) or token expiry/invalid (403)
     if (status === 401 || (status === 403 && (errorMessage.includes('Invalid or expired token') || errorMessage.includes('token')))) {
+      console.error('API Auth Error:', { status, errorMessage, url: error.response?.config?.url });
       // Clear all auth data
       ['authToken', 'token', 'adminToken', 'adminInfo', 'userData', 'userEmail', 'userInfo', 'landing_search_results', 'landing_search_prompt'].forEach((key) => localStorage.removeItem(key));
 

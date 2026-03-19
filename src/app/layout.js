@@ -5,6 +5,7 @@ import { SocketProvider } from "./context/SocketContext";
 import { ThemeProvider } from "./context/ThemeContext";
 import { LanguageProvider } from "./context/LanguageContext";
 import { ReduxProvider } from "@/store/ReduxProvider";
+import AuthCookieSyncer from "@/components/AuthCookieSyncer";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -39,6 +40,7 @@ export default function RootLayout({ children }) {
         suppressHydrationWarning={true}
       >
         <ReduxProvider>
+          <AuthCookieSyncer />
           <ThemeProvider>
             <LanguageProvider>
               <AuthProvider>

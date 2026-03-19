@@ -57,6 +57,9 @@ function LoginForm() {
             return;
         }
 
+        // Debug: Log when trying to redirect
+        console.log('Login page: User is authenticated, attempting redirect', { isAuthenticated, user, token: token ? 'exists' : 'missing' });
+
         // User is authenticated, determine redirect
         let redirect = searchParams.get('redirect') || searchParams.get('from');
 
@@ -132,6 +135,8 @@ function LoginForm() {
             }
             if (token) {
                 localStorage.setItem('authToken', token);
+                // Set authToken as cookie for middleware validation
+                document.cookie = `authToken=${token}; path=/; max-age=${7 * 24 * 60 * 60}`;
             }
             const userType = user.type || 'USER';
             document.cookie = `userType=${userType}; path=/; max-age=${7 * 24 * 60 * 60}`;
