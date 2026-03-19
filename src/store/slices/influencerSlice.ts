@@ -56,8 +56,7 @@ export const getInfluencerById = createAsyncThunk(
 export const getTrendingInfluencers = createAsyncThunk(
   'influencer/getTrendingInfluencers',
   async (params?: any) => {
-    // Use regular influencers endpoint with limit parameter
-    const response = await apiClient.get('/auth/influencers', { params });
+    const response = await apiClient.get('/trending/influencers', { params });
     return response.data;
   }
 );
