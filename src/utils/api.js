@@ -206,7 +206,7 @@ export const authAPI = {
   // Get influencers list
   getInfluencers: async (params = {}) => {
     try {
-      const response = await api.get('/auth/influencers', { params });
+      const response = await api.get('/influencers', { params });
       return response.data;
     } catch (error) {
       throw error.response?.data || error.message;
@@ -216,7 +216,7 @@ export const authAPI = {
   // Get influencer by ID
   getInfluencerById: async (id) => {
     try {
-      const response = await api.get(`/auth/influencers/${id}`);
+      const response = await api.get(`/influencers/${id}`);
       return response.data;
     } catch (error) {
       throw error.response?.data || error.message;

@@ -151,7 +151,7 @@ export const campaignApi = {
       params.limit = pagination?.limit || 10;
 
       const response = await api.get<IPaginatedCampaigns>(
-        '/campaigns/brand/my-campaigns',
+        '/campaigns/mine',
         { params }
       );
 

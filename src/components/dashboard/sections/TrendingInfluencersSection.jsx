@@ -15,10 +15,10 @@ export default function TrendingInfluencersSection() {
   const router = useRouter();
 
   // Redux influencers hook
-  const { influencers, loading, fetchTrendingInfluencers } = useInfluencers();
+  const { trendingInfluencers, loading, fetchTrendingInfluencers } = useInfluencers();
 
   // Format influencers with color coding
-  const trendingInfluencers = (influencers || []).slice(0, 10).map((influencer, index) => ({
+  const formattedInfluencers = (trendingInfluencers || []).slice(0, 10).map((influencer, index) => ({
     id: influencer._id || influencer.id || index,
     name: influencer.name || 'Influencer',
     avatar: influencer.avatar || '/dummyAvatar.jpg',
@@ -55,8 +55,8 @@ export default function TrendingInfluencersSection() {
       {/* Horizontal Scroll of Influencers */}
       {!loading && (
         <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
-          {trendingInfluencers.length > 0 ? (
-            trendingInfluencers.map((influencer) => (
+          {formattedInfluencers.length > 0 ? (
+            formattedInfluencers.map((influencer) => (
               <InfluencerAvatar
                 key={influencer.id}
                 name={influencer.name}

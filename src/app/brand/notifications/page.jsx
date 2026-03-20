@@ -1,13 +1,19 @@
 'use client'
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { ArrowLeftLine, BellLine, MoreLine, CheckLine, CloseLine, ArrowRightLine } from '@phyoofficial/phyo-icon-library';
 import { useRouter } from 'next/navigation';
 import { useGoBack } from '@/hooks/useGoBack';
+import { getNotifications, markAsRead, markAllAsRead, deleteNotification } from '@/store/slices/notificationSlice';
 
 function NotificationsPage() {
   const router = useRouter();
   const goBack = useGoBack();
+  const dispatch = useDispatch();
   const [activeFilter, setActiveFilter] = useState('All');
+
+  // Redux selectors
+  const { notifications = [], loading, unreadCount = 0 } = useSelector(state => state.notification || {});
 
   const filters = [
     'All',
@@ -16,57 +22,15 @@ function NotificationsPage() {
     'Applications'
   ];
 
-  const notifications = [
-    {
-      id: 1,
-      type: 'request',
-      avatar: '/dummyAvatar.jpg',
-      avatarBg: '#ff4f6d',
-      label: 'Campaign Invitation',
-      paragraph: 'You have been invited to join a new campaign',
-      hasActions: true
-    },
-    {
-      id: 2,
-      type: 'unread',
-      avatar: '/dummyAvatar1.jpg',
-      avatarBg: '#02b523',
-      label: 'New Message',
-      paragraph: 'You have a new message from Brand Team',
-      hasActions: false,
-      hasNotificationDot: true
-    },
-    {
-      id: 3,
-      type: 'normal',
-      avatar: '/dummyAvatar.jpg',
-      avatarBg: '#0b4fd9',
-      label: 'Campaign Update',
-      paragraph: 'Your campaign status has been updated',
-      hasActions: false,
-      hasChevron: true
-    },
-    {
-      id: 4,
-      type: 'action',
-      avatar: '/dummyAvatar1.jpg',
-      avatarBg: '#2375f0',
-      label: 'Action Required',
-      hasActions: false,
-      hasButton: true
-    },
-    {
-      id: 5,
-      type: 'detail',
-      avatar: '/dummyAvatar.jpg',
-      avatarBg: '#f4c10f',
-      label: 'Payment Processed',
-      paragraph: 'Your payment has been successfully processed',
-      trailingLabel: 'Rs 5,000',
-      trailingParagraph: 'Today',
-      hasChevron: true
-    }
-  ];
+  // Fetch notifications on mount
+  useEffect(() => {
+    dispatch(getNotifications());
+  }, [dispatch]);
+
+  // Filter notifications based on active filter
+  const filteredNotifications = activeFilter === 'All'
+    ? notifications
+    : notifications.filter(n => n.type === activeFilter || n.title?.includes(activeFilter));
 
   return (
     <div className='min-h-screen bg-neutral-base'>
@@ -125,7 +89,12 @@ function NotificationsPage() {
 
         {/* Notifications List */}
         <div className="space-y-0">
-          {notifications.map((notification) => (
+          {loading ? (
+            <div className="text-center py-8 text-gray-500">Loading notifications...</div>
+          ) : filteredNotifications.length === 0 ? (
+            <div className="text-center py-8 text-gray-500">No notifications</div>
+          ) : (
+            filteredNotifications.map((notification) => (
             <div 
               key={notification.id} 
               className="bg-neutral-base border-b border-gray-100 hover:bg-gray-50 transition-colors"
@@ -165,56 +134,54 @@ function NotificationsPage() {
 
                 {/* Trailing Actions */}
                 <div className="flex items-center gap-2 px-4">
-                  {notification.hasActions && (
+                  {!notification.isRead && (
                     <>
-                      <button className="p-3 hover:bg-green-50 rounded-full transition-colors">
+                      <button
+                        onClick={() => dispatch(markAsRead(notification._id))}
+                        className="p-3 hover:bg-green-50 rounded-full transition-colors"
+                        title="Mark as read"
+                      >
                         <CheckLine className="h-6 w-6 text-[#08a64a]" />
                       </button>
-                      <button className="p-3 hover:bg-red-50 rounded-full transition-colors">
+                      <button
+                        onClick={() => dispatch(deleteNotification(notification._id))}
+                        className="p-3 hover:bg-red-50 rounded-full transition-colors"
+                        title="Delete"
+                      >
                         <CloseLine className="h-6 w-6 text-[#bf3709]" />
                       </button>
                     </>
                   )}
-                  
-                  {notification.hasNotificationDot && (
+
+                  {!notification.isRead && (
                     <div className="w-2 h-2 bg-[#0b4fd9] rounded-full"></div>
                   )}
                   
-                  {notification.hasButton && (
-                    <button 
-                      className="px-4 py-2 bg-[#dae3d1] text-[#43573b] rounded-full text-sm font-medium hover:bg-[#c5d1bb] transition-colors"
-                      style={{ fontFamily: 'Work Sans, sans-serif' }}
-                    >
-                      Button
-                    </button>
-                  )}
-                  
-                  {notification.trailingLabel && (
+                  {notification.createdAt && (
                     <div className="text-right mr-2">
-                      <p 
+                      <p
                         className="text-base font-semibold text-[#242527]"
                         style={{ fontFamily: 'Work Sans, sans-serif' }}
                       >
-                        {notification.trailingLabel}
+                        {notification.priority || 'Normal'}
                       </p>
-                      {notification.trailingParagraph && (
-                        <p 
+                      {notification.createdAt && (
+                        <p
                           className="text-sm text-[#808080]"
                           style={{ fontFamily: 'Work Sans, sans-serif' }}
                         >
-                          {notification.trailingParagraph}
+                          {new Date(notification.createdAt).toLocaleDateString()}
                         </p>
                       )}
                     </div>
                   )}
-                  
-                  {notification.hasChevron && (
-                    <ArrowRightLine className="h-6 w-6 text-[#6c6d6e]" />
-                  )}
+
+                  <ArrowRightLine className="h-6 w-6 text-[#6c6d6e]" />
                 </div>
               </div>
             </div>
-          ))}
+            ))
+          )}
         </div>
       </div>
     </div>

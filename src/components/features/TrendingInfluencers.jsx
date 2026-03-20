@@ -10,47 +10,81 @@ export default function TrendingInfluencers({ limit = 8, category }) {
   const [influencers, setInfluencers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [retryCount, setRetryCount] = useState(0);
+
+  const fetchTrendingInfluencers = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      const response = await influencerService.advancedSearch({
+        sortBy: 'engagement',
+        sortOrder: 'desc',
+        limit,
+        ...(category && { category })
+      });
+
+      setInfluencers(response.data?.slice(0, limit) || []);
+    } catch (err) {
+      console.error('Error fetching trending influencers:', err);
+      const planDetails = getPlanRestrictionDetails(err);
+
+      // Check if it's a plan tier restriction error
+      if (planDetails) {
+        setError({
+          message: planDetails.message,
+          upgradeRequired: true,
+          requiredPlans: planDetails.requiredPlans,
+          currentPlan: planDetails.currentPlan,
+          canRetry: false
+        });
+      } else {
+        // Better error message handling
+        let errorMessage = 'Failed to load trending influencers';
+        let canRetry = true;
+
+        if (err?.response?.status === 401) {
+          errorMessage = 'Please log in to view trending influencers';
+          canRetry = false;
+        } else if (err?.response?.status === 403) {
+          errorMessage = 'You don\'t have permission to view this data';
+          canRetry = false;
+        } else if (err?.code === 'ERR_NETWORK' || !err?.response) {
+          errorMessage = 'Network error. Ensure the backend server is running at http://localhost:4000. Please check your connection and try again.';
+          canRetry = true;
+        } else if (err?.response?.status === 404) {
+          errorMessage = 'The influencers endpoint is not available on the backend server.';
+          canRetry = true;
+        } else if (err?.response?.status >= 500) {
+          errorMessage = 'Backend server error. Please try again later.';
+          canRetry = true;
+        } else if (err?.message) {
+          errorMessage = err.message;
+          canRetry = true;
+        } else if (err?.error) {
+          errorMessage = err.error;
+          canRetry = true;
+        }
+
+        setError({
+          message: errorMessage,
+          upgradeRequired: false,
+          canRetry
+        });
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchTrendingInfluencers = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-
-        const response = await influencerService.advancedSearch({
-          sortBy: 'engagement',
-          sortOrder: 'desc',
-          limit,
-          ...(category && { category })
-        });
-
-        setInfluencers(response.data?.slice(0, limit) || []);
-      } catch (err) {
-        const planDetails = getPlanRestrictionDetails(err);
-
-        // Check if it's a plan tier restriction error
-        if (planDetails) {
-          setError({
-            message: planDetails.message,
-            upgradeRequired: true,
-            requiredPlans: planDetails.requiredPlans,
-            currentPlan: planDetails.currentPlan
-          });
-        } else {
-          const errorMessage = err?.message || err?.error || 'Failed to load trending influencers';
-          setError({
-            message: errorMessage,
-            upgradeRequired: false
-          });
-        }
-        console.error('Error fetching trending influencers:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchTrendingInfluencers();
   }, [limit, category]);
+
+  const handleRetry = () => {
+    setRetryCount(retryCount + 1);
+    fetchTrendingInfluencers();
+  };
 
   if (loading) {
     return (
@@ -80,7 +114,16 @@ export default function TrendingInfluencers({ limit = 8, category }) {
     // Generic error
     return (
       <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
-        <p className="text-red-600 dark:text-red-400">{error.message}</p>
+        <p className="text-red-600 dark:text-red-400 mb-3">{error.message}</p>
+        {error.canRetry && (
+          <button
+            onClick={handleRetry}
+            disabled={loading}
+            className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm font-medium"
+          >
+            {loading ? 'Retrying...' : 'Retry'}
+          </button>
+        )}
       </div>
     );
   }

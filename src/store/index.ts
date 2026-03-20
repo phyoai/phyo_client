@@ -12,6 +12,10 @@ import projectReducer from './slices/projectSlice';
 import portfolioReducer from './slices/portfolioSlice';
 import fileReducer from './slices/fileSlice';
 import aiReducer from './slices/aiSlice';
+import brandReducer from './slices/brandSlice';
+import notificationReducer from './slices/notificationSlice';
+import analyticsReducer from './slices/analyticsSlice';
+import favoritesReducer from './slices/favoritesSlice';
 
 export const store = configureStore({
   reducer: {
@@ -28,6 +32,10 @@ export const store = configureStore({
     portfolio: portfolioReducer,
     file: fileReducer,
     ai: aiReducer,
+    brand: brandReducer,
+    notification: notificationReducer,
+    analytics: analyticsReducer,
+    favorites: favoritesReducer,
   },
   devTools: process.env.NODE_ENV !== 'production',
   middleware: (getDefaultMiddleware) =>
@@ -35,6 +43,8 @@ export const store = configureStore({
       serializableCheck: {
         // Ignore these action types for serialization check
         ignoredActions: ['campaign/getCampaigns/pending'],
+        // Ignore favorites slice which contains Set
+        ignoredPaths: ['favorites.favoriteIds'],
       },
     }),
 });

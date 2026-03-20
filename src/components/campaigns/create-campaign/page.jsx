@@ -7,6 +7,7 @@ import Button from '@/components/ui/Button';
 import IconButton from '@/components/ui/IconButton';
 
 import { useApiMutation } from '@/hooks/useApi';
+import { CampaignService } from '@/services';
 
 const CreateCampaignPages = () => {
   const router = useRouter();
@@ -15,7 +16,7 @@ const CreateCampaignPages = () => {
 
   // API mutation for creating campaign
   const { submit: createCampaign, loading: isSubmitting } = useApiMutation(
-    (data) => campaignService.createCampaign(data)
+    (data) => CampaignService.createCampaign(data)
   );
   const [selectedCampaignTypes, setSelectedCampaignTypes] = useState(['Brand Awareness']);
   const [formData, setFormData] = useState({

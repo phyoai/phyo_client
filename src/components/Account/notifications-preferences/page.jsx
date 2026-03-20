@@ -1,25 +1,71 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import AppBar from '@/components/ui/AppBar';
 import { useGoBack } from '@/hooks/useGoBack';
+import apiClient from '@/utils/api';
 
 export default function NotificationPreferencesAll() {
   const router = useRouter();
   const goBack = useGoBack();
   const [preferences, setPreferences] = useState({
-    smsAlerts: true,
-    emailAlerts: true,
-    pushNotifications: true,
-    campaignRecommendations: true,
+    smsAlerts: false,
+    emailAlerts: false,
+    pushNotifications: false,
+    campaignRecommendations: false,
   });
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  const togglePreference = (key) => {
-    setPreferences(prev => ({
-      ...prev,
-      [key]: !prev[key]
-    }));
+  useEffect(() => {
+    fetchNotificationSettings();
+  }, []);
+
+  const fetchNotificationSettings = async () => {
+    try {
+      setLoading(true);
+      const response = await apiClient.get('/notification-settings');
+      const settings = response.data.data;
+
+      setPreferences({
+        smsAlerts: settings.sms?.urgent || false,
+        emailAlerts: settings.email?.campaigns || false,
+        pushNotifications: settings.push?.campaigns || false,
+        campaignRecommendations: settings.email?.promotions || false,
+      });
+    } catch (err) {
+      console.error('Error fetching notification settings:', err);
+      setError('Failed to load notification settings');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const togglePreference = async (key) => {
+    const newPreferences = {
+      ...preferences,
+      [key]: !preferences[key]
+    };
+    setPreferences(newPreferences);
+
+    try {
+      // Send updates to API
+      if (key === 'smsAlerts') {
+        await apiClient.patch('/notification-settings/sms', { urgent: newPreferences[key] });
+      } else if (key === 'emailAlerts') {
+        await apiClient.patch('/notification-settings/email', { campaigns: newPreferences[key] });
+      } else if (key === 'pushNotifications') {
+        await apiClient.patch('/notification-settings/push', { campaigns: newPreferences[key] });
+      } else if (key === 'campaignRecommendations') {
+        await apiClient.patch('/notification-settings/email', { promotions: newPreferences[key] });
+      }
+    } catch (err) {
+      console.error('Error updating notification settings:', err);
+      setError('Failed to update settings');
+      // Revert the change on error
+      setPreferences(prev => ({ ...prev, [key]: !prev[key] }));
+    }
   };
 
   const PreferenceItem = ({ label, enabled, onToggle }) => (
@@ -36,6 +82,22 @@ export default function NotificationPreferencesAll() {
     </div>
   );
 
+  if (loading) {
+    return (
+      <div className="w-full h-full flex flex-col bg-neutral-base">
+        <AppBar
+          title="Notification preferences"
+          onBack={() => router.back()}
+          showMenu={true}
+          onMenuClick={() => console.log('Open menu')}
+        />
+        <div className="flex-1 flex items-center justify-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-blue-600"></div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="w-full h-full flex flex-col bg-neutral-base">
       <AppBar
@@ -44,6 +106,12 @@ export default function NotificationPreferencesAll() {
         showMenu={true}
         onMenuClick={() => console.log('Open menu')}
       />
+
+      {error && (
+        <div className="mx-3 mt-3 p-3 bg-red-50 border border-red-200 rounded text-red-800 text-sm">
+          {error}
+        </div>
+      )}
 
       {/* Content */}
       <div className="flex-1 overflow-y-auto px-3 sm:px-4 md:px-6 lg:px-9 py-3 sm:py-4">

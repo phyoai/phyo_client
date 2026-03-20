@@ -1,6 +1,7 @@
 import { useDispatch, useSelector } from 'react-redux';
 import {
   getCampaigns,
+  getTrendingCampaigns,
   getMyCampaigns,
   getCampaignById,
   createCampaign,
@@ -19,6 +20,7 @@ export const useCampaigns = () => {
   const dispatch = useDispatch();
   const {
     campaigns,
+    trendingCampaigns,
     myCampaigns,
     selectedCampaign,
     loading,
@@ -29,6 +31,13 @@ export const useCampaigns = () => {
   const fetchCampaigns = useCallback(
     (params?: any) => {
       dispatch(getCampaigns(params) as any);
+    },
+    [dispatch]
+  );
+
+  const fetchTrendingCampaigns = useCallback(
+    (params?: any) => {
+      dispatch(getTrendingCampaigns(params) as any);
     },
     [dispatch]
   );
@@ -82,6 +91,7 @@ export const useCampaigns = () => {
   return {
     // State
     campaigns,
+    trendingCampaigns,
     myCampaigns,
     selectedCampaign,
     loading,
@@ -89,6 +99,7 @@ export const useCampaigns = () => {
     pagination,
     // Actions
     fetchCampaigns,
+    fetchTrendingCampaigns,
     fetchMyCampaigns,
     fetchCampaignById,
     createNewCampaign,

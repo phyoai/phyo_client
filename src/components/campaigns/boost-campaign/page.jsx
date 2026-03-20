@@ -1,14 +1,89 @@
 'use client'
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { ArrowLeftLine, MoreLine, LineChartLine, UserLine, Clock, AlertCircle } from '@phyoofficial/phyo-icon-library';
 import Button from '@/components/ui/Button';
 import IconButton from '@/components/ui/IconButton';
 import Card from '@/components/ui/Card';
+import apiClient from '@/utils/api';
 
 export default function BoostCampaigns() {
-  const [selectedOptions, setSelectedOptions] = useState([]);
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const campaignId = searchParams.get('campaignId');
 
-  const recommendations = [
+  const [selectedOptions, setSelectedOptions] = useState([]);
+  const [boostRecommendations, setBoostRecommendations] = useState([]);
+  const [campaign, setCampaign] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
+
+  useEffect(() => {
+    if (campaignId) {
+      fetchBoostRecommendations(campaignId);
+    } else {
+      setLoading(false);
+    }
+  }, [campaignId]);
+
+  const fetchBoostRecommendations = async (id) => {
+    try {
+      const response = await apiClient.get(`/campaigns/${id}/boost-recommendations`);
+      const recommendations = response.data.data || [];
+      setBoostRecommendations(recommendations);
+      // Also fetch campaign data for context
+      await fetchCampaignData(id);
+    } catch (error) {
+      console.error('Error fetching boost recommendations:', error);
+      setBoostRecommendations([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchCampaignData = async (id) => {
+    try {
+      const response = await apiClient.get(`/campaigns/${id}`);
+      setCampaign(response.data.data || {});
+    } catch (error) {
+      console.error('Error fetching campaign data:', error);
+    }
+  };
+
+  const handleBoostCampaign = async () => {
+    if (!campaignId || selectedOptions.length === 0) return;
+    setSubmitting(true);
+    try {
+      await apiClient.post(`/campaigns/${campaignId}/boost`, {
+        boostOptions: selectedOptions
+      });
+      // Show success message and redirect
+      router.push(`/${router.query?.role || 'brand'}/campaigns/${campaignId}`);
+    } catch (error) {
+      console.error('Error boosting campaign:', error);
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  if (!campaignId) {
+    return (
+      <div className="flex items-center justify-center h-screen bg-neutral-base">
+        <div className="text-center">
+          <p className="text-gray-600 mb-4">No campaign ID provided</p>
+          <button
+            onClick={() => router.back()}
+            className="text-blue-600 hover:text-blue-700 font-medium"
+          >
+            Go Back
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // Use fetched recommendations or provide default options
+  const displayRecommendations = boostRecommendations.length > 0 ? boostRecommendations : [
     {
       id: 1,
       title: 'Supercharge Campaign',
@@ -25,9 +100,9 @@ export default function BoostCampaigns() {
       metric: '+50% reach',
       metricColor: 'text-green-600',
       label: 'Current Budget',
-      current: '$50,000',
+      current: campaign?.budget ? `$${campaign.budget}` : '$50,000',
       rounded: 'Boosted',
-      boosted: '$75,000',
+      boosted: campaign?.budget ? `$${Math.ceil(campaign.budget * 1.5)}` : '$75,000',
       icon: '💰'
     },
     {
@@ -37,9 +112,9 @@ export default function BoostCampaigns() {
       metric: '+167% coverage',
       metricColor: 'text-blue-600',
       label: 'Current',
-      current: '15',
+      current: campaign?.selectedInfluencersCount || '15',
       rounded: 'Rounded',
-      boosted: '25',
+      boosted: campaign?.selectedInfluencersCount ? Math.ceil(campaign.selectedInfluencersCount * 1.67) : '25',
       icon: '👥'
     },
     {
@@ -63,6 +138,14 @@ export default function BoostCampaigns() {
       setSelectedOptions([...selectedOptions, id]);
     }
   };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-screen bg-neutral-base">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-neutral-base flex flex-col">
@@ -108,7 +191,7 @@ export default function BoostCampaigns() {
           </div>
 
           {/* Option Cards */}
-          {recommendations.slice(1).map((option) => (
+          {displayRecommendations.slice(1).map((option) => (
             <div
               key={option.id}
               onClick={() => toggleOption(option.id)}
@@ -168,6 +251,7 @@ export default function BoostCampaigns() {
             variant="outlined"
             size="lg"
             fullWidth
+            onClick={() => router.back()}
           >
             Cancel
           </Button>
@@ -175,8 +259,10 @@ export default function BoostCampaigns() {
             variant="primary"
             size="lg"
             fullWidth
+            onClick={handleBoostCampaign}
+            disabled={submitting || selectedOptions.length === 0}
           >
-            Boost Campaign
+            {submitting ? 'Boosting...' : 'Boost Campaign'}
           </Button>
         </div>
       </div>

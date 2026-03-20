@@ -45,20 +45,20 @@ export const influencerApi = {
 
       const trimmedId = influencerId.trim();
 
-      // Try the /api/user/influencer/:id endpoint first
+      // Try the /api/influencer/:id endpoint
       try {
         const response = await api.get<IInfluencerResponse>(
-          `/user/influencer/${trimmedId}`
+          `/influencer/${trimmedId}`
         );
 
         if (response.data.data) {
           return response.data.data;
         }
       } catch (error: any) {
-        // If 404 or auth error on user endpoint, try the public endpoint
+        // If 404 or auth error on auth endpoint, try the influencer endpoint
         if (error.response?.status === 404 || error.response?.status === 403) {
           const fallbackResponse = await api.get<IInfluencerResponse>(
-            `/influencers/${trimmedId}`
+            `/influencer/${trimmedId}`
           );
 
           if (!fallbackResponse.data.data) {
@@ -122,9 +122,9 @@ export const influencerApi = {
       params.page = pagination?.page || 1;
       params.limit = pagination?.limit || 10;
 
-      // Try the /api/user/influencers endpoint first
+      // Try the /api/influencers endpoint first
       try {
-        const response = await api.get<IPaginatedInfluencers>('/user/influencers', {
+        const response = await api.get<IPaginatedInfluencers>('/influencers', {
           params,
         });
 
@@ -140,10 +140,10 @@ export const influencerApi = {
           },
         };
       } catch (error: any) {
-        // If 404 or auth error on user endpoint, try the public endpoint
+        // If 404 or auth error on auth endpoint, try the influencer endpoint
         if (error.response?.status === 404 || error.response?.status === 403) {
           const fallbackResponse = await api.get<IPaginatedInfluencers>(
-            '/influencers',
+            '/influencer',
             { params }
           );
 
@@ -207,7 +207,7 @@ export const influencerApi = {
       params.page = pagination?.page || 1;
       params.limit = pagination?.limit || 10;
 
-      const response = await api.get<IPaginatedInfluencers>('/user/influencers', {
+      const response = await api.get<IPaginatedInfluencers>('/influencers', {
         params,
       });
 

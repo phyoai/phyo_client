@@ -1,16 +1,65 @@
 'use client'
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ArrowLeftLine, MoreLine, DownloadLine, CloseLine } from '@phyoofficial/phyo-icon-library';
+import { useSearchParams, useRouter } from 'next/navigation';
+import apiClient from '@/utils/api';
 
-export default function InfluencersDetailsWithDeliverable() {
-  const [deliverableStates, setDeliverableStates] = useState({
-    1: 'pending', // pending, changes_requested, approved
-    2: 'approved'
-  });
+export default function InfluencersDetailsWithDeliverable({ campaignId: propCampaignId, influencerId: propInfluencerId }) {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+
+  // Use props first, then fall back to query parameters
+  const campaignId = propCampaignId || searchParams.get('campaignId');
+  const influencerId = propInfluencerId || searchParams.get('influencerId');
+
+  const [deliverableStates, setDeliverableStates] = useState({});
+  const [deliverables, setDeliverables] = useState([]);
+  const [influencer, setInfluencer] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [timelineEvents, setTimelineEvents] = useState([]);
 
   const [showRequestChangesModal, setShowRequestChangesModal] = useState(false);
-  const [changesText, setChangesText] = useState(''); 
-    const handleRequestChanges = () => {
+  const [changesText, setChangesText] = useState('');
+
+  useEffect(() => {
+    if (campaignId) {
+      fetchDeliverables(campaignId);
+      fetchActivityTimeline(campaignId);
+    } else {
+      setLoading(false);
+    }
+  }, [campaignId]);
+
+  const fetchDeliverables = async (id) => {
+    try {
+      const response = await apiClient.get(`/campaigns/${id}/deliverables`);
+      const deliverablesData = response.data.data || [];
+      setDeliverables(deliverablesData);
+      // Initialize states for deliverables
+      const initialStates = {};
+      deliverablesData.forEach((d, idx) => {
+        initialStates[d.id || d._id || idx] = d.status || 'pending';
+      });
+      setDeliverableStates(initialStates);
+    } catch (error) {
+      console.error('Error fetching deliverables:', error);
+      setDeliverables([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchActivityTimeline = async (id) => {
+    try {
+      const response = await apiClient.get(`/campaigns/${id}/activity-timeline`);
+      setTimelineEvents(response.data.data || []);
+    } catch (error) {
+      console.error('Error fetching activity timeline:', error);
+      setTimelineEvents([]);
+    }
+  };
+
+  const handleRequestChanges = () => {
     setShowRequestChangesModal(true);
   };
   const handleSubmitChanges = () => {    // Here you would typically send the changesText to your backend to save the requested changes
@@ -29,7 +78,8 @@ export default function InfluencersDetailsWithDeliverable() {
     });
   };
 
-  const deliverables = [
+  // Use fetched deliverables or mock fallback
+  const displayDeliverables = deliverables.length > 0 ? deliverables : [
     {
       id: 1,
       type: 'InstagramFill Post',
@@ -47,26 +97,34 @@ export default function InfluencersDetailsWithDeliverable() {
     }
   ];
 
-  const timelineEvents = [
-    {
-      id: 1,
-      title: 'Deliverable Submitted',
-      time: '2hours ago',
-      status: 'completed'
-    },
-    {
-      id: 2,
-      title: 'Counter offer sent',
-      time: '1 day ago',
-      status: 'completed'
-    },
-    {
-      id: 3,
-      title: 'Influencer invited',
-      time: '3 days ago',
-      status: 'pending'
-    }
-  ];
+  // Show fallback UI if no campaign ID provided
+  if (!campaignId) {
+    return (
+      <div className="min-h-screen bg-neutral-base flex flex-col items-center justify-center">
+        <div className="text-center max-w-md p-6">
+          <h1 className="text-2xl font-bold text-gray-900 mb-4">Deliverables Review</h1>
+          <p className="text-gray-600 mb-8">No campaign selected</p>
+          <div className="space-y-4">
+            <p className="text-sm text-gray-500">
+              To view deliverables, please select a campaign from the campaign detail page
+            </p>
+            <button
+              onClick={() => router.back()}
+              className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors w-full"
+            >
+              Go Back
+            </button>
+            <div className="pt-8 border-t border-gray-200">
+              <p className="text-xs text-gray-500 mb-3">Sample URL:</p>
+              <code className="text-xs bg-gray-100 p-3 rounded text-left block break-words">
+                /brand/campaigns/influencer-detail-deliverables?campaignId=69bbbd5948e716248cc066e9
+              </code>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-neutral-base flex flex-col">
@@ -132,7 +190,7 @@ export default function InfluencersDetailsWithDeliverable() {
             </div>
 
             <div className="space-y-4">
-              {deliverables.map((deliverable) => (
+              {displayDeliverables.map((deliverable) => (
                 <div key={deliverable.id} className="border border-gray-200 rounded-lg p-4">
                   <div className="flex gap-4 mb-4">
                     {/* Thumbnail */}
@@ -213,7 +271,7 @@ export default function InfluencersDetailsWithDeliverable() {
             
             <div className="space-y-6">
               {timelineEvents.map((event, index) => (
-                <div key={event.id} className="flex gap-4">
+                <div key={event.id || index} className="flex gap-4">
                   {/* Timeline Dot and Line */}
                   <div className="flex flex-col items-center flex-shrink-0">
                     {/* Dot */}

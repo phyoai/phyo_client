@@ -1,10 +1,13 @@
 'use client'
 import React, { Suspense, useEffect } from 'react';
+import { useDispatch } from 'react-redux';
 import InboxPage from '@/components/inbox/InboxPage'
 import { useMessaging } from '@/hooks/useMessaging';
 import { useSocket } from '@/app/context/SocketContext';
+import { addMessage } from '@/store/slices/messagingSlice';
 
 function BrandInboxContent() {
+  const dispatch = useDispatch();
   const { socket, onMessage } = useSocket();
   const { conversations } = useMessaging();
 
@@ -16,13 +19,13 @@ function BrandInboxContent() {
     conversations.forEach(conv => {
       const unsub = onMessage(conv._id || conv.id, (message) => {
         // Update Redux state when new message arrives
-        // This would be handled by the messaging slice in a full implementation
+        dispatch(addMessage(message));
       });
       unsubscribers.push(unsub);
     });
 
     return () => unsubscribers.forEach(unsub => unsub?.());
-  }, [socket, conversations, onMessage]);
+  }, [socket, conversations, onMessage, dispatch]);
 
   return <InboxPage />;
 }

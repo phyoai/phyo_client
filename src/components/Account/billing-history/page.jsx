@@ -6,20 +6,17 @@ import { UserLine, FileCopyLine, DownloadLine, MoreLine } from '@phyoofficial/ph
 import AppBar from '@/components/ui/AppBar';
 import Button from '@/components/ui/Button';
 import IconButton from '@/components/ui/IconButton';
-import { usePayment } from '@/hooks';
 import { colors } from '@/config/colors';
+import apiClient from '@/utils/api';
+import { useRoleContext } from '@/app/context/RoleContext';
 
 export default function BillingHistoryAll() {
   const router = useRouter();
-  const {
-    paymentHistory,
-    loading,
-    error,
-    pagination,
-    fetchPaymentHistory,
-    verifyNewPayment
-  } = usePayment();
-
+  const { role } = useRoleContext();
+  const [paymentHistory, setPaymentHistory] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [pagination, setPagination] = useState({});
   const [openMenuId, setOpenMenuId] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [filters, setFilters] = useState({
@@ -31,57 +28,38 @@ export default function BillingHistoryAll() {
   });
   const [showFilters, setShowFilters] = useState(false);
 
+  // Fetch payment history from API
+  const fetchPaymentHistory = async (page = 1) => {
+    try {
+      setLoading(true);
+      setError(null);
+      const response = await apiClient.get(`/account/payments/history?page=${page}&limit=10`);
+      setPaymentHistory(response.data.data || []);
+      setPagination(response.data.pagination || {});
+    } catch (err) {
+      console.error('Error fetching payment history:', err);
+      setError('Failed to load payment history');
+      setPaymentHistory([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // Fetch payment history on mount and when page changes
   useEffect(() => {
-    fetchPaymentHistory(currentPage, 10);
-  }, [currentPage, fetchPaymentHistory]);
+    fetchPaymentHistory(currentPage);
+  }, [currentPage]);
 
-  const mockBillingHistory = [
-    {
-      id: 1,
-      title: 'Cancelled Free Trial',
-      date: '3:45 PM 05-01-2026',
-      amount: '+₹0',
-      action: 'DownloadLine Invoice',
-      status: 'completed'
-    },
-    {
-      id: 2,
-      title: 'Payment Failed',
-      date: '9:30 AM 07-20-2026',
-      amount: '-₹499',
-      action: 'Retry Payment',
-      isNegative: true,
-      status: 'failed'
-    },
-    {
-      id: 3,
-      title: 'Cancelled Free Trial',
-      date: '3:45 PM 05-01-2026',
-      amount: '+₹0',
-      action: 'DownloadLine Invoice',
-      status: 'completed'
-    },
-    {
-      id: 4,
-      title: 'Subscription Upgrade',
-      date: '11:00 AM 08-30-2026',
-      amount: '+₹999',
-      action: 'DownloadLine Receipt',
-      status: 'completed'
-    },
-    {
-      id: 5,
-      title: 'Renewed Subscription',
-      date: '1:15 PM 06-15-2026',
-      amount: '+₹499',
-      action: 'View Invoice',
-      status: 'pending'
-    }
-  ];
-
-  // Use Redux data or fallback to mock data
-  const transactions = (paymentHistory && paymentHistory.length > 0) ? paymentHistory : mockBillingHistory;
+  // Format payment history for display
+  const transactions = paymentHistory.map(payment => ({
+    _id: payment._id,
+    title: payment.description || payment.type,
+    date: new Date(payment.createdAt).toLocaleString(),
+    amount: payment.amount ? `${payment.type === 'credit' ? '+' : '-'}₹${payment.amount}` : '₹0',
+    action: payment.status === 'failed' ? 'Retry Payment' : 'Download Invoice',
+    status: payment.status,
+    isNegative: payment.type !== 'credit'
+  }));
 
   // Handle retry payment for failed transactions
   const handleRetryPayment = async (transactionId) => {

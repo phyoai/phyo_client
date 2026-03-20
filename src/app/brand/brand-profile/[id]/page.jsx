@@ -1,8 +1,10 @@
 'use client';
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useParams, useRouter } from "next/navigation";
 import { YoutubeFill, InstagramFill, TwitterXLine } from '@phyoofficial/phyo-icon-library';
 import { ShieldCheckLine, ExternalLinkLine, GlobeLine, ArrowLeftLine, MoreLine } from '@phyoofficial/phyo-icon-library';
+import apiClient from "@/utils/api";
 
 const SOCIALS = [
   { platform: "Youtube",   icon: <YoutubeFill size={18} /> },
@@ -72,25 +74,30 @@ function CampaignCard({ title, subtitle, img }) {
   );
 }
 
-function CampaignsTab() {
+function CampaignsTab({ campaigns }) {
+  if (!campaigns || campaigns.length === 0) {
+    return (
+      <div style={{ padding: "20px", textAlign: "center", color: "#6b7280" }}>
+        No campaigns available
+      </div>
+    );
+  }
+
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
-      {/* Latest */}
       <div>
         <h3 style={{ fontSize: 15, fontWeight: 700, color: "#111", margin: "0 0 10px", paddingLeft: 2 }}>
-          Latest campaigns
+          Campaigns ({campaigns.length})
         </h3>
         <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-          {LATEST_CAMPAIGNS.map(c => <CampaignCard key={c.id} {...c} />)}
-        </div>
-      </div>
-      {/* Previous */}
-      <div>
-        <h3 style={{ fontSize: 15, fontWeight: 700, color: "#111", margin: "0 0 10px", paddingLeft: 2 }}>
-          Previous Campaigns
-        </h3>
-        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-          {PREVIOUS_CAMPAIGNS.map(c => <CampaignCard key={c.id} {...c} />)}
+          {campaigns.map(c => (
+            <CampaignCard
+              key={c.id || c._id}
+              title={c.title || c.campaignName || 'Campaign'}
+              subtitle={c.subtitle || c.campaignBrief || 'Campaign Details'}
+              img={c.productImages?.[0] || 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=600&q=80'}
+            />
+          ))}
         </div>
       </div>
     </div>
@@ -98,7 +105,54 @@ function CampaignsTab() {
 }
 
 export default function BrandProfile() {
+  const params = useParams();
+  const router = useRouter();
+  const brandId = params.id;
+
   const [activeTab, setActiveTab] = useState("info");
+  const [brand, setBrand] = useState(null);
+  const [campaigns, setCampaigns] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (brandId) {
+      fetchBrandData(brandId);
+      fetchBrandCampaigns(brandId);
+    }
+  }, [brandId]);
+
+  const fetchBrandData = async (id) => {
+    try {
+      const response = await apiClient.get(`/brand/${id}`);
+      setBrand(response.data.data || {});
+    } catch (error) {
+      console.error('Error fetching brand data:', error);
+      setBrand({});
+    }
+  };
+
+  const fetchBrandCampaigns = async (id) => {
+    try {
+      const response = await apiClient.get(`/brand/${id}/campaigns`);
+      setCampaigns(response.data.data || []);
+    } catch (error) {
+      console.error('Error fetching campaigns:', error);
+      setCampaigns([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="w-full h-screen flex items-center justify-center bg-neutral-base">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading brand profile...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <>
@@ -184,17 +238,19 @@ export default function BrandProfile() {
                 fontSize: 28, fontWeight: 900, color: "#111",
                 margin: 0, letterSpacing: "-0.03em",
               }}>
-                Lenskart
+                {brand?.companyName || brand?.name || 'Brand'}
               </h1>
-              <span style={{ width: 22, height: 22, flexShrink: 0, display: "inline-flex", alignItems: "center", justifyContent: "center", color: "#43573b" }}>
-                <ShieldCheckLine size={22} />
-              </span>
+              {brand?.isVerified && (
+                <span style={{ width: 22, height: 22, flexShrink: 0, display: "inline-flex", alignItems: "center", justifyContent: "center", color: "#43573b" }}>
+                  <ShieldCheckLine size={22} />
+                </span>
+              )}
             </div>
             <p style={{ fontSize: 15, color: "#4b5563", margin: "0 0 14px", lineHeight: 1.5 }}>
-              Creating beautiful sunglasses for modern living
+              {brand?.bio || brand?.description || 'Brand description'}
             </p>
             <div style={{ display: "flex", gap: 8 }}>
-              {["Lifestyle", "Fashion"].map((cat, i) => (
+              {(brand?.categories || []).slice(0, 2).map((cat, i) => (
                 <span key={i} style={{
                   padding: "5px 16px",
                   background: "rgba(255,255,255,0.55)",
@@ -255,7 +311,7 @@ export default function BrandProfile() {
                   </span>
                 </div>
                 <p style={{ fontSize: 14, color: "#6b7280", lineHeight: 1.8, margin: 0 }}>
-                  Um, I'm happy you're home. You're an idiot, Steve Harrington. You're beautiful, Nancy Wheeler. You're right. You are a freak.... Who would you rather be friends with: Bowie or Kenny Rogers? Why's he gotta kick the door? Why do we even need weapons anyway? We have her. Friends don't lie. It's about the shadow monster, isn't it? You're an idiot, Steve Harrington. You're beautiful, Nancy Wheeler. Nobody normal ever accomplished anything meaningful...
+                  {brand?.about || brand?.bio || brand?.description || 'No description available'}
                 </p>
               </div>
 
@@ -272,47 +328,55 @@ export default function BrandProfile() {
                 overflow: "hidden",
                 background: "#fff",
               }}>
-                {SOCIALS.map((s, i) => (
-                  <div key={i} style={{
-                    display: "flex", alignItems: "center", justifyContent: "space-between",
-                    padding: "14px 16px",
-                    borderBottom: i < SOCIALS.length - 1 ? "1px solid #f0f0f0" : "none",
-                    cursor: "pointer",
-                  }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
-                      <div style={{
-                        width: 38, height: 38,
-                        background: "#111",
-                        borderRadius: 10,
-                        display: "flex", alignItems: "center", justifyContent: "center",
-                        flexShrink: 0,
-                        color: "white",
+                {brand?.socials && Object.keys(brand.socials).length > 0 ? (
+                  Object.entries(brand.socials).map(([platform, url], i) => {
+                    const socialConfig = SOCIALS.find(s => s.platform.toLowerCase().includes(platform.toLowerCase()));
+                    return (
+                      <a key={i} href={url} target="_blank" rel="noopener noreferrer" style={{
+                        display: "flex", alignItems: "center", justifyContent: "space-between",
+                        padding: "14px 16px",
+                        borderBottom: i < Object.keys(brand.socials).length - 1 ? "1px solid #f0f0f0" : "none",
+                        cursor: "pointer",
+                        textDecoration: "none",
                       }}>
-                        {s.icon}
-                      </div>
-                      <span style={{ fontSize: 15, fontWeight: 600, color: "#111" }}>{s.platform}</span>
-                    </div>
-                    <div style={{
-                      width: 34, height: 34,
-                      border: "1px solid #e0e0e0",
-                      borderRadius: 8,
-                      display: "flex", alignItems: "center", justifyContent: "center",
-                      background: "#fafafa",
-                      flexShrink: 0,
-                      overflow: "hidden",
-                    }}>
-                      <span style={{ width: 15, height: 15, display: "inline-flex", alignItems: "center", justifyContent: "center", color: "#6b7280" }}>
-                        <ExternalLinkLine size={15} />
-                      </span>
-                    </div>
-                  </div>
-                ))}
+                        <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+                          <div style={{
+                            width: 38, height: 38,
+                            background: "#111",
+                            borderRadius: 10,
+                            display: "flex", alignItems: "center", justifyContent: "center",
+                            flexShrink: 0,
+                            color: "white",
+                          }}>
+                            {socialConfig?.icon || <ExternalLinkLine size={18} />}
+                          </div>
+                          <span style={{ fontSize: 15, fontWeight: 600, color: "#111" }}>{platform.charAt(0).toUpperCase() + platform.slice(1)}</span>
+                        </div>
+                        <div style={{
+                          width: 34, height: 34,
+                          border: "1px solid #e0e0e0",
+                          borderRadius: 8,
+                          display: "flex", alignItems: "center", justifyContent: "center",
+                          background: "#fafafa",
+                          flexShrink: 0,
+                          overflow: "hidden",
+                        }}>
+                          <span style={{ width: 15, height: 15, display: "inline-flex", alignItems: "center", justifyContent: "center", color: "#6b7280" }}>
+                            <ExternalLinkLine size={15} />
+                          </span>
+                        </div>
+                      </a>
+                    );
+                  })
+                ) : (
+                  <div style={{ padding: "16px", color: "#6b7280", textAlign: "center" }}>No social links available</div>
+                )}
               </div>
             </>
           )}
 
           {activeTab === "campaigns" && (
-            <CampaignsTab />
+            <CampaignsTab campaigns={campaigns} />
           )}
         </div>
       </div>

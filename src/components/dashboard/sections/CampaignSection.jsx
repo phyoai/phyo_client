@@ -13,14 +13,19 @@ export default function CampaignSection({
   title,
   eyebrow,
   campaignsCount = 3,
-  showViewAll = true
+  showViewAll = true,
+  isTrending = false
 }) {
   const { getUserType } = useAuth();
   const role = (getUserType() || 'user').toLowerCase();
   const router = useRouter();
+  
 
   // Redux campaigns hook
-  const { campaigns: campaignsAll, loading, fetchCampaigns } = useCampaigns();
+  const { campaigns: campaignsAll, trendingCampaigns, loading, fetchCampaigns, fetchTrendingCampaigns } = useCampaigns();
+
+  // Use trending or regular campaigns based on prop
+  const campaignsToDisplay = isTrending ? trendingCampaigns : campaignsAll;
 
   // Helper function to calculate time ago
   const getTimeAgo = (date) => {
@@ -55,18 +60,28 @@ export default function CampaignSection({
   };
 
   // Transform API data to card format
-  const campaigns = campaignsAll.slice(0, campaignsCount).map((campaign) => ({
-    id: campaign._id,
-    brandName: campaign.brandId?.companyName || 'Unknown Brand',
-    brandInitials: getInitials(campaign.brandId?.companyName || 'UB'),
-    timeAgo: getTimeAgo(campaign.createdAt),
-    campaignImage: campaign.productImages?.[0] || '/dummyAvatar.jpg',
-    initialsColor: getInitialsColor(campaign._id)
-  }));
+  const campaigns = campaignsToDisplay.slice(0, campaignsCount).map((campaign) => {
+    const brandCompanyName = campaign.brand?.companyName || campaign.brand?.name || campaign.brandId?.companyName || campaign.brandId?.name || 'Unknown Brand';
+    return {
+      id: campaign._id,
+      brandName: brandCompanyName,
+      brandInitials: getInitials(brandCompanyName),
+      timeAgo: getTimeAgo(campaign.createdAt),
+      campaignImage: campaign.productImages?.[0] || '/dummyAvatar.jpg',
+      campaignTitle: campaign.title || 'Untitled Campaign',
+      budget: campaign.budget || 0,
+      applications: campaign.applications || 0,
+      initialsColor: getInitialsColor(campaign._id)
+    };
+  });
   // Load campaigns on mount
   useEffect(() => {
-    fetchCampaigns();
-  }, [role]);
+    if (isTrending) {
+      fetchTrendingCampaigns({ limit: campaignsCount });
+    } else {
+      fetchCampaigns();
+    }
+  }, [role, isTrending, campaignsCount]);
 
   return (
     <div className="mb-8">
@@ -91,6 +106,9 @@ export default function CampaignSection({
               brandInitials={campaign.brandInitials}
               timeAgo={campaign.timeAgo}
               campaignImage={campaign.campaignImage}
+              campaignTitle={campaign.campaignTitle}
+              budget={campaign.budget}
+              applications={campaign.applications}
               initialsColor={campaign.initialsColor}
               onClick={() => router.push(`/${role}/campaigns/${campaign.id}`)}
             />

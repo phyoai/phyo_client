@@ -12,6 +12,7 @@ interface Campaign {
 
 interface CampaignState {
   campaigns: Campaign[];
+  trendingCampaigns: Campaign[];
   myCampaigns: Campaign[];
   selectedCampaign: Campaign | null;
   loading: boolean;
@@ -25,6 +26,7 @@ interface CampaignState {
 
 const initialState: CampaignState = {
   campaigns: [],
+  trendingCampaigns: [],
   myCampaigns: [],
   selectedCampaign: null,
   loading: false,
@@ -45,6 +47,20 @@ export const getCampaigns = createAsyncThunk(
       return response.data;
     } catch (error: any) {
       console.error('Error fetching campaigns:', error.response?.status, error.message);
+      // Return empty data instead of rejecting to prevent crash
+      return { data: [], pagination: { page: 1, totalPages: 1, totalItems: 0 } };
+    }
+  }
+);
+
+export const getTrendingCampaigns = createAsyncThunk(
+  'campaign/getTrendingCampaigns',
+  async (params: any = {}, { rejectWithValue }) => {
+    try {
+      const response = await apiClient.get('/trending/campaigns', { params });
+      return response.data;
+    } catch (error: any) {
+      console.error('Error fetching trending campaigns:', error.message);
       // Return empty data instead of rejecting to prevent crash
       return { data: [], pagination: { page: 1, totalPages: 1, totalItems: 0 } };
     }
@@ -105,7 +121,7 @@ export const createCampaign = createAsyncThunk(
 export const updateCampaign = createAsyncThunk(
   'campaign/updateCampaign',
   async ({ id, data }: { id: string; data: any }) => {
-    const response = await apiClient.put(`/campaigns/${id}`, data);
+    const response = await apiClient.patch(`/campaigns/${id}`, data);
     return response.data.data;
   }
 );
@@ -121,7 +137,7 @@ export const deleteCampaign = createAsyncThunk(
 export const applyToCampaign = createAsyncThunk(
   'campaign/applyToCampaign',
   async ({ id, applicationData }: { id: string; applicationData?: any }) => {
-    const response = await apiClient.post(`/campaigns/${id}/influencers`, applicationData || {});
+    const response = await apiClient.post(`/campaigns/${id}/apply`, applicationData || {});
     return response.data;
   }
 );
@@ -155,6 +171,22 @@ const campaignSlice = createSlice({
         state.loading = false;
         state.error = null; // Don't show error, just show empty list
         state.campaigns = [];
+      });
+
+    // Get Trending Campaigns
+    builder
+      .addCase(getTrendingCampaigns.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(getTrendingCampaigns.fulfilled, (state, action) => {
+        state.loading = false;
+        state.trendingCampaigns = action.payload.data || [];
+      })
+      .addCase(getTrendingCampaigns.rejected, (state, action) => {
+        state.loading = false;
+        state.error = null;
+        state.trendingCampaigns = [];
       });
 
     // Get My Campaigns

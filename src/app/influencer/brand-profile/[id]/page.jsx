@@ -1,8 +1,11 @@
 'use client';
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useParams, useRouter } from "next/navigation";
+import { useDispatch, useSelector } from "react-redux";
 import { YoutubeFill, InstagramFill, TwitterXLine } from '@phyoofficial/phyo-icon-library';
 import { ShieldCheckLine, ExternalLinkLine, GlobeLine, ArrowLeftLine, MoreLine } from '@phyoofficial/phyo-icon-library';
+import { getBrandById } from "@/store/slices/brandSlice";
 
 const SOCIALS = [
   { platform: "Youtube",   icon: <YoutubeFill size={18} /> },
@@ -98,7 +101,68 @@ function CampaignsTab() {
 }
 
 export default function BrandProfile() {
+  const params = useParams();
+  const router = useRouter();
+  const dispatch = useDispatch();
   const [activeTab, setActiveTab] = useState("info");
+
+  // Redux selectors
+  const { selectedBrand: brand, loading, error } = useSelector(state => state.brand);
+  const brandId = params?.id;
+
+  // Fetch brand data on mount
+  useEffect(() => {
+    if (brandId) {
+      dispatch(getBrandById(brandId));
+    }
+  }, [brandId, dispatch]);
+
+  // Loading state
+  if (loading) {
+    return (
+      <div style={{
+        minHeight: "100vh",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        background: "linear-gradient(180deg, #c8d9be 0%, #d4e2ca 35%, #ddebd4 65%, #eaf2e5 100%)",
+      }}>
+        <div style={{ textAlign: "center" }}>
+          <div style={{ fontSize: 18, fontWeight: 600, color: "#111", marginBottom: 10 }}>Loading brand...</div>
+        </div>
+      </div>
+    );
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <div style={{
+        minHeight: "100vh",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        background: "linear-gradient(180deg, #c8d9be 0%, #d4e2ca 35%, #ddebd4 65%, #eaf2e5 100%)",
+      }}>
+        <div style={{ textAlign: "center" }}>
+          <div style={{ fontSize: 18, fontWeight: 600, color: "#d32f2f", marginBottom: 10 }}>Brand not found</div>
+          <button onClick={() => router.back()} style={{
+            padding: "8px 16px",
+            background: "#4a6cf7",
+            color: "white",
+            border: "none",
+            borderRadius: 6,
+            cursor: "pointer",
+          }}>
+            Go Back
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // Get brand initials
+  const initials = brand?.name?.split(' ').map(w => w[0]).join('').toUpperCase() || 'AB';
 
   return (
     <>
@@ -117,7 +181,7 @@ export default function BrandProfile() {
         maxWidth: 830,
         boxSizing: "border-box",
       }}>
-        <button style={{ background: "none", border: "none", cursor: "pointer", padding: 4 }}>
+        <button onClick={() => router.back()} style={{ background: "none", border: "none", cursor: "pointer", padding: 4 }}>
           <ArrowLeftLine size={22} className="text-gray-950" />
         </button>
         <button style={{ background: "none", border: "none", cursor: "pointer", padding: 4 }}>
@@ -144,7 +208,7 @@ export default function BrandProfile() {
           paddingTop: 14,
         }}>
 
-          {/* Large "AB" initials — fixed, fades out toward bottom */}
+          {/* Large initials — fixed, fades out toward bottom */}
           <div style={{
             position: "fixed",
             top: "8%",
@@ -161,7 +225,7 @@ export default function BrandProfile() {
             lineHeight: 0.9,
             zIndex: 0,
           }}>
-            AB
+            {initials}
           </div>
 
           {/* Spacer so brand name sits below AB */}
@@ -184,17 +248,17 @@ export default function BrandProfile() {
                 fontSize: 28, fontWeight: 900, color: "#111",
                 margin: 0, letterSpacing: "-0.03em",
               }}>
-                Lenskart
+                {brand?.name || 'Brand'}
               </h1>
               <span style={{ width: 22, height: 22, flexShrink: 0, display: "inline-flex", alignItems: "center", justifyContent: "center", color: "#43573b" }}>
                 <ShieldCheckLine size={22} />
               </span>
             </div>
             <p style={{ fontSize: 15, color: "#4b5563", margin: "0 0 14px", lineHeight: 1.5 }}>
-              Creating beautiful sunglasses for modern living
+              {brand?.website ? `Visit ${brand.name} at ${brand.website}` : 'Premium brand'}
             </p>
             <div style={{ display: "flex", gap: 8 }}>
-              {["Lifestyle", "Fashion"].map((cat, i) => (
+              {(brand?.categories || ["Lifestyle", "Premium"]).map((cat, i) => (
                 <span key={i} style={{
                   padding: "5px 16px",
                   background: "rgba(255,255,255,0.55)",

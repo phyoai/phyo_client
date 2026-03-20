@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { ArrowLeftLine, FileTextLine, Message3Line, MailLine, PhoneLine, CloseLine, SearchLine } from '@phyoofficial/phyo-icon-library';
 import { useGoBack } from '@/hooks/useGoBack';
@@ -9,6 +9,7 @@ import Button from '@/components/ui/Button';
 import IconButton from '@/components/ui/IconButton';
 import Card from '@/components/ui/Card';
 import { colors } from '@/config/colors';
+import apiClient from '@/utils/api';
 
 export default function HelpSupportAll() {
   const router = useRouter();
@@ -18,6 +19,28 @@ export default function HelpSupportAll() {
   const [selectedLanguage, setSelectedLanguage] = useState('english');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedFaqId, setSelectedFaqId] = useState(null);
+  const [faqs, setFaqs] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    fetchFaqs();
+  }, []);
+
+  const fetchFaqs = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const response = await apiClient.get('/help/faqs');
+      setFaqs(response.data.data || []);
+    } catch (err) {
+      console.error('Error fetching FAQs:', err);
+      setError('Failed to load FAQs');
+      setFaqs([]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const languages = [
     { id: 'english', name: 'English', subtitle: "device's language" },
@@ -30,46 +53,35 @@ export default function HelpSupportAll() {
     { id: 'malayalam', name: 'മലയാളം', subtitle: 'Malayalam' }
   ];
 
-  const faqs = [
-    {
-      id: 1,
-      title: "How to use the app?",
-      content: "Our app is designed to be intuitive and user-friendly. Here's a quick guide to get you started:\n\n1. **Account Setup**: First, create your account by selecting whether you're an influencer or a brand. Fill in your profile information to help others understand who you are.\n\n2. **Dashboard Navigation**: Once logged in, you'll see your main dashboard. Use the navigation menu to explore different sections like your profile, messages, collaborations, and analytics.\n\n3. **Discovery**: Use the search and filter features to find influencers or brands that match your criteria. You can filter by niche, location, engagement rate, and more.\n\n4. **Connecting**: When you find someone you'd like to work with, send them a collaboration request. Include details about your proposal to increase your chances of a positive response.\n\n5. **Managing Collaborations**: Track all your ongoing and past collaborations in the \"My Collaborations\" section. Here you can view contract details, deliverables, timelines, and communicate with your partners.\n\n6. **Analytics**: Monitor your performance through our analytics dashboard. Track engagement, reach, and ROI for all your collaborations.\n\nIf you need more help, check out our video tutorials or contact our support team."
-    },
-    {
-      id: 2,
-      title: "How to convert to an influencer account?",
-      content: "Converting your account to an influencer account is simple:\n\n1. Go to your account settings\n2. Select 'Account Type' from the menu\n3. Click on 'Convert to Influencer Account'\n4. Follow the on-screen instructions\n5. Complete your influencer profile with your niche, engagement rates, and portfolio\n6. Your account will be reviewed and approved within 24-48 hours\n\nOnce approved, you'll have access to all influencer features and be discoverable to brands looking for collaborations."
-    },
-    {
-      id: 3,
-      title: "What's the difference between influencer and brand accounts?",
-      content: "**Influencer Accounts** are designed for content creators and influencers who want to collaborate with brands. Features include:\n- Portfolio showcase\n- Analytics dashboard for engagement tracking\n- Collaboration requests from brands\n- Direct messaging with brands\n\n**Brand Accounts** are for businesses looking to collaborate with influencers. Features include:\n- SearchLine and filter influencers by niche\n- Campaign management tools\n- Budget and deliverable tracking\n- Team collaboration features\n\nChoose the account type that best fits your role in the influencer marketing ecosystem."
-    },
-    {
-      id: 4,
-      title: "How do I choose the right influencer for my brand?",
-      content: "Finding the right influencer for your brand involves several steps:\n\n1. **Define Your Goals**: Clearly identify what you want to achieve - brand awareness, sales, content creation, etc.\n\n2. **Identify Your Target Audience**: Understand your ideal customer and look for influencers whose audience matches.\n\n3. **Check Engagement Rates**: Look beyond follower count. Engagement rate shows how active and loyal an influencer's audience is.\n\n4. **Review Content Quality**: Make sure the influencer's content style aligns with your brand values.\n\n5. **Analyze Niche Alignment**: Choose influencers who operate in your industry or related areas.\n\n6. **Check Authenticity**: Look for genuine engagement and avoid accounts with suspicious activity.\n\n7. **Review Past Collaborations**: See what other brands they've worked with and the results.\n\n8. **Start Small**: Begin with micro-influencers or smaller collaborations before committing to major campaigns."
-    },
-    {
-      id: 5,
-      title: "How can user feedback improve product design?",
-      content: "UserLine feedback is invaluable for improving our platform:\n\n1. **Direct Feedback**: We actively listen to suggestions and complaints from our users.\n\n2. **Usage Analytics**: We analyze how users interact with different features to identify pain points.\n\n3. **UserLine Testing**: We conduct regular sessions with users to understand their needs and frustrations.\n\n4. **Community Forum**: Our community discusses feature requests and improvements.\n\n5. **Continuous Iteration**: Based on feedback, we regularly update and improve our features.\n\n6. **Transparency**: We keep our users informed about upcoming changes and improvements.\n\nIf you have feedback or suggestions, please don't hesitate to contact our support team. Your input helps us build a better platform for everyone."
-    }
-  ];
-
   const filteredFaqs = faqs.filter(faq =>
-    faq.title.toLowerCase().includes(searchQuery.toLowerCase())
+    faq.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    (faq.question && faq.question.toLowerCase().includes(searchQuery.toLowerCase()))
   );
 
-  const selectedFaq = faqs.find(faq => faq.id === selectedFaqId);
+  const selectedFaq = faqs.find(faq => faq._id === selectedFaqId || faq.id === selectedFaqId);
 
   const FaqItem = ({ faq, onClick }) => (
     <button onClick={onClick} className="w-full flex items-center px-6 py-5 transition-colors" style={{ backgroundColor: colors.neutral.base }}>
       <FileTextLine className="w-6 h-6 mr-3 flex-shrink-0" style={{ color: colors.brand.base }} strokeWidth={1.5} />
-      <span className="text-base font-semibold text-left" style={{ color: colors.text.neutral.base }}>{faq.title}</span>
+      <span className="text-base font-semibold text-left" style={{ color: colors.text.neutral.base }}>{faq.title || faq.question}</span>
     </button>
   );
+
+  if (loading) {
+    return (
+      <div className="w-full h-full flex flex-col" style={{ backgroundColor: colors.neutral.base }}>
+        <AppBar
+          title="Help & Support"
+          onBack={() => router.back()}
+          showMenu={true}
+          onMenuClick={() => setIsLanguageModalOpen(true)}
+        />
+        <div className="flex-1 flex items-center justify-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2" style={{ borderColor: colors.brand.base }}></div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full h-full flex flex-col" style={{ backgroundColor: colors.neutral.base }}>
@@ -79,6 +91,12 @@ export default function HelpSupportAll() {
         showMenu={true}
         onMenuClick={() => setIsLanguageModalOpen(true)}
       />
+
+      {error && (
+        <div className="mx-3 mt-3 p-3 bg-red-50 border border-red-200 rounded text-red-800 text-sm">
+          {error}
+        </div>
+      )}
 
       {/* Content */}
       <div className="flex-1 overflow-y-auto px-3 sm:px-4 md:px-6 lg:px-9 relative flex flex-col">
@@ -94,10 +112,12 @@ export default function HelpSupportAll() {
               />
               <span className="text-sm font-semibold" style={{ color: colors.text.neutral.base }}>Back</span>
             </div>
-            <div className="flex-1 px-4 py-4">
-              <h1 className="text-2xl font-semibold mb-4" style={{ color: colors.text.neutral.base }}>{selectedFaq.title}</h1>
-              <p className="text-base whitespace-pre-line leading-relaxed" style={{ color: colors.text.neutral.muted }}>{selectedFaq.content}</p>
-            </div>
+            {selectedFaq && (
+              <div className="flex-1 px-4 py-4">
+                <h1 className="text-2xl font-semibold mb-4" style={{ color: colors.text.neutral.base }}>{selectedFaq.title || selectedFaq.question}</h1>
+                <p className="text-base whitespace-pre-line leading-relaxed" style={{ color: colors.text.neutral.muted }}>{selectedFaq.content || selectedFaq.answer}</p>
+              </div>
+            )}
           </>
         ) : (
           /* FAQ List View */
@@ -144,9 +164,9 @@ export default function HelpSupportAll() {
                 <div className="w-full">
                   {filteredFaqs.map((faq) => (
                     <FaqItem
-                      key={faq.id}
+                      key={faq._id || faq.id}
                       faq={faq}
-                      onClick={() => setSelectedFaqId(faq.id)}
+                      onClick={() => setSelectedFaqId(faq._id || faq.id)}
                     />
                   ))}
                 </div>

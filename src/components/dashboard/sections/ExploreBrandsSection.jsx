@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import BrandCard from '@/components/cards/BrandCard';
 import { useAuth } from '@/app/context/AuthContext';
-import { useCampaigns } from '@/hooks/useCampaigns';
+import { useBrands } from '@/hooks/useBrands';
 
 /**
  * Explore Brands Section
@@ -13,43 +13,29 @@ export default function ExploreBrandsSection() {
   const { getUserType } = useAuth();
   const role = (getUserType() || 'user').toLowerCase();
 
-  // Redux campaigns hook
-  const { campaigns, loading, fetchCampaigns } = useCampaigns();
+  // Redux brands hook
+  const { trendingBrands, loading, fetchTrendingBrands } = useBrands();
 
-  // Extract unique brands from campaigns
+  // Format brands with color coding
   const brands = (() => {
-    const brandsMap = new Map();
-    (campaigns || []).forEach((campaign) => {
-      const brandKey = campaign.brand?.id || 'unknown';
-      if (!brandsMap.has(brandKey)) {
-        brandsMap.set(brandKey, {
-          id: campaign.brand?.id || Math.random(),
-          name: `${campaign.brand?.firstName || ''} ${campaign.brand?.lastName || 'Unknown Brand'}`.trim(),
-          companyName: campaign.brand?.companyName || '',
-          campaigns: 0,
-          totalBudget: 0
-        });
-      }
-      const brand = brandsMap.get(brandKey);
-      brand.campaigns += 1;
-      brand.totalBudget += campaign.budget || 0;
-    });
-
-    // Format brands with color coding
     const colorOptions = [
       'bg-yellow-500', 'bg-green-600', 'bg-blue-600', 'bg-red-600',
       'bg-red-700', 'bg-yellow-500', 'bg-green-600', 'bg-blue-600'
     ];
 
-    return Array.from(brandsMap.values()).slice(0, 8).map((brand, index) => ({
-      ...brand,
+    return (trendingBrands || []).slice(0, 8).map((brand, index) => ({
+      id: brand._id || brand.id,
+      name: brand.name || 'Unknown Brand',
+      companyName: brand.companyName || brand.name || '',
+      campaigns: brand.activeCampaigns || 0,
+      totalBudget: brand.totalBudget || 0,
       initial: (brand.name || brand.companyName || 'B').split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2),
       color: colorOptions[index % colorOptions.length]
     }));
   })();
 
   useEffect(() => {
-    fetchCampaigns({ limit: 24 });
+    fetchTrendingBrands({ limit: 8 });
   }, []);
 
   return (

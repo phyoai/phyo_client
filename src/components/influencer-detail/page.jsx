@@ -4,6 +4,7 @@ import { ArrowLeftLine, MoreLine, BookmarkLine, YoutubeFill, InstagramFill, Twit
 import { useRouter, useParams, useSearchParams } from 'next/navigation';
 import { useRoleContext } from '@/app/context/RoleContext';
 import Image2Line from 'next/image';
+import apiClient from '@/utils/api';
 
 const influencersData = [
   {
@@ -162,26 +163,45 @@ const TopInfluencersPageDetails = () => {
     { id: 2, name: 'Campaign 1', initials: 'AB', color: '#0066ff' }
   ]);
 
-  // Get influencer data from URL params (passed from onClick)
-  // NO API CALLS - data is passed through URL
+  // Get influencer data from URL params or fetch from API
   useEffect(() => {
-    const influencerParam = searchParams?.get('influencer');
+    const fetchInfluencerData = async () => {
+      // First try to get from URL query parameter
+      const influencerParam = searchParams?.get('influencer');
 
-    if (!influencerParam) {
-      setError('No influencer data provided');
-      return;
-    }
+      if (influencerParam) {
+        try {
+          const influencer = JSON.parse(decodeURIComponent(influencerParam));
+          transformAndSetInfluencer(influencer);
+          return;
+        } catch (err) {
+          console.error('Error parsing influencer param:', err);
+        }
+      }
 
-    try {
-      // Decode influencer data from URL
-      const influencer = JSON.parse(decodeURIComponent(influencerParam));
+      // If no query param, fetch from API using route ID
+      if (params?.id) {
+        try {
+          const response = await apiClient.get(`/influencer/${params.id}`);
+          const influencer = response.data.data || response.data;
+          transformAndSetInfluencer(influencer);
+        } catch (err) {
+          console.error('Error fetching influencer:', err);
+          setError('Failed to load influencer profile');
+          setDisplayInfluencer(null);
+        }
+      } else {
+        setError('No influencer ID provided');
+        setDisplayInfluencer(null);
+      }
+    };
 
-      // Transform to display format
+    const transformAndSetInfluencer = (influencer) => {
       const transformed = {
         id: influencer._id || influencer.id || params?.id,
         name: influencer.username || influencer.name || 'Unknown',
         username: `@${influencer.username || influencer.name || 'user'}`,
-        followers: influencer.followers ? `${(influencer.followers / 1000).toFixed(1)}k` : '0k',
+        followers: influencer.instagramFollowers || influencer.followers ? `${((influencer.instagramFollowers || influencer.followers) / 1000).toFixed(1)}k` : '0k',
         following: influencer.following ? `${(influencer.following / 1000).toFixed(1)}k` : '0k',
         posts: influencer.posts || influencer.postsCount || '0',
         location: influencer.location || 'Unknown',
@@ -194,11 +214,9 @@ const TopInfluencersPageDetails = () => {
 
       setDisplayInfluencer(transformed);
       setError(null);
-    } catch (err) {
-      console.error('Error parsing influencer data:', err);
-      setError('Invalid influencer data provided');
-      setDisplayInfluencer(null);
-    }
+    };
+
+    fetchInfluencerData();
   }, [searchParams, params?.id]);
 
   const handleBack = () => {

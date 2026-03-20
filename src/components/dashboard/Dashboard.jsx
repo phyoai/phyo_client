@@ -25,7 +25,7 @@ function BrandDashboardContent({ t, role }) {
   return (
     <>
       <TrendingInfluencersSection />
-      <CampaignSection title={t('top_campaigns')} campaignsCount={3} role={role} />
+      <CampaignSection title={t('top_campaigns')} campaignsCount={3} isTrending={true} />
       <InfluencerListSection title={t('influencers_near_you')} role={role} />
       <ExploreBrandsSection role={role} />
       <CampaignSection title={t('campaigns_near_you')} campaignsCount={2} role={role} />
@@ -56,7 +56,7 @@ function InfluencerDashboardContent({ t, role }) {
   return (
     <>
       <TrendingInfluencersSection />
-      <CampaignSection title={t('top_campaigns')} campaignsCount={3} role={role} />
+      <CampaignSection title={t('top_campaigns')} campaignsCount={3} isTrending={true} />
       <InfluencerListSection title={t('influencers_near_you')} role={role} />
       <CampaignSection title={t('campaigns_near_you')} campaignsCount={2} role={role} />
       <InfluencerListSection title={t('influencers_near_you')} role={role} />
@@ -79,7 +79,7 @@ function UserDashboardContent({ t, role }) {
   return (
     <>
       <TrendingInfluencersSection />
-      <CampaignSection title={t('top_campaigns')} campaignsCount={3} role={role} />
+      <CampaignSection title={t('top_campaigns')} campaignsCount={3} isTrending={true} />
       <InfluencerListSection title={t('influencers_near_you')} role={role} />
       <ExploreBrandsSection role={role} />
       <CampaignSection title={t('campaigns_near_you')} campaignsCount={2} role={role} />

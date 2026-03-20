@@ -5,76 +5,50 @@ import { useRouter } from 'next/navigation';
 import { ArrowLeftLine, MoreLine } from '@phyoofficial/phyo-icon-library';
 import AppBar from '@/components/ui/AppBar';
 import { useRoleContext } from '@/app/context/RoleContext';
+import apiClient from '@/utils/api';
 
 const TransactionsPage = () => {
   const router = useRouter();
   const { role } = useRoleContext();
   const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(1);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    // Mock transactions data grouped by month
-    const mockTransactions = [
-      {
-        id: 1,
-        date: '2026-07-20',
-        time: '9:30 AM',
-        month: 'December 2025',
-        type: 'Payment Failed',
-        amount: '-₹499',
-        amountColor: 'text-red-600',
-        action: 'Retry Payment',
-        icon: 'bg-blue-600'
-      },
-      {
-        id: 2,
-        date: '2026-07-20',
-        time: '10:15 AM',
-        month: 'December 2025',
-        type: 'Payment Successful',
-        amount: '+₹499',
-        amountColor: 'text-green-600',
-        action: 'View Receipt',
-        icon: 'bg-blue-600'
-      },
-      {
-        id: 3,
-        date: '2026-07-20',
-        time: '11:00 AM',
-        month: 'December 2025',
-        type: 'Payment Pending',
-        amount: '₹0',
-        amountColor: 'text-yellow-600',
-        action: 'Check Status',
-        icon: 'bg-blue-600'
-      },
-      {
-        id: 4,
-        date: '2026-07-20',
-        time: '11:45 AM',
-        month: 'December 2025',
-        type: 'Payment Declined',
-        amount: '-₹499',
-        amountColor: 'text-red-600',
-        action: 'Contact Support',
-        icon: 'bg-blue-600'
-      },
-      {
-        id: 5,
-        date: '2026-07-20',
-        time: '12:30 PM',
-        month: 'December 2025',
-        type: 'Refund Processed',
-        amount: '+₹499',
-        amountColor: 'text-green-600',
-        action: 'View Refund Details',
-        icon: 'bg-blue-600'
-      },
-    ];
+    fetchTransactions();
+  }, [page]);
 
-    setTransactions(mockTransactions);
-    setLoading(false);
-  }, []);
+  const fetchTransactions = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const response = await apiClient.get(`/account/transactions?page=${page}&limit=20`);
+      const data = response.data.data || [];
+
+      // Format transactions for display
+      const formattedTransactions = data.map(transaction => ({
+        _id: transaction._id,
+        date: new Date(transaction.createdAt).toLocaleDateString(),
+        time: new Date(transaction.createdAt).toLocaleTimeString(),
+        month: new Date(transaction.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long' }),
+        type: transaction.type.charAt(0).toUpperCase() + transaction.type.slice(1),
+        amount: transaction.type.includes('debit') || transaction.type === 'payment' ? `-₹${transaction.amount}` : `+₹${transaction.amount}`,
+        amountColor: transaction.type.includes('debit') || transaction.type === 'payment' ? 'text-red-600' : 'text-green-600',
+        status: transaction.status,
+        action: transaction.status === 'pending' ? 'Check Status' : transaction.status === 'failed' ? 'Retry Payment' : 'View Receipt',
+        icon: 'bg-blue-600'
+      }));
+
+      setTransactions(formattedTransactions);
+    } catch (err) {
+      console.error('Error fetching transactions:', err);
+      setError('Failed to load transactions. Please try again.');
+      setTransactions([]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // Group transactions by month
   const groupedTransactions = transactions.reduce((groups, transaction) => {
@@ -94,6 +68,11 @@ const TransactionsPage = () => {
       />
 
       <div className="flex-1 px-4 sm:px-6 lg:px-8 py-6">
+        {error && (
+          <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg text-red-800">
+            {error}
+          </div>
+        )}
         {loading ? (
           <div className="flex items-center justify-center h-64">
             <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-blue-600"></div>
@@ -111,7 +90,7 @@ const TransactionsPage = () => {
                 <div className="space-y-4">
                   {monthTransactions.map((transaction) => (
                     <div
-                      key={transaction.id}
+                      key={transaction._id || transaction.date + transaction.time}
                       className="flex items-center justify-between p-4 bg-gray-50 dark:bg-[#1e1e1e] border border-gray-200 dark:border-gray-700 rounded-lg hover:shadow-md transition-shadow"
                     >
                       {/* Avatar & Details */}

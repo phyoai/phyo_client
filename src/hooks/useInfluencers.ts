@@ -17,6 +17,7 @@ export const useInfluencers = () => {
   const dispatch = useDispatch();
   const {
     influencers,
+    trendingInfluencers,
     selectedInfluencer,
     loading,
     error,
@@ -65,6 +66,7 @@ export const useInfluencers = () => {
   return {
     // State
     influencers,
+    trendingInfluencers,
     selectedInfluencer,
     loading,
     error,

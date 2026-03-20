@@ -9,6 +9,7 @@ import IconButton from '@/components/ui/IconButton';
 import Card from '@/components/ui/Card';
 import { usePayment } from '@/hooks';
 import { colors } from '@/config/colors';
+import apiClient from '@/utils/api';
 
 const PaymentMethodCard = ({ method, isDefault, onSetDefault, onEdit, onDelete, loading }) => {
   const getCardType = (type) => {
@@ -69,7 +70,7 @@ const PaymentMethodCard = ({ method, isDefault, onSetDefault, onEdit, onDelete, 
               onClick={onSetDefault}
               disabled={loading}
             >
-              Set Default
+              {loading ? 'Setting...' : 'Set Default'}
             </Button>
           )}
           <IconButton
@@ -77,12 +78,14 @@ const PaymentMethodCard = ({ method, isDefault, onSetDefault, onEdit, onDelete, 
             size="md"
             variant="default"
             onClick={onEdit}
+            disabled={loading}
           />
           <IconButton
             icon={DeleteLine}
             size="md"
             variant="default"
             onClick={onDelete}
+            disabled={loading}
           />
         </div>
       </div>
@@ -92,59 +95,87 @@ const PaymentMethodCard = ({ method, isDefault, onSetDefault, onEdit, onDelete, 
 
 export default function PaymentMethodsAll() {
   const router = useRouter();
-  const { loading, error } = usePayment();
+  const { loading: paymentLoading, error: paymentError } = usePayment();
 
+  const [loading, setLoading] = useState(true);
   const [paymentMethods, setPaymentMethods] = useState([]);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(null);
   const [showAddModal, setShowAddModal] = useState(false);
   const [defaultMethodId, setDefaultMethodId] = useState(null);
-
-  // Mock payment methods data
-  const mockPaymentMethods = [
-    {
-      id: 1,
-      type: 'visa',
-      lastFourDigits: '4242',
-      expiryDate: '12/25',
-      isDefault: true
-    },
-    {
-      id: 2,
-      type: 'mastercard',
-      lastFourDigits: '5555',
-      expiryDate: '08/26',
-      isDefault: false
-    },
-    {
-      id: 3,
-      type: 'upi',
-      lastFourDigits: '9876',
-      expiryDate: null,
-      isDefault: false
-    }
-  ];
+  const [apiLoading, setApiLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [successMessage, setSuccessMessage] = useState('');
 
   useEffect(() => {
-    // Load payment methods from Redux or use mock data
-    setPaymentMethods(mockPaymentMethods);
-    setDefaultMethodId(mockPaymentMethods.find(m => m.isDefault)?.id || null);
+    fetchPaymentMethods();
   }, []);
 
-  const handleSetDefault = (methodId) => {
-    setPaymentMethods(prevMethods =>
-      prevMethods.map(method => ({
-        ...method,
-        isDefault: method.id === methodId
-      }))
-    );
-    setDefaultMethodId(methodId);
+  const fetchPaymentMethods = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const response = await apiClient.get('/payment-methods');
+      const methods = response.data.data || [];
+      setPaymentMethods(methods);
+      const defaultMethod = methods.find(m => m.isDefault);
+      setDefaultMethodId(defaultMethod?._id || defaultMethod?.id || null);
+    } catch (err) {
+      console.error('Error fetching payment methods:', err);
+      setError('Failed to load payment methods');
+      setPaymentMethods([]);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleDeleteMethod = (methodId) => {
-    setPaymentMethods(prevMethods =>
-      prevMethods.filter(method => method.id !== methodId)
-    );
-    setShowDeleteConfirm(null);
+  const handleSetDefault = async (methodId) => {
+    try {
+      setApiLoading(true);
+      setError(null);
+      await apiClient.patch(`/payment-methods/${methodId}/set-default`);
+
+      // Update local state
+      setPaymentMethods(prevMethods =>
+        prevMethods.map(method => ({
+          ...method,
+          isDefault: (method._id || method.id) === methodId
+        }))
+      );
+      setDefaultMethodId(methodId);
+      setSuccessMessage('Default payment method updated');
+      setTimeout(() => setSuccessMessage(''), 3000);
+    } catch (err) {
+      console.error('Error setting default payment method:', err);
+      setError('Failed to set default payment method');
+    } finally {
+      setApiLoading(false);
+    }
+  };
+
+  const handleDeleteMethod = async (methodId) => {
+    try {
+      setApiLoading(true);
+      setError(null);
+      await apiClient.delete(`/payment-methods/${methodId}`);
+
+      // Update local state
+      setPaymentMethods(prevMethods =>
+        prevMethods.filter(method => (method._id || method.id) !== methodId)
+      );
+
+      if (defaultMethodId === methodId) {
+        setDefaultMethodId(null);
+      }
+
+      setShowDeleteConfirm(null);
+      setSuccessMessage('Payment method deleted');
+      setTimeout(() => setSuccessMessage(''), 3000);
+    } catch (err) {
+      console.error('Error deleting payment method:', err);
+      setError('Failed to delete payment method');
+    } finally {
+      setApiLoading(false);
+    }
   };
 
   const handleAddPaymentMethod = () => {
@@ -230,17 +261,20 @@ export default function PaymentMethodsAll() {
               <h2 className="text-lg font-semibold mb-4" style={{ color: colors.text.neutral.base }}>
                 Saved Payment Methods
               </h2>
-              {paymentMethods.map((method) => (
-                <PaymentMethodCard
-                  key={method.id}
-                  method={method}
-                  isDefault={defaultMethodId === method.id}
-                  onSetDefault={() => handleSetDefault(method.id)}
-                  onEdit={() => console.log('Edit payment method:', method.id)}
-                  onDelete={() => setShowDeleteConfirm(method.id)}
-                  loading={loading}
-                />
-              ))}
+              {paymentMethods.map((method) => {
+                const methodId = method._id || method.id;
+                return (
+                  <PaymentMethodCard
+                    key={methodId}
+                    method={method}
+                    isDefault={defaultMethodId === methodId}
+                    onSetDefault={() => handleSetDefault(methodId)}
+                    onEdit={() => console.log('Edit payment method:', methodId)}
+                    onDelete={() => setShowDeleteConfirm(methodId)}
+                    loading={apiLoading}
+                  />
+                );
+              })}
             </div>
           </div>
         )}
@@ -337,6 +371,19 @@ export default function PaymentMethodsAll() {
               </div>
             </div>
           </Card>
+        </div>
+      )}
+
+      {/* Error/Success Messages */}
+      {error && (
+        <div className="fixed bottom-4 right-4 bg-red-600 text-white px-6 py-3 rounded-lg shadow-lg max-w-md">
+          {error}
+        </div>
+      )}
+
+      {successMessage && (
+        <div className="fixed bottom-4 right-4 bg-green-600 text-white px-6 py-3 rounded-lg shadow-lg max-w-md">
+          {successMessage}
         </div>
       )}
     </div>

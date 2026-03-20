@@ -63,7 +63,7 @@ export const getAllInfluencers = createAsyncThunk(
   'influencerData/getAllInfluencers',
   async ({ page = 1, limit = 10 }: { page?: number; limit?: number } = {}, { rejectWithValue }) => {
     try {
-      const response = await api.get('/auth/influencers', { params: { page, limit } });
+      const response = await api.get('/influencers', { params: { page, limit } });
       const data = response.data?.data || response.data;
       return { data: Array.isArray(data) ? data : [], pagination: response.data?.pagination || { page, limit, total: 0 } };
     } catch (error) {
@@ -83,7 +83,7 @@ export const searchInfluencers = createAsyncThunk(
     { rejectWithValue }
   ) => {
     try {
-      const response = await api.get('/auth/influencers', { params: { search: query, page, limit } });
+      const response = await api.get('/influencers', { params: { search: query, page, limit } });
       const data = response.data?.data || response.data;
       return { data: Array.isArray(data) ? data : [], pagination: response.data?.pagination || { page, limit, total: 0 } };
     } catch (error) {
@@ -108,7 +108,7 @@ export const advancedSearchInfluencers = createAsyncThunk(
     { rejectWithValue }
   ) => {
     try {
-      const response = await api.get('/auth/influencers', { params: filters });
+      const response = await api.get('/influencers', { params: filters });
       const data = response.data?.data || response.data;
       return {
         data: Array.isArray(data) ? data : [],
@@ -128,7 +128,7 @@ export const getInfluencerById = createAsyncThunk(
   'influencerData/getInfluencerById',
   async (id: string, { rejectWithValue }) => {
     try {
-      const response = await api.get(`/auth/influencers/${id}`);
+      const response = await api.get(`/influencers/${id}`);
       return response.data?.data || response.data;
     } catch (error) {
       return rejectWithValue((error as Error).message);
@@ -140,7 +140,7 @@ export const getInfluencerByUsername = createAsyncThunk(
   'influencerData/getInfluencerByUsername',
   async (username: string, { rejectWithValue }) => {
     try {
-      const response = await api.get(`/auth/influencers/username/${username}`);
+      const response = await api.get(`/influencers/username/${username}`);
       return response.data?.data || response.data;
     } catch (error) {
       return rejectWithValue((error as Error).message);
@@ -152,7 +152,7 @@ export const getInfluencerStats = createAsyncThunk(
   'influencerData/getInfluencerStats',
   async (_, { rejectWithValue }) => {
     try {
-      const response = await api.get('/auth/influencers/stats');
+      const response = await api.get('/influencers/stats');
       return response.data?.data || response.data;
     } catch (error) {
       return rejectWithValue((error as Error).message);

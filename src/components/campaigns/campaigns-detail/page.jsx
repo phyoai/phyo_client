@@ -11,6 +11,7 @@ import IconButton from '@/components/ui/IconButton';
 import Card from '@/components/ui/Card';
 import { useCampaigns } from '@/hooks/useCampaigns';
 import { useGoBack } from '@/hooks/useGoBack';
+import apiClient from '@/utils/api';
 
 export default function CampaignDetailPage() {
   const params = useParams();
@@ -24,11 +25,65 @@ export default function CampaignDetailPage() {
   const [responded, setResponded] = useState(false);
   const [images, setImages] = useState([]); // This will hide the images section
 
+  // State for related data
+  const [applications, setApplications] = useState([]);
+  const [influencers, setInfluencers] = useState([]);
+  const [deliverables, setDeliverables] = useState([]);
+  const [loadingApplications, setLoadingApplications] = useState(false);
+  const [loadingInfluencers, setLoadingInfluencers] = useState(false);
+  const [loadingDeliverables, setLoadingDeliverables] = useState(false);
+
   useEffect(() => {
     if (campaignId) {
       fetchCampaignById(campaignId);
+      fetchCampaignApplications(campaignId);
+      fetchCampaignInfluencers(campaignId);
+      fetchCampaignDeliverables(campaignId);
     }
   }, [campaignId, fetchCampaignById]);
+
+  // Fetch campaign applications
+  const fetchCampaignApplications = async (id) => {
+    setLoadingApplications(true);
+    try {
+      const response = await apiClient.get(`/campaigns/${id}/applications`);
+      setApplications(response.data.data || []);
+    } catch (error) {
+      console.error('Error fetching applications:', error);
+      setApplications([]);
+    } finally {
+      setLoadingApplications(false);
+    }
+  };
+
+  // Fetch campaign influencers
+  const fetchCampaignInfluencers = async (id) => {
+    setLoadingInfluencers(true);
+    try {
+      const response = await apiClient.get(`/campaigns/${id}/influencers`);
+      setInfluencers(response.data.data || []);
+    } catch (error) {
+      console.error('Error fetching influencers:', error);
+      setInfluencers([]);
+    } finally {
+      setLoadingInfluencers(false);
+    }
+  };
+
+  // Fetch campaign deliverables (if not already in campaign object)
+  const fetchCampaignDeliverables = async (id) => {
+    setLoadingDeliverables(true);
+    try {
+      const response = await apiClient.get(`/campaigns/${id}/deliverables`);
+      setDeliverables(response.data.data || []);
+    } catch (error) {
+      // If API endpoint doesn't exist, use campaign object deliverables
+      console.log('Using deliverables from campaign object');
+      setDeliverables(selectedCampaign?.deliverables || []);
+    } finally {
+      setLoadingDeliverables(false);
+    }
+  };
 
   const campaign = selectedCampaign;
 
@@ -53,88 +108,6 @@ export default function CampaignDetailPage() {
     );
   }
 
-  const deliverables = [
-    {
-      id: 1,
-      title: 'InstagramFill Story',
-      details: 'UTC • Duration 15 Secs',
-      icon: <AddLine className="w-5 h-5" />,
-      status: '1'
-    },
-    {
-      id: 2,
-      title: 'InstagramFill Reel',
-      details: 'UTC • Duration 30-60 Secs',
-      icon: <VideoLine className="w-5 h-5" />,
-      status: '3'
-    }
-  ];
-  
-  const applications = [
-    {
-      name: 'Michael Smith',
-      role: 'An innovative web developer skilled in HTML, CSS, and JavaScript. He thrives on solving compl...',
-      avatar: 'https://i.pravatar.cc/150?img=1'
-    },
-    {
-      name: 'Michael Smith',
-      role: 'An innovative web developer skilled in HTML, CSS, and JavaScript. He thrives on solving compl...',
-      avatar: 'https://i.pravatar.cc/150?img=1'
-    },
-    {
-      name: 'Michael Smith',
-      role: 'An innovative web developer skilled in HTML, CSS, and JavaScript. He thrives on solving compl...',
-      avatar: 'https://i.pravatar.cc/150?img=1'
-    },
-    {
-      name: 'Michael Smith',
-      role: 'An innovative web developer skilled in HTML, CSS, and JavaScript. He thrives on solving compl...',
-      avatar: 'https://i.pravatar.cc/150?img=1'
-    },
-  ];
-
-  const influencers = [
-    {
-      id: 1,
-      name: 'Michael Smith',
-      role: 'An innovative web developer skilled in HTML, CSS, and JavaScript. He thrives on solving com...',
-      avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop',
-      status: 'Pending Review',
-      statusColor: 'bg-blue-100 text-blue-700 border-blue-300'
-    },
-    {
-      id: 2,
-      name: 'Sarah Lee',
-      role: 'A UX researcher dedicated to understanding user behavior and needs. She utilizes qualitative a...',
-      avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&h=150&fit=crop',
-      status: 'Negotiating',
-      statusColor: 'bg-yellow-100 text-yellow-700 border-yellow-300'
-    },
-    {
-      id: 3,
-      name: 'David Chen',
-      role: 'A digital marketer with a focus on brand strategy and social media engagement. He enjoys crafting...',
-      avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop',
-      status: 'Approved',
-      statusColor: 'bg-green-100 text-green-700 border-green-300'
-    },
-    {
-      id: 4,
-      name: 'Emma Garcia',
-      role: 'A product manager with a strong background in agile methodologies. She excels at aligning cross-f...',
-      avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop',
-      status: 'Rejected',
-      statusColor: 'bg-red-100 text-red-700 border-red-300'
-    },
-    {
-      id: 5,
-      name: 'James Brown',
-      role: 'A content strategist who specializes in creating impactful copy and storytelling. He believes in the power of word...',
-      avatar: 'https://images.unsplash.com/photo-1463746862605-36257daa3e4e?w=150&h=150&fit=crop',
-      status: 'Approved',
-      statusColor: 'bg-green-100 text-green-700 border-green-300'
-    }
-  ];
 
   return (
     <div className="w-full min-h-screen bg-neutral-base py-2 px-1 justify-between items-start">
@@ -291,7 +264,8 @@ export default function CampaignDetailPage() {
                                 size="sm"
                                 onClick={() => {
                                   setResponded(!responded);
-                                  router.push(`/${role}/campaigns/influencer-counter-offer`);
+                                  const influencerId = influencers[0]?._id || influencers[0]?.id || 'influencer123';
+                                  router.push(`/${role}/campaigns/influencer-counter-offer?campaignId=${campaignId}&influencerId=${influencerId}`);
                                 }}
                                 className="self-center"
                               >
@@ -350,7 +324,7 @@ export default function CampaignDetailPage() {
                                 size="sm"
                                 onClick={() => {
                                   setResponded(!responded);
-                                  router.push(`/${role}/campaigns/influencer-detail-deliverables`);
+                                  router.push(`/${role}/campaigns/influencer-detail-deliverables?campaignId=${campaignId}`);
                                 }}
                                 className="self-center mt-auto"
                               >
@@ -371,22 +345,29 @@ export default function CampaignDetailPage() {
                         {/* Goal */}
                         <div>
                           <p className="text-sm text-gray-500 font-medium mb-2">Goal</p>
-                          <p className="text-base text-gray-900">Drive awareness and engagement for our new summer fashion collection</p>
+                          <p className="text-base text-gray-900">{campaign?.goal || campaign?.description || 'No goal defined'}</p>
                         </div>
 
                         {/* Campaign Type */}
                         <div>
                           <p className="text-sm text-gray-500 font-medium mb-2">Campaign Type</p>
-                          <div className="flex gap-2">
-                            <span className="bg-green-100 text-green-700 text-sm font-medium px-3 py-1 rounded-full">Brand Awareness</span>
-                            <span className="bg-green-100 text-green-700 text-sm font-medium px-3 py-1 rounded-full">Product Launch</span>
+                          <div className="flex gap-2 flex-wrap">
+                            {campaign?.types && Array.isArray(campaign.types) && campaign.types.length > 0 ? (
+                              campaign.types.map((type, idx) => (
+                                <span key={idx} className="bg-green-100 text-green-700 text-sm font-medium px-3 py-1 rounded-full">
+                                  {type}
+                                </span>
+                              ))
+                            ) : (
+                              <span className="bg-green-100 text-green-700 text-sm font-medium px-3 py-1 rounded-full">General Campaign</span>
+                            )}
                           </div>
                         </div>
 
                         {/* Target Countries */}
                         <div>
                           <p className="text-sm text-gray-500 font-medium mb-2">Target Countries</p>
-                          <p className="text-base text-gray-900">United States, Canada, United Kingdom</p>
+                          <p className="text-base text-gray-900">{campaign?.targetCountries || campaign?.location || 'Not specified'}</p>
                         </div>
 
                         {/* Campaign Period */}
@@ -394,14 +375,18 @@ export default function CampaignDetailPage() {
                           <p className="text-sm text-gray-500 font-medium mb-2">Campaign Period</p>
                           <div className="flex items-center gap-2 text-base text-gray-900">
                             <CalendarLine className="w-4 h-4 text-gray-600" />
-                            <span>June 1, 2026 → June 30, 2026</span>
+                            <span>
+                              {campaign?.startDate && campaign?.endDate
+                                ? `${new Date(campaign.startDate).toLocaleDateString()} → ${new Date(campaign.endDate).toLocaleDateString()}`
+                                : 'Date range not specified'}
+                            </span>
                           </div>
                         </div>
                       </div>
                     </div>
 
                     {/* Boost This Campaign Section */}
-                    <div className="border-2 border-gray-300 rounded-2xl bg-gradient-to-r from-green-700 to-green-600 p-8 cursor-pointer" onClick={() => router.push(`/${role}/campaigns/boost-campaign`)}>
+                    <div className="border-2 border-gray-300 rounded-2xl bg-gradient-to-r from-green-700 to-green-600 p-8 cursor-pointer" onClick={() => router.push(`/${role}/campaigns/boost-campaign?campaignId=${campaignId}`)}>
                       <div className="flex items-start gap-4">
                         {/* Icon Circle */}
                         <div className="w-12 h-12 bg-neutral-base rounded-full flex items-center justify-center flex-shrink-0">
@@ -438,32 +423,40 @@ export default function CampaignDetailPage() {
                     <div className="border-2 border-gray-300 rounded-2xl bg-neutral-base p-8">
                       <h3 className="text-xl font-semibold text-gray-900 mb-6">Deliverables</h3>
 
-                      <div className="space-y-0 divide-y divide-gray-200">
-                        {deliverables.map((item) => (
-                          <div key={item.id} className="flex items-center justify-between py-4 first:pt-0 last:pb-0">
-                            {/* Left Section - Icon and Content */}
-                            <div className="flex items-start gap-4 flex-1">
-                              {/* Icon Circle */}
-                              <div className="w-10 h-10 rounded-full border-2 border-gray-400 flex items-center justify-center flex-shrink-0 text-gray-600">
-                                {item.icon}
+                      {loadingDeliverables ? (
+                        <div className="flex items-center justify-center py-8">
+                          <div className="text-gray-500">Loading deliverables...</div>
+                        </div>
+                      ) : deliverables.length > 0 ? (
+                        <div className="space-y-0 divide-y divide-gray-200">
+                          {deliverables.map((item) => (
+                            <div key={item.id || item._id} className="flex items-center justify-between py-4 first:pt-0 last:pb-0">
+                              {/* Left Section - Icon and Content */}
+                              <div className="flex items-start gap-4 flex-1">
+                                {/* Icon Circle */}
+                                <div className="w-10 h-10 rounded-full border-2 border-gray-400 flex items-center justify-center flex-shrink-0 text-gray-600">
+                                  {item.icon || '📋'}
+                                </div>
+
+                                {/* Content */}
+                                <div>
+                                  <h4 className="text-base font-semibold text-gray-900">{item.title || item.name || 'Deliverable'}</h4>
+                                  <p className="text-sm text-gray-500 mt-1">{item.details || item.description || ''}</p>
+                                </div>
                               </div>
 
-                              {/* Content */}
-                              <div>
-                                <h4 className="text-base font-semibold text-gray-900">{item.title}</h4>
-                                <p className="text-sm text-gray-500 mt-1">{item.details}</p>
+                              {/* Right Section - Status Badge */}
+                              <div className="flex-shrink-0 ml-4">
+                                <div className="w-8 h-8 rounded-full bg-green-800 text-white flex items-center justify-center text-sm font-semibold">
+                                  {item.status || '✓'}
+                                </div>
                               </div>
                             </div>
-
-                            {/* Right Section - Status Badge */}
-                            <div className="flex-shrink-0 ml-4">
-                              <div className="w-8 h-8 rounded-full bg-green-800 text-white flex items-center justify-center text-sm font-semibold">
-                                {item.status}
-                              </div>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <p className="text-gray-500 text-center py-6">No deliverables added yet</p>
+                      )}
                     </div>
 
                     {/* Budget & Compensation Section */}
@@ -478,29 +471,37 @@ export default function CampaignDetailPage() {
                               <MoneyDollarBoxLine className="w-4 h-4 text-gray-600" />
                               <span className="text-sm text-gray-600 font-medium">Total Budget</span>
                             </div>
-                            <span className="text-2xl font-bold text-gray-900">$50,000</span>
+                            <span className="text-2xl font-bold text-gray-900">
+                              {campaign?.budget ? `₹${(campaign.budget / 100000).toFixed(1)}L` : '—'}
+                            </span>
                           </div>
 
                           {/* Budget Used Info */}
-                          <div className="flex items-center justify-between mb-3">
-                            <span className="text-sm text-gray-600">₹32,000 used</span>
-                            <span className="text-sm text-gray-600 font-medium">64%</span>
-                          </div>
+                          {campaign?.budgetUsed && campaign?.budget ? (
+                            <>
+                              <div className="flex items-center justify-between mb-3">
+                                <span className="text-sm text-gray-600">₹{(campaign.budgetUsed / 100000).toFixed(1)}L used</span>
+                                <span className="text-sm text-gray-600 font-medium">{Math.round((campaign.budgetUsed / campaign.budget) * 100)}%</span>
+                              </div>
 
-                          {/* Progress Bar */}
-                          <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
-                            <div
-                              className="h-full bg-green-700 rounded-full transition-all duration-300"
-                              style={{ width: '64%' }}
-                            ></div>
-                          </div>
+                              {/* Progress Bar */}
+                              <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
+                                <div
+                                  className="h-full bg-green-700 rounded-full transition-all duration-300"
+                                  style={{ width: `${Math.round((campaign.budgetUsed / campaign.budget) * 100)}%` }}
+                                ></div>
+                              </div>
+                            </>
+                          ) : (
+                            <p className="text-sm text-gray-500">Budget usage data not available</p>
+                          )}
                         </div>
 
                         {/* Compensation Model */}
                         <div>
                           <p className="text-sm text-gray-600 font-medium mb-2">Compensation Model</p>
                           <span className="inline-block bg-green-100 text-green-700 text-sm font-medium px-4 py-1 rounded-full">
-                            Per Influencer
+                            {campaign?.compensationModel || 'Per Influencer'}
                           </span>
                         </div>
                       </div>
@@ -517,31 +518,36 @@ export default function CampaignDetailPage() {
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2">
                             <UserLine className="w-4 h-4 text-gray-600" />
-                            <span className="text-sm text-gray-600 font-medium">Influencers</span>
+                            <span className="text-sm text-gray-600 font-medium">Target Influencers</span>
                           </div>
-                          <span className="text-2xl font-bold text-gray-900">15</span>
+                          <span className="text-2xl font-bold text-gray-900">{campaign?.targetInfluencersCount || influencers.length || '—'}</span>
                         </div>
 
                         {/* Follower Range */}
                         <div>
                           <p className="text-sm text-gray-600 font-medium mb-2">Follower Range</p>
-                          <p className="text-base text-gray-900">10K – 100K</p>
+                          <p className="text-base text-gray-900">{campaign?.followerRange || '—'}</p>
                         </div>
 
                         {/* Age Range */}
                         <div>
                           <p className="text-sm text-gray-600 font-medium mb-2">Age Range</p>
-                          <p className="text-base text-gray-900">18 – 35 years</p>
+                          <p className="text-base text-gray-900">{campaign?.ageRange || '—'}</p>
                         </div>
 
                         {/* Interests */}
                         <div>
                           <p className="text-sm text-gray-600 font-medium mb-3">Interests</p>
                           <div className="flex flex-wrap gap-2">
-                            <span className="bg-green-100 text-green-700 text-sm font-medium px-4 py-1 rounded-full">Fashion</span>
-                            <span className="bg-green-100 text-green-700 text-sm font-medium px-4 py-1 rounded-full">Lifestyle</span>
-                            <span className="bg-green-100 text-green-700 text-sm font-medium px-4 py-1 rounded-full">Beauty</span>
-                            <span className="bg-green-100 text-green-700 text-sm font-medium px-4 py-1 rounded-full">Travel</span>
+                            {campaign?.interests && campaign.interests.length > 0 ? (
+                              campaign.interests.map((interest, idx) => (
+                                <span key={idx} className="bg-green-100 text-green-700 text-sm font-medium px-4 py-1 rounded-full">
+                                  {interest}
+                                </span>
+                              ))
+                            ) : (
+                              <span className="text-gray-500 text-sm">No specific interests defined</span>
+                            )}
                           </div>
                         </div>
                       </div>
@@ -614,7 +620,7 @@ export default function CampaignDetailPage() {
                         size="md"
                         fullWidth
                         icon={FileTextLine}
-                        onClick={() => router.push(`/${role}/campaigns/campaign-summary`)}
+                        onClick={() => router.push(`/${role}/campaigns/campaign-summary?campaignId=${campaignId}`)}
                       >
                         Summarize
                       </Button>
@@ -635,56 +641,68 @@ export default function CampaignDetailPage() {
                     {/* Stats Cards Section */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <div className="border-2 border-gray-300 rounded-2xl bg-neutral-base p-8 flex flex-col items-center justify-center text-center">
-                        <p className="text-4xl font-bold text-gray-900 mb-2">15</p>
-                        <p className="text-sm text-gray-600 font-medium">Total Influencers</p>
+                        <p className="text-4xl font-bold text-gray-900 mb-2">{applications.length}</p>
+                        <p className="text-sm text-gray-600 font-medium">Total Applications</p>
                       </div>
 
                       <div className="border-2 border-gray-300 rounded-2xl bg-neutral-base p-8 flex flex-col items-center justify-center text-center">
-                        <p className="text-4xl font-bold text-gray-900 mb-2">2</p>
-                        <p className="text-sm text-gray-600 font-medium">Currently Active</p>
+                        <p className="text-4xl font-bold text-gray-900 mb-2">{influencers.length}</p>
+                        <p className="text-sm text-gray-600 font-medium">Currently Working</p>
                       </div>
                     </div>
                     {/* New Applications Section */}
                     <div className="bg-neutral-base">
                       {/* Header */}
                       <div className="flex items-center justify-between mb-8">
-                        <h3 className="text-xl font-semibold text-gray-900">New Applications</h3>
-                        <button className="text-blue-600 hover:text-blue-700 font-medium text-sm">
+                        <h3 className="text-xl font-semibold text-gray-900">New Applications ({applications.length})</h3>
+                        <button
+                          onClick={() => router.push(`/${role}/campaigns/new-applications?campaignId=${campaignId}`)}
+                          className="text-blue-600 hover:text-blue-700 font-medium text-sm"
+                        >
                           view all →
                         </button>
                       </div>
 
                       {/* Applications List */}
-                      <div className="space-y-4">
-                        {applications.map((app) => (
-                          <div
-                            key={app.id}
-                            className="flex items-center justify-between p-4 hover:bg-gray-50 transition-colors"
-                          >
-                            {/* Left Section - Avatar and Info */}
-                            <div className="flex items-start gap-4 flex-1 min-w-0">
-                              <img
-                                src={app.avatar}
-                                alt={app.name}
-                                className="w-10 h-10 rounded-full flex-shrink-0 object-cover"
-                              />
-                              <div className="flex-1 min-w-0">
-                                <h4 className="text-base font-semibold text-gray-900">{app.name}</h4>
-                                <p className="text-sm text-gray-600 mt-1 truncate">{app.role}</p>
-                              </div>
-                            </div>
-
-                            {/* Right Section - Portfolio Button */}
-                            <Button
-                              variant="outlined"
-                              size="sm"
-                              className="flex-shrink-0 ml-4"
+                      {loadingApplications ? (
+                        <div className="flex items-center justify-center py-8">
+                          <div className="text-gray-500">Loading applications...</div>
+                        </div>
+                      ) : applications.length > 0 ? (
+                        <div className="space-y-4">
+                          {applications.map((app) => (
+                            <div
+                              key={app.id || app._id}
+                              className="flex items-center justify-between p-4 hover:bg-gray-50 transition-colors"
                             >
-                              portfolio
-                            </Button>
-                          </div>
-                        ))}
-                      </div>
+                              {/* Left Section - Avatar and Info */}
+                              <div className="flex items-start gap-4 flex-1 min-w-0">
+                                <img
+                                  src={app.avatar || app.profileImage || 'https://i.pravatar.cc/150?img=0'}
+                                  alt={app.name}
+                                  className="w-10 h-10 rounded-full flex-shrink-0 object-cover"
+                                />
+                                <div className="flex-1 min-w-0">
+                                  <h4 className="text-base font-semibold text-gray-900">{app.name || app.username || 'Unknown'}</h4>
+                                  <p className="text-sm text-gray-600 mt-1 truncate">{app.role || app.bio || app.description || 'Influencer'}</p>
+                                </div>
+                              </div>
+
+                              {/* Right Section - Portfolio Button */}
+                              <Button
+                                variant="outlined"
+                                size="sm"
+                                className="flex-shrink-0 ml-4"
+                                onClick={() => router.push(`/${role}/influencers/${app.id || app._id}`)}
+                              >
+                                profile
+                              </Button>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <p className="text-gray-500 text-center py-8">No applications yet</p>
+                      )}
                     </div>
                     {/* Influencers Working On Section */}
                     <div className="bg-neutral-base">
@@ -697,28 +715,36 @@ export default function CampaignDetailPage() {
                       </div>
 
                       {/* Influencers List */}
-                      <div className="space-y-4 divide-y divide-gray-200">
-                        {influencers.map((influencer) => (
-                          <div key={influencer.id} className="flex items-center justify-between py-4 first:pt-0 last:pb-0">
-                            <div className="flex items-start gap-4 flex-1 min-w-0">
-                              <img
-                                src={influencer.avatar}
-                                alt={influencer.name}
-                                className="w-10 h-10 rounded-full flex-shrink-0 object-cover"
-                              />
-                              <div className="flex-1 min-w-0">
-                                <h4 className="text-base font-semibold text-gray-900">{influencer.name}</h4>
-                                <p className="text-sm text-gray-600 mt-1 truncate">{influencer.role}</p>
+                      {loadingInfluencers ? (
+                        <div className="flex items-center justify-center py-8">
+                          <div className="text-gray-500">Loading influencers...</div>
+                        </div>
+                      ) : influencers.length > 0 ? (
+                        <div className="space-y-4 divide-y divide-gray-200">
+                          {influencers.map((influencer) => (
+                            <div key={influencer.id || influencer._id} className="flex items-center justify-between py-4 first:pt-0 last:pb-0">
+                              <div className="flex items-start gap-4 flex-1 min-w-0">
+                                <img
+                                  src={influencer.avatar || influencer.profileImage || 'https://i.pravatar.cc/150?img=0'}
+                                  alt={influencer.name || influencer.username || 'Influencer'}
+                                  className="w-10 h-10 rounded-full flex-shrink-0 object-cover"
+                                />
+                                <div className="flex-1 min-w-0">
+                                  <h4 className="text-base font-semibold text-gray-900">{influencer.name || influencer.username || 'Unknown'}</h4>
+                                  <p className="text-sm text-gray-600 mt-1 truncate">{influencer.role || influencer.bio || influencer.description || 'Influencer'}</p>
+                                </div>
+                              </div>
+                              <div className="flex-shrink-0 ml-4">
+                                <span className={`px-3 py-1 rounded-full text-sm font-medium border ${influencer.statusColor || 'bg-blue-50 text-blue-700 border-blue-200'}`}>
+                                  {influencer.status || 'Active'}
+                                </span>
                               </div>
                             </div>
-                            <div className="flex-shrink-0 ml-4">
-                              <span className={`px-3 py-1 rounded-full text-sm font-medium border ${influencer.statusColor}`}>
-                                {influencer.status}
-                              </span>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <p className="text-gray-500 text-center py-8">No influencers working on this campaign yet</p>
+                      )}
                     </div>
                     <div className="my-8 border-t border-gray-200"></div>
                     {/* Find More Influencers Section */}

@@ -6,7 +6,7 @@ export const signupUser = createAsyncThunk(
   'auth/signupUser',
   async ({ email, password, type, name, username }, { rejectWithValue }) => {
     try {
-      const response = await api.post('/user/signup', { email, password, type, name, username });
+      const response = await api.post('/auth/signup', { email, password, type, name, username });
       return response.data || response;
     } catch (error) {
       return rejectWithValue(error.message || 'Signup failed');
@@ -38,7 +38,7 @@ export const forgotPassword = createAsyncThunk(
   'auth/forgotPassword',
   async ({ email }, { rejectWithValue }) => {
     try {
-      await api.post('/user/forgot-password', { email });
+      await api.post('/auth/forgot-password', { email });
       return { success: true, email };
     } catch (error) {
       return rejectWithValue(error.message || 'Failed to send reset email');
@@ -50,7 +50,7 @@ export const verifyResetCode = createAsyncThunk(
   'auth/verifyResetCode',
   async ({ email, code }, { rejectWithValue }) => {
     try {
-      await api.post('/user/verify-code', { email, code });
+      await api.post('/auth/verify-reset-code', { email, code });
       return { success: true, email };
     } catch (error) {
       return rejectWithValue(error.message || 'Invalid or expired code');
@@ -62,7 +62,7 @@ export const resetPassword = createAsyncThunk(
   'auth/resetPassword',
   async ({ email, newPassword }, { rejectWithValue }) => {
     try {
-      await api.post('/user/reset-password', { email, newPassword });
+      await api.post('/auth/reset-password', { email, newPassword });
       return { success: true };
     } catch (error) {
       return rejectWithValue(error.message || 'Failed to reset password');
@@ -74,7 +74,7 @@ export const verifyEmailOtp = createAsyncThunk(
   'auth/verifyEmailOtp',
   async ({ email, otp }, { rejectWithValue }) => {
     try {
-      const response = await api.post('/user/verify-otp', { email, otp });
+      const response = await api.post('/auth/verify-email-otp', { email, otp });
       const data = response.data || response;
       return {
         token: data.token || data.data?.token,
@@ -90,7 +90,7 @@ export const resendEmailOtp = createAsyncThunk(
   'auth/resendEmailOtp',
   async ({ email }, { rejectWithValue }) => {
     try {
-      await api.post('/user/resend-otp', { email });
+      await api.post('/auth/resend-email-otp', { email });
       return { success: true, email };
     } catch (error) {
       return rejectWithValue(error.message || 'Failed to resend OTP');
@@ -118,7 +118,7 @@ export const googleOAuth = createAsyncThunk(
         ...(profilePicture && { profilePicture }),
       };
 
-      const response = await api.post('/user/google', body);
+      const response = await api.post('/auth/google', body);
       const data = response.data || response;
       return {
         token: data.token || data.data?.token,

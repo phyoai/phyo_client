@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Image2Line from 'next/image';
 import { useInfluencers } from '@/hooks/useInfluencers';
 import { useRoleContext } from '@/app/context/RoleContext';
+import apiClient from '@/utils/api';
 
 const mockInfluencersData = [
   {
@@ -447,13 +448,36 @@ function InfluencerProfile({ influencer }) {
   const [showSaveModal, setShowSaveModal] = useState(false);
   const [showNewListModal, setShowNewListModal] = useState(false);
   const [newListName, setNewListName] = useState('');
+  const [savedLists, setSavedLists] = useState([]);
+  const [listsLoading, setListsLoading] = useState(true);
+  const [apiError, setApiError] = useState(null);
+  const [successMessage, setSuccessMessage] = useState('');
   const moreMenuRef = useRef(null);
 
-  // Sample lists data
-  const [savedLists, setSavedLists] = useState([
-    { id: 1, name: 'Favorties', initials: 'AB', color: '#0066ff' },
-    { id: 2, name: 'Campaign 1', initials: 'AB', color: '#0066ff' }
-  ]);
+  // Fetch lists on mount
+  useEffect(() => {
+    fetchLists();
+  }, []);
+
+  const fetchLists = async () => {
+    try {
+      setListsLoading(true);
+      setApiError(null);
+      const response = await apiClient.get('/lists');
+      const lists = response.data.data || [];
+      setSavedLists(lists.map(list => ({
+        id: list._id || list.id,
+        name: list.name,
+        initials: list.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2),
+        color: '#0066ff'
+      })));
+    } catch (err) {
+      console.error('Error fetching lists:', err);
+      setApiError('Failed to load lists');
+    } finally {
+      setListsLoading(false);
+    }
+  };
 
   // Close menu when clicking outside
   useEffect(() => {
@@ -470,24 +494,52 @@ function InfluencerProfile({ influencer }) {
     };
   }, [showMoreMenu]);
 
-  const handleSaveToList = (listId) => {
-    // Handle saving to list
-    console.log('Saving to list:', listId);
-    setShowSaveModal(false);
+  const handleSaveToList = async (listId) => {
+    try {
+      setApiError(null);
+      await apiClient.post(`/lists/${listId}/influencers`, {
+        influencerId: influencer.id
+      });
+      setSuccessMessage(`Added to ${savedLists.find(l => l.id === listId)?.name || 'list'}`);
+      setTimeout(() => setSuccessMessage(''), 3000);
+      setShowSaveModal(false);
+    } catch (err) {
+      console.error('Error saving to list:', err);
+      setApiError('Failed to save to list');
+    }
   };
 
-  const handleCreateNewList = () => {
+  const handleCreateNewList = async () => {
     if (newListName.trim()) {
-      const newList = {
-        id: savedLists.length + 1,
-        name: newListName,
-        initials: 'AB',
-        color: '#0066ff'
-      };
-      setSavedLists([...savedLists, newList]);
-      setNewListName('');
-      setShowNewListModal(false);
-      setShowSaveModal(true);
+      try {
+        setApiError(null);
+        const response = await apiClient.post('/lists', {
+          name: newListName,
+          description: '',
+          isPublic: false
+        });
+        const newList = response.data.data;
+        setSavedLists([...savedLists, {
+          id: newList._id || newList.id,
+          name: newList.name,
+          initials: newList.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2),
+          color: '#0066ff'
+        }]);
+
+        // Add influencer to the new list
+        await apiClient.post(`/lists/${newList._id || newList.id}/influencers`, {
+          influencerId: influencer.id
+        });
+
+        setSuccessMessage(`Created and saved to "${newListName}"`);
+        setTimeout(() => setSuccessMessage(''), 3000);
+        setNewListName('');
+        setShowNewListModal(false);
+        setShowSaveModal(true);
+      } catch (err) {
+        console.error('Error creating list:', err);
+        setApiError('Failed to create list');
+      }
     }
   };
 
@@ -593,7 +645,8 @@ function InfluencerProfile({ influencer }) {
                   </div>
                   <button
                     onClick={() => handleSaveToList(list.id)}
-                    className="p-2 hover:bg-gray-100 rounded-full"
+                    disabled={apiError || listsLoading}
+                    className="p-2 hover:bg-gray-100 rounded-full disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     <BookmarkLine className="h-5 w-5" />
                   </button>
@@ -652,6 +705,19 @@ function InfluencerProfile({ influencer }) {
               </button>
             </div>
           </div>
+        </div>
+      )}
+
+      {/* Error/Success Messages */}
+      {apiError && (
+        <div className="fixed bottom-4 right-4 bg-red-600 text-white px-6 py-3 rounded-lg shadow-lg max-w-md">
+          {apiError}
+        </div>
+      )}
+
+      {successMessage && (
+        <div className="fixed bottom-4 right-4 bg-green-600 text-white px-6 py-3 rounded-lg shadow-lg max-w-md">
+          {successMessage}
         </div>
       )}
 

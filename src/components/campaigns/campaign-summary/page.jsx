@@ -1,11 +1,62 @@
 'use client'
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { ArrowLeftLine, MoreLine, Share2Line, DownloadLine, MoneyDollarBoxLine, UserLine, FileTextLine, CalendarLine, AddLine, PlayLine, User2 } from '@phyoofficial/phyo-icon-library';
 import Button from '@/components/ui/Button';
 import IconButton from '@/components/ui/IconButton';
 import Card from '@/components/ui/Card';
+import apiClient from '@/utils/api';
 
 export default function CampaignSummarys() {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const campaignId = searchParams.get('campaignId');
+
+  const [campaign, setCampaign] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (campaignId) {
+      fetchCampaignSummary(campaignId);
+    } else {
+      setLoading(false);
+    }
+  }, [campaignId]);
+
+  const fetchCampaignSummary = async (id) => {
+    try {
+      const response = await apiClient.get(`/campaigns/${id}`);
+      setCampaign(response.data.data || {});
+    } catch (error) {
+      console.error('Error fetching campaign summary:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (!campaignId) {
+    return (
+      <div className="flex items-center justify-center h-screen bg-neutral-base">
+        <div className="text-center">
+          <p className="text-gray-600 mb-4">No campaign ID provided</p>
+          <button
+            onClick={() => router.back()}
+            className="text-blue-600 hover:text-blue-700 font-medium"
+          >
+            Go Back
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-screen bg-neutral-base">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
   return (
     <div className="min-h-screen bg-neutral-base flex flex-col">
       {/* Header */}
@@ -35,24 +86,28 @@ export default function CampaignSummarys() {
             <div className="flex items-start gap-4">
               {/* Avatar */}
               <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold text-2xl flex-shrink-0">
-                L
+                {(campaign?.brand?.companyName || campaign?.brandName || 'C').charAt(0).toUpperCase()}
               </div>
               <div>
-                <h2 className="text-2xl font-bold text-gray-900">Lenskart</h2>
-                <p className="text-base text-gray-600">Campaign Brief</p>
+                <h2 className="text-2xl font-bold text-gray-900">{campaign?.brand?.companyName || campaign?.brandName || 'Campaign'}</h2>
+                <p className="text-base text-gray-600">{campaign?.campaignName || 'Campaign Brief'}</p>
               </div>
             </div>
             {/* Status Badge */}
-            <span className="bg-green-600 text-white text-xs font-semibold px-3 py-1 rounded flex items-center gap-1">
+            <span className={`text-white text-xs font-semibold px-3 py-1 rounded flex items-center gap-1 ${
+              campaign?.status === 'Active' ? 'bg-green-600' :
+              campaign?.status === 'Completed' ? 'bg-blue-600' :
+              campaign?.status === 'Paused' ? 'bg-yellow-600' : 'bg-gray-600'
+            }`}>
               <span className="w-2 h-2 bg-neutral-base rounded-full"></span>
-              On going
+              {campaign?.status || 'On going'}
             </span>
           </div>
 
           {/* Campaign Description */}
           <div>
             <p className="text-base text-gray-700 leading-relaxed">
-              Engage influencers to promote our latest beverage and encourage their followers to try it out. Let's create buzz and excitement around this new drink!
+              {campaign?.goal || campaign?.description || 'Engage influencers to promote this campaign and encourage followers to participate. Let\'s create buzz and excitement!'}
             </p>
           </div>
 
@@ -64,8 +119,8 @@ export default function CampaignSummarys() {
                 <MoneyDollarBoxLine className="w-5 h-5 text-gray-600" />
                 <p className="text-sm text-gray-600 font-medium">Budget</p>
               </div>
-              <p className="text-2xl font-bold text-gray-900">$25,000</p>
-              <p className="text-xs text-gray-500 mt-2">64% used</p>
+              <p className="text-2xl font-bold text-gray-900">{campaign?.budget ? `₹${(campaign.budget / 100000).toFixed(1)}L` : '$25,000'}</p>
+              <p className="text-xs text-gray-500 mt-2">{campaign?.budgetUsed ? `${Math.round((campaign.budgetUsed / campaign.budget) * 100)}% used` : '64% used'}</p>
             </div>
 
             {/* Influencers */}
@@ -74,8 +129,8 @@ export default function CampaignSummarys() {
                 <UserLine className="w-5 h-5 text-gray-600" />
                 <p className="text-sm text-gray-600 font-medium">Influencers</p>
               </div>
-              <p className="text-2xl font-bold text-gray-900">15</p>
-              <p className="text-xs text-gray-500 mt-2">2 active</p>
+              <p className="text-2xl font-bold text-gray-900">{campaign?.selectedInfluencersCount || '15'}</p>
+              <p className="text-xs text-gray-500 mt-2">{campaign?.activeInfluencersCount || '2'} active</p>
             </div>
 
             {/* Total Posts */}
@@ -84,7 +139,7 @@ export default function CampaignSummarys() {
                 <FileTextLine className="w-5 h-5 text-gray-600" />
                 <p className="text-sm text-gray-600 font-medium">Total Posts</p>
               </div>
-              <p className="text-2xl font-bold text-gray-900">41</p>
+              <p className="text-2xl font-bold text-gray-900">{campaign?.totalDeliverables || '41'}</p>
               <p className="text-xs text-gray-500 mt-2">Deliverables</p>
             </div>
 
@@ -94,7 +149,7 @@ export default function CampaignSummarys() {
                 <CalendarLine className="w-5 h-5 text-gray-600" />
                 <p className="text-sm text-gray-600 font-medium">Duration</p>
               </div>
-              <p className="text-2xl font-bold text-gray-900">30</p>
+              <p className="text-2xl font-bold text-gray-900">{campaign?.durationDays || '30'}</p>
               <p className="text-xs text-gray-500 mt-2">Days</p>
             </div>
           </div>

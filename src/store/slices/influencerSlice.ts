@@ -11,6 +11,7 @@ interface Influencer {
 
 interface InfluencerState {
   influencers: Influencer[];
+  trendingInfluencers: Influencer[];
   selectedInfluencer: Influencer | null;
   loading: boolean;
   error: string | null;
@@ -24,6 +25,7 @@ interface InfluencerState {
 
 const initialState: InfluencerState = {
   influencers: [],
+  trendingInfluencers: [],
   selectedInfluencer: null,
   loading: false,
   error: null,
@@ -35,7 +37,7 @@ export const getInfluencers = createAsyncThunk(
   'influencer/getInfluencers',
   async (params: any = {}, { rejectWithValue }) => {
     try {
-      const response = await apiClient.get('/auth/influencers', { params });
+      const response = await apiClient.get('/influencers', { params });
       return response.data;
     } catch (error: any) {
       console.error('Error fetching influencers:', error.message);
@@ -48,23 +50,28 @@ export const getInfluencers = createAsyncThunk(
 export const getInfluencerById = createAsyncThunk(
   'influencer/getInfluencerById',
   async (id: string) => {
-    const response = await apiClient.get(`/auth/influencers/${id}`);
+    const response = await apiClient.get(`/influencers/${id}`);
     return response.data.data;
   }
 );
 
 export const getTrendingInfluencers = createAsyncThunk(
   'influencer/getTrendingInfluencers',
-  async (params?: any) => {
-    const response = await apiClient.get('/trending/influencers', { params });
-    return response.data;
+  async (params: any = {}) => {
+    try {
+      const response = await apiClient.get('/trending/influencers', { params });
+      return response.data;
+    } catch (error: any) {
+      console.error('Error fetching trending influencers:', error.message);
+      return { data: [] };
+    }
   }
 );
 
 export const searchInfluencers = createAsyncThunk(
   'influencer/searchInfluencers',
   async (query: string) => {
-    const response = await apiClient.get(`/auth/influencers/search?q=${query}`);
+    const response = await apiClient.get(`/influencers/search?q=${query}`);
     return response.data;
   }
 );
@@ -120,7 +127,7 @@ const influencerSlice = createSlice({
       })
       .addCase(getTrendingInfluencers.fulfilled, (state, action) => {
         state.loading = false;
-        state.influencers = action.payload.data || [];
+        state.trendingInfluencers = action.payload.data || [];
       })
       .addCase(getTrendingInfluencers.rejected, (state, action) => {
         state.loading = false;

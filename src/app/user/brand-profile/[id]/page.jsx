@@ -1,25 +1,16 @@
 'use client';
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useParams } from "next/navigation";
 import { YoutubeFill, InstagramFill, TwitterXLine } from '@phyoofficial/phyo-icon-library';
 import { ShieldCheckLine, ExternalLinkLine, GlobeLine, ArrowLeftLine, MoreLine } from '@phyoofficial/phyo-icon-library';
 
-const SOCIALS = [
-  { platform: "Youtube",   icon: <YoutubeFill size={18} /> },
-  { platform: "Instagram", icon: <InstagramFill size={18} /> },
-  { platform: "Twitter X", icon: <TwitterXLine size={18} /> },
-  { platform: "Website",   icon: <GlobeLine size={18} /> },
-];
-
-const LATEST_CAMPAIGNS = [
-  { id: 1, title: "Outdoor Adventure", subtitle: "Hiking Essentials", img: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=600&q=80" },
-  { id: 2, title: "Healthy Living",    subtitle: "Meal Prep Kits",    img: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=600&q=80" },
-];
-
-const PREVIOUS_CAMPAIGNS = [
-  { id: 3, title: "Eco-Friendly Living", subtitle: "Sustainable Products", img: "https://images.unsplash.com/photo-1518611012118-696072aa579a?w=600&q=80" },
-  { id: 4, title: "Urban Style",         subtitle: "City Fashion Week",    img: "https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=600&q=80" },
-];
+const SOCIAL_ICONS = {
+  "Youtube": YoutubeFill,
+  "Instagram": InstagramFill,
+  "Twitter": TwitterXLine,
+  "Website": GlobeLine,
+};
 
 function CampaignCard({ title, subtitle, img }) {
   return (
@@ -72,33 +63,98 @@ function CampaignCard({ title, subtitle, img }) {
   );
 }
 
-function CampaignsTab() {
+function CampaignsTab({ campaigns = [] }) {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
-      {/* Latest */}
-      <div>
-        <h3 style={{ fontSize: 15, fontWeight: 700, color: "#111", margin: "0 0 10px", paddingLeft: 2 }}>
-          Latest campaigns
-        </h3>
-        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-          {LATEST_CAMPAIGNS.map(c => <CampaignCard key={c.id} {...c} />)}
+      {campaigns.length === 0 ? (
+        <p style={{ fontSize: 14, color: "#6b7280", margin: 0 }}>No campaigns available</p>
+      ) : (
+        <div>
+          <h3 style={{ fontSize: 15, fontWeight: 700, color: "#111", margin: "0 0 10px", paddingLeft: 2 }}>
+            All campaigns
+          </h3>
+          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+            {campaigns.map(c => (
+              <CampaignCard
+                key={c._id}
+                title={c.title}
+                subtitle={c.description}
+                img={c.image || "https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=600&q=80"}
+              />
+            ))}
+          </div>
         </div>
-      </div>
-      {/* Previous */}
-      <div>
-        <h3 style={{ fontSize: 15, fontWeight: 700, color: "#111", margin: "0 0 10px", paddingLeft: 2 }}>
-          Previous Campaigns
-        </h3>
-        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-          {PREVIOUS_CAMPAIGNS.map(c => <CampaignCard key={c.id} {...c} />)}
-        </div>
-      </div>
+      )}
     </div>
   );
 }
 
 export default function BrandProfile() {
+  const params = useParams();
   const [activeTab, setActiveTab] = useState("info");
+  const [brand, setBrand] = useState(null);
+  const [campaigns, setCampaigns] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchBrandData = async () => {
+      try {
+        setLoading(true);
+        const brandId = params.id;
+        const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000/api";
+
+        // Fetch brand profile
+        const brandRes = await fetch(`${API_URL}/brand/${brandId}`);
+        if (!brandRes.ok) throw new Error("Failed to fetch brand");
+        const brandData = await brandRes.json();
+        setBrand(brandData.data || brandData);
+
+        // Fetch brand campaigns
+        const campaignsRes = await fetch(`${API_URL}/brand/${brandId}/campaigns`);
+        if (campaignsRes.ok) {
+          const campaignsData = await campaignsRes.json();
+          setCampaigns(Array.isArray(campaignsData) ? campaignsData : campaignsData.data || []);
+        }
+      } catch (err) {
+        setError(err.message);
+        console.error("Error fetching brand:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (params.id) {
+      fetchBrandData();
+    }
+  }, [params.id]);
+
+  if (loading) {
+    return (
+      <div style={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "100vh", fontSize: 16, color: "#6b7280" }}>
+        Loading brand profile...
+      </div>
+    );
+  }
+
+  if (error || !brand) {
+    return (
+      <div style={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "100vh", fontSize: 16, color: "#dc2626" }}>
+        {error ? `Error: ${error}` : "Brand not found"}
+      </div>
+    );
+  }
+
+  const getInitials = (name) => {
+    return name
+      ?.split(" ")
+      .map(n => n[0])
+      .join("")
+      .toUpperCase()
+      .slice(0, 2) || "BR";
+  };
+
+  const categories = brand.categories || brand.industry ? [brand.industry] : [];
 
   return (
     <>
@@ -117,7 +173,7 @@ export default function BrandProfile() {
         maxWidth: 830,
         boxSizing: "border-box",
       }}>
-        <button style={{ background: "none", border: "none", cursor: "pointer", padding: 4 }}>
+        <button style={{ background: "none", border: "none", cursor: "pointer", padding: 4 }} onClick={() => window.history.back()}>
           <ArrowLeftLine size={22} className="text-gray-950" />
         </button>
         <button style={{ background: "none", border: "none", cursor: "pointer", padding: 4 }}>
@@ -144,7 +200,7 @@ export default function BrandProfile() {
           paddingTop: 14,
         }}>
 
-          {/* Large "AB" initials — fixed, fades out toward bottom */}
+          {/* Large initials — fixed, fades out toward bottom */}
           <div style={{
             position: "fixed",
             top: "8%",
@@ -161,7 +217,7 @@ export default function BrandProfile() {
             lineHeight: 0.9,
             zIndex: 0,
           }}>
-            AB
+            {getInitials(brand.brandName || brand.name)}
           </div>
 
           {/* Spacer so brand name sits below AB */}
@@ -184,17 +240,19 @@ export default function BrandProfile() {
                 fontSize: 28, fontWeight: 900, color: "#111",
                 margin: 0, letterSpacing: "-0.03em",
               }}>
-                Lenskart
+                {brand.brandName || brand.name}
               </h1>
-              <span style={{ width: 22, height: 22, flexShrink: 0, display: "inline-flex", alignItems: "center", justifyContent: "center", color: "#43573b" }}>
-                <ShieldCheckLine size={22} />
-              </span>
+              {brand.verified && (
+                <span style={{ width: 22, height: 22, flexShrink: 0, display: "inline-flex", alignItems: "center", justifyContent: "center", color: "#43573b" }}>
+                  <ShieldCheckLine size={22} />
+                </span>
+              )}
             </div>
             <p style={{ fontSize: 15, color: "#4b5563", margin: "0 0 14px", lineHeight: 1.5 }}>
-              Creating beautiful sunglasses for modern living
+              {brand.tagline || brand.description}
             </p>
-            <div style={{ display: "flex", gap: 8 }}>
-              {["Lifestyle", "Fashion"].map((cat, i) => (
+            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+              {categories.map((cat, i) => (
                 <span key={i} style={{
                   padding: "5px 16px",
                   background: "rgba(255,255,255,0.55)",
@@ -242,77 +300,93 @@ export default function BrandProfile() {
           {activeTab === "info" && (
             <>
               {/* About card */}
-              <div style={{
-                background: "#fff",
-                borderRadius: 14,
-                border: "1px solid #e5e7eb",
-                padding: "18px 18px 20px",
-              }}>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
-                  <h3 style={{ fontSize: 17, fontWeight: 700, color: "#111", margin: 0 }}>About</h3>
-                  <span style={{ width: 20, height: 20, flexShrink: 0, display: "inline-flex", alignItems: "center", justifyContent: "center", color: "#6b7280" }}>
-                    <ExternalLinkLine size={20} />
-                  </span>
+              {brand.about || brand.description && (
+                <div style={{
+                  background: "#fff",
+                  borderRadius: 14,
+                  border: "1px solid #e5e7eb",
+                  padding: "18px 18px 20px",
+                }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
+                    <h3 style={{ fontSize: 17, fontWeight: 700, color: "#111", margin: 0 }}>About</h3>
+                    <span style={{ width: 20, height: 20, flexShrink: 0, display: "inline-flex", alignItems: "center", justifyContent: "center", color: "#6b7280" }}>
+                      <ExternalLinkLine size={20} />
+                    </span>
+                  </div>
+                  <p style={{ fontSize: 14, color: "#6b7280", lineHeight: 1.8, margin: 0 }}>
+                    {brand.about || brand.description}
+                  </p>
                 </div>
-                <p style={{ fontSize: 14, color: "#6b7280", lineHeight: 1.8, margin: 0 }}>
-                  Um, I'm happy you're home. You're an idiot, Steve Harrington. You're beautiful, Nancy Wheeler. You're right. You are a freak.... Who would you rather be friends with: Bowie or Kenny Rogers? Why's he gotta kick the door? Why do we even need weapons anyway? We have her. Friends don't lie. It's about the shadow monster, isn't it? You're an idiot, Steve Harrington. You're beautiful, Nancy Wheeler. Nobody normal ever accomplished anything meaningful...
-                </p>
-              </div>
+              )}
 
               {/* Socials label */}
-              <h3 style={{ fontSize: 15, fontWeight: 700, color: "#111", margin: "2px 0 0", paddingLeft: 2 }}>
-                Socials
-              </h3>
+              {brand.socialLinks && Object.keys(brand.socialLinks).length > 0 && (
+                <>
+                  <h3 style={{ fontSize: 15, fontWeight: 700, color: "#111", margin: "2px 0 0", paddingLeft: 2 }}>
+                    Socials
+                  </h3>
 
-              {/* Socials list */}
-              <div style={{
-                display: "flex", flexDirection: "column",
-                border: "1px solid #e5e7eb",
-                borderRadius: 14,
-                overflow: "hidden",
-                background: "#fff",
-              }}>
-                {SOCIALS.map((s, i) => (
-                  <div key={i} style={{
-                    display: "flex", alignItems: "center", justifyContent: "space-between",
-                    padding: "14px 16px",
-                    borderBottom: i < SOCIALS.length - 1 ? "1px solid #f0f0f0" : "none",
-                    cursor: "pointer",
+                  {/* Socials list */}
+                  <div style={{
+                    display: "flex", flexDirection: "column",
+                    border: "1px solid #e5e7eb",
+                    borderRadius: 14,
+                    overflow: "hidden",
+                    background: "#fff",
                   }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
-                      <div style={{
-                        width: 38, height: 38,
-                        background: "#111",
-                        borderRadius: 10,
-                        display: "flex", alignItems: "center", justifyContent: "center",
-                        flexShrink: 0,
-                        color: "white",
-                      }}>
-                        {s.icon}
-                      </div>
-                      <span style={{ fontSize: 15, fontWeight: 600, color: "#111" }}>{s.platform}</span>
-                    </div>
-                    <div style={{
-                      width: 34, height: 34,
-                      border: "1px solid #e0e0e0",
-                      borderRadius: 8,
-                      display: "flex", alignItems: "center", justifyContent: "center",
-                      background: "#fafafa",
-                      flexShrink: 0,
-                      overflow: "hidden",
-                    }}>
-                      <span style={{ width: 15, height: 15, display: "inline-flex", alignItems: "center", justifyContent: "center", color: "#6b7280" }}>
-                        <ExternalLinkLine size={15} />
-                      </span>
-                    </div>
+                    {Object.entries(brand.socialLinks).map(([platform, url], i, arr) => {
+                      const entries = Object.entries(brand.socialLinks);
+                      return (
+                        <a key={platform} href={url} target="_blank" rel="noopener noreferrer" style={{
+                          display: "flex", alignItems: "center", justifyContent: "space-between",
+                          padding: "14px 16px",
+                          borderBottom: i < entries.length - 1 ? "1px solid #f0f0f0" : "none",
+                          cursor: "pointer",
+                          textDecoration: "none",
+                        }}>
+                          <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+                            <div style={{
+                              width: 38, height: 38,
+                              background: "#111",
+                              borderRadius: 10,
+                              display: "flex", alignItems: "center", justifyContent: "center",
+                              flexShrink: 0,
+                              color: "white",
+                              fontSize: 18,
+                            }}>
+                              {platform === "instagram" && <InstagramFill size={18} />}
+                              {platform === "youtube" && <YoutubeFill size={18} />}
+                              {platform === "twitter" && <TwitterXLine size={18} />}
+                              {platform === "website" && <GlobeLine size={18} />}
+                            </div>
+                            <span style={{ fontSize: 15, fontWeight: 600, color: "#111" }}>
+                              {platform.charAt(0).toUpperCase() + platform.slice(1)}
+                            </span>
+                          </div>
+                          <div style={{
+                            width: 34, height: 34,
+                            border: "1px solid #e0e0e0",
+                            borderRadius: 8,
+                            display: "flex", alignItems: "center", justifyContent: "center",
+                            background: "#fafafa",
+                            flexShrink: 0,
+                            overflow: "hidden",
+                          }}>
+                            <span style={{ width: 15, height: 15, display: "inline-flex", alignItems: "center", justifyContent: "center", color: "#6b7280" }}>
+                              <ExternalLinkLine size={15} />
+                            </span>
+                          </div>
+                        </a>
+                      );
+                    })}
                   </div>
-                ))}
-              </div>
+                </>
+              )}
             </>
           )}
 
           {activeTab === "campaigns" && (
-            <CampaignsTab />
+            <CampaignsTab campaigns={campaigns} />
           )}
         </div>
       </div>

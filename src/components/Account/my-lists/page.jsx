@@ -7,55 +7,42 @@ import { useGoBack } from '@/hooks/useGoBack';
 import Button from '@/components/ui/Button';
 import IconButton from '@/components/ui/IconButton';
 import Card from '@/components/ui/Card';
+import apiClient from '@/utils/api';
 
 export default function MyListsAll() {
   const router = useRouter();
   const goBack = useGoBack();
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [apiLoading, setApiLoading] = useState(false);
   const [selectionMode, setSelectionMode] = useState(false);
   const [selectedItems, setSelectedItems] = useState([]);
   const [activeChip, setActiveChip] = useState('All');
   const [showNewListModal, setShowNewListModal] = useState(false);
   const [newListName, setNewListName] = useState('');
-  
-  // Mock data - Replace with actual API call
-  const [lists, setLists] = useState([
-    {
-      id: 1,
-      name: 'Emily Thompson',
-      description: 'Lifestyle influencer sharing sustainable living tips and eco-friendly products.',
-      avatar: '/dummyAvatar.jpg',
-      list: 'Favorites'
-    },
-    {
-      id: 2,
-      name: 'Sophie Kim',
-      description: 'Travel blogger exploring hidden gems around the world and sharing travel hacks.',
-      avatar: '/dummyAvatar1.jpg',
-      list: 'Campaign 1'
-    },
-    {
-      id: 3,
-      name: 'Jake Reyes',
-      description: 'Tech enthusiast and reviewer focusing on the latest gadgets and software.',
-      avatar: '/test1.png',
-      list: 'Campaign 2'
-    },
-    {
-      id: 4,
-      name: 'Olivia Martinez',
-      description: 'Beauty guru demonstrating makeup tutorials and skincare routines.',
-      avatar: '/dummyAvatar.jpg',
-      list: 'Favorites'
-    },
-    {
-      id: 5,
-      name: 'Michael Chen',
-      description: 'Fitness coach offering workout plans and healthy meal prep ideas.',
-      avatar: '/dummyAvatar1.jpg',
-      list: 'Campaign 1'
+  const [error, setError] = useState(null);
+  const [successMessage, setSuccessMessage] = useState('');
+
+  // Fetch lists from API
+  const [lists, setLists] = useState([]);
+
+  useEffect(() => {
+    fetchLists();
+  }, []);
+
+  const fetchLists = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const response = await apiClient.get('/lists');
+      setLists(response.data.data || []);
+    } catch (err) {
+      console.error('Error fetching lists:', err);
+      setError('Failed to load your lists. Please try again.');
+      setLists([]);
+    } finally {
+      setLoading(false);
     }
-  ]);
+  };
 
   const chips = ['All', 'Favorites', 'Campaign 1', 'Campaign 2', 'Label', 'Label', 'Label', 'Label', 'Label', 'Label'];
 
@@ -89,11 +76,28 @@ export default function MyListsAll() {
     }
   };
 
-  const handleDelete = () => {
-    // Filter out selected items
-    setLists(lists.filter(item => !selectedItems.includes(item.id)));
-    setSelectedItems([]);
-    setSelectionMode(false);
+  const handleDelete = async () => {
+    try {
+      setApiLoading(true);
+      setError(null);
+
+      // Delete selected lists via API
+      for (const itemId of selectedItems) {
+        await apiClient.delete(`/lists/${itemId}`);
+      }
+
+      // Update local state
+      setLists(lists.filter(item => !selectedItems.includes(item.id)));
+      setSelectedItems([]);
+      setSelectionMode(false);
+      setSuccessMessage(`${selectedItems.length} list(s) deleted successfully`);
+      setTimeout(() => setSuccessMessage(''), 3000);
+    } catch (err) {
+      console.error('Error deleting lists:', err);
+      setError('Failed to delete lists. Please try again.');
+    } finally {
+      setApiLoading(false);
+    }
   };
 
   const handleExport = () => {
@@ -105,30 +109,47 @@ export default function MyListsAll() {
     setShowNewListModal(true);
   };
 
-  const handleCreateList = () => {
+  const handleCreateList = async () => {
     if (newListName.trim()) {
-      // Add new list to the lists
-      const newList = {
-        id: Math.max(...lists.map(l => l.id), 0) + 1,
-        name: newListName,
-        description: 'New list',
-        avatar: '/dummyAvatar.jpg',
-        list: newListName
-      };
-      setLists([...lists, newList]);
+      try {
+        setApiLoading(true);
+        setError(null);
 
-      // Update chips to include new list
-      if (!chips.includes(newListName)) {
-        chips.push(newListName);
+        // Create new list via API
+        const response = await apiClient.post('/lists', {
+          name: newListName,
+          description: '',
+          isPublic: false
+        });
+
+        // Add to local state
+        setLists([...lists, response.data.data]);
+        setSuccessMessage('List created successfully');
+        setTimeout(() => setSuccessMessage(''), 3000);
+
+        // Reset and close modal
+        setNewListName('');
+        setShowNewListModal(false);
+        setSelectionMode(false);
+        setSelectedItems([]);
+      } catch (err) {
+        console.error('Error creating list:', err);
+        setError('Failed to create list. Please try again.');
+      } finally {
+        setApiLoading(false);
       }
-
-      // Reset and close modal
-      setNewListName('');
-      setShowNewListModal(false);
-      setSelectionMode(false);
-      setSelectedItems([]);
     }
   };
+
+  // Loading state
+  if (loading) {
+    return (
+      <div className="flex flex-col h-screen bg-neutral-base items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-blue-600"></div>
+        <p className="mt-4 text-gray-600">Loading your lists...</p>
+      </div>
+    );
+  }
 
   // Empty state
   if (lists.length === 0 && !loading) {
@@ -183,7 +204,9 @@ export default function MyListsAll() {
               icon={DeleteBinLine}
               size="lg"
               variant="default"
+              disabled={apiLoading}
               onClick={handleDelete}
+              title="Delete selected lists"
             />
           )}
           <IconButton
@@ -374,6 +397,7 @@ export default function MyListsAll() {
               <Button
                 variant="outlined"
                 size="md"
+                disabled={apiLoading}
                 onClick={() => {
                   setShowNewListModal(false);
                   setNewListName('');
@@ -384,12 +408,26 @@ export default function MyListsAll() {
               <Button
                 variant="primary"
                 size="md"
+                disabled={apiLoading || !newListName.trim()}
                 onClick={handleCreateList}
               >
-                Create
+                {apiLoading ? 'Creating...' : 'Create'}
               </Button>
             </Card.Footer>
           </Card>
+        </div>
+      )}
+
+      {/* Error/Success Messages */}
+      {error && (
+        <div className="fixed bottom-4 right-4 bg-red-600 text-white px-6 py-3 rounded-lg shadow-lg max-w-md">
+          {error}
+        </div>
+      )}
+
+      {successMessage && (
+        <div className="fixed bottom-4 right-4 bg-green-600 text-white px-6 py-3 rounded-lg shadow-lg max-w-md">
+          {successMessage}
         </div>
       )}
     </div>

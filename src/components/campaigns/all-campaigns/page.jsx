@@ -6,6 +6,7 @@ import { ArrowLeftLine, SearchLine, CloseLine, HeartLine } from '@phyoofficial/p
 import { useApiQuery } from '@/hooks/useApi';
 import { useGoBack } from '@/hooks/useGoBack';
 import { useAuth } from '@/app/context/AuthContext';
+import { CampaignService } from '@/services';
 
 export default function AllCampaign() {
   const router = useRouter();
@@ -24,7 +25,7 @@ export default function AllCampaign() {
       if (authLoading) return null;
       const params = { page: 1, limit: 20 };
       if (searchQuery) params.search = searchQuery;
-      return campaignService.getCampaigns(params);
+      return CampaignService.getCampaigns(params);
     },
     [searchQuery, authLoading]
   );
