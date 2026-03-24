@@ -6,7 +6,7 @@ import { getConversations } from '@/store/slices/messagingSlice';
 import Card from '@/components/ui/Card';
 import Input from '@/components/ui/Input';
 import Spinner from '@/components/ui/Spinner';
-import { Search, MessagePlus } from 'lucide-react';
+import { Search, MessageSquarePlus } from 'lucide-react';
 
 export default function MessagesPage() {
   const dispatch = useDispatch();
@@ -33,7 +33,7 @@ export default function MessagesPage() {
           <div className="flex items-center justify-between mb-4">
             <h1 className="text-2xl font-bold text-gray-900">Messages</h1>
             <button className="p-2 hover:bg-gray-100 rounded-full transition-colors">
-              <MessagePlus size={20} className="text-blue-600" />
+              <MessageSquarePlus size={20} className="text-blue-600" />
             </button>
           </div>
 
@@ -57,7 +57,7 @@ export default function MessagesPage() {
           ) : filteredConversations.length === 0 ? (
             <div className="flex items-center justify-center h-full">
               <div className="text-center">
-                <MessagePlus size={48} className="text-gray-300 mx-auto mb-4" />
+                <MessageSquarePlus size={48} className="text-gray-300 mx-auto mb-4" />
                 <p className="text-gray-500">No conversations yet</p>
               </div>
             </div>
@@ -112,7 +112,7 @@ export default function MessagesPage() {
         ) : (
           <div className="flex-1 flex items-center justify-center">
             <div className="text-center">
-              <MessagePlus size={64} className="text-gray-300 mx-auto mb-4" />
+              <MessageSquarePlus size={64} className="text-gray-300 mx-auto mb-4" />
               <h2 className="text-2xl font-bold text-gray-900 mb-2">
                 Select a conversation
               </h2>

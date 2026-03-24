@@ -1,41 +1,15 @@
-'use client'
-import React, { Suspense, useEffect } from 'react';
+import React, { Suspense } from 'react';
 import InboxPage from '@/components/inbox/InboxPage'
-import { useMessaging } from '@/hooks/useMessaging';
-import { useSocket } from '@/app/context/SocketContext';
 
-function UserInboxContent() {
-  const { socket, onMessage } = useSocket();
-  const { conversations } = useMessaging();
-
-  // Real-time message updates via socket
-  useEffect(() => {
-    if (!socket || !conversations || conversations.length === 0) return;
-
-    const unsubscribers = [];
-    conversations.forEach(conv => {
-      const unsub = onMessage(conv._id || conv.id, (message) => {
-        // Update Redux state when new message arrives
-        // This would be handled by the messaging slice in a full implementation
-      });
-      unsubscribers.push(unsub);
-    });
-
-    return () => unsubscribers.forEach(unsub => unsub?.());
-  }, [socket, conversations, onMessage]);
-
-  return <InboxPage />;
-}
-
-export default function UserInbox() {
+export default function BrandInbox() {
   return (
     <div>
       <Suspense fallback={
         <div className="flex h-screen overflow-hidden bg-gray-50">
           {/* Left Sidebar Skeleton */}
-          <div className="w-full sm:w-[30%] bg-neutral-base border-r border-gray-200 flex flex-col overflow-hidden">
+          <div className="w-full sm:w-[30%] bg-white border-r border-gray-200 flex flex-col overflow-hidden">
             {/* Header Skeleton */}
-            <div className="flex-shrink-0 bg-neutral-base border-b border-gray-200">
+            <div className="flex-shrink-0 bg-white border-b border-gray-200">
               <div className="px-4 sm:px-6 py-4 sm:py-5">
                 <div className="h-7 bg-gray-200 rounded w-24 animate-pulse"></div>
               </div>
@@ -70,7 +44,7 @@ export default function UserInbox() {
           </div>
 
           {/* Right Side Skeleton */}
-          <div className="flex-1 flex items-center justify-center bg-neutral-base">
+          <div className="flex-1 flex items-center justify-center bg-white">
             <div className="text-center">
               <div className="w-64 h-32 bg-gray-200 rounded-lg mx-auto mb-4 animate-pulse"></div>
               <div className="h-4 bg-gray-200 rounded w-40 mx-auto animate-pulse"></div>
@@ -78,8 +52,8 @@ export default function UserInbox() {
           </div>
         </div>
       }>
-        <UserInboxContent/>
+        <InboxPage/>
       </Suspense>
     </div>
   );
-}
+} 

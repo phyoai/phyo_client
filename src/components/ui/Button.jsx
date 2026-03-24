@@ -69,8 +69,8 @@ const Button = React.forwardRef(({
     }
   };
 
-  const size_config = sizeConfig[size];
-  const variant_config = variantConfig[variant];
+  const size_config = sizeConfig[size] || sizeConfig.md;
+  const variant_config = variantConfig[variant] || variantConfig.primary;
 
   const baseClasses = `
     inline-flex items-center justify-center

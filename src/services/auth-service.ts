@@ -4,7 +4,7 @@
  */
 
 import { apiClient, APIResponse } from "./api-client";
-import { AUTH_ENDPOINTS, INFLUENCER_ENDPOINTS } from "@/utils/api-endpoints";
+import { AUTH_ENDPOINTS, INFLUENCER_PUBLIC_ENDPOINTS as INFLUENCER_ENDPOINTS } from "@/utils/api-endpoints";
 
 /**
  * Authentication Response Types

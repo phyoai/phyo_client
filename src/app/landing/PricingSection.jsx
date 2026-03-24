@@ -9,7 +9,6 @@ const PricingSection = () => {
   const [loading, setLoading] = useState(false);
   const [processingPlan, setProcessingPlan] = useState(null);
   const [userPlan, setUserPlan] = useState(null);
-  const [planLoading, setPlanLoading] = useState(false);
   const { isAuthenticated } = useAuth();
   const router = useRouter();
 
@@ -29,18 +28,13 @@ const PricingSection = () => {
   }, [isAuthenticated]);
 
   const checkUserPlan = async () => {
-    setPlanLoading(true);
     try {
       const response = await paymentService.getUserPlan();
-      if (response && response.success) {
-        setUserPlan(response.data?.currentPlan);
+      if (response.success) {
+        setUserPlan(response.data.currentPlan);
       }
     } catch (error) {
-      // Handle missing endpoint gracefully - default to no plan
-      console.warn('Could not fetch user plan:', error?.message || error);
-      setUserPlan(null);
-    } finally {
-      setPlanLoading(false);
+      console.error('Error fetching user plan:', error);
     }
   };
 
@@ -202,7 +196,7 @@ const PricingSection = () => {
         '10 AI-Powered Campaign Reports',
         'Dedicated Chat Support',
         'AI optimizes campaigns',
-        'Unlimited UserLine',
+        'Unlimited Users',
         'Historical Data (Up to 6 months)',
         'Exportable Analytics (CSV/PDF)',
         'AI Smart Creators, Niche, Region, Top',
@@ -264,7 +258,7 @@ const PricingSection = () => {
               onClick={() => setBillingCycle('monthly')}
               className={`px-6 py-2 rounded-full transition-colors ${
                 billingCycle === 'monthly' 
-                  ? 'bg-neutral-base text-black' 
+                  ? 'bg-white text-black' 
                   : 'text-white border border-gray-500'
               }`}
             >
@@ -274,7 +268,7 @@ const PricingSection = () => {
               onClick={() => setBillingCycle('annually')}
               className={`px-6 py-2 rounded-full transition-colors flex items-center ${
                 billingCycle === 'annually' 
-                  ? 'bg-neutral-base text-black' 
+                  ? 'bg-white text-black' 
                   : 'text-white border border-gray-500'
               }`}
             >

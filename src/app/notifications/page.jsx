@@ -11,7 +11,7 @@ import {
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import Spinner from '@/components/ui/Spinner';
-import { Bell, Trash2, CheckAll } from 'lucide-react';
+import { Bell, Trash2, CheckCheck } from 'lucide-react';
 
 export default function NotificationsPage() {
   const dispatch = useDispatch();
@@ -87,7 +87,7 @@ export default function NotificationsPage() {
             <Button
               variant="outline"
               onClick={handleMarkAllAsRead}
-              icon={CheckAll}
+              icon={CheckCheck}
             >
               Mark All as Read
             </Button>

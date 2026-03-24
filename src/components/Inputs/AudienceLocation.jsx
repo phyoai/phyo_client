@@ -130,7 +130,7 @@ const AudienceLocation = ({ name, label, required = false }) => {
                 </label>
             )}
 
-            {/* City SearchLine Input */}
+            {/* City Search Input */}
             <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                     <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -139,14 +139,14 @@ const AudienceLocation = ({ name, label, required = false }) => {
                 </div>
                 <input
                     type="text"
-                    placeholder="SearchLine cities"
+                    placeholder="Search cities"
                     value={citySearchTerm}
                     onChange={(e) => setCitySearchTerm(e.target.value)}
                     className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-600 focus:border-transparent"
                 />
             </div>
 
-            {/* SearchLine Results */}
+            {/* Search Results */}
             {citySearchTerm && (
                 <div className="max-h-60 overflow-y-auto border border-gray-200 rounded-md">
                     {/* Cities Section */}
@@ -238,7 +238,7 @@ const AudienceLocation = ({ name, label, required = false }) => {
             )}
 
 
-            {/* City SearchLine Input */}
+            {/* City Search Input */}
             <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                     <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -247,13 +247,13 @@ const AudienceLocation = ({ name, label, required = false }) => {
                 </div>
                 <input
                     type="text"
-                    placeholder="SearchLine cities"
+                    placeholder="Search cities"
                     value={countrySearchTerm}
                     onChange={(e) => setCountrySearchTerm(e.target.value)}
                     className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-600 focus:border-transparent"
                 />
             </div>
-            {/* Countries SearchLine Results */}
+            {/* Countries Search Results */}
             {countrySearchTerm && (
                 <div className="max-h-60 overflow-y-auto border border-gray-200 rounded-md">
 

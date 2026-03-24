@@ -7,7 +7,8 @@
  */
 
 // API Client
-export { APIClient, apiClient, APIResponse } from "./api-client";
+export { APIClient, apiClient } from "./api-client";
+export type { APIResponse } from "./api-client";
 
 // Authentication Service
 export { AuthService } from "./auth-service";
@@ -39,7 +40,7 @@ export type {
   Brand,
   BrandSignupPayload,
   UpdateBrandPayload,
-  ChangePasswordPayload,
+  ChangePasswordPayload as BrandChangePasswordPayload,
   BrandRequest,
 } from "./brand-service";
 
@@ -57,7 +58,7 @@ export { MessagingService } from "./messaging-service";
 export type {
   Conversation,
   Message,
-  CreateConversationPayload,
+  CreateConversationPayload as MessagingCreateConversationPayload,
   SendMessagePayload,
 } from "./messaging-service";
 

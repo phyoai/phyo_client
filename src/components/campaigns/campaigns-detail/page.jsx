@@ -301,11 +301,11 @@ export default function CampaignDetailPage() {
                                   {/* Thumbnail Images - Show images if exist, otherwise show placeholder icon */}
                                   {images && images.length > 0 ? (
                                     <div className="flex gap-2 mt-3">
-                                      {images.map((image, index) => (
+                                      {images.map((image) => (
                                         <img
-                                          key={index}
+                                          key={image.id || image._id || image.url}
                                           src={image.url}
-                                          alt={`Deliverable ${index + 1}`}
+                                          alt={image.alt || 'Deliverable'}
                                           className="w-14 h-14 rounded-lg object-cover"
                                         />
                                       ))}
@@ -353,8 +353,8 @@ export default function CampaignDetailPage() {
                           <p className="text-sm text-gray-500 font-medium mb-2">Campaign Type</p>
                           <div className="flex gap-2 flex-wrap">
                             {campaign?.types && Array.isArray(campaign.types) && campaign.types.length > 0 ? (
-                              campaign.types.map((type, idx) => (
-                                <span key={idx} className="bg-green-100 text-green-700 text-sm font-medium px-3 py-1 rounded-full">
+                              campaign.types.map((type) => (
+                                <span key={type} className="bg-green-100 text-green-700 text-sm font-medium px-3 py-1 rounded-full">
                                   {type}
                                 </span>
                               ))
@@ -540,8 +540,8 @@ export default function CampaignDetailPage() {
                           <p className="text-sm text-gray-600 font-medium mb-3">Interests</p>
                           <div className="flex flex-wrap gap-2">
                             {campaign?.interests && campaign.interests.length > 0 ? (
-                              campaign.interests.map((interest, idx) => (
-                                <span key={idx} className="bg-green-100 text-green-700 text-sm font-medium px-4 py-1 rounded-full">
+                              campaign.interests.map((interest) => (
+                                <span key={interest} className="bg-green-100 text-green-700 text-sm font-medium px-4 py-1 rounded-full">
                                   {interest}
                                 </span>
                               ))
@@ -567,7 +567,7 @@ export default function CampaignDetailPage() {
                       <div className="grid grid-cols-4 gap-4 sm:grid-cols-8">
                         {[1, 2, 3, 4, 5, 6, 7, 8].map((item) => (
                           <div
-                            key={item}
+                            key={`media-${item}`}
                             className="aspect-square bg-gray-200 rounded-lg flex items-center justify-center hover:bg-gray-300 transition-colors cursor-pointer"
                           >
                             <Image2Line className="w-6 h-6 text-gray-500" />
@@ -589,7 +589,7 @@ export default function CampaignDetailPage() {
                           { title: 'Campaign Live', date: 'June 1', status: 'active', color: 'bg-blue-500' },
                           { title: 'Campaign End', date: 'June 30', status: 'pending', color: 'bg-gray-300' }
                         ].map((event, index, array) => (
-                          <div key={index} className="flex gap-4">
+                          <div key={event.title} className="flex gap-4">
                             {/* Timeline Dot and Line */}
                             <div className="flex flex-col items-center">
                               {/* Dot */}

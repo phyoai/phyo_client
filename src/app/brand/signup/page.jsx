@@ -1,7 +1,7 @@
 'use client'
-import Image2Line from 'next/image'
+import Image from 'next/image'
 import React, { Suspense } from 'react'
-import FormContainer from '@/components/dashboard/FormContainer'
+import FormContainer from '@/components/shared/FormContainer'
 import { useAuth } from '../../context/AuthContext';
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
@@ -81,12 +81,12 @@ export default function Page() {
                 name: "social_media.instagram", 
                 type: "text", 
                 placeholder: "https://instagram.com/yourcompany", 
-                label: "InstagramFill", 
+                label: "Instagram", 
                 required: false,
                 validation: {
                     pattern: {
                         value: /^(https?:\/\/)?(www\.)?instagram\.com\/.+$/,
-                        message: "Please enter a valid InstagramFill URL"
+                        message: "Please enter a valid Instagram URL"
                     }
                 }
             },
@@ -94,7 +94,7 @@ export default function Page() {
                 name: "social_media.linkedin", 
                 type: "text", 
                 placeholder: "https://linkedin.com/company/yourcompany", 
-                label: "LinkedinFill", 
+                label: "Linkedin", 
                 required: false,
                 validation: {
                     pattern: {
@@ -107,12 +107,12 @@ export default function Page() {
                 name: "social_media.twitter", 
                 type: "text", 
                 placeholder: "https://twitter.com/yourcompany", 
-                label: "CloseLine (TwitterXLine)", 
+                label: "X (Twitter)", 
                 required: false,
                 validation: {
                     pattern: {
                         value: /^(https?:\/\/)?(www\.)?(twitter|x)\.com\/.+$/,
-                        message: "Please enter a valid TwitterXLine/CloseLine URL"
+                        message: "Please enter a valid Twitter/X URL"
                     }
                 }
             },
@@ -156,7 +156,7 @@ export default function Page() {
         ],
     }]
     return (
-        <div className='min-h-screen bg-neutral-base flex items-center justify-center'>
+        <div className='min-h-screen bg-white flex items-center justify-center'>
             <div className='w-full h-screen max-w-full overflow-hidden'>
                 <Suspense fallback={
                     <div className="flex items-center justify-center h-full">

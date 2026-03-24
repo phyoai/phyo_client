@@ -39,7 +39,7 @@ const Navbar = () => {
             influencerRegistrationStatus: 'NONE',
             userType: null
           });
-          console.log('Token expired or invalid in Navbar. UserLine logged out.');
+          console.log('Token expired or invalid in Navbar. User logged out.');
           return;
         }
         
@@ -83,18 +83,10 @@ const Navbar = () => {
 
   const handleDashboardClick = () => {
     // Check which type of user is approved and redirect accordingly
-    if (registrationStatus.userType === 'BRAND' || registrationStatus.brandRegistrationStatus === 'APPROVED') {
+    if (registrationStatus.brandRegistrationStatus === 'APPROVED') {
       router.push('/brand/dashboard');
-    } else if (registrationStatus.userType === 'INFLUENCER' || registrationStatus.influencerRegistrationStatus === 'APPROVED') {
+    } else if (registrationStatus.influencerRegistrationStatus === 'APPROVED') {
       router.push('/influencer/dashboard');
-    } else if (registrationStatus.userType === 'USER') {
-      router.push('/user/dashboard');
-    } else if (userType === 'BRAND') {
-      router.push('/brand/dashboard');
-    } else if (userType === 'INFLUENCER') {
-      router.push('/influencer/dashboard');
-    } else if (userType === 'USER') {
-      router.push('/user/dashboard');
     }
   };
 
@@ -286,7 +278,7 @@ const Navbar = () => {
           {!isAuthenticated ? (
             <Link 
               href="/login" 
-              className="hidden md:inline-flex border border-white text-white hover:bg-neutral-base hover:text-black font-medium px-4 py-2 rounded-full transition-colors text-sm lg:text-base"
+              className="hidden md:inline-flex border border-white text-white hover:bg-white hover:text-black font-medium px-4 py-2 rounded-full transition-colors text-sm lg:text-base"
             >
               Sign In
             </Link>
@@ -315,7 +307,7 @@ const Navbar = () => {
               {(registrationStatus.brandRegistrationStatus === 'APPROVED' || registrationStatus.influencerRegistrationStatus === 'APPROVED') && (
                 <button
                   onClick={handleDashboardClick}
-                  className="border border-white text-white hover:bg-neutral-base hover:text-black font-medium px-4 py-2 rounded-full transition-colors text-sm lg:text-base"
+                  className="border border-white text-white hover:bg-white hover:text-black font-medium px-4 py-2 rounded-full transition-colors text-sm lg:text-base"
                 >
                   Dashboard
                 </button>
@@ -323,7 +315,7 @@ const Navbar = () => {
 
               <button
                 onClick={handleLogout}
-                className="bg-neutral-base text-black hover:bg-gray-200 font-medium px-4 py-2 rounded-full transition-colors text-sm lg:text-base"
+                className="bg-white text-black hover:bg-gray-200 font-medium px-4 py-2 rounded-full transition-colors text-sm lg:text-base"
               >
                 Logout
               </button>
@@ -400,7 +392,7 @@ const Navbar = () => {
                 <li>
                   <Link
                     href="/login"
-                    className="block border border-white text-white hover:bg-neutral-base hover:text-black font-medium transition-colors py-2 px-4 rounded-full text-base text-center"
+                    className="block border border-white text-white hover:bg-white hover:text-black font-medium transition-colors py-2 px-4 rounded-full text-base text-center"
                     onClick={() => setIsMenuOpen(false)}
                   >
                     Sign In
@@ -435,7 +427,7 @@ const Navbar = () => {
                   {(registrationStatus.brandRegistrationStatus === 'APPROVED' || registrationStatus.influencerRegistrationStatus === 'APPROVED') && (
                     <li>
                       <button
-                        className="block w-full border border-white text-white hover:bg-neutral-base hover:text-black font-medium transition-colors py-2 px-4 rounded-full text-base text-center"
+                        className="block w-full border border-white text-white hover:bg-white hover:text-black font-medium transition-colors py-2 px-4 rounded-full text-base text-center"
                         onClick={() => {
                           handleDashboardClick();
                           setIsMenuOpen(false);
@@ -452,7 +444,7 @@ const Navbar = () => {
                         handleLogout();
                         setIsMenuOpen(false);
                       }}
-                      className="block w-full bg-neutral-base text-black hover:bg-gray-200 font-medium transition-colors py-2 px-4 rounded-full text-base text-center"
+                      className="block w-full bg-white text-black hover:bg-gray-200 font-medium transition-colors py-2 px-4 rounded-full text-base text-center"
                     >
                       Logout
                     </button>
@@ -473,7 +465,7 @@ const Navbar = () => {
           onClick={() => setShowStatusModal(false)}
         >
           <div 
-            className="bg-neutral-base rounded-3xl shadow-2xl max-w-md w-full p-6 relative animate-fadeIn"
+            className="bg-white rounded-3xl shadow-2xl max-w-md w-full p-6 relative animate-fadeIn"
             onClick={(e) => e.stopPropagation()}
           >
             <button

@@ -102,6 +102,15 @@ export interface IListItem {
   addedAt: string;
 }
 
+const defaultPagination: IPagination = {
+  page: 1,
+  limit: 10,
+  total: 0,
+  totalPages: 0,
+  hasNextPage: false,
+  hasPreviousPage: false,
+};
+
 /**
  * Account API service
  * Handles account, billing, subscriptions, and list management
@@ -124,16 +133,10 @@ export const accountApi = {
         pagination: IPagination;
       }>>('/account/transactions', { params });
 
+      const payload = response.data?.data;
       return {
-        transactions: response.data.data || [],
-        pagination: response.data.pagination || {
-          page: 1,
-          limit: 10,
-          total: 0,
-          totalPages: 0,
-          hasNextPage: false,
-          hasPreviousPage: false,
-        },
+        transactions: (payload?.data ?? []) as ITransaction[],
+        pagination: payload?.pagination ?? defaultPagination,
       };
     } catch (error: any) {
       const errorMessage =
@@ -158,15 +161,8 @@ export const accountApi = {
       const response = await api.get<IApiResponse<any>>('/account/payments/history', { params });
 
       return {
-        payments: response.data.data || [],
-        pagination: response.data.pagination || {
-          page: 1,
-          limit: 10,
-          total: 0,
-          totalPages: 0,
-          hasNextPage: false,
-          hasPreviousPage: false,
-        },
+        payments: response.data?.data ?? [],
+        pagination: response.data?.pagination ?? defaultPagination,
       };
     } catch (error: any) {
       const errorMessage =
@@ -192,7 +188,7 @@ export const accountApi = {
         '/account/payments/methods',
         paymentMethodData
       );
-      return response.data.data || response.data;
+      return response.data?.data as IPaymentMethod;
     } catch (error: any) {
       const errorMessage =
         error.response?.data?.message || error.message || 'Failed to add payment method';
@@ -211,7 +207,7 @@ export const accountApi = {
       const response = await api.get<IApiResponse<IPaymentMethod[]>>(
         '/account/payments/methods'
       );
-      return response.data.data || response.data;
+      return (response.data?.data ?? []) as IPaymentMethod[];
     } catch (error: any) {
       const errorMessage =
         error.response?.data?.message || error.message || 'Failed to fetch payment methods';
@@ -235,7 +231,7 @@ export const accountApi = {
       const response = await api.put<IApiResponse<IPaymentMethod>>(
         `/account/payments/methods/${paymentMethodId}/default`
       );
-      return response.data.data || response.data;
+      return response.data?.data as IPaymentMethod;
     } catch (error: any) {
       const errorMessage =
         error.response?.data?.message || error.message || 'Failed to set default payment method';
@@ -259,7 +255,7 @@ export const accountApi = {
       const response = await api.delete<IApiResponse<{ success: boolean }>>(
         `/account/payments/methods/${paymentMethodId}`
       );
-      return response.data.data || { success: true };
+      return (response.data?.data ?? { success: true }) as { success: boolean };
     } catch (error: any) {
       const errorMessage =
         error.response?.data?.message || error.message || 'Failed to delete payment method';
@@ -280,7 +276,7 @@ export const accountApi = {
       const response = await api.get<IApiResponse<ISubscription>>(
         '/account/subscriptions/current'
       );
-      return response.data.data || response.data;
+      return response.data?.data as ISubscription;
     } catch (error: any) {
       const errorMessage =
         error.response?.data?.message || error.message || 'Failed to fetch current subscription';
@@ -299,7 +295,7 @@ export const accountApi = {
       const response = await api.get<IApiResponse<ISubscriptionTimeline>>(
         '/account/subscriptions/timeline'
       );
-      return response.data.data || response.data;
+      return response.data?.data as ISubscriptionTimeline;
     } catch (error: any) {
       const errorMessage =
         error.response?.data?.message || error.message || 'Failed to fetch subscription timeline';
@@ -318,7 +314,7 @@ export const accountApi = {
       const response = await api.get<IApiResponse<ISubscriptionPlan[]>>(
         '/account/subscriptions/plans'
       );
-      return response.data.data || response.data;
+      return (response.data?.data ?? []) as ISubscriptionPlan[];
     } catch (error: any) {
       const errorMessage =
         error.response?.data?.message || error.message || 'Failed to fetch subscription plans';
@@ -343,7 +339,7 @@ export const accountApi = {
         '/account/subscriptions/upgrade',
         { planId }
       );
-      return response.data.data || response.data;
+      return response.data?.data as ISubscription;
     } catch (error: any) {
       const errorMessage =
         error.response?.data?.message || error.message || 'Failed to upgrade subscription';
@@ -368,7 +364,7 @@ export const accountApi = {
         '/account/subscriptions/downgrade',
         { planId }
       );
-      return response.data.data || response.data;
+      return response.data?.data as ISubscription;
     } catch (error: any) {
       const errorMessage =
         error.response?.data?.message || error.message || 'Failed to downgrade subscription';
@@ -389,7 +385,7 @@ export const accountApi = {
         '/account/subscriptions/cancel',
         { reason }
       );
-      return response.data.data || { success: true, message: 'Subscription cancelled' };
+      return (response.data?.data ?? { success: true, message: 'Subscription cancelled' }) as { success: boolean; message: string };
     } catch (error: any) {
       const errorMessage =
         error.response?.data?.message || error.message || 'Failed to cancel subscription';
@@ -409,7 +405,7 @@ export const accountApi = {
   getLists: async (params?: Record<string, any>): Promise<IList[]> => {
     try {
       const response = await api.get<IApiResponse<IList[]>>('/account/lists', { params });
-      return response.data.data || response.data;
+      return (response.data?.data ?? []) as IList[];
     } catch (error: any) {
       const errorMessage =
         error.response?.data?.message || error.message || 'Failed to fetch lists';
@@ -433,7 +429,7 @@ export const accountApi = {
       }
 
       const response = await api.post<IApiResponse<IList>>('/account/lists', listData);
-      return response.data.data || response.data;
+      return response.data?.data as IList;
     } catch (error: any) {
       const errorMessage =
         error.response?.data?.message || error.message || 'Failed to create list';
@@ -463,16 +459,10 @@ export const accountApi = {
         pagination: IPagination;
       }>>(`/account/lists/${listId}/items`, { params });
 
+      const payload = response.data?.data;
       return {
-        items: response.data.data || [],
-        pagination: response.data.pagination || {
-          page: 1,
-          limit: 10,
-          total: 0,
-          totalPages: 0,
-          hasNextPage: false,
-          hasPreviousPage: false,
-        },
+        items: (payload?.data ?? []) as IListItem[],
+        pagination: payload?.pagination ?? defaultPagination,
       };
     } catch (error: any) {
       const errorMessage =
@@ -502,7 +492,7 @@ export const accountApi = {
         `/account/lists/${listId}/items`,
         itemData
       );
-      return response.data.data || response.data;
+      return response.data?.data as IListItem;
     } catch (error: any) {
       const errorMessage =
         error.response?.data?.message || error.message || 'Failed to add item to list';
@@ -527,7 +517,7 @@ export const accountApi = {
       const response = await api.delete<IApiResponse<{ success: boolean }>>(
         `/account/lists/${listId}/items/${itemId}`
       );
-      return response.data.data || { success: true };
+      return (response.data?.data ?? { success: true }) as { success: boolean };
     } catch (error: any) {
       const errorMessage =
         error.response?.data?.message || error.message || 'Failed to remove item from list';

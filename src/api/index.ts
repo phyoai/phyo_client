@@ -13,12 +13,6 @@ export { influencerApi, buildInfluencerFilter, validateInfluencerFilter } from '
 
 // Export all types and interfaces
 export type {
-  // Enums
-  CampaignStatus,
-  CampaignType,
-  CompensationType,
-  UserRole,
-  Gender,
   // Pagination & Common
   IPagination,
   IApiResponse,

@@ -1,7 +1,6 @@
 'use client'
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAuth } from '@/hooks';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -11,46 +10,65 @@ const ForgotPassword = () => {
   const [verificationCode, setVerificationCode] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmNewPassword, setConfirmNewPassword] = useState('');
+  const [loading, setLoading] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const router = useRouter();
-  const { forgotPass, verifyCode: verifyCodeAction, resetPass, loading, error, resetCodeVerified } = useAuth();
 
-  // Monitor error notifications
-  useEffect(() => {
-    if (error) {
-      toast.error(error);
-    }
-  }, [error]);
-
-  // Monitor step progression
-  useEffect(() => {
-    if (resetCodeVerified) {
-      setStep(3);
-    }
-  }, [resetCodeVerified]);
-
-  const sendForgotPasswordEmail = () => {
+  const sendForgotPasswordEmail = async () => {
     if (!email) {
       toast.error('Please enter your email address');
       return;
     }
-    forgotPass(email);
-    toast.success('📧 Verification code sent to your email!');
-    setStep(2);
+    setLoading(true);
+    try {
+      const response = await fetch('https://api.phyo.ai/api/user/forgot-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      });
+      const result = await response.json();
+      if (response.ok) {
+        toast.success('📧 Verification code sent to your email!');
+        setStep(2);
+      } else {
+        toast.error(result.message || 'Failed to send verification code');
+      }
+    } catch {
+      toast.error('Network error. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const verifyCode = () => {
+  const verifyCode = async () => {
     if (!verificationCode) {
       toast.error('Please enter the verification code');
       return;
     }
-    verifyCodeAction(email, verificationCode);
-    toast.success('✅ Code verified successfully!');
+    setLoading(true);
+    try {
+      const response = await fetch('https://api.phyo.ai/api/user/verify-code', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, code: verificationCode }),
+      });
+      const result = await response.json();
+      if (response.ok) {
+        toast.success('✅ Code verified successfully!');
+        setStep(3);
+      } else {
+        toast.error(result.message || 'Invalid verification code');
+      }
+    } catch {
+      toast.error('Network error. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const resetPassword = () => {
+  const resetPassword = async () => {
     if (!newPassword || !confirmNewPassword) {
       toast.error('Please fill in all password fields');
       return;
@@ -63,15 +81,31 @@ const ForgotPassword = () => {
       toast.error('Password must be at least 6 characters long');
       return;
     }
-    resetPass(email, newPassword);
-    toast.success('✅ Password reset successfully! Redirecting to login...');
-    setTimeout(() => {
-      router.replace('/login');
-    }, 2000);
+    setLoading(true);
+    try {
+      const response = await fetch('https://api.phyo.ai/api/user/reset-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, newPassword }),
+      });
+      const result = await response.json();
+      if (response.ok) {
+        toast.success('✅ Password reset successfully! Redirecting to login...');
+        setTimeout(() => {
+          router.replace('/login');
+        }, 2000);
+      } else {
+        toast.error(result.message || 'Failed to reset password');
+      }
+    } catch {
+      toast.error('Network error. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-neutral-base relative overflow-hidden">
+    <div className="min-h-screen flex items-center justify-center bg-white relative overflow-hidden">
       {/* Logo - Top Left - Fixed Position */}
       <div className="absolute top-6 left-8 z-20">
         <img 
@@ -93,7 +127,7 @@ const ForgotPassword = () => {
 
       {/* Middle Section - Forgot Password Form */}
       <div className="w-full max-w-[30%] flex items-center justify-center p-4 z-10">
-        <div className="w-full bg-neutral-base rounded-3xl shadow-xl py-8 px-6  border border-gray-100">
+        <div className="w-full bg-white rounded-3xl shadow-xl py-8 px-6  border border-gray-100">
           {step === 1 && <h2 className="text-2xl font-semibold mb-3 text-center text-gray-900">Forgot Password?</h2>}
           
           {step === 1 && (
@@ -106,7 +140,7 @@ const ForgotPassword = () => {
                   type="email"
                   value={email}
                   onChange={e => setEmail(e.target.value)}
-                  className="w-full px-4 py-2 bg-gray-100 border-4 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#43573B] focus:bg-neutral-base text-gray-900 placeholder-gray-400 text-sm"
+                  className="w-full px-4 py-2 bg-gray-100 border-4 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#43573B] focus:bg-white text-gray-900 placeholder-gray-400 text-sm"
                   placeholder="jazleen@gmail.com"
                 />
               </div>
@@ -158,7 +192,7 @@ const ForgotPassword = () => {
                         document.getElementById(`otp-${index - 1}`)?.focus();
                       }
                     }}
-                    className="w-10 h-10 text-center text-lg font-semibold bg-[#F0F0F0] border-[3px] border-[#E6E6E6] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#43573B] focus:bg-neutral-base text-gray-900"
+                    className="w-10 h-10 text-center text-lg font-semibold bg-[#F0F0F0] border-[3px] border-[#E6E6E6] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#43573B] focus:bg-white text-gray-900"
                   />
                 ))}
               </div>
@@ -207,7 +241,7 @@ const ForgotPassword = () => {
                     type={showNewPassword ? "text" : "password"}
                     value={newPassword}
                     onChange={e => setNewPassword(e.target.value)}
-                    className="w-full px-4 py-2 pr-10 bg-[#F0F0F0] border-[3px] border-[#E6E6E6] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#43573B] focus:bg-neutral-base text-gray-900 placeholder-gray-400 text-sm"
+                    className="w-full px-4 py-2 pr-10 bg-[#F0F0F0] border-[3px] border-[#E6E6E6] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#43573B] focus:bg-white text-gray-900 placeholder-gray-400 text-sm"
                     placeholder="jazleen@gmail.com"
                   />
                   <button
@@ -239,7 +273,7 @@ const ForgotPassword = () => {
                     type={showConfirmPassword ? "text" : "password"}
                     value={confirmNewPassword}
                     onChange={e => setConfirmNewPassword(e.target.value)}
-                    className="w-full px-4 py-2 pr-10 bg-[#F0F0F0] border-[3px] border-[#E6E6E6] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#43573B] focus:bg-neutral-base text-gray-900 placeholder-gray-400 text-sm"
+                    className="w-full px-4 py-2 pr-10 bg-[#F0F0F0] border-[3px] border-[#E6E6E6] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#43573B] focus:bg-white text-gray-900 placeholder-gray-400 text-sm"
                     placeholder="Complete"
                   />
                   <button

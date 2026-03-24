@@ -1,6 +1,6 @@
 'use client';
 import React from 'react';
-import { ArrowRightLine } from '@phyoofficial/phyo-icon-library';
+import { ChevronRight } from 'lucide-react';
 import { useLanguage } from '@/app/context/LanguageContext';
 
 /**
@@ -30,7 +30,7 @@ export default function SectionHeading({
           className="flex items-center text-blue-600 hover:text-blue-700 font-medium text-sm transition-colors"
         >
           {t('view_all')}
-          <ArrowRightLine className="h-4 w-4 ml-0.5" />
+          <ChevronRight className="h-4 w-4 ml-0.5" />
         </button>
       )}
     </div>

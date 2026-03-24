@@ -28,7 +28,7 @@ export const AUTH_ENDPOINTS = {
 /**
  * Influencer Endpoints - PUBLIC (No Auth Required)
  */
-export const INFLUENCER_ENDPOINTS = {
+export const INFLUENCER_PUBLIC_ENDPOINTS = {
   GET_INFLUENCERS: `${API_BASE_URL}/influencers`,
   GET_INFLUENCER_BY_ID: (id: string) =>
     `${API_BASE_URL}/influencers/${id}`,

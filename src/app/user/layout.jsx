@@ -1,68 +1,41 @@
 'use client'
-import React, { useEffect, Suspense } from 'react';
+import React from 'react';
 import { usePathname } from 'next/navigation';
 import UserSidebar from '../../components/UserSidebar';
-import ProtectedRoute from '../../components/ProtectedRoute';
 import { SidebarProvider, useSidebar } from '../context/SidebarContext';
-import { RoleProvider } from '../context/RoleContext';
 
 function UserLayoutContent({ children, pathname }) {
   const { isExpanded } = useSidebar();
-  
-  // Debug logging
-  useEffect(() => {
-    console.log('UserLayout: pathname =', pathname);
-  }, [pathname]);
-  
-  // Don't show sidebar for specific pages
-  const isAuthPage = pathname === '/user/signup' || pathname === '/user/login';
-  const isCreateCampaignPage = pathname === '/user/campaigns/create-campaign';
-  const isNewApplicationsPage = pathname === '/user/campaigns/new-applications';
-  const isAllCampaignsPage = pathname === '/user/campaigns/all-campaigns';
-  const isAllDraftsPage = pathname === '/user/campaigns/all-drafts';
-  const isInfluencerSearchPage = pathname === '/user/influencer-search';
-  const isInfluencersPage = pathname === '/user/influencers';
-  const isNotificationsPage = pathname === '/user/notifications';
-  // Hide sidebar for all account sub-pages (but not the main account page)
-  const isAccountSubPage = pathname.startsWith('/user/account/');
-  // Hide sidebar for dynamic campaign details page only
-  const isCampaignDetailsPage =
-    pathname.startsWith('/user/campaigns/') &&
-    !pathname.includes('/create-campaign') &&
-    !pathname.includes('/new-applications') &&
-    !pathname.includes('/all-campaigns') &&
-    !pathname.includes('/all-drafts');
-  // Hide sidebar for inbox page
-  const isInboxPage = pathname === '/user/inbox';
 
-  if (
-    isAuthPage ||
-    isCreateCampaignPage ||
-    isNewApplicationsPage ||
-    isAllCampaignsPage ||
-    isAllDraftsPage ||
-    isInfluencerSearchPage ||
-    isInfluencersPage ||
-    isNotificationsPage ||
-    isAccountSubPage ||
-    isCampaignDetailsPage ||
-    isInboxPage
-  ) {
-    // console.log('UserLayout: Rendering page without sidebar');
+  const noSidebarRoutes = [
+    '/user/campaigns/create-campaign',
+    '/user/campaigns/new-applications',
+    '/user/campaigns/all-campaigns',
+    '/user/campaigns/all-drafts',
+    '/user/influencer-search',
+    '/user/influencers',
+    '/user/notifications',
+  ];
+
+  const isNoSidebarRoute =
+    noSidebarRoutes.some(r => pathname === r) ||
+    pathname.startsWith('/user/account/') ||
+    (pathname.startsWith('/user/campaigns/') &&
+      !pathname.includes('/create-campaign') &&
+      !pathname.includes('/new-applications') &&
+      !pathname.includes('/all-campaigns') &&
+      !pathname.includes('/all-drafts'));
+
+  if (isNoSidebarRoute) {
     return <>{children}</>;
   }
-  
-  // console.log('UserLayout: Rendering layout with sidebar');
-  
+
   return (
-    <div className="flex min-h-screen bg-neutral-base">
+    <div className="flex min-h-screen bg-[#FFFFFF]">
       <UserSidebar />
-       <main
-        className="bg-neutral-base text-text-base border-l border-primary transition-all duration-300 ease-in-out min-h-screen w-full"
-        style={{
-          marginLeft: isExpanded ? 240 : 80,
-        }}
-      >
+      <main className={`flex-1 bg-[#FFFFFF] transition-all duration-300 ease-in-out ${
+        isExpanded ? 'ml-[220px]' : 'ml-[96px]'
+      } h-screen overflow-y-auto`}>
         {children}
       </main>
     </div>
@@ -73,18 +46,10 @@ export default function UserLayout({ children }) {
   const pathname = usePathname();
 
   return (
-    <RoleProvider>
-      <SidebarProvider>
-        <UserLayoutContent pathname={pathname}>
-          {children}
-        </UserLayoutContent>
-      </SidebarProvider>
-    </RoleProvider>
+    <SidebarProvider>
+      <UserLayoutContent pathname={pathname}>
+        {children}
+      </UserLayoutContent>
+    </SidebarProvider>
   );
-} 
-
-
-
-
-
-
+}

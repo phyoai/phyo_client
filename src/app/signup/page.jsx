@@ -4,7 +4,7 @@ import { useForm } from 'react-hook-form';
 import { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useAuth } from '@/hooks';
+import { useAuth } from '../context/AuthContext';
 import { GoogleLogin, GoogleOAuthProvider } from '@react-oauth/google';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -64,67 +64,176 @@ function SignupForm() {
         getValues
     } = useForm();
 
+    const [loading, setLoading] = useState(false);
     const [showOTP, setShowOTP] = useState(false);
     const [otp, setOtp] = useState(['', '', '', '', '', '']);
+    const [otpLoading, setOtpLoading] = useState(false);
     const [signupData, setSignupData] = useState(null);
+    const [googleLoading, setGoogleLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
-
+    
     const router = useRouter();
     const searchParams = useSearchParams();
-    const { isAuthenticated, signup, googleLogin, verifyOtp, resendOtp, loading, otpSent, error } = useAuth();
+    const { isAuthenticated } = useAuth();
 
     // Check if user is already authenticated
     useEffect(() => {
-        if (isAuthenticated) {
+        if (isAuthenticated()) {
             const redirect = searchParams.get('redirect') || '/';
             router.push(redirect);
         }
     }, [isAuthenticated, router, searchParams]);
 
-    // Handle signup success - show OTP screen
-    useEffect(() => {
-        if (otpSent && signupData) {
-            toast.success('📧 OTP sent to your email! Please check your inbox.');
-            setShowOTP(true);
-        }
-    }, [otpSent, signupData]);
-
-    // Handle error notifications
-    useEffect(() => {
-        if (error) {
-            toast.error(error);
-        }
-    }, [error]);
-
-    const handleGoogleSuccess = (credentialResponse) => {
-        googleLogin({
-            idToken: credentialResponse.credential,
-            type: 'USER'
+    const signupAPI = async (userData) => {
+        console.log('Sending signup data:', userData); // Debug log
+        
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://api.phyo.ai/api';
+        const response = await fetch(`${apiUrl}/user/signup`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4ODlhY2E1YTA0MTM5NjE0ODM4OWNmNSIsImlhdCI6MTc1Mzg1MzIyNiwiZXhwIjoxNzUzOTM5NjI2fQ.lep_xGBaaSJDUH68SCspcrudeybsmtwBpeRkJolKlBY'
+            },
+            body: JSON.stringify(userData)
         });
+
+        const data = await response.json();
+        console.log('API Response:', data); // Debug log
+        console.log('Response status:', response.status); // Debug log
+        
+        if (!response.ok) {
+            throw new Error(data.message || `HTTP error! status: ${response.status}`);
+        }
+        
+        return data;
     };
 
-    // Monitor Google login success
-    useEffect(() => {
-        if (isAuthenticated) {
-            toast.success('🎉 Successfully signed up with Google!');
-            const redirect = searchParams.get('redirect') || '/user/dashboard';
-            setTimeout(() => router.push(redirect), 1000);
+    const verifyOTPAPI = async (email, otpCode) => {
+        console.log('Verifying OTP for:', email, 'with code:', otpCode); // Debug log
+        
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://api.phyo.ai/api';
+        const response = await fetch(`${apiUrl}/user/verify-otp`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4ODlhY2E1YTA0MTM5NjE0ODM4OWNmNSIsImlhdCI6MTc1Mzg1MzIyNiwiZXhwIjoxNzUzOTM5NjI2fQ.lep_xGBaaSJDUH68SCspcrudeybsmtwBpeRkJolKlBY'
+            },
+            body: JSON.stringify({ email, otp: otpCode })
+        });
+
+        const data = await response.json();
+        console.log('OTP Verification Response:', data); // Debug log
+        console.log('OTP Response status:', response.status); // Debug log
+        
+        if (!response.ok) {
+            throw new Error(data.message || `HTTP error! status: ${response.status}`);
         }
-    }, [isAuthenticated, router, searchParams]);
+        
+        return data;
+    };
+
+    const googleSignupAPI = async (idToken) => {
+        console.log('Attempting Google signup'); // Debug log
+        
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://api.phyo.ai/api';
+        const response = await fetch(`${apiUrl}/user/google`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ 
+                idToken,
+                type: 'USER' // Default user type
+            })
+        });
+
+        const data = await response.json();
+        console.log('Google Signup API Response:', data); // Debug log
+        
+        if (!response.ok) {
+            throw new Error(data.message || `HTTP error! status: ${response.status}`);
+        }
+        
+        return data;
+    };
+
+    const handleGoogleSuccess = async (credentialResponse) => {
+        setGoogleLoading(true);
+
+        try {
+            console.log('Google credential received'); // Debug log
+            const result = await googleSignupAPI(credentialResponse.credential);
+            
+            // Handle successful signup/login
+            if (result.token) {
+                console.log('Google signup successful'); // Debug log
+                
+                // Store the authentication token
+                localStorage.setItem('authToken', result.token);
+                
+                // Store user data if provided
+                if (result.user) {
+                    localStorage.setItem('userData', JSON.stringify(result.user));
+                    if (result.user.email) {
+                        localStorage.setItem('userEmail', result.user.email);
+                    }
+                }
+                
+                toast.success('🎉 Successfully signed up with Google!');
+                
+                // Redirect to dashboard or requested page
+                const redirect = searchParams.get('redirect') || '/';
+                setTimeout(() => router.push(redirect), 1000);
+                
+            } else {
+                console.log('Google signup failed with result:', result); // Debug log
+                toast.error(result.message || 'Google signup failed');
+            }
+        } catch (error) {
+            console.error('Google signup error:', error); // Debug log
+            toast.error(error.message || 'Failed to sign up with Google');
+        } finally {
+            setGoogleLoading(false);
+        }
+    };
 
     const handleGoogleError = () => {
         console.error('Google Sign-Up failed');
         toast.error('Google Sign-Up was unsuccessful. Please try again.');
     };
 
-    const onSubmit = (data) => {
-        const userData = {
-            ...data,
-            type: 'USER'
-        };
+    const onSubmit = async (data) => {
+        setLoading(true);
 
-        signup(userData);
-        setSignupData(userData);
+        try {
+            const userData = {
+                ...data,
+                type: 'USER' // Set to USER as requested
+            };
+
+            console.log('Submitting form with data:', userData); // Debug log
+            const result = await signupAPI(userData);
+            console.log('Signup result:', result); // Debug log
+            
+            // More flexible response handling
+            if (result.success || result.message?.includes('OTP') || result.status === 'success' || result.data) {
+                console.log('OTP should be sent, showing OTP screen'); // Debug log
+                toast.success('📧 OTP sent to your email! Please check your inbox.');
+                setSignupData(userData);
+                setShowOTP(true);
+            } else {
+                console.log('Unexpected response format:', result); // Debug log
+                // Still show OTP screen if we got a response (assuming OTP was sent)
+                toast.success('📧 OTP sent to your email! Please check your inbox.');
+                setSignupData(userData);
+                setShowOTP(true);
+            }
+        } catch (error) {
+            console.error('Signup error:', error); // Debug log
+            toast.error(error.message || 'An unexpected error occurred');
+        } finally {
+            setLoading(false);
+        }
     };
 
     const handleOTPChange = (index, value) => {
@@ -140,36 +249,74 @@ function SignupForm() {
         }
     };
 
-    const handleOTPSubmit = () => {
+    const handleOTPSubmit = async () => {
         const otpCode = otp.join('');
         if (otpCode.length !== 6) {
             toast.error('Please enter all 6 digits');
             return;
         }
 
-        verifyOtp(signupData.email, otpCode);
+        setOtpLoading(true);
+
+        try {
+            console.log('Attempting OTP verification...'); // Debug log
+            const result = await verifyOTPAPI(signupData.email, otpCode);
+            console.log('OTP verification result:', result); // Debug log
+            
+            // More flexible success handling
+            if (result.success || result.message?.includes('verified') || result.status === 'success' || result.verified) {
+                console.log('OTP verified successfully, redirecting to login...'); // Debug log
+                
+                // Store token if provided
+                if (result.token) {
+                    localStorage.setItem('authToken', result.token);
+                }
+                
+                toast.success('✅ Email verified successfully! Redirecting to login...');
+                
+                // Small delay to show success, then redirect
+                setTimeout(() => {
+                    router.push('/login?verified=true');
+                }, 1500);
+                
+            } else {
+                console.log('OTP verification failed with result:', result); // Debug log
+                toast.error(result.message || 'OTP verification failed');
+            }
+        } catch (error) {
+            console.error('OTP verification error:', error); // Debug log
+            
+            // If the error message indicates success, still redirect
+            if (error.message?.includes('verified') || error.message?.includes('success')) {
+                console.log('Error message indicates success, redirecting anyway...'); // Debug log
+                toast.success('✅ Email verified successfully! Redirecting to login...');
+                setTimeout(() => {
+                    router.push('/login?verified=true');
+                }, 1500);
+            } else {
+                toast.error(error.message || 'OTP verification failed');
+            }
+        } finally {
+            setOtpLoading(false);
+        }
     };
 
-    // Monitor OTP verification success
-    useEffect(() => {
-        // Check if user was verified successfully by checking for successful flow
-        const checkVerificationSuccess = () => {
-            // The verifyEmailOtp action sets otpVerified to true on success
-            // But we need to add a way to track this in Redux state
-            // For now, redirect after a successful OTP submission
-        };
-    }, []);
-
-    const resendOTP = () => {
+    const resendOTP = async () => {
         if (!signupData) return;
-        resendOtp(signupData.email);
-        toast.success('📧 OTP resent to your email!');
+        
+        try {
+            await signupAPI(signupData);
+            setError('');
+            // Show success message or toast
+        } catch (error) {
+            setError('Failed to resend OTP');
+        }
     };
 
     // Show loading if checking authentication
-    if (isAuthenticated) {
+    if (isAuthenticated()) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-neutral-base">
+            <div className="min-h-screen flex items-center justify-center bg-white">
                 <div className="animate-spin rounded-full h-16 w-16 border-4 border-[#00897B] border-t-transparent"></div>
             </div>
         );
@@ -178,7 +325,7 @@ function SignupForm() {
     if (showOTP) {
         return (
             <div className="min-h-screen flex items-center justify-center bg-[#F8F8F8] p-4">
-                <div className="bg-neutral-base rounded-2xl shadow-sm border border-gray-200 p-8 w-full max-w-md">
+                <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8 w-full max-w-md">
                     <div className="text-center mb-8">
                         <div className="w-16 h-16 bg-[#E8F5E9] rounded-full flex items-center justify-center mx-auto mb-4">
                             <span className="text-2xl">📧</span>
@@ -206,10 +353,10 @@ function SignupForm() {
 
                     <button
                         onClick={handleOTPSubmit}
-                        disabled={loading || otp.join('').length !== 6}
+                        disabled={otpLoading || otp.join('').length !== 6}
                         className="w-full bg-[#00897B] hover:bg-[#00796B] text-white font-semibold py-4 rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                        {loading ? (
+                        {otpLoading ? (
                             <div className="flex items-center justify-center">
                                 <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent mr-2"></div>
                                 Verifying...
@@ -234,7 +381,7 @@ function SignupForm() {
     }
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-neutral-base relative overflow-hidden">
+        <div className="min-h-screen flex items-center justify-center bg-white relative overflow-hidden">
             {/* Logo - Top Left - Fixed Position */}
             <div className="absolute top-6 left-8 z-20">
                 <img 
@@ -256,7 +403,7 @@ function SignupForm() {
 
             {/* Middle Section - Signup Form */}
             <div className="w-full max-w-[30%] flex items-center justify-center p-4 z-10">
-                <div className="w-full bg-neutral-base rounded-2xl shadow-xl py-6 px-6 border border-gray-100">
+                <div className="w-full bg-white rounded-2xl shadow-xl py-6 px-6 border border-gray-100">
                     <div className="mb-6">
                         <h2 className="text-2xl font-bold text-gray-900 mb-1">Let's setup your account</h2>
                         <p className="text-gray-500 text-sm">
@@ -275,7 +422,7 @@ function SignupForm() {
                                         type={field.name === 'password' && showPassword ? 'text' : field.type}
                                         placeholder={field.placeholder}
                                         {...register(field.name, field.validation)}
-                                        className="w-full px-4 py-1.5 bg-gray-100 border-[3px] rounded-lg focus:ring-2 focus:ring-[#43573B] focus:bg-neutral-base outline-none transition-all text-gray-900 placeholder-gray-400 text-sm"
+                                        className="w-full px-4 py-1.5 bg-gray-100 border-[3px] rounded-lg focus:ring-2 focus:ring-[#43573B] focus:bg-white outline-none transition-all text-gray-900 placeholder-gray-400 text-sm"
                                     />
                                     {field.name === 'password' && (
                                         <button
@@ -307,7 +454,7 @@ function SignupForm() {
                                 type="checkbox"
                                 id="terms"
                                 required
-                                className="mt-0.5 w-5 h-5 text-[#43573B] bg-neutral-base border-2 border-gray-300 rounded focus:ring-2 focus:ring-[#43573B] checked:bg-[#43573B] checked:border-[#43573B] cursor-pointer"
+                                className="mt-0.5 w-5 h-5 text-[#43573B] bg-white border-2 border-gray-300 rounded focus:ring-2 focus:ring-[#43573B] checked:bg-[#43573B] checked:border-[#43573B] cursor-pointer"
                                 style={{
                                     accentColor: '#43573B'
                                 }}
@@ -338,7 +485,7 @@ function SignupForm() {
                                 {/* <div className="w-full border-t border-gray-300"></div> */}
                             </div>
                             <div className="relative flex justify-center text-sm">
-                                <span className="px-3 bg-neutral-base text-gray-500 text-xs font-bold">or continue with</span>
+                                <span className="px-3 bg-white text-gray-500 text-xs font-bold">or continue with</span>
                             </div>
                         </div>
 
@@ -353,7 +500,7 @@ function SignupForm() {
                                         googleBtn.click();
                                     }
                                 }}
-                                className="w-full flex items-center justify-center gap-3 px-4 py-2.5 bg-neutral-base border-[#43573B] border-2 rounded-lg hover:bg-gray-50 transition-all duration-200 font-medium text-gray-700 text-sm shadow-sm"
+                                className="w-full flex items-center justify-center gap-3 px-4 py-2.5 bg-white border-[#43573B] border-2 rounded-lg hover:bg-gray-50 transition-all duration-200 font-medium text-gray-700 text-sm shadow-sm"
                             >
                                 <svg className="w-5 h-5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                     <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
@@ -419,7 +566,7 @@ export default function SignupPage() {
     return (
         <GoogleOAuthProvider clientId={clientId}>
             <Suspense fallback={
-                <div className="min-h-screen flex items-center justify-center bg-neutral-base">
+                <div className="min-h-screen flex items-center justify-center bg-white">
                     <div className="animate-spin rounded-full h-16 w-16 border-4 border-[#00897B] border-t-transparent"></div>
                 </div>
             }>

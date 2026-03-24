@@ -158,7 +158,7 @@ export default function OTPPage() {
                 Didn't receive the code?
               </p>
               <Button
-                variant="outline"
+                variant="outlined"
                 className="w-full"
                 onClick={handleResendOtp}
                 disabled={loading || resendCountdown > 0}

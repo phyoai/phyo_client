@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import Image2Line from 'next/image';
+import Image from 'next/image';
 
-// Custom Image2Line Component using Next.js Image2Line (same as Hero component)
+// Custom Image Component using Next.js Image (same as Hero component)
 const ProfileImage = ({ src, alt, name, className }) => {
   const [imageError, setImageError] = useState(false);
 
@@ -69,7 +69,7 @@ const ProfileImage = ({ src, alt, name, className }) => {
 
   return (
     <div className="relative">
-      <Image2Line
+      <Image
         src={imageUrl}
         alt={alt}
         width={80}

@@ -1,5 +1,5 @@
 import apiClient from '@/utils/api';
-import { INFLUENCER_ENDPOINTS } from '@/utils/api-endpoints';
+import { INFLUENCER_PUBLIC_ENDPOINTS as INFLUENCER_ENDPOINTS } from '@/utils/api-endpoints';
 
 /**
  * Influencer Service - Wrapper around API client

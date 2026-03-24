@@ -4,15 +4,16 @@ import { useForm } from 'react-hook-form';
 import { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useAuth } from '@/hooks';
+import { useAuth } from '../context/AuthContext';
 import { GoogleLogin, GoogleOAuthProvider } from '@react-oauth/google';
+import { authUtils } from '../../utils/api';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 const formFields = [
     {
         name: 'email',
-        label: 'Email/PhoneLine number',
+        label: 'Email/Phone number',
         type: 'email',
         placeholder: 'john@example.com',
         validation: { 
@@ -41,10 +42,12 @@ function LoginForm() {
         formState: { errors },
     } = useForm();
 
+    const [loading, setLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
+    const [googleLoading, setGoogleLoading] = useState(false);
     const router = useRouter();
     const searchParams = useSearchParams();
-    const { isAuthenticated, login, googleLogin, loading, user, error, token } = useAuth();
+    const { isAuthenticated } = useAuth();
 
     // Check for verification success message
     const verified = searchParams.get('verified');
@@ -53,47 +56,43 @@ function LoginForm() {
 
     // Check if user is already authenticated
     useEffect(() => {
-        if (!isAuthenticated) {
-            return;
-        }
-
-        // Debug: Log when trying to redirect
-        console.log('Login page: User is authenticated, attempting redirect', { isAuthenticated, user, token: token ? 'exists' : 'missing' });
-
-        // User is authenticated, determine redirect
-        let redirect = searchParams.get('redirect') || searchParams.get('from');
-
-        if (!redirect) {
-            // Determine redirect from user data
-            try {
+        if (isAuthenticated()) {
+            let redirect = searchParams.get('redirect');
+            if (!redirect) {
+                // Check user type from localStorage
                 const userDataStr = localStorage.getItem('userData');
                 if (userDataStr) {
-                    const userData = JSON.parse(userDataStr);
-                    if (userData.type === 'USER') {
-                        if (userData.brandRegistrationStatus === 'COMPLETED') {
+                    try {
+                        const userData = JSON.parse(userDataStr);
+                        if (userData.type === 'USER') {
+                            // Check registration status for regular users
+                            if (userData.brandRegistrationStatus === 'COMPLETED') {
+                                redirect = '/brand/dashboard';
+                            } else if (userData.influencerRegistrationStatus === 'COMPLETED') {
+                                redirect = '/influencer/dashboard';
+                            } else {
+                                redirect = '/user/dashboard';
+                            }
+                        } else if (userData.type === 'BRAND') {
                             redirect = '/brand/dashboard';
-                        } else if (userData.influencerRegistrationStatus === 'COMPLETED') {
+                        } else if (userData.type === 'INFLUENCER') {
                             redirect = '/influencer/dashboard';
                         } else {
-                            redirect = '/user/dashboard';
+                            redirect = '/';
                         }
-                    } else if (userData.type === 'BRAND') {
-                        redirect = '/brand/dashboard';
-                    } else if (userData.type === 'INFLUENCER') {
-                        redirect = '/influencer/dashboard';
-                    } else if (userData.type === 'ADMIN') {
-                        redirect = '/admin/dashboard';
-                    } else {
-                        redirect = '/user/dashboard';
+                    } catch (e) {
+                        redirect = '/';
                     }
+                } else {
+                    redirect = '/';
                 }
-            } catch (e) {
-                redirect = '/user/dashboard';
             }
-        }
-
-        if (redirect) {
-            router.push(redirect);
+            
+            // Only redirect if we're not already on the login page with a redirect param
+            // This prevents infinite loops
+            if (redirect) {
+                router.push(redirect);
+            }
         }
     }, [isAuthenticated, router, searchParams]);
 
@@ -104,11 +103,121 @@ function LoginForm() {
         }
     }, [verified]);
 
-    const handleGoogleSuccess = (credentialResponse) => {
-        googleLogin({
-            idToken: credentialResponse.credential,
-            type: 'USER'
+    const loginAPI = async (email, password) => {
+        console.log('Attempting login for:', email); // Debug log
+
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://api.phyo.ai/api';
+        const response = await fetch(`${apiUrl}/auth/login`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ email, password })
         });
+
+        const data = await response.json();
+        console.log('Login API Response:', data); // Debug log
+        console.log('Response status:', response.status); // Debug log
+        
+        if (!response.ok) {
+            throw new Error(data.message || `HTTP error! status: ${response.status}`);
+        }
+        
+        return data;
+    };
+
+    const googleLoginAPI = async (idToken) => {
+        console.log('Attempting Google login'); // Debug log
+
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://api.phyo.ai/api';
+        const response = await fetch(`${apiUrl}/auth/google`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ 
+                idToken,
+                type: 'USER' // Default user type, can be modified based on your needs
+            })
+        });
+
+        const data = await response.json();
+        console.log('Google Login API Response:', data); // Debug log
+        
+        if (!response.ok) {
+            throw new Error(data.message || `HTTP error! status: ${response.status}`);
+        }
+        
+        return data;
+    };
+
+    const handleGoogleSuccess = async (credentialResponse) => {
+        setGoogleLoading(true);
+
+        try {
+            console.log('Google credential received'); // Debug log
+            const result = await googleLoginAPI(credentialResponse.credential);
+            
+            // Handle successful login
+            if (result.token) {
+                console.log('Google login successful'); // Debug log
+                
+                // Store the authentication token in both localStorage and cookies
+                authUtils.setToken(result.token);
+                
+                // Store user data if provided
+                // Backend returns data in result.data (not result.user)
+                const userData = result.user || result.data?.user || result.data;
+                console.log('Google API Response:', result); // Debug: Full response
+                console.log('Google userData:', userData); // Debug: User data
+                console.log('Google userType:', userData?.type); // Debug: User type
+
+                if (userData) {
+                    localStorage.setItem('userData', JSON.stringify(userData));
+                    if (userData.email) {
+                        localStorage.setItem('userEmail', userData.email);
+                    }
+                }
+
+                toast.success('Successfully signed in with Google!');
+
+                // Determine redirect based on user type and registration status
+                let redirect = searchParams.get('redirect');
+                if (!redirect) {
+                    const userType = userData?.type;
+                    console.log('Google: Determining redirect - userType:', userType); // Debug
+                    
+                    if (userType === 'USER') {
+                        // Check registration status for regular users
+                        if (userData.brandRegistrationStatus === 'COMPLETED') {
+                            redirect = '/brand/dashboard';
+                        } else if (userData.influencerRegistrationStatus === 'COMPLETED') {
+                            redirect = '/influencer/dashboard';
+                        } else {
+                            // User hasn't completed any registration
+                            redirect = '/user/dashboard';
+                        }
+                    } else if (userType === 'BRAND') {
+                        redirect = '/brand/dashboard';
+                    } else if (userType === 'INFLUENCER') {
+                        redirect = '/influencer/dashboard';
+                    } else {
+                        redirect = '/';
+                    }
+                }
+                console.log('Google: Final redirect URL:', redirect); // Debug: Final redirect
+                setTimeout(() => router.push(redirect), 1000);
+
+            } else {
+                console.log('Google login failed with result:', result); // Debug log
+                toast.error(result.message || 'Google login failed');
+            }
+        } catch (error) {
+            console.error('Google login error:', error); // Debug log
+            toast.error(error.message || 'Failed to sign in with Google');
+        } finally {
+            setGoogleLoading(false);
+        }
     };
 
     const handleGoogleError = () => {
@@ -116,75 +225,90 @@ function LoginForm() {
         toast.error('Google Sign-In was unsuccessful. Please try again.');
     };
 
-    const onSubmit = (data) => {
-        login({
-            email: data.email,
-            password: data.password
-        });
-    };
+    const onSubmit = async (data) => {
+        setLoading(true);
 
-    // Monitor Redux state for login success
-    useEffect(() => {
-        if (isAuthenticated && user) {
-            toast.success('Login successful! Welcome back!');
+        try {
+            console.log('Submitting login form'); // Debug log
+            const result = await loginAPI(data.email, data.password);
+            
+            // Handle successful login
+            if (result.success || result.token || result.data?.token) {
+                console.log('Login successful'); // Debug log
+                
+                // Store the authentication token in both localStorage and cookies
+                const token = result.token || result.data?.token;
+                if (token) {
+                    authUtils.setToken(token);
+                    localStorage.setItem('userEmail', data.email);
+                }
+                
+                // Store user data if provided
+                // Backend returns data in result.data (not result.user)
+                let userData = result.user || result.data?.user || result.data;
+                console.log('Full API Response:', result); // Debug: Full response
+                console.log('Extracted userData:', userData); // Debug: Extracted user data
+                console.log('User type:', userData?.type); // Debug: User type
 
-            // Store user data and token for persistence across page reloads
-            localStorage.setItem('userData', JSON.stringify(user));
-            if (user.email) {
-                localStorage.setItem('userEmail', user.email);
-            }
-            if (token) {
-                localStorage.setItem('authToken', token);
-                // Set authToken as cookie for middleware validation
-                document.cookie = `authToken=${token}; path=/; max-age=${7 * 24 * 60 * 60}`;
-            }
-            const userType = user.type || 'USER';
-            document.cookie = `userType=${userType}; path=/; max-age=${7 * 24 * 60 * 60}`;
+                if (userData) {
+                    localStorage.setItem('userData', JSON.stringify(userData));
+                    console.log('✅ userData stored in localStorage:', userData); // Debug: Stored
+                } else {
+                    console.warn('⚠️ WARNING: No userData in response!'); // Debug: Missing userData
+                }
 
-            // Determine redirect
-            let redirect = searchParams.get('redirect') || searchParams.get('from');
-            if (!redirect) {
-                if (user.type === 'BRAND') {
-                    redirect = '/brand/dashboard';
-                } else if (user.type === 'INFLUENCER') {
-                    redirect = '/influencer/dashboard';
-                } else if (user.type === 'USER') {
-                    if (user.brandRegistrationStatus === 'COMPLETED') {
+                toast.success('Login successful! Welcome back!');
+
+                // Determine redirect based on user type and registration status
+                let redirect = searchParams.get('redirect');
+                if (!redirect) {
+                    const userType = userData?.type;
+                    console.log('Determining redirect - userType:', userType); // Debug
+
+                    if (userType === 'USER') {
+                        // Check registration status for regular users
+                        if (userData.brandRegistrationStatus === 'COMPLETED') {
+                            redirect = '/brand/dashboard';
+                        } else if (userData.influencerRegistrationStatus === 'COMPLETED') {
+                            redirect = '/influencer/dashboard';
+                        } else {
+                            // User hasn't completed any registration
+                            redirect = '/user/dashboard';
+                        }
+                    } else if (userType === 'BRAND') {
                         redirect = '/brand/dashboard';
-                    } else if (user.influencerRegistrationStatus === 'COMPLETED') {
+                    } else if (userType === 'INFLUENCER') {
                         redirect = '/influencer/dashboard';
                     } else {
-                        redirect = '/user/dashboard';
+                        redirect = '/';
                     }
-                } else if (user.type === 'ADMIN') {
-                    redirect = '/admin/dashboard';
-                } else {
-                    redirect = '/user/dashboard';
                 }
+                console.log('Final redirect URL:', redirect); // Debug: Final redirect
+                setTimeout(() => router.push(redirect), 1000);
+
+            } else {
+                console.log('Login failed with result:', result); // Debug log
+                toast.error(result.message || 'Login failed');
             }
-
-            setTimeout(() => router.push(redirect || '/user/dashboard'), 500);
+        } catch (error) {
+            console.error('Login error:', error); // Debug log
+            toast.error(error.message || 'An unexpected error occurred');
+        } finally {
+            setLoading(false);
         }
-    }, [isAuthenticated, user, router, searchParams]);
-
-    // Monitor Redux state for errors
-    useEffect(() => {
-        if (error) {
-            toast.error(error);
-        }
-    }, [error]);
+    };
 
     // Show loading if checking authentication
-    if (isAuthenticated) {
+    if (isAuthenticated()) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-neutral-base">
+            <div className="min-h-screen flex items-center justify-center bg-white">
                 <div className="animate-spin rounded-full h-16 w-16 border-4 border-[#00897B] border-t-transparent"></div>
             </div>
         );
     }
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-neutral-base relative overflow-hidden">
+        <div className="min-h-screen flex items-center justify-center bg-white relative overflow-hidden">
             {/* Logo - Top Left - Fixed Position */}
             <div className="absolute top-6 left-8 z-20">
                 <img 
@@ -206,7 +330,7 @@ function LoginForm() {
 
             {/* Middle Section - Login Form */}
             <div className="w-full max-w-[30%] flex items-center justify-center p-4 z-10">
-                <div className="w-full bg-neutral-base rounded-2xl shadow-xl py-6 px-6 border border-gray-100">
+                <div className="w-full bg-white rounded-2xl shadow-xl py-6 px-6 border border-gray-100">
                     <div className="mb-6">
                         <h2 className="text-2xl font-bold text-gray-900 mb-1">Welcome Back</h2>
                         <p className="text-gray-500 text-sm">
@@ -225,7 +349,7 @@ function LoginForm() {
                                         type={field.name === 'password' && showPassword ? 'text' : field.type}
                                         placeholder={field.placeholder}
                                         {...register(field.name, field.validation)}
-                                        className="w-full px-4 py-1.5 bg-[#F0F0F0]  border-4 rounded-lg focus:ring-2 focus:ring-[#43573B] focus:bg-neutral-base outline-none transition-all text-gray-900 placeholder-gray-400 text-sm"
+                                        className="w-full px-4 py-1.5 bg-[#F0F0F0]  border-4 rounded-lg focus:ring-2 focus:ring-[#43573B] focus:bg-white outline-none transition-all text-gray-900 placeholder-gray-400 text-sm"
                                     />
                                     {field.name === 'password' && (
                                         <button
@@ -266,7 +390,7 @@ function LoginForm() {
                                 type="checkbox"
                                 id="terms"
                                 required
-                                className="mt-0.5 w-5 h-5 text-[#43573B] bg-neutral-base border-2 border-gray-300 rounded focus:ring-2 focus:ring-[#43573B] checked:bg-[#43573B] checked:border-[#43573B] cursor-pointer"
+                                className="mt-0.5 w-5 h-5 text-[#43573B] bg-white border-2 border-gray-300 rounded focus:ring-2 focus:ring-[#43573B] checked:bg-[#43573B] checked:border-[#43573B] cursor-pointer"
                                 style={{
                                     accentColor: '#43573B'
                                 }}
@@ -277,8 +401,8 @@ function LoginForm() {
                             </label>
                         </div>
 
-                        <button
-                            type="submit"
+                        <button 
+                            type="submit" 
                             disabled={loading}
                             className="w-full bg-[#43573B] hover:bg-[#2d4a3a] text-white font-semibold py-3 rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed mt-4"
                         >
@@ -297,7 +421,7 @@ function LoginForm() {
                                 {/* <div className="w-full border-t border-gray-300"></div> */}
                             </div>
                             <div className="relative flex justify-center text-sm">
-                                <span className="px-3 bg-neutral-base text-gray-500 text-xs font-bold">or login with</span>
+                                <span className="px-3 bg-white text-gray-500 text-xs font-bold">or login with</span>
                             </div>
                         </div>
 
@@ -312,7 +436,7 @@ function LoginForm() {
                                         googleBtn.click();
                                     }
                                 }}
-                                className="w-full flex items-center justify-center gap-3 px-4 py-2.5 bg-neutral-base border-[#43573B] border-2 rounded-lg hover:bg-gray-50 transition-all duration-200 font-medium text-gray-700 text-sm shadow-sm"
+                                className="w-full flex items-center justify-center gap-3 px-4 py-2.5 bg-white border-[#43573B] border-2 rounded-lg hover:bg-gray-50 transition-all duration-200 font-medium text-gray-700 text-sm shadow-sm"
                             >
                                 <svg className="w-5 h-5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                     <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
@@ -378,7 +502,7 @@ export default function LoginPage() {
     return (
         <GoogleOAuthProvider clientId={clientId}>
             <Suspense fallback={
-                <div className="min-h-screen flex items-center justify-center bg-neutral-base">
+                <div className="min-h-screen flex items-center justify-center bg-white">
                     <div className="animate-spin rounded-full h-16 w-16 border-4 border-[#00897B] border-t-transparent"></div>
                 </div>
             }>

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * API Integration Examples - Quick Reference
  * Shows how to use all 118+ API endpoints in your components

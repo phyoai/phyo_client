@@ -1,5 +1,3 @@
-@import '../styles/responsive.css';
-
 html, body {
   overflow-x: hidden;
 }
@@ -7,28 +5,11 @@ html, body {
 /* Dark Mode Base */
 html.dark {
   color-scheme: dark;
-
-  /* Design System Colors - Dark Mode */
-  --color-brand-base: #5A7250;
-  --color-brand-icon: #7DB06E;
-  --color-brand-text: #7DB06E;
-  --color-accent-base: #2C3E27;
-  --color-accent-subtle: #1E2B1A;
-  --color-neutral-base: #FFFFFF;
-  --color-neutral-base1: #1E1E1E;
-  --color-neutral-muted: #2C2C2C;
-  --color-neutral-inverse-muted: #A0A0A0;
-  --color-neutral-inverse-icon: #555555;
-  --color-semantic-error: #EF4444;
-  --color-text-base: #E5E7EB;
-  --color-text-muted: #9CA3AF;
-  --color-surface-error: #3C1515;
-  --color-sidebar-bg: #1E1E1E;
 }
 
 html.dark body {
-  background-color: var(--color-neutral-base);
-  color: var(--color-text-base);
+  background-color: #121212;
+  color: #e5e7eb;
 }
 
 @tailwind base;
@@ -46,82 +27,12 @@ html.dark body {
 }
 
 :root {
-    /* Legacy colors (keep for backward compatibility) */
     --light-grey: #F5F5F5;
     --grey: #A3AED0;
     --light-green: #A3D0A5;
     --green: #169B00;
     --dark-green: #226839;
     --sea-green: #C2E695;
-
-    /* Design System Colors - Light Mode */
-    --color-brand-base: #43573B;
-    --color-brand-icon: #43573B;
-    --color-brand-text: #43573B;
-    --color-accent-base: #D9E3CC;
-    --color-accent-subtle: #E8F5E9;
-    --color-neutral-base: #FFFFFF;
-    --color-neutral-base1: #F0F0F0;
-    --color-neutral-muted: #E8E8E8;
-    --color-neutral-inverse-muted: #999999;
-    --color-neutral-inverse-icon: #D0D0D0;
-    --color-semantic-error: #DC2626;
-    --color-text-base: #242527;
-    --color-text-muted: #999999;
-    --color-surface-error: #FEE2E2;
-    --color-sidebar-bg: #F0F0F0;
-
-    /* Extended Color Palette - Badges & Variants */
-    --color-red-base: #DC2626;
-    --color-red-light: #FEE2E2;
-    --color-green-base: #16A34A;
-    --color-green-light: #DCFCE7;
-    --color-yellow-base: #EAB308;
-    --color-yellow-light: #FEFCE8;
-    --color-blue-base: #2563EB;
-    --color-blue-light: #DBEAFE;
-    --color-purple-base: #7C3AED;
-    --color-purple-light: #EDE9FE;
-
-    /* Semantic Colors */
-    --color-success: #16A34A;
-    --color-warning: #EAB308;
-    --color-error: #DC2626;
-    --color-info: #2563EB;
-
-    /* Typography Scales */
-    --font-family-base: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
-    --font-size-xs: 0.75rem;
-    --font-size-sm: 0.875rem;
-    --font-size-md: 1rem;
-    --font-size-lg: 1.125rem;
-    --font-size-xl: 1.25rem;
-    --font-size-2xl: 1.5rem;
-    --font-weight-light: 300;
-    --font-weight-normal: 400;
-    --font-weight-medium: 500;
-    --font-weight-semibold: 600;
-    --font-weight-bold: 700;
-
-    /* Spacing Scale */
-    --spacing-xs: 0.25rem;
-    --spacing-sm: 0.5rem;
-    --spacing-md: 1rem;
-    --spacing-lg: 1.5rem;
-    --spacing-xl: 2rem;
-    --spacing-2xl: 2.5rem;
-
-    /* Border Radius */
-    --radius-sm: 4px;
-    --radius-md: 8px;
-    --radius-lg: 12px;
-    --radius-full: 9999px;
-
-    /* Shadows */
-    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-    --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
 }
 
 input[type=number] {

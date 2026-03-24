@@ -10,45 +10,21 @@ class PaymentService {
   // Get all available subscription plans
   async getPlans() {
     try {
-      // Use local Next.js API route as proxy
-      const response = await api.get('/api/payments/plans');
+      const response = await api.get('/payments/plans');
       return response.data;
     } catch (error) {
-      console.error('Error fetching plans:', error);
-      // Return default plans if API fails
-      return {
-        success: true,
-        data: [
-          { id: 'free', name: 'Free', price: '$0' },
-          { id: 'silver', name: 'Silver', price: '$29' },
-          { id: 'gold', name: 'Gold', price: '$79' },
-        ]
-      };
+      throw error.response?.data || error.message;
     }
   }
 
   // Get user's current plan
-  async getCurrentPlan() {
+  async getUserPlan() {
     try {
-      // Use local Next.js API route as proxy
-      const response = await api.get('/api/payments/current-plan');
+      const response = await api.get('/payments/current-plan');
       return response.data;
     } catch (error) {
-      // Return default response if API fails
-      return {
-        success: true,
-        data: {
-          currentPlan: null,
-          status: 'free',
-          message: 'No active subscription'
-        }
-      };
+      throw error.response?.data || error.message;
     }
-  }
-
-  // Legacy: Get user's current plan (backward compatibility)
-  async getUserPlan() {
-    return this.getCurrentPlan();
   }
 
   // Get user's credit information
@@ -64,55 +40,10 @@ class PaymentService {
   // Create payment order
   async createOrder(planId, interval = 'MONTHLY') {
     try {
-      // Map plan names to tier endpoints
-      let tier = 'silver';
-      if (typeof planId === 'string') {
-        if (planId.toLowerCase().includes('gold')) {
-          tier = 'gold';
-        } else if (planId.toLowerCase().includes('premium')) {
-          tier = 'premium';
-        }
-      } else if (typeof planId === 'number') {
-        // Assume: 1=silver, 2=gold, 3=premium
-        if (planId === 2) tier = 'gold';
-        else if (planId === 3) tier = 'premium';
-      }
-
-      const endpoint = `/payments/order/${tier}`;
-      const response = await api.post(endpoint, {
+      const response = await api.post('/payments/order/silver', {
         planId,
         interval
       });
-      return response.data;
-    } catch (error) {
-      throw error.response?.data || error.message;
-    }
-  }
-
-  // Create Silver plan order
-  async createSilverOrder(data = {}) {
-    try {
-      const response = await api.post('/payments/order/silver', data);
-      return response.data;
-    } catch (error) {
-      throw error.response?.data || error.message;
-    }
-  }
-
-  // Create Gold plan order
-  async createGoldOrder(data = {}) {
-    try {
-      const response = await api.post('/payments/order/gold', data);
-      return response.data;
-    } catch (error) {
-      throw error.response?.data || error.message;
-    }
-  }
-
-  // Create Premium plan order
-  async createPremiumOrder(data = {}) {
-    try {
-      const response = await api.post('/payments/order/premium', data);
       return response.data;
     } catch (error) {
       throw error.response?.data || error.message;
@@ -160,7 +91,7 @@ class PaymentService {
   initializeRazorpay(orderData, onSuccess, onFailure) {
     // Prefer razorpayKey from API response, fallback to environment variable
     const razorpayKey = orderData.razorpayKey || this.razorpayKey;
-
+    
     if (!razorpayKey) {
       throw new Error('Razorpay key not found. Please check NEXT_PUBLIC_RAZORPAY_KEY_ID environment variable or ensure the API returns razorpayKey.');
     }

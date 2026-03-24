@@ -1,44 +1,15 @@
-'use client'
-import React, { Suspense, useEffect } from 'react';
-import { useDispatch } from 'react-redux';
-import InboxPage from '@/components/inbox/InboxPage'
-import { useMessaging } from '@/hooks/useMessaging';
-import { useSocket } from '@/app/context/SocketContext';
-import { addMessage } from '@/store/slices/messagingSlice';
+import React, { Suspense } from 'react';
+import InboxPage from './InboxPage'
 
-function InfluencerInboxContent() {
-  const dispatch = useDispatch();
-  const { socket, onMessage } = useSocket();
-  const { conversations } = useMessaging();
-
-  // Real-time message updates via socket
-  useEffect(() => {
-    if (!socket || !conversations || conversations.length === 0) return;
-
-    const unsubscribers = [];
-    conversations.forEach(conv => {
-      const unsub = onMessage(conv._id || conv.id, (message) => {
-        // Update Redux state when new message arrives
-        dispatch(addMessage(message));
-      });
-      unsubscribers.push(unsub);
-    });
-
-    return () => unsubscribers.forEach(unsub => unsub?.());
-  }, [socket, conversations, onMessage, dispatch]);
-
-  return <InboxPage />;
-}
-
-export default function InfluencerInbox() {
+export default function BrandInbox() {
   return (
     <div>
       <Suspense fallback={
         <div className="flex h-screen overflow-hidden bg-gray-50">
           {/* Left Sidebar Skeleton */}
-          <div className="w-full sm:w-[30%] bg-neutral-base border-r border-gray-200 flex flex-col overflow-hidden">
+          <div className="w-full sm:w-[30%] bg-white border-r border-gray-200 flex flex-col overflow-hidden">
             {/* Header Skeleton */}
-            <div className="flex-shrink-0 bg-neutral-base border-b border-gray-200">
+            <div className="flex-shrink-0 bg-white border-b border-gray-200">
               <div className="px-4 sm:px-6 py-4 sm:py-5">
                 <div className="h-7 bg-gray-200 rounded w-24 animate-pulse"></div>
               </div>
@@ -73,7 +44,7 @@ export default function InfluencerInbox() {
           </div>
 
           {/* Right Side Skeleton */}
-          <div className="flex-1 flex items-center justify-center bg-neutral-base">
+          <div className="flex-1 flex items-center justify-center bg-white">
             <div className="text-center">
               <div className="w-64 h-32 bg-gray-200 rounded-lg mx-auto mb-4 animate-pulse"></div>
               <div className="h-4 bg-gray-200 rounded w-40 mx-auto animate-pulse"></div>
@@ -81,8 +52,8 @@ export default function InfluencerInbox() {
           </div>
         </div>
       }>
-        <InfluencerInboxContent/>
+        <InboxPage/>
       </Suspense>
     </div>
   );
-}
+} 

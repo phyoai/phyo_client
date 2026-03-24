@@ -1,37 +1,27 @@
-'use client';
-
 import React, { useState } from 'react'
 // import { influencers } from '../../data/data'
 import InfluencerCard from '../../components/InfluencerCard'
-import { useAI } from '@/hooks'
+import axios from 'axios'
 
-export default function SearchLine() {
+export default function Search() {
+    const [influencers, setInfluencers] = useState([])
     const [fetchingState, setFetchingState] = useState("idle")
     const [prompt, setPrompt] = useState("")
-    const { aiResults, search, loading } = useAI()
     
     // Restore previous search on mount
     React.useEffect(() => {
         try {
-            let savedResults = null;
-            let savedPrompt = null;
-
-            // Try to get from localStorage
-            try {
-                savedResults = localStorage.getItem('home_search_results');
-                savedPrompt = localStorage.getItem('home_search_prompt');
-            } catch (e) {
-                console.warn('localStorage access failed in Search component:', e);
-                // Continue without cached results
-            }
-
+            const savedResults = localStorage.getItem('home_search_results');
+            const savedPrompt = localStorage.getItem('home_search_prompt');
+            
             if (savedResults) {
                 const parsedResults = JSON.parse(savedResults);
                 if (Array.isArray(parsedResults) && parsedResults.length > 0) {
+                    setInfluencers(parsedResults);
                     setFetchingState("success");
                 }
             }
-
+            
             if (savedPrompt) {
                 setPrompt(savedPrompt);
             }
@@ -39,39 +29,40 @@ export default function SearchLine() {
             console.error('Error restoring search results:', err);
         }
     }, []);
-
-    // Monitor Redux state for search results
-    React.useEffect(() => {
-        if (loading) {
-            setFetchingState("loading");
-        } else if (aiResults && aiResults.length > 0) {
-            setFetchingState("success");
-            // Store in localStorage for persistence
-            try {
-                localStorage.setItem('influencer_search_results', JSON.stringify(aiResults));
-                localStorage.setItem('home_search_results', JSON.stringify(aiResults));
-                localStorage.setItem('home_search_prompt', prompt);
-            } catch (e) {
-                console.warn('Failed to store results in localStorage:', e);
-            }
-        } else if (!loading && aiResults.length === 0 && prompt) {
-            setFetchingState("notFound");
-            try {
+    
+    const getInfluencers = async (searchPrompt) => {
+        setFetchingState("loading")
+        try {
+            const res = await axios({
+                method: "post",
+                baseURL: "https://api.phyo.ai",
+                url: "/api/ask",
+                data: {
+                    prompt: searchPrompt
+                }
+            })
+            if (res.data.data.length < 1) {
+                setFetchingState("notFound")
+                // Clear localStorage if no results
                 localStorage.removeItem('home_search_results');
                 localStorage.removeItem('home_search_prompt');
-            } catch (e) {
-                console.warn('Failed to clear localStorage:', e);
+            } else {
+                setInfluencers(res.data.data)
+                // Store in localStorage for persistence
+                localStorage.setItem('influencer_search_results', JSON.stringify(res.data.data))
+                localStorage.setItem('home_search_results', JSON.stringify(res.data.data))
+                localStorage.setItem('home_search_prompt', searchPrompt)
+                setFetchingState("success")
             }
+            
+        } catch (error) {
+            alert("Could not fetch the influencers")
+            setFetchingState("error")
+            console.log(error);
+            // Clear localStorage on error
+            localStorage.removeItem('home_search_results');
+            localStorage.removeItem('home_search_prompt');
         }
-    }, [aiResults, loading, prompt]);
-
-    const getInfluencers = (searchPrompt) => {
-        if (!searchPrompt) {
-            alert("Please enter a search prompt");
-            return;
-        }
-        setPrompt(searchPrompt);
-        search(searchPrompt);
     }
     return (
         <div className='relative bg-black overflow-hidden min-h-screen'>
@@ -83,7 +74,7 @@ export default function SearchLine() {
                     prompt={prompt} 
                     setPrompt={setPrompt} 
                 />
-                <InfluencersList influencers={aiResults} fetchingState={fetchingState} />
+                <InfluencersList influencers={influencers} fetchingState={fetchingState} />
             </div>
             
             {/* Background div */}
@@ -95,7 +86,7 @@ export default function SearchLine() {
 const Header = ({ handleSubmit, fetchingState, prompt, setPrompt }) => {
     return (
         <div>
-            <h1 className='text-[color:var(--light-green)] font-semibold text-[64px] text-center'>Ai SearchLine</h1>
+            <h1 className='text-[color:var(--light-green)] font-semibold text-[64px] text-center'>Ai Search</h1>
             <h2 className='text-white text-[40px] font-medium text-center'>Find top right influencer for your brand</h2>
             <div className='mt-[55px] border-2 border-[color:var(--dark-green)] flex p-2 pl-[40px] rounded-xl'>
                 <input 
@@ -106,7 +97,7 @@ const Header = ({ handleSubmit, fetchingState, prompt, setPrompt }) => {
                     className='outline-none bg-transparent border-none flex-grow py-2 text-white' 
                 />
                 <button 
-                    className='bg-neutral-base px-6 py-2 rounded-md' 
+                    className='bg-white px-6 py-2 rounded-md' 
                     onClick={() => handleSubmit(prompt)}
                     disabled={fetchingState === "loading"}
                 >

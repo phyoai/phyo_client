@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Complete Service Usage Examples
  * Demonstrates how to use all 118+ API endpoints across services

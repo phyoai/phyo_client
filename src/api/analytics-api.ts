@@ -8,7 +8,7 @@
  */
 
 import api from '@/utils/api';
-import { IApiResponse, IPagination } from '@/types';
+import { IApiResponse } from '@/types';
 
 /**
  * Analytics response types
@@ -118,7 +118,7 @@ export const analyticsApi = {
         '/analytics/dashboard',
         { params }
       );
-      return response.data.data || response.data;
+      return response.data?.data as any;
     } catch (error: any) {
       const errorMessage =
         error.response?.data?.message || error.message || 'Failed to fetch dashboard';
@@ -146,7 +146,7 @@ export const analyticsApi = {
       const response = await api.get<IApiResponse<IInfluencerPerformance[]>>(endpoint, {
         params,
       });
-      return response.data.data || response.data;
+      return response.data?.data as any;
     } catch (error: any) {
       const errorMessage =
         error.response?.data?.message || error.message || 'Failed to fetch influencer performance';
@@ -175,7 +175,7 @@ export const analyticsApi = {
         `/analytics/campaign-performance/${campaignId}`,
         { params }
       );
-      return response.data.data || response.data;
+      return response.data?.data as any;
     } catch (error: any) {
       const errorMessage =
         error.response?.data?.message || error.message || 'Failed to fetch campaign performance';
@@ -196,7 +196,7 @@ export const analyticsApi = {
         '/analytics/reports',
         { params }
       );
-      return response.data.data || response.data;
+      return response.data?.data as any;
     } catch (error: any) {
       const errorMessage =
         error.response?.data?.message || error.message || 'Failed to generate report';
@@ -217,7 +217,7 @@ export const analyticsApi = {
         '/analytics/earnings',
         { params }
       );
-      return response.data.data || response.data;
+      return response.data?.data as any;
     } catch (error: any) {
       const errorMessage =
         error.response?.data?.message || error.message || 'Failed to fetch earnings';

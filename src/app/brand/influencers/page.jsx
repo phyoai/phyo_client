@@ -1,13 +1,11 @@
 'use client'
 import React, { useState, useRef, useEffect } from 'react';
-import { ArrowLeftLine, MoreLine, BookmarkLine, YoutubeFill, InstagramFill, TwitterXLine, UserAddLine, Message3Line, FacebookCircleFill } from '@phyoofficial/phyo-icon-library';
+import { ArrowLeft, MoreVertical, MessageSquare, UserPlus, Bookmark, ChevronLeft } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import Image2Line from 'next/image';
-import { useInfluencers } from '@/hooks/useInfluencers';
-import { useRoleContext } from '@/app/context/RoleContext';
-import apiClient from '@/utils/api';
+import Image from 'next/image';
+import { BookmarkLine, YoutubeFill, InstagramFill, TwitterXLine, UserAddLine, Message3Line, FacebookCircleFill } from '@phyoofficial/phyo-icon-library';
 
-const mockInfluencersData = [
+const influencersData = [
   {
     id: 1,
     name: 'Campaign Chacha',
@@ -146,64 +144,30 @@ const categories = ['All', 'Fitness', 'Comedy', 'Lifestyle', 'Infra', 'Real Esta
 
 const TopInfluencersPage = () => {
   const router = useRouter();
-  const { influencers: reduxInfluencers, loading, fetchInfluencers } = useInfluencers();
   const [selectedInfluencer, setSelectedInfluencer] = useState(null);
   const [activeCategory, setActiveCategory] = useState('All');
   const categoriesScrollRef = useRef(null);
 
-  // Transform influencers for display
-  const influencers = reduxInfluencers.map((influencer, index) => ({
-    id: influencer._id || influencer.id || index,
-    name: influencer.name || 'Unknown',
-    username: `@${(influencer.name || 'user').toLowerCase().replace(/\s/g, '')}`,
-    followers: `${influencer.followers || 0} followers`,
-    avatar: influencer.avatar || '/dummyAvatar.jpg',
-    coverImage: '/world-bg.png',
-    coverColor: ['from-yellow-400 to-yellow-500', 'from-blue-400 to-blue-600', 'from-green-400 to-green-600', 'from-orange-400 to-red-500', 'from-pink-400 to-purple-500'][index % 5],
-    bio: influencer.bio || 'Professional influencer',
-    tags: influencer.categories || ['Influencer'],
-    stats: {
-      followers: influencer.followers ? `${(influencer.followers / 1000).toFixed(1)}k` : '0',
-      following: '0',
-      posts: influencer.posts || '0',
-      engagement: influencer.engagement ? `${(influencer.engagement * 100).toFixed(1)}%` : '0%'
-    },
-    platforms: {
-      instagram: influencer.instagramFollowers || '0',
-      youtube: influencer.youtubeSubscribers || '0',
-      twitter: influencer.xFollowers || '0'
-    }
-  }));
-
-  // Fetch influencers on mount
-  useEffect(() => {
-    fetchInfluencers({ page: 1, limit: 20 });
-  }, []);
-
-  const { role } = useRoleContext();
-
   const handleBack = () => {
-    router.push(`/${role}/dashboard`);
+    router.push('/brand/dashboard');
   };
 
   const handleInfluencerClick = (influencer) => {
-    // Pass influencer data through URL params (no API calls on detail page)
-    const influencerData = {
+    // Transform the data to match the profile component's expected format
+    const transformedInfluencer = {
       id: influencer.id,
       name: influencer.name,
       username: influencer.username,
-      followers: influencer.stats?.followers || '0',
-      following: influencer.stats?.following || '0',
-      posts: influencer.stats?.posts || '0',
-      bio: influencer.bio,
-      avatar: influencer.avatar,
-      location: influencer.location || 'Delhi, India',
-      age: influencer.age || '34',
+      followers: influencer.stats.followers,
+      following: influencer.stats.following,
+      posts: influencer.stats.posts,
+      location: 'Delhi, India',
+      age: '34',
+      about: influencer.bio,
       likes: '9.2K',
       views: '9.2K'
     };
-    // Navigate to detail page with influencer data encoded in URL
-    router.push(`/${role}/influencers/${influencer.id}?influencer=${encodeURIComponent(JSON.stringify(influencerData))}`);
+    setSelectedInfluencer(transformedInfluencer);
   };
 
   const handleCloseProfile = () => {
@@ -229,14 +193,14 @@ const TopInfluencersPage = () => {
   };
 
   return (
-    <div className="bg-neutral-base h-screen flex flex-col overflow-hidden">
+    <div className="bg-white h-screen flex flex-col overflow-hidden">
       {/* App Bar */}
-      <div className="bg-neutral-base flex items-center justify-between px-4 py-2 border-b border-gray-100 shrink-0">
+      <div className="bg-white flex items-center justify-between px-4 py-2 border-b border-gray-100 shrink-0">
         <button
           onClick={handleBack}
           className="flex items-center justify-center w-12 h-12 rounded-full hover:bg-gray-100 transition-colors"
         >
-          <ArrowLeftLine className="w-6 h-6 text-gray-700" />
+          <ArrowLeft className="w-6 h-6 text-gray-700" />
         </button>
 
         <h1 className="text-xl font-semibold text-[#242527] flex-1 px-2">
@@ -247,7 +211,7 @@ const TopInfluencersPage = () => {
           type="button"
           className="flex items-center justify-center w-12 h-12 rounded-full hover:bg-gray-100 transition-colors"
         >
-          <MoreLine className="w-6 h-6 text-gray-700" />
+          <MoreVertical className="w-6 h-6 text-gray-700" />
         </button>
       </div>
 
@@ -256,7 +220,7 @@ const TopInfluencersPage = () => {
         {/* Influencers List */}
         <div className={`flex flex-col ${selectedInfluencer ? 'w-[604px]' : 'flex-1'} border-r border-gray-200 transition-all duration-300 shrink-0 overflow-hidden`}>
           {/* Categories - Sticky */}
-          <div className="px-6 py-4 border-b border-gray-100 bg-neutral-base sticky top-0 z-10">
+          <div className="px-6 py-4 border-b border-gray-100 bg-white sticky top-0 z-10">
             <div className="flex items-center gap-2">
               {/* Left Arrow */}
               <button
@@ -320,19 +284,13 @@ const TopInfluencersPage = () => {
 
             {/* Influencers List */}
             <div className="px-6 space-y-3">
-              {loading ? (
-                <div className="flex items-center justify-center py-8">
-                  <div className="text-gray-500">Loading influencers...</div>
-                </div>
-              ) : influencers.length > 0 ? (
-                <>
-                  {influencers
-                    .filter(
-                      (influencer) =>
-                        activeCategory === 'All' ||
-                        influencer.tags.includes(activeCategory)
-                    )
-                    .map((influencer) => (
+              {influencersData
+                .filter(
+                  (influencer) =>
+                    activeCategory === 'All' ||
+                    influencer.tags.includes(activeCategory)
+                )
+                .map((influencer) => (
                   <div
                     key={influencer.id}
                     onClick={() => handleInfluencerClick(influencer)}
@@ -341,7 +299,7 @@ const TopInfluencersPage = () => {
                   >
                     <div className="flex items-center gap-3 mb-3">
                       <div className="w-12 h-12 rounded-full overflow-hidden bg-blue-500">
-                        <Image2Line
+                        <Image
                           src={influencer.avatar}
                           alt={influencer.name}
                           width={48}
@@ -405,25 +363,19 @@ const TopInfluencersPage = () => {
                       </button>
                     </div>
                   </div>
-                    ))}
-                </>
-              ) : (
-                <div className="flex items-center justify-center py-8">
-                  <div className="text-gray-500">No influencers found</div>
-                </div>
-              )}
+                ))}
             </div>
           </div>
         </div>
 
         {/* Profile Panel */}
-        <div className="flex-1 overflow-y-auto bg-neutral-base m-1 shadow-[0_0_20px_rgba(0,0,0,0.1)] rounded-lg">
+        <div className="flex-1 overflow-y-auto bg-white m-1 shadow-[0_0_20px_rgba(0,0,0,0.1)] rounded-lg">
           {selectedInfluencer ? (
             <InfluencerProfile influencer={selectedInfluencer} />
           ) : (
             <div className="flex flex-col items-center justify-center h-full bg-[#f0f0f0]">
               <div className="text-center">
-                <Image2Line
+                <Image
                   src="/logo.png"
                   alt="Phyo Logo"
                   width={286}
@@ -448,36 +400,13 @@ function InfluencerProfile({ influencer }) {
   const [showSaveModal, setShowSaveModal] = useState(false);
   const [showNewListModal, setShowNewListModal] = useState(false);
   const [newListName, setNewListName] = useState('');
-  const [savedLists, setSavedLists] = useState([]);
-  const [listsLoading, setListsLoading] = useState(true);
-  const [apiError, setApiError] = useState(null);
-  const [successMessage, setSuccessMessage] = useState('');
   const moreMenuRef = useRef(null);
 
-  // Fetch lists on mount
-  useEffect(() => {
-    fetchLists();
-  }, []);
-
-  const fetchLists = async () => {
-    try {
-      setListsLoading(true);
-      setApiError(null);
-      const response = await apiClient.get('/lists');
-      const lists = response.data.data || [];
-      setSavedLists(lists.map(list => ({
-        id: list._id || list.id,
-        name: list.name,
-        initials: list.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2),
-        color: '#0066ff'
-      })));
-    } catch (err) {
-      console.error('Error fetching lists:', err);
-      setApiError('Failed to load lists');
-    } finally {
-      setListsLoading(false);
-    }
-  };
+  // Sample lists data
+  const [savedLists, setSavedLists] = useState([
+    { id: 1, name: 'Favorties', initials: 'AB', color: '#0066ff' },
+    { id: 2, name: 'Campaign 1', initials: 'AB', color: '#0066ff' }
+  ]);
 
   // Close menu when clicking outside
   useEffect(() => {
@@ -494,52 +423,24 @@ function InfluencerProfile({ influencer }) {
     };
   }, [showMoreMenu]);
 
-  const handleSaveToList = async (listId) => {
-    try {
-      setApiError(null);
-      await apiClient.post(`/lists/${listId}/influencers`, {
-        influencerId: influencer.id
-      });
-      setSuccessMessage(`Added to ${savedLists.find(l => l.id === listId)?.name || 'list'}`);
-      setTimeout(() => setSuccessMessage(''), 3000);
-      setShowSaveModal(false);
-    } catch (err) {
-      console.error('Error saving to list:', err);
-      setApiError('Failed to save to list');
-    }
+  const handleSaveToList = (listId) => {
+    // Handle saving to list
+    console.log('Saving to list:', listId);
+    setShowSaveModal(false);
   };
 
-  const handleCreateNewList = async () => {
+  const handleCreateNewList = () => {
     if (newListName.trim()) {
-      try {
-        setApiError(null);
-        const response = await apiClient.post('/lists', {
-          name: newListName,
-          description: '',
-          isPublic: false
-        });
-        const newList = response.data.data;
-        setSavedLists([...savedLists, {
-          id: newList._id || newList.id,
-          name: newList.name,
-          initials: newList.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2),
-          color: '#0066ff'
-        }]);
-
-        // Add influencer to the new list
-        await apiClient.post(`/lists/${newList._id || newList.id}/influencers`, {
-          influencerId: influencer.id
-        });
-
-        setSuccessMessage(`Created and saved to "${newListName}"`);
-        setTimeout(() => setSuccessMessage(''), 3000);
-        setNewListName('');
-        setShowNewListModal(false);
-        setShowSaveModal(true);
-      } catch (err) {
-        console.error('Error creating list:', err);
-        setApiError('Failed to create list');
-      }
+      const newList = {
+        id: savedLists.length + 1,
+        name: newListName,
+        initials: 'AB',
+        color: '#0066ff'
+      };
+      setSavedLists([...savedLists, newList]);
+      setNewListName('');
+      setShowNewListModal(false);
+      setShowSaveModal(true);
     }
   };
 
@@ -547,7 +448,7 @@ function InfluencerProfile({ influencer }) {
     <div className="w-full h-full relative rounded-lg overflow-y-auto">
       {/* Yellow Background - Sticky at top */}
       <div className="sticky top-0 bg-yellow-400 h-[400px] z-0">
-        {/* Profile Image2Line - Centered */}
+        {/* Profile Image - Centered */}
         <div className="absolute inset-0 flex items-center justify-center pt-8">
           <div className="w-64 h-64 rounded-full overflow-hidden shadow-lg">
             {/* Placeholder for profile image */}
@@ -557,27 +458,27 @@ function InfluencerProfile({ influencer }) {
 
         {/* Top Action Buttons - Overlaid */}
         <div className="absolute top-4 left-4 right-4 flex justify-between z-10">
-          <button className="w-10 h-10 bg-neutral-base rounded-full flex items-center justify-center hover:bg-gray-100 shadow-md">
-            <ArrowLeftLine className="h-5 w-5" />
+          <button className="w-10 h-10 bg-white rounded-full flex items-center justify-center hover:bg-gray-100 shadow-md">
+            <ArrowLeft className="h-5 w-5" />
           </button>
           <div className="flex gap-2">
             <button
               onClick={() => setShowSaveModal(true)}
-              className="w-10 h-10 bg-neutral-base rounded-full flex items-center justify-center hover:bg-gray-100 shadow-md"
+              className="w-10 h-10 bg-white rounded-full flex items-center justify-center hover:bg-gray-100 shadow-md"
             >
               <BookmarkLine className="h-5 w-5" />
             </button>
             <div className="relative" ref={moreMenuRef}>
               <button
                 onClick={() => setShowMoreMenu(!showMoreMenu)}
-                className="w-10 h-10 bg-neutral-base rounded-full flex items-center justify-center hover:bg-gray-100 shadow-md"
+                className="w-10 h-10 bg-white rounded-full flex items-center justify-center hover:bg-gray-100 shadow-md"
               >
-                <MoreLine className="h-5 w-5" />
+                <MoreVertical className="h-5 w-5" />
               </button>
 
               {/* More Menu Dropdown */}
               {showMoreMenu && (
-                <div className="absolute right-0 mt-2 w-48 bg-neutral-base rounded-lg shadow-lg py-2 z-50">
+                <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 z-50">
                   <button
                     onClick={() => {
                       setShowMoreMenu(false);
@@ -624,7 +525,7 @@ function InfluencerProfile({ influencer }) {
       {/* Save to List Modal */}
       {showSaveModal && (
         <div className="fixed inset-0 bg-black bg-opacity-25 flex items-center justify-center z-50" onClick={() => setShowSaveModal(false)}>
-          <div className="bg-neutral-base rounded-3xl shadow-xl w-[480px]" onClick={(e) => e.stopPropagation()}>
+          <div className="bg-white rounded-3xl shadow-xl w-[480px]" onClick={(e) => e.stopPropagation()}>
             {/* Header */}
             <div className="px-4 pt-4 pb-3">
               <h3 className="text-lg font-semibold text-[#242527]">Save to...</h3>
@@ -645,8 +546,7 @@ function InfluencerProfile({ influencer }) {
                   </div>
                   <button
                     onClick={() => handleSaveToList(list.id)}
-                    disabled={apiError || listsLoading}
-                    className="p-2 hover:bg-gray-100 rounded-full disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="p-2 hover:bg-gray-100 rounded-full"
                   >
                     <BookmarkLine className="h-5 w-5" />
                   </button>
@@ -708,21 +608,8 @@ function InfluencerProfile({ influencer }) {
         </div>
       )}
 
-      {/* Error/Success Messages */}
-      {apiError && (
-        <div className="fixed bottom-4 right-4 bg-red-600 text-white px-6 py-3 rounded-lg shadow-lg max-w-md">
-          {apiError}
-        </div>
-      )}
-
-      {successMessage && (
-        <div className="fixed bottom-4 right-4 bg-green-600 text-white px-6 py-3 rounded-lg shadow-lg max-w-md">
-          {successMessage}
-        </div>
-      )}
-
       {/* Profile Content - White card that scrolls over yellow background */}
-      <div className="relative bg-neutral-base rounded-t-3xl -mt-8 z-10 shadow-lg">
+      <div className="relative bg-white rounded-t-3xl -mt-8 z-10 shadow-lg">
         <div className="px-4 py-6 pb-28">
           {/* Username and Name */}
           <div className="mb-6">
@@ -779,7 +666,7 @@ function InfluencerProfile({ influencer }) {
             {/* Likes and Views Graphs */}
             <div className="flex gap-3 overflow-x-auto mb-6">
               {/* Likes Graph */}
-              <div className="bg-neutral-base border-[0.5px] border-[#e6e6e6] rounded-xl p-2 min-w-[380px] flex-shrink-0">
+              <div className="bg-white border-[0.5px] border-[#e6e6e6] rounded-xl p-2 min-w-[380px] flex-shrink-0">
                 <div className="mb-2">
                   <p className="text-[#242527] text-base font-semibold leading-6 tracking-[0.24px]">{influencer.likes} Likes</p>
                   <div className="flex items-center gap-1 text-xs">
@@ -820,7 +707,7 @@ function InfluencerProfile({ influencer }) {
               </div>
 
               {/* Views Graph */}
-              <div className="bg-neutral-base border-[0.5px] border-[#e6e6e6] rounded-xl p-2 min-w-[380px] flex-shrink-0">
+              <div className="bg-white border-[0.5px] border-[#e6e6e6] rounded-xl p-2 min-w-[380px] flex-shrink-0">
                 <div className="mb-2">
                   <p className="text-[#242527] text-base font-semibold leading-6 tracking-[0.24px]">{influencer.views} views</p>
                   <div className="flex items-center gap-1 text-xs">
@@ -867,7 +754,7 @@ function InfluencerProfile({ influencer }) {
             <h3 className="text-[#242527] text-xl font-semibold leading-7 tracking-[-0.14px] mb-3">Audience Insights</h3>
 
             {/* Age Group */}
-            <div className="bg-neutral-base border-[0.5px] border-[#e6e6e6] rounded-xl p-2 mb-3">
+            <div className="bg-white border-[0.5px] border-[#e6e6e6] rounded-xl p-2 mb-3">
               <p className="text-[#242527] text-base font-semibold leading-6 tracking-[0.24px] mb-2">Age Group</p>
               <div className="flex gap-2">
                 <div className="flex flex-col justify-between text-[#333] text-xs py-2 text-right" style={{ minWidth: '32px' }}>
@@ -910,7 +797,7 @@ function InfluencerProfile({ influencer }) {
             </div>
 
             {/* Gender */}
-            <div className="bg-neutral-base border-[0.5px] border-[#e6e6e6] rounded-xl p-2 mb-3">
+            <div className="bg-white border-[0.5px] border-[#e6e6e6] rounded-xl p-2 mb-3">
               <p className="text-[#242527] text-base font-semibold leading-6 tracking-[0.24px] mb-2">Gender</p>
               <div className="flex items-center justify-center py-4">
                 <svg width="150" height="150" viewBox="0 0 150 150">
@@ -932,7 +819,7 @@ function InfluencerProfile({ influencer }) {
             </div>
 
             {/* Top Locations */}
-            <div className="bg-neutral-base border-[0.5px] border-[#e6e6e6] rounded-xl p-2">
+            <div className="bg-white border-[0.5px] border-[#e6e6e6] rounded-xl p-2">
               <p className="text-[#242527] text-base font-semibold leading-6 tracking-[0.24px] mb-2">Top Locations</p>
               <div className="flex gap-2">
                 <div className="flex flex-col justify-between text-[#333] text-xs py-2 text-right" style={{ minWidth: '32px' }}>
@@ -1045,14 +932,14 @@ function InfluencerProfile({ influencer }) {
       </div>
 
       {/* Bottom Action Buttons - Sticky at bottom */}
-      <div className="sticky bottom-0 bg-neutral-base border-t border-gray-200 px-4 py-4 z-20 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)]">
+      <div className="sticky bottom-0 bg-white border-t border-gray-200 px-4 py-4 z-20 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)]">
         <div className="flex gap-3">
           <button className="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-[#dae3d1] rounded-full text-[#43573b] text-base font-semibold hover:bg-[#c9d9ba] transition-colors tracking-[0.24px]">
-            <UserAddLine className="h-6 w-6" />
+            <UserPlus className="h-6 w-6" />
             Invite
           </button>
           <button className="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-[#43573b] rounded-full text-white text-base font-semibold hover:bg-[#374829] transition-colors tracking-[0.24px]">
-            <Message3Line className="h-6 w-6" />
+            <MessageSquare className="h-6 w-6" />
             Send Message
           </button>
         </div>

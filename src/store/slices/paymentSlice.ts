@@ -67,7 +67,7 @@ export const getSubscriptionPlans = createAsyncThunk(
   'payment/getSubscriptionPlans',
   async (_, { rejectWithValue }) => {
     try {
-      const response = await api.get('/payment/plans');
+      const response = await api.get('/payments/plans');
       return response.data?.data || response.data;
     } catch (error) {
       return rejectWithValue((error as Error).message);
@@ -79,7 +79,7 @@ export const getUserPlan = createAsyncThunk(
   'payment/getUserPlan',
   async (_, { rejectWithValue }) => {
     try {
-      const response = await api.get('/payment/user-plan');
+      const response = await api.get('/payments/current-plan');
       return response.data?.data || response.data;
     } catch (error) {
       return { planId: 'free', planName: 'Free', credits: 0, creditsUsed: 0, status: 'active', startDate: '', endDate: '', features: [] };
@@ -91,7 +91,7 @@ export const getCreditInfo = createAsyncThunk(
   'payment/getCreditInfo',
   async (_, { rejectWithValue }) => {
     try {
-      const response = await api.get('/payment/credits');
+      const response = await api.get('/payments/credits');
       return response.data?.data || response.data;
     } catch (error) {
       return { totalCredits: 0, remainingCredits: 0, usedCredits: 0, resetDate: '', monthlyLimit: 0 };
@@ -103,7 +103,7 @@ export const createPaymentOrder = createAsyncThunk(
   'payment/createPaymentOrder',
   async ({ planId, interval }: { planId: string; interval: string }, { rejectWithValue }) => {
     try {
-      const response = await api.post('/payment/create-order', { planId, interval });
+      const response = await api.post('/payments/order/silver', { planId, interval });
       return response.data?.data || response.data;
     } catch (error) {
       return rejectWithValue((error as Error).message);
@@ -128,7 +128,7 @@ export const verifyPayment = createAsyncThunk(
     { rejectWithValue }
   ) => {
     try {
-      const response = await api.post('/payment/verify-payment', {
+      const response = await api.post('/payments/verify', {
         razorpayOrderId,
         razorpayPaymentId,
         razorpaySignature,
@@ -145,7 +145,7 @@ export const getPaymentHistory = createAsyncThunk(
   'payment/getPaymentHistory',
   async ({ page = 1, limit = 10 }: { page?: number; limit?: number } = {}, { rejectWithValue }) => {
     try {
-      const response = await api.get('/payment/history', { params: { page, limit } });
+      const response = await api.get('/payments/history', { params: { page, limit } });
       const data = response.data?.data || response.data;
       return { history: data, pagination: response.data?.pagination || { page, limit, total: 0 } };
     } catch (error) {
@@ -158,7 +158,7 @@ export const cancelSubscription = createAsyncThunk(
   'payment/cancelSubscription',
   async (_, { rejectWithValue }) => {
     try {
-      const response = await api.post('/payment/cancel-subscription', {});
+      const response = await api.post('/payments/cancel', {});
       return response.data?.data || response.data;
     } catch (error) {
       return rejectWithValue((error as Error).message);

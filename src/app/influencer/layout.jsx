@@ -1,68 +1,43 @@
 'use client'
-import React, { useEffect, Suspense } from 'react';
+import React from 'react';
 import { usePathname } from 'next/navigation';
-import InfluencerSidebar from '../../components/InfluencerSidebar';
-import ProtectedRoute from '../../components/ProtectedRoute';
+import BrandSidebar from '../../components/BrandSidebar';
 import { SidebarProvider, useSidebar } from '../context/SidebarContext';
-import { RoleProvider } from '../context/RoleContext';
 
 function InfluencerLayoutContent({ children, pathname }) {
   const { isExpanded } = useSidebar();
 
-  // Debug logging
-  useEffect(() => {
-    console.log('InfluencerLayout: pathname =', pathname);
-  }, [pathname]);
+  const noSidebarRoutes = [
+    '/influencer/signup',
+    '/influencer/login',
+    '/influencer/campaigns/create-campaign',
+    '/influencer/campaigns/new-applications',
+    '/influencer/campaigns/all-campaigns',
+    '/influencer/campaigns/all-drafts',
+    '/influencer/influencer-search',
+    '/influencer/influencers',
+    '/influencer/notifications',
+  ];
 
-  // Don't show sidebar for specific pages
-  const isAuthPage = pathname === '/influencer/signup' || pathname === '/influencer/login';
-  const isCreateCampaignPage = pathname === '/influencer/campaigns/create-campaign';
-  const isNewApplicationsPage = pathname === '/influencer/campaigns/new-applications';
-  const isAllCampaignsPage = pathname === '/influencer/campaigns/all-campaigns';
-  const isAllDraftsPage = pathname === '/influencer/campaigns/all-drafts';
-  const isInfluencerSearchPage = pathname === '/influencer/influencer-search';
-  const isInfluencersPage = pathname === '/influencer/influencers';
-  const isNotificationsPage = pathname === '/influencer/notifications';
-  // Hide sidebar for all account sub-pages (but not the main account page)
-  const isAccountSubPage = pathname.startsWith('/influencer/account/');
-  // Hide sidebar for dynamic campaign details page only
-  const isCampaignDetailsPage =
-    pathname.startsWith('/influencer/campaigns/') &&
-    !pathname.includes('/create-campaign') &&
-    !pathname.includes('/new-applications') &&
-    !pathname.includes('/all-campaigns') &&
-    !pathname.includes('/all-drafts');
-  // Hide sidebar for inbox page
-  const isInboxPage = pathname === '/influencer/inbox';
+  const isNoSidebarRoute =
+    noSidebarRoutes.some(r => pathname === r) ||
+    pathname.startsWith('/influencer/account/') ||
+    (pathname.startsWith('/influencer/campaigns/') &&
+      !pathname.includes('/create-campaign') &&
+      !pathname.includes('/new-applications') &&
+      !pathname.includes('/all-campaigns') &&
+      !pathname.includes('/all-drafts'));
 
-  if (
-    isAuthPage ||
-    isCreateCampaignPage ||
-    isNewApplicationsPage ||
-    isAllCampaignsPage ||
-    isAllDraftsPage ||
-    isInfluencerSearchPage ||
-    isInfluencersPage ||
-    isNotificationsPage ||
-    isAccountSubPage ||
-    isCampaignDetailsPage ||
-    isInboxPage
-  ) {
-    // console.log('InfluencerLayout: Rendering page without sidebar');
+  if (isNoSidebarRoute) {
     return <>{children}</>;
   }
 
-  // console.log('InfluencerLayout: Rendering layout with sidebar');
-
   return (
-    <div className="flex min-h-screen bg-neutral-base">
-      <InfluencerSidebar />
-       <main
-        className="bg-neutral-base text-text-base border-l border-primary transition-all duration-300 ease-in-out min-h-screen w-full"
-        style={{
-          marginLeft: isExpanded ? 240 : 80,
-        }}
-      >
+    <div className="flex min-h-screen bg-[#FFFFFF]">
+      <BrandSidebar />
+      <main className={`flex-1 bg-[#FFFFFF] transition-all duration-300 ease-in-out ${
+        isExpanded ? 'ml-[220px]' : 'ml-[96px]'
+      } h-screen overflow-y-auto`}>
         {children}
       </main>
     </div>
@@ -73,17 +48,10 @@ export default function InfluencerLayout({ children }) {
   const pathname = usePathname();
 
   return (
-    <RoleProvider>
-      <SidebarProvider>
-        <InfluencerLayoutContent pathname={pathname}>
-          {children}
-        </InfluencerLayoutContent>
-      </SidebarProvider>
-    </RoleProvider>
+    <SidebarProvider>
+      <InfluencerLayoutContent pathname={pathname}>
+        {children}
+      </InfluencerLayoutContent>
+    </SidebarProvider>
   );
-} 
-
-
-
-
-
+}
