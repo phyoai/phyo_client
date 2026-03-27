@@ -1,5 +1,6 @@
 'use client';
 
+import { Suspense } from 'react';
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { userAPI } from '@/utils/api';
@@ -15,7 +16,7 @@ import {
   AddLargeFill
 } from '@phyoofficial/phyo-icon-library';
 
-export default function BrandAccount() {
+function BrandAccountContent() {
   const router = useRouter();
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -1334,5 +1335,24 @@ const RightPanelCategories = () => {
         </div>
       )}
     </div>
+  );
+}
+
+function BrandAccountSkeleton() {
+  return (
+    <div className="p-6">
+      <div className="animate-pulse space-y-4">
+        <div className="h-10 bg-gray-200 dark:bg-gray-700 rounded w-1/4"></div>
+        <div className="h-64 bg-gray-200 dark:bg-gray-700 rounded"></div>
+      </div>
+    </div>
+  );
+}
+
+export default function BrandAccount() {
+  return (
+    <Suspense fallback={<BrandAccountSkeleton />}>
+      <BrandAccountContent />
+    </Suspense>
   );
 }

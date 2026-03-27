@@ -574,6 +574,141 @@ export const campaignApi = {
       throw error.response?.data || { message: errorMessage };
     }
   },
+
+  /**
+   * Get applications for a specific campaign
+   *
+   * @param campaignId - Campaign ID to get applications for
+   * @param pagination - Pagination parameters
+   * @returns Promise resolving to paginated applications
+   *
+   * @example
+   * const result = await campaignApi.getCampaignApplications('camp_123', { page: 1, limit: 20 });
+   */
+  getCampaignApplications: async (
+    campaignId: string,
+    pagination?: Partial<IPagination>
+  ): Promise<{ applications: ICampaignApplication[]; pagination: IPagination }> => {
+    try {
+      if (!campaignId || typeof campaignId !== 'string') {
+        throw new Error('Invalid campaign ID');
+      }
+
+      const params: Record<string, any> = {
+        page: pagination?.page || 1,
+        limit: pagination?.limit || 10,
+      };
+
+      const response = await api.get<IApiResponse<{
+        data: ICampaignApplication[];
+        pagination: IPagination;
+      }>>(`/campaigns/${campaignId.trim()}/applications`, { params });
+
+      const payload = response.data?.data;
+      return {
+        applications: (payload?.data ?? []) as ICampaignApplication[],
+        pagination: payload?.pagination ?? {
+          page: 1,
+          limit: 10,
+          total: 0,
+          totalPages: 0,
+          hasNextPage: false,
+          hasPreviousPage: false,
+        },
+      };
+    } catch (error: any) {
+      const errorMessage =
+        error.response?.data?.message || error.message || 'Failed to fetch campaign applications';
+      console.error('Error in getCampaignApplications:', errorMessage);
+      throw error.response?.data || { message: errorMessage };
+    }
+  },
+
+  /**
+   * Accept a campaign application
+   *
+   * @param campaignId - Campaign ID
+   * @param applicationId - Application ID to accept
+   * @param notes - Optional notes for acceptance
+   * @returns Promise resolving to action response
+   *
+   * @example
+   * await campaignApi.acceptApplication('camp_123', 'app_456', 'Looking forward to collaboration');
+   */
+  acceptApplication: async (
+    campaignId: string,
+    applicationId: string,
+    notes?: string
+  ): Promise<ICampaignActionResponse> => {
+    try {
+      if (!campaignId || typeof campaignId !== 'string') {
+        throw new Error('Invalid campaign ID');
+      }
+      if (!applicationId || typeof applicationId !== 'string') {
+        throw new Error('Invalid application ID');
+      }
+
+      const payload: Record<string, any> = {};
+      if (notes) {
+        payload.notes = notes;
+      }
+
+      const response = await api.post<ICampaignActionResponse>(
+        `/campaigns/${campaignId.trim()}/applications/${applicationId.trim()}/accept`,
+        payload
+      );
+
+      return response.data;
+    } catch (error: any) {
+      const errorMessage =
+        error.response?.data?.message || error.message || 'Failed to accept application';
+      console.error('Error in acceptApplication:', errorMessage);
+      throw error.response?.data || { message: errorMessage };
+    }
+  },
+
+  /**
+   * Reject a campaign application
+   *
+   * @param campaignId - Campaign ID
+   * @param applicationId - Application ID to reject
+   * @param reason - Rejection reason
+   * @returns Promise resolving to action response
+   *
+   * @example
+   * await campaignApi.rejectApplication('camp_123', 'app_456', 'Does not match campaign requirements');
+   */
+  rejectApplication: async (
+    campaignId: string,
+    applicationId: string,
+    reason?: string
+  ): Promise<ICampaignActionResponse> => {
+    try {
+      if (!campaignId || typeof campaignId !== 'string') {
+        throw new Error('Invalid campaign ID');
+      }
+      if (!applicationId || typeof applicationId !== 'string') {
+        throw new Error('Invalid application ID');
+      }
+
+      const payload: Record<string, any> = {};
+      if (reason) {
+        payload.reason = reason;
+      }
+
+      const response = await api.post<ICampaignActionResponse>(
+        `/campaigns/${campaignId.trim()}/applications/${applicationId.trim()}/reject`,
+        payload
+      );
+
+      return response.data;
+    } catch (error: any) {
+      const errorMessage =
+        error.response?.data?.message || error.message || 'Failed to reject application';
+      console.error('Error in rejectApplication:', errorMessage);
+      throw error.response?.data || { message: errorMessage };
+    }
+  },
 };
 
 /**

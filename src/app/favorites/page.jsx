@@ -1,185 +1,276 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import {
-  getFavorites,
-  getFavoriteCampaigns,
-  getFavoriteInfluencers,
-  getFavoriteBrands,
-  removeFavorite,
-} from '@/store/slices/favoritesSlice';
-import Card from '@/components/ui/Card';
-import Button from '@/components/ui/Button';
-import Spinner from '@/components/ui/Spinner';
-import { Heart, Trash2 } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { ArrowLeft, Heart, Trash2, AlertCircle } from 'lucide-react';
+import { favoritesApi } from '@/api/favorites-api';
+
+const FavoriteSkeleton = () => (
+  <div className="h-40 bg-gray-200 rounded animate-pulse" />
+);
 
 export default function FavoritesPage() {
-  const dispatch = useDispatch();
+  const router = useRouter();
+  const [campaigns, setCampaigns] = useState([]);
+  const [influencers, setInfluencers] = useState([]);
+  const [brands, setBrands] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [activeTab, setActiveTab] = useState('campaigns');
+  const [actionLoading, setActionLoading] = useState(false);
 
-  const { items, campaigns, influencers, brands, loading } = useSelector(
-    (state) => state.favorites
-  );
-
-  const [activeTab, setActiveTab] = useState('all');
-
+  // Fetch favorites on mount and when tab changes
   useEffect(() => {
-    dispatch(getFavorites());
-    dispatch(getFavoriteCampaigns());
-    dispatch(getFavoriteInfluencers());
-    dispatch(getFavoriteBrands());
-  }, [dispatch]);
+    const fetch = async () => {
+      try {
+        setLoading(true);
+        setError(null);
 
-  const handleRemove = (type, itemId) => {
-    dispatch(removeFavorite({ type, itemId }));
+        if (activeTab === 'campaigns' || activeTab === 'all') {
+          const campaignResponse = await favoritesApi.getFavoriteCampaigns({ page: 1, limit: 20 });
+          setCampaigns(campaignResponse.favorites || []);
+        }
+
+        if (activeTab === 'influencers' || activeTab === 'all') {
+          const influencerResponse = await favoritesApi.getFavoriteInfluencers({ page: 1, limit: 20 });
+          setInfluencers(influencerResponse.favorites || []);
+        }
+
+        if (activeTab === 'brands' || activeTab === 'all') {
+          const brandResponse = await favoritesApi.getFavoriteBrands({ page: 1, limit: 20 });
+          setBrands(brandResponse.favorites || []);
+        }
+      } catch (err) {
+        setError(err?.message || 'Failed to load favorites');
+        console.error('Error fetching favorites:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetch();
+  }, [activeTab]);
+
+  const handleRemove = async (itemId, itemType) => {
+    try {
+      setActionLoading(true);
+      await favoritesApi.removeFavorite(itemType, itemId);
+
+      // Update local state
+      if (itemType === 'campaign') {
+        setCampaigns(campaigns.filter(c => c.itemId !== itemId));
+      } else if (itemType === 'influencer') {
+        setInfluencers(influencers.filter(i => i.itemId !== itemId));
+      } else if (itemType === 'brand') {
+        setBrands(brands.filter(b => b.itemId !== itemId));
+      }
+
+      setError(null);
+    } catch (err) {
+      setError(err?.message || 'Failed to remove favorite');
+      console.error('Error removing favorite:', err);
+    } finally {
+      setActionLoading(false);
+    }
   };
 
-  const renderItemCard = (item, type) => (
-    <Card key={`${type}-${item.id}`} className="p-6 hover:shadow-lg transition-shadow">
-      <div className="flex items-start justify-between gap-4">
-        <div className="flex-1">
-          <h3 className="font-semibold text-gray-900">{item.name || item.title}</h3>
-          {item.description && (
-            <p className="text-sm text-gray-600 mt-2">{item.description}</p>
-          )}
-          {item.budget && (
-            <p className="text-sm font-medium text-gray-700 mt-2">
-              Budget: ${item.budget?.toLocaleString()}
-            </p>
-          )}
-          {item.followers && (
-            <p className="text-sm font-medium text-gray-700 mt-2">
-              Followers: {item.followers?.toLocaleString()}
-            </p>
-          )}
-        </div>
+  const getTotalCount = () => {
+    return campaigns.length + influencers.length + brands.length;
+  };
 
-        <button
-          onClick={() => handleRemove(type, item.id)}
-          className="text-red-500 hover:text-red-700 transition-colors flex-shrink-0"
-        >
-          <Trash2 size={20} />
-        </button>
-      </div>
-    </Card>
-  );
+  const tabs = [
+    { id: 'campaigns', label: 'Campaigns', count: campaigns.length },
+    { id: 'influencers', label: 'Influencers', count: influencers.length },
+    { id: 'brands', label: 'Brands', count: brands.length },
+  ];
 
   return (
-    <div className="p-8 bg-gray-50 min-h-screen">
-      <div className="max-w-5xl mx-auto">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
-            <Heart className="text-red-500" size={32} />
-            Favorites
-          </h1>
-          <p className="text-gray-600 mt-2">Your saved campaigns, influencers, and brands</p>
+    <div className="min-h-screen bg-white">
+      {/* Header */}
+      <div className="px-4 py-3 border-b border-gray-100 flex items-center gap-3">
+        <button
+          onClick={() => router.back()}
+          className="p-2 hover:bg-gray-100 rounded-full"
+        >
+          <ArrowLeft className="w-6 h-6" />
+        </button>
+        <div className="flex items-center gap-2">
+          <Heart className="w-6 h-6 text-red-500 fill-red-500" />
+          <h1 className="text-xl font-semibold">Favorites</h1>
         </div>
+      </div>
 
-        {/* Tabs */}
-        <div className="flex gap-4 mb-8 border-b border-gray-200">
-          {[
-            { id: 'all', label: 'All', count: items.length },
-            { id: 'campaigns', label: 'Campaigns', count: campaigns.length },
-            { id: 'influencers', label: 'Influencers', count: influencers.length },
-            { id: 'brands', label: 'Brands', count: brands.length },
-          ].map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={`
-                px-4 py-3 font-medium transition-colors border-b-2
-                ${
-                  activeTab === tab.id
-                    ? 'text-blue-600 border-blue-600'
-                    : 'text-gray-600 border-transparent hover:text-gray-900'
-                }
-              `}
-            >
-              {tab.label} <span className="text-xs ml-2">({tab.count})</span>
-            </button>
-          ))}
-        </div>
+      {/* Tabs */}
+      <div className="px-4 py-3 border-b border-gray-100 flex gap-4 overflow-x-auto">
+        {tabs.map(tab => (
+          <button
+            key={tab.id}
+            onClick={() => {
+              setActiveTab(tab.id);
+              setError(null);
+            }}
+            className={`pb-2 whitespace-nowrap font-medium transition-colors ${
+              activeTab === tab.id
+                ? 'border-b-2 border-blue-600 text-blue-600'
+                : 'text-gray-600 hover:text-gray-900'
+            }`}
+          >
+            {tab.label} ({tab.count})
+          </button>
+        ))}
+      </div>
 
-        {/* Content */}
-        {loading ? (
-          <div className="flex items-center justify-center py-12">
-            <Spinner size="lg" />
+      {/* Error Alert */}
+      {error && (
+        <div className="p-4 m-4 bg-red-50 border border-red-200 rounded-lg flex items-start gap-3">
+          <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+          <div className="flex-1">
+            <p className="text-sm text-red-800">{error}</p>
           </div>
-        ) : (
-          <div className="space-y-6">
-            {activeTab === 'all' && items.length === 0 && (
-              <Card className="p-12 text-center">
-                <Heart size={48} className="text-gray-300 mx-auto mb-4" />
-                <h2 className="text-xl font-semibold text-gray-900 mb-2">No Favorites Yet</h2>
-                <p className="text-gray-600">
-                  Start adding campaigns, influencers, and brands to your favorites!
-                </p>
-              </Card>
-            )}
+          <button
+            onClick={() => setError(null)}
+            className="text-red-600 hover:text-red-700 text-sm font-medium"
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
 
-            {(activeTab === 'all' || activeTab === 'campaigns') && (
-              <>
-                {campaigns.length > 0 && (
-                  <div>
-                    <h2 className="text-xl font-semibold text-gray-900 mb-4">Campaigns</h2>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      {campaigns.map((campaign) =>
-                        renderItemCard(campaign, 'campaign')
-                      )}
-                    </div>
-                  </div>
-                )}
-              </>
-            )}
+      {/* Content */}
+      <div className="p-4">
+        {/* Loading State */}
+        {loading && (
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            {[1, 2, 3, 4].map(i => (
+              <FavoriteSkeleton key={i} />
+            ))}
+          </div>
+        )}
 
-            {(activeTab === 'all' || activeTab === 'influencers') && (
-              <>
-                {influencers.length > 0 && (
-                  <div>
-                    <h2 className="text-xl font-semibold text-gray-900 mb-4">Influencers</h2>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      {influencers.map((influencer) =>
-                        renderItemCard(influencer, 'influencer')
-                      )}
-                    </div>
-                  </div>
-                )}
-              </>
-            )}
+        {/* Empty State */}
+        {!loading && getTotalCount() === 0 && (
+          <div className="flex flex-col items-center justify-center py-12">
+            <Heart className="w-12 h-12 text-gray-300 mb-4" />
+            <p className="text-center text-gray-500 text-lg">No favorites yet</p>
+            <p className="text-center text-gray-400 text-sm mt-2">
+              Start adding {activeTab} to your favorites
+            </p>
+          </div>
+        )}
 
-            {(activeTab === 'all' || activeTab === 'brands') && (
-              <>
-                {brands.length > 0 && (
-                  <div>
-                    <h2 className="text-xl font-semibold text-gray-900 mb-4">Brands</h2>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      {brands.map((brand) =>
-                        renderItemCard(brand, 'brand')
-                      )}
-                    </div>
-                  </div>
-                )}
-              </>
-            )}
+        {/* Campaigns Grid */}
+        {!loading && activeTab === 'campaigns' && campaigns.length > 0 && (
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            {campaigns.map(item => (
+              <div
+                key={item.itemId}
+                className="border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg transition-shadow"
+              >
+                <div className="relative aspect-square bg-gray-100">
+                  {item.itemImage && (
+                    <img
+                      src={item.itemImage}
+                      alt={item.itemName}
+                      className="w-full h-full object-cover"
+                    />
+                  )}
+                  <button
+                    onClick={() => handleRemove(item.itemId, 'campaign')}
+                    disabled={actionLoading}
+                    className="absolute top-2 right-2 p-2 bg-white rounded-full shadow hover:bg-red-50 disabled:opacity-50"
+                  >
+                    <Trash2 className="w-4 h-4 text-red-600" />
+                  </button>
+                </div>
+                <div className="p-3">
+                  <p className="font-semibold text-sm line-clamp-2">{item.itemName}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
 
-            {activeTab === 'campaigns' && campaigns.length === 0 && (
-              <Card className="p-12 text-center">
-                <p className="text-gray-600">No favorite campaigns yet</p>
-              </Card>
-            )}
+        {/* Campaigns Empty */}
+        {!loading && activeTab === 'campaigns' && campaigns.length === 0 && (
+          <div className="flex flex-col items-center justify-center py-12">
+            <p className="text-center text-gray-500">No favorite campaigns</p>
+          </div>
+        )}
 
-            {activeTab === 'influencers' && influencers.length === 0 && (
-              <Card className="p-12 text-center">
-                <p className="text-gray-600">No favorite influencers yet</p>
-              </Card>
-            )}
+        {/* Influencers Grid */}
+        {!loading && activeTab === 'influencers' && influencers.length > 0 && (
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            {influencers.map(item => (
+              <div
+                key={item.itemId}
+                className="border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg transition-shadow"
+              >
+                <div className="relative aspect-square bg-gray-100">
+                  {item.itemImage && (
+                    <img
+                      src={item.itemImage}
+                      alt={item.itemName}
+                      className="w-full h-full object-cover"
+                    />
+                  )}
+                  <button
+                    onClick={() => handleRemove(item.itemId, 'influencer')}
+                    disabled={actionLoading}
+                    className="absolute top-2 right-2 p-2 bg-white rounded-full shadow hover:bg-red-50 disabled:opacity-50"
+                  >
+                    <Trash2 className="w-4 h-4 text-red-600" />
+                  </button>
+                </div>
+                <div className="p-3">
+                  <p className="font-semibold text-sm line-clamp-2">{item.itemName}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
 
-            {activeTab === 'brands' && brands.length === 0 && (
-              <Card className="p-12 text-center">
-                <p className="text-gray-600">No favorite brands yet</p>
-              </Card>
-            )}
+        {/* Influencers Empty */}
+        {!loading && activeTab === 'influencers' && influencers.length === 0 && (
+          <div className="flex flex-col items-center justify-center py-12">
+            <p className="text-center text-gray-500">No favorite influencers</p>
+          </div>
+        )}
+
+        {/* Brands Grid */}
+        {!loading && activeTab === 'brands' && brands.length > 0 && (
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            {brands.map(item => (
+              <div
+                key={item.itemId}
+                className="border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg transition-shadow"
+              >
+                <div className="relative aspect-square bg-gray-100">
+                  {item.itemImage && (
+                    <img
+                      src={item.itemImage}
+                      alt={item.itemName}
+                      className="w-full h-full object-cover"
+                    />
+                  )}
+                  <button
+                    onClick={() => handleRemove(item.itemId, 'brand')}
+                    disabled={actionLoading}
+                    className="absolute top-2 right-2 p-2 bg-white rounded-full shadow hover:bg-red-50 disabled:opacity-50"
+                  >
+                    <Trash2 className="w-4 h-4 text-red-600" />
+                  </button>
+                </div>
+                <div className="p-3">
+                  <p className="font-semibold text-sm line-clamp-2">{item.itemName}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Brands Empty */}
+        {!loading && activeTab === 'brands' && brands.length === 0 && (
+          <div className="flex flex-col items-center justify-center py-12">
+            <p className="text-center text-gray-500">No favorite brands</p>
           </div>
         )}
       </div>

@@ -2,379 +2,225 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, MoreVertical, Trash2, Download, Plus } from 'lucide-react';
+import { ArrowLeft, AlertCircle, Trash2, Plus } from 'lucide-react';
+import { accountApi } from '@/api/account-api';
 
 export default function MyLists() {
   const router = useRouter();
-  const [loading, setLoading] = useState(false);
-  const [selectionMode, setSelectionMode] = useState(false);
-  const [selectedItems, setSelectedItems] = useState([]);
-  const [activeChip, setActiveChip] = useState('All');
+  const [lists, setLists] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [showNewListModal, setShowNewListModal] = useState(false);
   const [newListName, setNewListName] = useState('');
-  
-  // Mock data - Replace with actual API call
-  const [lists, setLists] = useState([
-    {
-      id: 1,
-      name: 'Emily Thompson',
-      description: 'Lifestyle influencer sharing sustainable living tips and eco-friendly products.',
-      avatar: '/dummyAvatar.jpg',
-      list: 'Favorites'
-    },
-    {
-      id: 2,
-      name: 'Sophie Kim',
-      description: 'Travel blogger exploring hidden gems around the world and sharing travel hacks.',
-      avatar: '/dummyAvatar1.jpg',
-      list: 'Campaign 1'
-    },
-    {
-      id: 3,
-      name: 'Jake Reyes',
-      description: 'Tech enthusiast and reviewer focusing on the latest gadgets and software.',
-      avatar: '/test1.png',
-      list: 'Campaign 2'
-    },
-    {
-      id: 4,
-      name: 'Olivia Martinez',
-      description: 'Beauty guru demonstrating makeup tutorials and skincare routines.',
-      avatar: '/dummyAvatar.jpg',
-      list: 'Favorites'
-    },
-    {
-      id: 5,
-      name: 'Michael Chen',
-      description: 'Fitness coach offering workout plans and healthy meal prep ideas.',
-      avatar: '/dummyAvatar1.jpg',
-      list: 'Campaign 1'
-    }
-  ]);
+  const [newListType, setNewListType] = useState('custom');
+  const [actionLoading, setActionLoading] = useState(false);
 
-  const chips = ['All', 'Favorites', 'Campaign 1', 'Campaign 2', 'Label', 'Label', 'Label', 'Label', 'Label', 'Label'];
-
-  const handleSelectAll = () => {
-    if (selectedItems.length === lists.length) {
-      setSelectedItems([]);
-    } else {
-      setSelectedItems(lists.map(item => item.id));
-    }
-  };
-
-  const handleSelectItem = (id) => {
-    if (selectedItems.includes(id)) {
-      setSelectedItems(selectedItems.filter(item => item !== id));
-    } else {
-      setSelectedItems([...selectedItems, id]);
-    }
-  };
-
-  const getInitials = (name) => {
-    if (!name) return 'U';
-    return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
-  };
-
-  const handleBack = () => {
-    if (selectionMode) {
-      setSelectionMode(false);
-      setSelectedItems([]);
-    } else {
-      router.back();
-    }
-  };
-
-  const handleDelete = () => {
-    // Filter out selected items
-    setLists(lists.filter(item => !selectedItems.includes(item.id)));
-    setSelectedItems([]);
-    setSelectionMode(false);
-  };
-
-  const handleExport = () => {
-    console.log('Exporting selected items:', selectedItems);
-    // Add export logic here
-  };
-
-  const handleCreateNewList = () => {
-    setShowNewListModal(true);
-  };
-
-  const handleCreateList = () => {
-    if (newListName.trim()) {
-      // Add new list to the lists
-      const newList = {
-        id: Math.max(...lists.map(l => l.id), 0) + 1,
-        name: newListName,
-        description: 'New list',
-        avatar: '/dummyAvatar.jpg',
-        list: newListName
-      };
-      setLists([...lists, newList]);
-
-      // Update chips to include new list
-      if (!chips.includes(newListName)) {
-        chips.push(newListName);
+  // Fetch lists on mount
+  useEffect(() => {
+    const fetch = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const response = await accountApi.getLists();
+        setLists(response || []);
+      } catch (err) {
+        setError(err?.message || 'Failed to load lists');
+        console.error('Error fetching lists:', err);
+      } finally {
+        setLoading(false);
       }
+    };
+    fetch();
+  }, []);
 
-      // Reset and close modal
+  const handleCreateList = async () => {
+    if (!newListName.trim()) {
+      setError('List name is required');
+      return;
+    }
+
+    try {
+      setActionLoading(true);
+      const newList = await accountApi.createList({
+        name: newListName.trim(),
+        type: newListType,
+      });
+      setLists([...lists, newList]);
       setNewListName('');
+      setNewListType('custom');
       setShowNewListModal(false);
-      setSelectionMode(false);
-      setSelectedItems([]);
+      setError(null);
+    } catch (err) {
+      setError(err?.message || 'Failed to create list');
+      console.error('Error creating list:', err);
+    } finally {
+      setActionLoading(false);
     }
   };
 
-  // Empty state
-  if (lists.length === 0 && !loading) {
-    return (
-      <div className="flex flex-col h-screen bg-white">
-        {/* App Bar */}
-        <div className="flex items-center justify-between px-1 py-2 bg-white shrink-0">
-          <button
-            onClick={handleBack}
-            className="flex items-center justify-center w-12 h-12 rounded-3xl hover:bg-gray-100 transition-colors"
-          >
-            <ArrowLeft className="w-6 h-6 text-[#242527]" strokeWidth={1.5} />
-          </button>
-          <div className="flex-1 px-2">
-            <h1 className="text-xl font-semibold text-[#242527] leading-7 tracking-[-0.14px]">My Lists</h1>
-          </div>
-          <div className="flex items-center gap-2">
-            <button className="flex items-center justify-center w-12 h-12 rounded-3xl hover:bg-gray-100 transition-colors">
-              <MoreVertical className="w-6 h-6 text-[#242527]" strokeWidth={1.5} />
-            </button>
-          </div>
-        </div>
-
-        {/* Empty State */}
-        <div className="flex-1 flex items-center justify-center px-9 py-4">
-          <div className="flex flex-col items-center justify-center p-4">
-            <h2 className="text-2xl font-semibold text-[#242527] leading-8 tracking-[-0.32px]">no lists created yet</h2>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  const handleDeleteList = async (listId) => {
+    try {
+      setActionLoading(true);
+      // Note: deleteList method doesn't exist in account-api yet
+      // For now, we'll remove from UI optimistically
+      // TODO: Add deleteList method to account-api
+      setLists(lists.filter(l => l.id !== listId));
+      setError(null);
+    } catch (err) {
+      setError(err?.message || 'Failed to delete list');
+      console.error('Error deleting list:', err);
+    } finally {
+      setActionLoading(false);
+    }
+  };
 
   return (
-    <div className="flex flex-col h-screen bg-white">
-      {/* App Bar */}
-      <div className="flex items-center justify-between px-1 py-2 bg-white shrink-0">
-        <button
-          onClick={handleBack}
-          className="flex items-center justify-center w-12 h-12 rounded-3xl hover:bg-gray-100 transition-colors"
-        >
-          <ArrowLeft className="w-6 h-6 text-[#242527]" strokeWidth={1.5} />
-        </button>
-        <div className="flex-1 px-2">
-          <h1 className="text-xl font-semibold text-[#242527] leading-7 tracking-[-0.14px]">My Lists</h1>
-        </div>
-        <div className="flex items-center gap-2 h-12">
-          {selectionMode && (
-            <button 
-              onClick={handleDelete}
-              className="flex items-center justify-center w-12 h-12 rounded-3xl hover:bg-gray-100 transition-colors"
-            >
-              <Trash2 className="w-6 h-6 text-[#242527]" strokeWidth={1.5} />
-            </button>
-          )}
+    <div className="min-h-screen bg-white">
+      {/* Header */}
+      <div className="px-4 py-3 border-b border-gray-100 flex items-center justify-between">
+        <div className="flex items-center gap-3">
           <button
-            onClick={() => {
-              setSelectionMode(true);
-              setSelectedItems([]);
-            }}
-            className="flex items-center justify-center w-12 h-12 rounded-3xl hover:bg-gray-100 transition-colors"
+            onClick={() => router.back()}
+            className="p-2 hover:bg-gray-100 rounded-full"
           >
-            <MoreVertical className="w-6 h-6 text-[#242527]" strokeWidth={1.5} />
+            <ArrowLeft className="w-6 h-6" />
+          </button>
+          <h1 className="text-xl font-semibold">My Lists</h1>
+        </div>
+        <button
+          onClick={() => setShowNewListModal(true)}
+          className="p-2 hover:bg-gray-100 rounded-full"
+        >
+          <Plus className="w-6 h-6" />
+        </button>
+      </div>
+
+      {/* Error Alert */}
+      {error && (
+        <div className="p-4 m-4 bg-red-50 border border-red-200 rounded-lg flex items-start gap-3">
+          <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+          <div className="flex-1">
+            <p className="text-sm text-red-800">{error}</p>
+          </div>
+          <button
+            onClick={() => setError(null)}
+            className="text-red-600 hover:text-red-700 text-sm font-medium"
+          >
+            Dismiss
           </button>
         </div>
-      </div>
+      )}
 
-      {/* Container */}
-      <div className="flex-1 flex flex-col overflow-hidden px-9 py-4">
-        <div className="flex flex-col flex-1 h-full overflow-hidden">
-          {/* Chip Group - Only show when not in selection mode */}
-          {!selectionMode && lists.length > 0 && (
-            <div className="flex items-center gap-2 overflow-x-auto overflow-y-hidden pl-4 py-2 shrink-0 scrollbar-hide">
-              {chips.map((chip, index) => (
-                <button
-                  key={index}
-                  onClick={() => setActiveChip(chip)}
-                  className={`flex items-center justify-center px-3 py-1.5 rounded-lg shrink-0 whitespace-nowrap transition-colors ${
-                    activeChip === chip
-                      ? 'bg-[#43573b] text-white'
-                      : 'bg-[#fbfcfa] text-[#242527] border border-[#f4f6f1] hover:bg-gray-50'
-                  }`}
-                  style={{ fontFamily: 'Work Sans, sans-serif' }}
-                >
-                  <span className="text-sm font-medium leading-5 tracking-[0.2px]">{chip}</span>
-                </button>
-              ))}
-            </div>
-          )}
-
-          {/* List Items */}
-          <div className="flex-1 overflow-y-auto">
-            {/* Select All - Only show in selection mode */}
-            {selectionMode && (
-              <>
-                <div className="flex items-center bg-white pl-4 hover:bg-gray-50 transition-colors">
-                  <div className="flex-1 flex flex-col justify-center pr-4 py-3">
-                    <p className="text-base font-semibold text-[#242527] leading-6 tracking-[0.24px]" style={{ fontFamily: 'Work Sans, sans-serif' }}>
-                      Select All
-                    </p>
-                  </div>
-                  <div className="flex items-center justify-center shrink-0">
-                    <button
-                      onClick={handleSelectAll}
-                      className="flex items-center justify-center w-12 h-12 rounded-full p-3 hover:bg-gray-100 transition-colors"
-                    >
-                      <div className="w-6 h-6 flex items-center justify-center">
-                        {selectedItems.length === lists.length ? (
-                          <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none">
-                            <rect x="3" y="3" width="18" height="18" rx="3" stroke="#808080" strokeWidth="2" fill="none"/>
-                            <path d="M6 12h12" stroke="#43573b" strokeWidth="2" strokeLinecap="round"/>
-                          </svg>
-                        ) : (
-                          <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none">
-                            <rect x="3" y="3" width="18" height="18" rx="3" stroke="#808080" strokeWidth="2" fill="none"/>
-                          </svg>
-                        )}
-                      </div>
-                    </button>
-                  </div>
-                </div>
-                <div className="h-px bg-[#f0f0f0]"></div>
-              </>
-            )}
-
-            {/* Influencer List */}
-            {lists.map((item, index) => (
-              <React.Fragment key={item.id}>
-                <div 
-                  className={`flex items-center bg-white ${selectionMode ? 'cursor-pointer hover:bg-gray-50' : ''} transition-colors`}
-                  onClick={() => selectionMode && handleSelectItem(item.id)}
-                  onDoubleClick={() => {
-                    if (!selectionMode) {
-                      setSelectionMode(true);
-                      setSelectedItems([item.id]);
-                    }
-                  }}
-                >
-                  <div className="flex items-center px-4 py-1.5 shrink-0">
-                    <div className="w-12 h-12 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center">
-                      <span className="text-lg font-bold text-white">
-                        {getInitials(item.name)}
-                      </span>
-                    </div>
-                  </div>
-                  <div className="flex-1 flex flex-col justify-center pr-4 py-3 overflow-hidden">
-                    <p className="text-base font-semibold text-[#242527] leading-6 tracking-[0.24px] truncate" style={{ fontFamily: 'Work Sans, sans-serif' }}>
-                      {item.name}
-                    </p>
-                    <p className="text-sm text-[#808080] leading-5 tracking-[0px] truncate" style={{ fontFamily: 'Work Sans, sans-serif' }}>
-                      {item.description}
-                    </p>
-                  </div>
-                  {selectionMode && (
-                    <div className="flex items-center justify-center shrink-0">
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleSelectItem(item.id);
-                        }}
-                        className="flex items-center justify-center w-12 h-12 rounded-full p-3 hover:bg-gray-100 transition-colors"
-                      >
-                        <div className="w-6 h-6 flex items-center justify-center">
-                          {selectedItems.includes(item.id) ? (
-                            <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none">
-                              <rect x="3" y="3" width="18" height="18" rx="3" fill="#43573b"/>
-                              <path d="M7 12L10.5 15.5L17 9" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                            </svg>
-                          ) : (
-                            <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none">
-                              <rect x="3" y="3" width="18" height="18" rx="3" stroke="#808080" strokeWidth="2" fill="none"/>
-                            </svg>
-                          )}
-                        </div>
-                      </button>
-                    </div>
-                  )}
-                </div>
-                {index < lists.length - 1 && (
-                  <div className="h-px bg-[#f0f0f0]"></div>
-                )}
-              </React.Fragment>
-            ))}
-          </div>
-
-          {/* Button Container - Only show in selection mode */}
-          {selectionMode && (
-            <div className="flex gap-2 p-4 bg-white shrink-0">
-              <button 
-                onClick={handleExport}
-                className="flex-1 flex items-center justify-center gap-2 px-8 py-4 border border-[#43573b] rounded-[32px] hover:bg-gray-50 transition-colors"
-              >
-                <Download className="w-6 h-6 text-[#43573b]" strokeWidth={1.5} />
-                <span className="text-base font-semibold text-[#43573b] leading-6 tracking-[0.24px]" style={{ fontFamily: 'Work Sans, sans-serif' }}>
-                  Export
-                </span>
-              </button>
-              <button 
-                onClick={handleCreateNewList}
-                className="flex-1 flex items-center justify-center gap-2 px-8 py-4 bg-[#43573b] text-white rounded-[32px] hover:bg-[#3d4f36] transition-colors"
-              >
-                <Plus className="w-6 h-6" strokeWidth={1.5} />
-                <span className="text-base font-semibold leading-6 tracking-[0.24px]" style={{ fontFamily: 'Work Sans, sans-serif' }}>
-                  Create New List
-                </span>
-              </button>
-            </div>
-          )}
+      {/* Loading State */}
+      {loading && (
+        <div className="p-4 space-y-4">
+          {[1, 2, 3].map(i => (
+            <div key={i} className="h-20 bg-gray-200 rounded animate-pulse" />
+          ))}
         </div>
-      </div>
+      )}
+
+      {/* Empty State */}
+      {!loading && lists.length === 0 && (
+        <div className="flex flex-col items-center justify-center py-12 px-4">
+          <p className="text-center text-gray-500 text-lg">No lists created yet</p>
+          <p className="text-center text-gray-400 text-sm mt-2">Create your first list to organize items</p>
+        </div>
+      )}
+
+      {/* Lists Grid */}
+      {!loading && lists.length > 0 && (
+        <div className="p-4 space-y-4">
+          {lists.map(list => (
+            <div
+              key={list.id}
+              className="p-4 border border-gray-200 rounded-lg hover:shadow-md transition-shadow cursor-pointer"
+              onClick={() => router.push(`/influencer/account/my-lists/${list.id}`)}
+            >
+              <div className="flex items-start justify-between">
+                <div className="flex-1">
+                  <h3 className="font-semibold text-lg">{list.name}</h3>
+                  {list.description && (
+                    <p className="text-sm text-gray-500 mt-1">{list.description}</p>
+                  )}
+                  <p className="text-xs text-gray-400 mt-2">
+                    {list.type} • {list.itemCount} {list.itemCount === 1 ? 'item' : 'items'}
+                  </p>
+                </div>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleDeleteList(list.id);
+                  }}
+                  disabled={actionLoading}
+                  className="p-2 hover:bg-red-50 rounded-full disabled:opacity-50"
+                >
+                  <Trash2 className="w-5 h-5 text-red-600" />
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
 
       {/* New List Modal */}
       {showNewListModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-3xl w-[400px] max-w-[90%] shadow-2xl overflow-hidden">
-            {/* Header */}
-            <div className="px-6 py-6 border-b border-gray-100">
-              <h2 className="text-xl font-semibold text-[#242527] text-center">
-                New List
-              </h2>
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg max-w-md w-full shadow-lg">
+            <div className="px-6 py-4 border-b border-gray-100">
+              <h2 className="text-xl font-semibold">Create New List</h2>
             </div>
 
-            {/* Content */}
-            <div className="px-6 py-6">
-              <input
-                type="text"
-                placeholder="New list"
-                value={newListName}
-                onChange={(e) => setNewListName(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && handleCreateList()}
-                className="w-full px-4 py-3 bg-gray-100 border border-gray-200 rounded-lg text-[#242527] placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#43573B]"
-                autoFocus
-              />
+            <div className="px-6 py-6 space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  List Name
+                </label>
+                <input
+                  type="text"
+                  value={newListName}
+                  onChange={(e) => setNewListName(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && handleCreateList()}
+                  placeholder="Enter list name"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  autoFocus
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Type
+                </label>
+                <select
+                  value={newListType}
+                  onChange={(e) => setNewListType(e.target.value)}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="custom">Custom</option>
+                  <option value="campaigns">Campaigns</option>
+                  <option value="influencers">Influencers</option>
+                  <option value="brands">Brands</option>
+                </select>
+              </div>
             </div>
 
-            {/* Actions */}
-            <div className="px-6 py-4 border-t border-gray-100 flex gap-3 justify-center">
+            <div className="px-6 py-4 border-t border-gray-100 flex gap-2 justify-end">
               <button
                 onClick={() => {
                   setShowNewListModal(false);
                   setNewListName('');
+                  setNewListType('custom');
                 }}
-                className="px-6 py-3 border border-gray-400 text-[#242527] rounded-full font-semibold hover:bg-gray-50 transition-colors"
+                className="px-4 py-2 text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50"
               >
                 Cancel
               </button>
               <button
                 onClick={handleCreateList}
-                className="px-6 py-3 bg-[#43573B] hover:bg-[#3d4f36] text-white rounded-full font-semibold transition-colors"
+                disabled={actionLoading || !newListName.trim()}
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Create
+                {actionLoading ? 'Creating...' : 'Create'}
               </button>
             </div>
           </div>

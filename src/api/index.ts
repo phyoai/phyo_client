@@ -10,6 +10,14 @@
 // Export all API functions
 export { campaignApi, createCampaignFormData } from './campaign-api';
 export { influencerApi, buildInfluencerFilter, validateInfluencerFilter } from './influencer-api';
+export { accountApi } from './account-api';
+export { notificationApi } from './notification-api';
+export { favoritesApi } from './favorites-api';
+export { messageApi } from './message-api';
+export { projectApi } from './project-api';
+export { adminApi, type IBrandApprovalRequest, type IInfluencerApprovalRequest, type IApproval, type IAdminUser, type IBlockedUser, type ISystemStats } from './admin-api';
+export { analyticsApi, type IDashboardAnalytics, type IDashboardMetrics, type ICampaignMetric, type IInfluencerMetric, type IReportData, type ITrendChart, type ITrendDataPoint } from './analytics-api';
+export { metaApi, type IFacebookAccount, type IFacebookMetric, type IFacebookInsight, type ISyncHistory, type IMetaDashboard } from './meta-api';
 
 // Export all types and interfaces
 export type {

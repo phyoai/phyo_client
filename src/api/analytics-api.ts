@@ -1,17 +1,137 @@
 /**
  * Analytics API Utility Functions
- * Provides typed wrapper functions for all analytics-related API operations
+ * Provides typed wrapper functions for analytics and reporting operations
  *
  * Usage:
  * import { analyticsApi } from '@/api/analytics-api';
- * const dashboard = await analyticsApi.getDashboard();
+ * const dashboardData = await analyticsApi.getDashboardAnalytics({ startDate, endDate });
  */
 
 import api from '@/utils/api';
-import { IApiResponse } from '@/types';
+import { IApiResponse, IPagination } from '@/types';
 
 /**
- * Analytics response types
+ * Analytics Types
+ */
+export interface IDateRange {
+  startDate: string;
+  endDate: string;
+}
+
+export interface IDashboardMetric {
+  label: string;
+  value: number;
+  change: number;
+  changeDirection: 'up' | 'down' | 'neutral';
+  unit?: string;
+}
+
+export interface ITrendDataPoint {
+  date: string;
+  value: number;
+  label?: string;
+}
+
+export interface ITrendChart {
+  title: string;
+  data: ITrendDataPoint[];
+  unit: string;
+  trend: 'up' | 'down' | 'neutral';
+  change: number;
+}
+
+export interface IDashboardAnalytics {
+  period: IDateRange;
+  metrics: {
+    totalCampaigns: IDashboardMetric;
+    totalInfluencers: IDashboardMetric;
+    totalReach: IDashboardMetric;
+    totalEngagement: IDashboardMetric;
+    conversionRate: IDashboardMetric;
+    averageROI: IDashboardMetric;
+  };
+  trends: ITrendChart[];
+  summary: {
+    topCampaigns: Array<{ id: string; name: string; reach: number; engagement: number }>;
+    topInfluencers: Array<{ id: string; name: string; followers: number; engagementRate: number }>;
+  };
+}
+
+export interface ICampaignMetric {
+  id: string;
+  campaignId: string;
+  campaignName: string;
+  status: 'active' | 'completed' | 'paused';
+  reach: number;
+  impressions: number;
+  clicks: number;
+  conversions: number;
+  engagementRate: number;
+  cost: number;
+  revenue: number;
+  roi: number;
+  startDate: string;
+  endDate?: string;
+}
+
+export interface ICampaignAnalyticsResponse {
+  data: ICampaignMetric[];
+  pagination: IPagination;
+  summary: {
+    totalReach: number;
+    totalImpressions: number;
+    totalConversions: number;
+    averageEngagementRate: number;
+    totalROI: number;
+  };
+}
+
+export interface IInfluencerMetric {
+  id: string;
+  influencerId: string;
+  influencerName: string;
+  niche: string;
+  followers: number;
+  engagementRate: number;
+  avgLikes: number;
+  avgComments: number;
+  avgShares: number;
+  reachPerPost: number;
+  totalCampaigns: number;
+  activeCampaigns: number;
+  totalRevenue: number;
+  performanceScore: number;
+}
+
+export interface IInfluencerAnalyticsResponse {
+  data: IInfluencerMetric[];
+  pagination: IPagination;
+  summary: {
+    topPerformer: IInfluencerMetric;
+    averageEngagementRate: number;
+    averagePerformanceScore: number;
+  };
+}
+
+export interface IReportData {
+  period: string;
+  startDate: string;
+  endDate: string;
+  metrics: {
+    totalCampaigns: number;
+    totalInfluencers: number;
+    totalReach: number;
+    totalEngagement: number;
+    totalRevenue: number;
+    averageROI: number;
+  };
+  trends: ITrendChart[];
+  topCampaigns: Array<{ name: string; reach: number; roi: number }>;
+  topInfluencers: Array<{ name: string; niche: string; engagementRate: number }>;
+}
+
+/**
+ * Legacy Dashboard Metrics (kept for backwards compatibility)
  */
 export interface IDashboardMetrics {
   totalReach: number;
@@ -222,6 +342,201 @@ export const analyticsApi = {
       const errorMessage =
         error.response?.data?.message || error.message || 'Failed to fetch earnings';
       console.error('Error in getEarnings:', errorMessage);
+      throw error.response?.data || { message: errorMessage };
+    }
+  },
+
+  /**
+   * Get comprehensive dashboard analytics with key metrics and trends
+   *
+   * @param params - Date range parameters
+   * @returns Promise resolving to dashboard analytics data
+   */
+  getDashboardAnalytics: async (
+    params?: Partial<IDateRange>
+  ): Promise<IDashboardAnalytics> => {
+    try {
+      const response = await api.get<IApiResponse<IDashboardAnalytics>>(
+        '/analytics/dashboard-v2',
+        { params }
+      );
+
+      return response.data?.data || ({
+        period: (params as IDateRange) || { startDate: '', endDate: '' },
+        metrics: {
+          totalCampaigns: { label: 'Total Campaigns', value: 0, change: 0, changeDirection: 'neutral' },
+          totalInfluencers: { label: 'Total Influencers', value: 0, change: 0, changeDirection: 'neutral' },
+          totalReach: { label: 'Total Reach', value: 0, change: 0, changeDirection: 'neutral' },
+          totalEngagement: { label: 'Total Engagement', value: 0, change: 0, changeDirection: 'neutral' },
+          conversionRate: { label: 'Conversion Rate', value: 0, change: 0, changeDirection: 'neutral' },
+          averageROI: { label: 'Average ROI', value: 0, change: 0, changeDirection: 'neutral' },
+        },
+        trends: [],
+        summary: { topCampaigns: [], topInfluencers: [] },
+      } as IDashboardAnalytics);
+    } catch (error: any) {
+      const errorMessage =
+        error.response?.data?.message || error.message || 'Failed to fetch dashboard analytics';
+      console.error('Error in getDashboardAnalytics:', errorMessage);
+      throw error.response?.data || { message: errorMessage };
+    }
+  },
+
+  /**
+   * Get campaign analytics with metrics and performance data
+   *
+   * @param params - Filter and pagination parameters
+   * @returns Promise resolving to paginated campaign analytics
+   */
+  getCampaignAnalytics: async (
+    params?: Partial<IDateRange & { campaignId?: string; page?: number; limit?: number }>
+  ): Promise<{ campaigns: ICampaignMetric[]; pagination: IPagination; summary: any }> => {
+    try {
+      const defaultPagination = {
+        page: 1,
+        limit: 20,
+        total: 0,
+        totalPages: 0,
+        hasNextPage: false,
+        hasPreviousPage: false,
+      };
+
+      const response = await api.get<IApiResponse<ICampaignAnalyticsResponse>>(
+        '/analytics/campaigns-v2',
+        { params }
+      );
+
+      const payload = response.data?.data;
+      return {
+        campaigns: (payload?.data ?? []) as ICampaignMetric[],
+        pagination: payload?.pagination ?? defaultPagination,
+        summary: payload?.summary ?? {
+          totalReach: 0,
+          totalImpressions: 0,
+          totalConversions: 0,
+          averageEngagementRate: 0,
+          totalROI: 0,
+        },
+      };
+    } catch (error: any) {
+      const errorMessage =
+        error.response?.data?.message || error.message || 'Failed to fetch campaign analytics';
+      console.error('Error in getCampaignAnalytics:', errorMessage);
+      throw error.response?.data || { message: errorMessage };
+    }
+  },
+
+  /**
+   * Get influencer analytics with performance metrics
+   *
+   * @param params - Filter and pagination parameters
+   * @returns Promise resolving to paginated influencer analytics
+   */
+  getInfluencerAnalytics: async (
+    params?: Partial<IDateRange & { influencerId?: string; niche?: string; page?: number; limit?: number }>
+  ): Promise<{ influencers: IInfluencerMetric[]; pagination: IPagination; summary: any }> => {
+    try {
+      const defaultPagination = {
+        page: 1,
+        limit: 20,
+        total: 0,
+        totalPages: 0,
+        hasNextPage: false,
+        hasPreviousPage: false,
+      };
+
+      const response = await api.get<IApiResponse<IInfluencerAnalyticsResponse>>(
+        '/analytics/influencers-v2',
+        { params }
+      );
+
+      const payload = response.data?.data;
+      return {
+        influencers: (payload?.data ?? []) as IInfluencerMetric[],
+        pagination: payload?.pagination ?? defaultPagination,
+        summary: payload?.summary ?? {
+          topPerformer: null,
+          averageEngagementRate: 0,
+          averagePerformanceScore: 0,
+        },
+      };
+    } catch (error: any) {
+      const errorMessage =
+        error.response?.data?.message || error.message || 'Failed to fetch influencer analytics';
+      console.error('Error in getInfluencerAnalytics:', errorMessage);
+      throw error.response?.data || { message: errorMessage };
+    }
+  },
+
+  /**
+   * Export analytics report as CSV or PDF
+   *
+   * @param params - Report parameters
+   * @returns Promise resolving to download URL or blob
+   */
+  exportAnalytics: async (
+    params: {
+      type: 'campaigns' | 'influencers' | 'dashboard' | 'monthly' | 'quarterly';
+      format?: 'csv' | 'pdf';
+      startDate?: string;
+      endDate?: string;
+    }
+  ): Promise<{ downloadUrl: string; fileName: string }> => {
+    try {
+      const response = await api.post<IApiResponse<{ downloadUrl: string; fileName: string }>>(
+        '/analytics/export',
+        params
+      );
+
+      return response.data?.data || { downloadUrl: '', fileName: 'analytics.csv' };
+    } catch (error: any) {
+      const errorMessage =
+        error.response?.data?.message || error.message || 'Failed to export analytics';
+      console.error('Error in exportAnalytics:', errorMessage);
+      throw error.response?.data || { message: errorMessage };
+    }
+  },
+
+  /**
+   * Get period-based report (monthly or quarterly)
+   *
+   * @param params - Report period parameters
+   * @returns Promise resolving to period report data
+   */
+  getPeriodReport: async (
+    params: {
+      period: 'monthly' | 'quarterly';
+      year: number;
+      month?: number;
+      quarter?: number;
+    }
+  ): Promise<IReportData> => {
+    try {
+      const response = await api.get<IApiResponse<IReportData>>(
+        '/analytics/reports-v2',
+        { params }
+      );
+
+      return response.data?.data || {
+        period: `${params.period}_${params.year}`,
+        startDate: '',
+        endDate: '',
+        metrics: {
+          totalCampaigns: 0,
+          totalInfluencers: 0,
+          totalReach: 0,
+          totalEngagement: 0,
+          totalRevenue: 0,
+          averageROI: 0,
+        },
+        trends: [],
+        topCampaigns: [],
+        topInfluencers: [],
+      };
+    } catch (error: any) {
+      const errorMessage =
+        error.response?.data?.message || error.message || 'Failed to fetch period report';
+      console.error('Error in getPeriodReport:', errorMessage);
       throw error.response?.data || { message: errorMessage };
     }
   },

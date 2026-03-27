@@ -5,6 +5,7 @@ import { ThemeProvider } from "./context/ThemeContext";
 import { LanguageProvider } from "./context/LanguageContext";
 import { ReduxProvider } from "@/store/ReduxProvider";
 import { RoleProvider } from "./context/RoleContext";
+import ErrorBoundary from "@/components/error-boundary";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -19,6 +20,27 @@ const geistMono = Geist_Mono({
 export const metadata = {
   title: "Phyo Ai",
   description: "Influencer Marketing Platform",
+  icons: {
+    icon: "/favicon.ico",
+    apple: "/apple-touch-icon.png",
+  },
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "Phyo Ai",
+  },
+};
+
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+  userScalable: true,
+  viewportFit: "cover",
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
+    { media: "(prefers-color-scheme: dark)", color: "#030712" },
+  ],
 };
 
 export default function RootLayout({ children }) {
@@ -28,17 +50,19 @@ export default function RootLayout({ children }) {
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         suppressHydrationWarning={true}
       >
-        <ReduxProvider>
-          <RoleProvider>
-            <ThemeProvider>
-              <LanguageProvider>
-                <AuthProvider>
-                  {children}
-                </AuthProvider>
-              </LanguageProvider>
-            </ThemeProvider>
-          </RoleProvider>
-        </ReduxProvider>
+        <ErrorBoundary>
+          <ReduxProvider>
+            <RoleProvider>
+              <ThemeProvider>
+                <LanguageProvider>
+                  <AuthProvider>
+                    {children}
+                  </AuthProvider>
+                </LanguageProvider>
+              </ThemeProvider>
+            </RoleProvider>
+          </ReduxProvider>
+        </ErrorBoundary>
       </body>
     </html>
   );

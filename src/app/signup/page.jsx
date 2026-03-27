@@ -88,7 +88,7 @@ function SignupForm() {
         console.log('Sending signup data:', userData); // Debug log
         
         const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://api.phyo.ai/api';
-        const response = await fetch(`${apiUrl}/user/signup`, {
+        const response = await fetch(`${apiUrl}/auth/signup`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -134,14 +134,14 @@ function SignupForm() {
 
     const googleSignupAPI = async (idToken) => {
         console.log('Attempting Google signup'); // Debug log
-        
+
         const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://api.phyo.ai/api';
-        const response = await fetch(`${apiUrl}/user/google`, {
+        const response = await fetch(`${apiUrl}/auth/google`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ 
+            body: JSON.stringify({
                 idToken,
                 type: 'USER' // Default user type
             })

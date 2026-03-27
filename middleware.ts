@@ -8,34 +8,89 @@ import { NextRequest, NextResponse } from 'next/server';
  * - Route protection
  */
 
-export function middleware(_request: NextRequest) {
+export function middleware(request: NextRequest) {
+    const { pathname, search } = request.nextUrl;
+
+    // Get token from cookies
+    const token = request.cookies.get('authToken')?.value;
+
+    // Public routes that should never be blocked
+    const publicRoutes = [
+        '/brand/signup',
+        '/brand/login',
+        '/login',
+        '/logout',
+        '/influencer/signup'
+    ];
+
+    if (publicRoutes.some(route => pathname.startsWith(route))) {
+        const response = NextResponse.next();
+        addSecurityHeaders(response);
+        return response;
+    }
+
+    // Protected routes that require authentication
+    const protectedRoutes = [
+        '/brand/dashboard',
+        '/brand/campaigns',
+        '/brand/account',
+        '/brand/help',
+        '/brand/inbox',
+        '/brand/settings',
+        '/user/dashboard',
+        '/user/campaigns',
+        '/user/account',
+        '/user/help',
+        '/user/inbox',
+        '/user/settings',
+        '/user/influencer-search',
+        '/user/influencers',
+        '/user/notifications',
+        '/influencer',
+        '/service-provider'
+    ];
+
+    const isProtectedRoute = protectedRoutes.some(route =>
+        pathname.startsWith(route)
+    );
+
+    // If accessing a protected route without token, redirect to login
+    if (isProtectedRoute && !token) {
+        const loginUrl = new URL('/login', request.url);
+        loginUrl.searchParams.set('redirect', `${pathname}${search || ''}`);
+        return NextResponse.redirect(loginUrl);
+    }
+
+    // If user is authenticated and trying to access brand signup, redirect to dashboard
+    if (token && pathname === '/brand/signup') {
+        return NextResponse.redirect(new URL('/brand/dashboard', request.url));
+    }
+
     // Create response with security headers
     const response = NextResponse.next();
+    addSecurityHeaders(response);
 
-    // Add security headers
+    return response;
+}
+
+// Helper function to add security headers
+function addSecurityHeaders(response: NextResponse) {
     response.headers.set('X-Content-Type-Options', 'nosniff');
     response.headers.set('X-Frame-Options', 'SAMEORIGIN');
     response.headers.set('X-XSS-Protection', '1; mode=block');
     response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
     response.headers.set('Permissions-Policy', 'geolocation=(), microphone=(), camera=()');
-
-    // Note: Authentication redirect is handled by the app's AuthProvider
-    // and ProtectedRoute component, not by middleware to prevent infinite loops
-
-    return response;
 }
 
 // Configure which routes the middleware should run on
 export const config = {
     matcher: [
-        /*
-         * Match all request paths except for the ones starting with:
-         * - api (API routes)
-         * - _next/static (static files)
-         * - _next/image (image optimization files)
-         * - favicon.ico (favicon file)
-         * - public (public files)
-         */
-        '/((?!api|_next/static|_next/image|favicon.ico|public).*)',
+        '/brand/:path*',
+        '/user/:path*',
+        '/influencer/:path*',
+        '/service-provider/:path*',
+        '/details/:path*',
+        '/login',
+        '/logout'
     ],
 };
