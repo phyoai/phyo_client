@@ -19,9 +19,9 @@ const footerOtherLinks = [
 ];
 
 const socialLinks = [
-  { href: "/", icon: Facebook, label: "Facebook" },
-  { href: "/", icon: Instagram, label: "Instagram" },
-  { href: "/", icon: Twitter, label: "Twitter" },
+  { href: "/", icon: '/footer/fb.svg', label: "Facebook" },
+  { href: "/", icon: '/footer/ig.svg', label: "Instagram" },
+  { href: "/", icon: '/footer/tw.svg', label: "Twitter" },
 ];
 
 export default function Footer() {
@@ -91,7 +91,7 @@ export default function Footer() {
                 aria-label={label}
                 className="grid h-11 w-11 place-items-center rounded-full bg-white/8 text-white transition duration-200 hover:bg-white/14"
               >
-                <Icon className="h-5 w-5" />
+                <img src={Icon} alt={`${label} icon`} className="h-10 w-10" />
               </Link>
             ))}
           </div>

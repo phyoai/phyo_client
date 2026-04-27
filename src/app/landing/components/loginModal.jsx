@@ -1,4 +1,5 @@
 import Image from "next/image";
+import OutlineGlowButton from "@/components/shared/OutlineGlowButton";
 
 const LoginModal = ({ onLogin, onLater }) => {
   return (
@@ -27,13 +28,14 @@ const LoginModal = ({ onLogin, onLater }) => {
           </div>
 
           <div className="flex w-full flex-col items-center gap-5">
-            <button
-              type="button"
+            <OutlineGlowButton
               onClick={onLogin}
-              className="h-12 w-full rounded-[40px] border border-white text-[16px] font-medium leading-[1.2] capitalize text-white transition hover:border-[#7ad59a] hover:text-[#eafcf0]"
+              className="h-12 w-full"
+              baseSurfaceClassName="bg-[#063d1a]"
+              glowSurfaceClassName="bg-[#063d1a]"
             >
               Login To Continue
-            </button>
+            </OutlineGlowButton>
 
             <button
               type="button"

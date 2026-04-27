@@ -44,7 +44,10 @@ const Hero = () => {
         World's First AI Powered Influencer Search Engine
       </div>
 
-      <div className='mt-[16px] text-center font-["Inter"] text-[16px] font-[400] leading-[120%] capitalize text-[#9B9B9B]'>
+      <div
+        className="mt-[16px] text-center font-inter text-[16px] font-[400] capitalize leading-[120%] text-[#9B9B9B]"
+        style={{ fontFamily: "var(--font-inter)" }}
+      >
         Search Influencers in Seconds with Phyo and Reach the Right Audience
         Faster.
       </div>

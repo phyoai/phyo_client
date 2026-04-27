@@ -8,6 +8,7 @@ import { GoogleLogin, GoogleOAuthProvider } from '@react-oauth/google';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { ToastContainer, toast } from 'react-toastify';
 import { useAuth } from '../context/AuthContext';
+import { ForgotPasswordCard } from '../forgot-password/page';
 import { authUtils } from '../../utils/api';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -226,6 +227,7 @@ function LoginForm() {
     const [loading, setLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
     const [googleLoading, setGoogleLoading] = useState(false);
+    const [forgotModalOpen, setForgotModalOpen] = useState(false);
     const router = useRouter();
     const searchParams = useSearchParams();
     const { isAuthenticated } = useAuth();
@@ -270,6 +272,26 @@ function LoginForm() {
             toast.info('Your session expired. Please sign in again.');
         }
     }, [expired]);
+
+    useEffect(() => {
+        if (!forgotModalOpen) {
+            return undefined;
+        }
+
+        const previousBodyOverflow = document.body.style.overflow;
+        const previousHtmlOverflow = document.documentElement.style.overflow;
+        const previousOverscroll = document.body.style.overscrollBehavior;
+
+        document.body.style.overflow = 'hidden';
+        document.documentElement.style.overflow = 'hidden';
+        document.body.style.overscrollBehavior = 'none';
+
+        return () => {
+            document.body.style.overflow = previousBodyOverflow;
+            document.documentElement.style.overflow = previousHtmlOverflow;
+            document.body.style.overscrollBehavior = previousOverscroll;
+        };
+    }, [forgotModalOpen]);
 
     const loginAPI = async (email, password) => {
         console.log('Attempting login for:', email);
@@ -503,15 +525,16 @@ function LoginForm() {
 
                                             {field.name === 'password' && (
                                                 <div className="pt-3 text-right">
-                                                    <Link
-                                                        href="/forgot-password"
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => setForgotModalOpen(true)}
                                                         className="text-[14px] text-[#10af56] transition hover:text-[#34d27a]"
                                                         style={{
                                                             fontFamily: 'var(--font-inter)',
                                                         }}
                                                     >
                                                         Forget Password?
-                                                    </Link>
+                                                    </button>
                                                 </div>
                                             )}
 
@@ -634,6 +657,25 @@ function LoginForm() {
                                 useOneTap={false}
                             />
                         </div>
+
+                        {forgotModalOpen && (
+                            <div className="fixed inset-0 z-[80] flex items-center justify-center bg-black/60 backdrop-blur-md p-4 sm:p-6">
+                                <button
+                                    type="button"
+                                    className="absolute inset-0 cursor-default"
+                                    aria-label="Close forgot password modal backdrop"
+                                    onClick={() => setForgotModalOpen(false)}
+                                />
+
+                                <div className="relative z-10 w-full max-w-[520px]">
+                                    <ForgotPasswordCard
+                                        isModal={true}
+                                        onClose={() => setForgotModalOpen(false)}
+                                        onCompleted={() => setForgotModalOpen(false)}
+                                    />
+                                </div>
+                            </div>
+                        )}
                     </div>
                 </section>
             </div>

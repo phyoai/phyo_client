@@ -57,8 +57,9 @@ export default {
         '2xl': 'var(--spacing-2xl)',
       },
       fontFamily: {
-      bricolage: ['"Bricolage Grotesque"', 'sans-serif'],
-    },
+        bricolage: ['"Bricolage Grotesque"', 'sans-serif'],
+        inter: ['var(--font-inter)', 'sans-serif'],
+      },
     },
   },
   plugins: [],
