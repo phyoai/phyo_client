@@ -1075,7 +1075,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      <section id="faq" className={`${pageSectionClass} mt-[120px] mb-[100px]`}>
+      <section id="faq" className={`${pageSectionClass} mt-[100px] mb-[100px]`}>
         <div className="grid gap-10 xl:grid-cols-[590px_570px] xl:items-stretch">
           <div className="flex flex-col gap-10 xl:self-stretch">
             <div>
@@ -1161,7 +1161,7 @@ export default function LandingPage() {
 
       <section
         id="testimonials"
-        className={` ${pageSectionClass} mt-[110px] mb-[110px]`}
+        className={` ${pageSectionClass} mt-[100px] mb-[100px]`}
       >
         <div className="mx-auto max-w-[900px] text-center">
           <h2 className="font-bricolage text-[34px] leading-[1.2] text-white sm:text-[36px]">

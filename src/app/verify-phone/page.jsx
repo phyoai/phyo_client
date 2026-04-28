@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, Suspense } from 'react';
 
 const OTP_LENGTH = 6;
 const OTP_ILLUSTRATION = '/landing/login_modal/loginmodal.svg';
@@ -79,7 +79,7 @@ function OTPSlot({
   );
 }
 
-export default function VerifyPhonePage() {
+function VerifyPhoneContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -356,5 +356,25 @@ export default function VerifyPhonePage() {
         </div>
       </section>
     </div>
+  );
+}
+
+function VerifyPhoneFallback() {
+  return (
+    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-[#010402] px-4 py-8 text-white sm:px-6">
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_84%_84%,rgba(22,163,74,0.26),rgba(1,4,2,0)_46%)]" />
+      <div className="absolute left-[-12rem] top-[-12rem] h-[28rem] w-[28rem] rounded-full bg-[#0f6b34]/20 blur-[120px]" />
+      <section className="relative z-10 w-full max-w-[520px] rounded-[24px] border border-white/10 bg-[#001a0a] p-8 text-center shadow-[0_30px_90px_rgba(0,0,0,0.45)] sm:p-10">
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-white/30 border-t-[#16a34a] mx-auto" />
+      </section>
+    </div>
+  );
+}
+
+export default function VerifyPhonePage() {
+  return (
+    <Suspense fallback={<VerifyPhoneFallback />}>
+      <VerifyPhoneContent />
+    </Suspense>
   );
 }
