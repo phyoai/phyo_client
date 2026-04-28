@@ -1,4 +1,4 @@
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Bricolage_Grotesque, Inter } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "./context/AuthContext";
 import { ThemeProvider } from "./context/ThemeContext";
@@ -14,6 +14,16 @@ const geistSans = Geist({
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
+  subsets: ["latin"],
+});
+
+const bricolageGrotesque = Bricolage_Grotesque({
+  variable: "--font-bricolage-grotesque",
+  subsets: ["latin"],
+});
+
+const inter = Inter({
+  variable: "--font-inter",
   subsets: ["latin"],
 });
 
@@ -47,7 +57,7 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} ${bricolageGrotesque.variable} ${inter.variable} antialiased`}
         suppressHydrationWarning={true}
       >
         <ErrorBoundary>

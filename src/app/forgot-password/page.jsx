@@ -1,11 +1,87 @@
-'use client'
-import React, { useState } from 'react';
+'use client';
+
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-const ForgotPassword = () => {
-  const [step, setStep] = useState(1); // 1: email, 2: verify code, 3: new password
+const OTP_LENGTH = 6;
+const FORGOT_ILLUSTRATION = '/landing/login_modal/loginmodal.svg';
+
+const headingFont = { fontFamily: 'var(--font-bricolage-grotesque)' };
+const bodyFont = { fontFamily: 'var(--font-inter)' };
+
+function ForgotIllustration({ compact = false }) {
+  return (
+    <div
+      className={`relative overflow-hidden ${compact ? 'h-[150px] w-[138px]' : 'h-[240px] w-[220px]'}`}
+      data-node-id="8:3026"
+    >
+      <img src={FORGOT_ILLUSTRATION} alt="" className="absolute h-full w-full object-fill" />
+    </div>
+  );
+}
+
+function EyeIcon({ slashed = false }) {
+  return (
+    <svg
+      aria-hidden="true"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      className="h-5 w-5"
+    >
+      {slashed ? (
+        <>
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M3 3l18 18m-8.879-8.879a3 3 0 104.243 4.243M9.88 9.88A3 3 0 0114.12 14.12"
+          />
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M10.73 5.08A10.94 10.94 0 0112 5c4.73 0 8.72 2.95 10 7a10.96 10.96 0 01-4.04 5.19M6.61 6.61A10.95 10.95 0 002 12c1.28 4.05 5.27 7 10 7 1.31 0 2.57-.23 3.74-.65"
+          />
+        </>
+      ) : (
+        <>
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M2.04 12.32a1.01 1.01 0 010-.64C3.42 7.51 7.36 4.5 12 4.5s8.58 3.01 9.96 7.18a1 1 0 010 .64C20.58 16.49 16.64 19.5 12 19.5S3.42 16.49 2.04 12.32z"
+          />
+          <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+        </>
+      )}
+    </svg>
+  );
+}
+
+function maskOtpDestination(value) {
+  if (!value || !value.includes('@')) {
+    return 'ap**************com';
+  }
+
+  const [localPart, domain] = value.split('@');
+  const alphaNumLocal = (localPart || '').replace(/[^a-zA-Z0-9]/g, '');
+  const alphaNumDomain = (domain || '').replace(/[^a-zA-Z0-9]/g, '');
+
+  if (!alphaNumLocal && !alphaNumDomain) {
+    return 'ap**************com';
+  }
+
+  const start = (alphaNumLocal.slice(0, 2) || 'ap').toLowerCase();
+  const end = (alphaNumDomain.slice(-3) || 'com').toLowerCase();
+  const starCount = Math.max(12, alphaNumLocal.length + alphaNumDomain.length - start.length - end.length);
+
+  return `${start}${'*'.repeat(starCount)}${end}`;
+}
+
+export function ForgotPasswordCard({ isModal = false, onClose, onCompleted }) {
+  const isCompact = false;
+  const [step, setStep] = useState(1);
   const [email, setEmail] = useState('');
   const [verificationCode, setVerificationCode] = useState('');
   const [newPassword, setNewPassword] = useState('');
@@ -13,24 +89,25 @@ const ForgotPassword = () => {
   const [loading, setLoading] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-
   const router = useRouter();
 
   const sendForgotPasswordEmail = async () => {
-    if (!email) {
+    if (!email.trim()) {
       toast.error('Please enter your email address');
       return;
     }
+
     setLoading(true);
     try {
       const response = await fetch('https://api.phyo.ai/api/user/forgot-password', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ email: email.trim() }),
       });
+
       const result = await response.json();
       if (response.ok) {
-        toast.success('📧 Verification code sent to your email!');
+        toast.success('Verification code sent to your email');
         setStep(2);
       } else {
         toast.error(result.message || 'Failed to send verification code');
@@ -43,20 +120,22 @@ const ForgotPassword = () => {
   };
 
   const verifyCode = async () => {
-    if (!verificationCode) {
-      toast.error('Please enter the verification code');
+    if (verificationCode.length !== OTP_LENGTH) {
+      toast.error('Please enter the 6-digit verification code');
       return;
     }
+
     setLoading(true);
     try {
       const response = await fetch('https://api.phyo.ai/api/user/verify-code', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, code: verificationCode }),
+        body: JSON.stringify({ email: email.trim(), code: verificationCode }),
       });
+
       const result = await response.json();
       if (response.ok) {
-        toast.success('✅ Code verified successfully!');
+        toast.success('Code verified successfully');
         setStep(3);
       } else {
         toast.error(result.message || 'Invalid verification code');
@@ -73,27 +152,41 @@ const ForgotPassword = () => {
       toast.error('Please fill in all password fields');
       return;
     }
+
     if (newPassword !== confirmNewPassword) {
       toast.error('Passwords do not match');
       return;
     }
-    if (newPassword.length < 6) {
-      toast.error('Password must be at least 6 characters long');
+
+    if (newPassword.length < 8) {
+      toast.error('Password must be at least 8 characters long');
       return;
     }
+
     setLoading(true);
     try {
       const response = await fetch('https://api.phyo.ai/api/user/reset-password', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, newPassword }),
+        body: JSON.stringify({ email: email.trim(), newPassword }),
       });
+
       const result = await response.json();
       if (response.ok) {
-        toast.success('✅ Password reset successfully! Redirecting to login...');
+        toast.success('Password reset successfully. Redirecting to login...');
         setTimeout(() => {
+          if (onCompleted) {
+            onCompleted();
+            return;
+          }
+
+          if (isModal && onClose) {
+            onClose();
+            return;
+          }
+
           router.replace('/login');
-        }, 2000);
+        }, 1500);
       } else {
         toast.error(result.message || 'Failed to reset password');
       }
@@ -104,236 +197,294 @@ const ForgotPassword = () => {
     }
   };
 
+  const handleOtpChange = (index, value) => {
+    const nextValue = value.replace(/\D/g, '').slice(0, 1);
+    const updated = verificationCode.split('');
+    updated[index] = nextValue;
+    const nextCode = updated.join('').slice(0, OTP_LENGTH);
+    setVerificationCode(nextCode);
+
+    if (nextValue && index < OTP_LENGTH - 1) {
+      document.getElementById(`otp-${index + 1}`)?.focus();
+    }
+  };
+
+  const handleOtpKeyDown = (event, index) => {
+    if (event.key === 'Backspace' && !verificationCode[index] && index > 0) {
+      document.getElementById(`otp-${index - 1}`)?.focus();
+    }
+  };
+
+  const modalHeightClass =
+    step === 1 ? 'sm:h-[610px]' : step === 2 ? 'sm:h-[621px]' : 'sm:h-[669px]';
+
+  const cardClass = isCompact
+    ? 'relative w-full max-w-[320px] overflow-hidden rounded-[18px] bg-[#001a0a] px-5 pb-6 pt-5 shadow-[0_30px_90px_rgba(0,0,0,0.45)] sm:min-h-0 sm:px-5 sm:pb-6 sm:pt-5'
+    : `relative w-full max-w-[520px] overflow-hidden rounded-[24px] bg-[#001a0a] px-6 pb-8 pt-8 shadow-[0_30px_90px_rgba(0,0,0,0.45)] ${modalHeightClass} sm:px-10 sm:pb-10 sm:pt-10`;
+
+  const contentGapClass = isCompact ? 'gap-5' : 'gap-8 sm:gap-10';
+  const contentWidthClass = isCompact ? 'w-full max-w-[280px]' : 'w-full max-w-[440px]';
+  const titleClass = isCompact
+    ? 'text-[40px] font-medium leading-[1.15] tracking-[-0.02em]'
+    : 'text-[36px] font-medium leading-[1.2] tracking-[-0.02em]';
+  const subtitleClass = isCompact ? 'text-[12px] leading-[1.5] text-[#9b9b9b]' : 'text-[16px] leading-[1.6] text-[#9b9b9b]';
+  const labelClass = isCompact ? 'block text-[12px] leading-[1.2] text-[#868686]' : 'block text-[16px] leading-[1.2] text-[#868686]';
+  const inputClass = isCompact
+    ? 'w-full bg-transparent text-[14px] leading-none text-white outline-none placeholder:text-white/25'
+    : 'w-full bg-transparent text-[18px] leading-none text-white outline-none placeholder:text-white/25';
+  const buttonClass = isCompact
+    ? 'flex h-10 w-full items-center justify-center rounded-[40px] border border-white text-[14px] font-medium text-white transition hover:border-[#16a34a] hover:text-[#16a34a] disabled:cursor-not-allowed disabled:opacity-55'
+    : 'flex h-12 w-full items-center justify-center rounded-[40px] border border-white text-[16px] font-medium text-white transition hover:border-[#16a34a] hover:text-[#16a34a] disabled:cursor-not-allowed disabled:opacity-55';
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-white relative overflow-hidden">
-      {/* Logo - Top Left - Fixed Position */}
-      <div className="absolute top-6 left-8 z-20">
-        <img 
-          src="/logo.png" 
-          alt="Phyo Logo" 
-          className="h-10 w-auto object-contain"
-        />
-      </div>
+    <section className={cardClass} data-node-id="8:3022">
+      <div className="pointer-events-none absolute bottom-[-210px] right-[-210px] h-[620px] w-[620px] rounded-full bg-[radial-gradient(circle,rgba(22,163,74,0.45)_0%,rgba(0,26,10,0)_68%)]" />
 
-      {/* Left Illustration - Positioned to overlap towards center */}
-      <div className="hidden lg:block absolute left-[-5%] bottom-0 w-[55%] h-[90%] z-0">
-        <img 
-          src="/assets/right_illustration.svg" 
-          alt="Welcome Illustration" 
-          className="w-full h-full object-contain object-right-bottom"
-          style={{ objectPosition: 'right bottom' }}
-        />
-      </div>
+      {isModal && onClose && (
+        <button
+          type="button"
+          onClick={onClose}
+          className="absolute right-4 top-4 z-20 flex h-8 w-8 items-center justify-center rounded-full border border-white/35 text-white/75 transition hover:border-white hover:text-white"
+          aria-label="Close forgot password modal"
+        >
+          <span className="text-lg leading-none">&times;</span>
+        </button>
+      )}
 
-      {/* Middle Section - Forgot Password Form */}
-      <div className="w-full max-w-[30%] flex items-center justify-center p-4 z-10">
-        <div className="w-full bg-white rounded-3xl shadow-xl py-8 px-6  border border-gray-100">
-          {step === 1 && <h2 className="text-2xl font-semibold mb-3 text-center text-gray-900">Forgot Password?</h2>}
-          
+      <div className={`relative z-10 flex h-full flex-col items-center ${contentGapClass}`}>
+        <ForgotIllustration compact={isCompact} />
+
+        <div className={contentWidthClass}>
           {step === 1 && (
-            <div className="space-y-6">
-              <p className="text-gray-500 text-sm text-center leading-relaxed">We'll send you an email with instruction to<br />reset your password.</p>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
-                <input
-                  type="email"
-                  value={email}
-                  onChange={e => setEmail(e.target.value)}
-                  className="w-full px-4 py-2 bg-gray-100 border-4 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#43573B] focus:bg-white text-gray-900 placeholder-gray-400 text-sm"
-                  placeholder="jazleen@gmail.com"
-                />
+            <form
+              className={isCompact ? 'space-y-5' : 'space-y-8'}
+              onSubmit={(event) => {
+                event.preventDefault();
+                sendForgotPasswordEmail();
+              }}
+            >
+              <div className="space-y-3 text-center">
+                <h1
+                  className={titleClass}
+                  style={headingFont}
+                  data-node-id="8:3186"
+                >
+                  <span className="text-white">Forget </span>
+                  <span className="text-[#16a34a]">Password</span>
+                </h1>
+                <p className={subtitleClass} style={bodyFont}>
+                  {`We'll send you an email with instruction to`}
+                  <br />
+                  reset your password.
+                </p>
               </div>
-              
-              <div className="flex justify-center pt-2">
+
+              <div className={isCompact ? 'space-y-5' : 'space-y-8'}>
+                <div className={isCompact ? 'space-y-2' : 'space-y-3'}>
+                  <label className={labelClass} style={bodyFont}>
+                    Enter Your Email
+                  </label>
+                  <div className="border-b border-white/65 pb-2.5 transition-colors focus-within:border-white">
+                    <input
+                      type="email"
+                      autoComplete="email"
+                      value={email}
+                      onChange={(event) => setEmail(event.target.value)}
+                      placeholder="name@email.com"
+                      className={inputClass}
+                      style={bodyFont}
+                    />
+                  </div>
+                </div>
+
                 <button
-                  onClick={sendForgotPasswordEmail}
+                  type="submit"
                   disabled={loading}
-                  className={`py-2 px-4 rounded-full font-semibold text-sm ${loading ? 'bg-gray-400' : 'bg-[#43573B] hover:bg-[#2d4a3a]'} text-white transition-colors`}
+                  className={buttonClass}
+                  style={bodyFont}
+                  data-node-id="8:3191"
                 >
                   {loading ? 'Sending...' : 'Send OTP'}
                 </button>
               </div>
-            </div>
+            </form>
           )}
-          
+
           {step === 2 && (
-            <div className="space-y-6">
-              <h2 className="text-2xl font-semibold text-center text-gray-900">Verify OTP</h2>
-              
-              <p className="text-gray-500 text-sm text-center leading-relaxed">
-                We have sent a verification code to your email at<br />
-                <span className="font-medium text-gray-700">{email.replace(/(.{1})(.*)(@.*)/, '$1****$3')}</span>
-              </p>
-              
-              <div className="flex justify-center gap-2">
-                {[0, 1, 2, 3, 4, 5].map((index) => (
-                  <input
-                    key={index}
-                    id={`otp-${index}`}
-                    type="text"
-                    maxLength="1"
-                    value={verificationCode[index] || ''}
-                    onChange={(e) => {
-                      const value = e.target.value;
-                      if (value.length <= 1) {
-                        const newCode = verificationCode.split('');
-                        newCode[index] = value;
-                        setVerificationCode(newCode.join(''));
-                        // Auto-focus next input
-                        if (value && index < 5) {
-                          document.getElementById(`otp-${index + 1}`)?.focus();
-                        }
-                      }
-                    }}
-                    onKeyDown={(e) => {
-                      // Handle backspace to go to previous input
-                      if (e.key === 'Backspace' && !verificationCode[index] && index > 0) {
-                        document.getElementById(`otp-${index - 1}`)?.focus();
-                      }
-                    }}
-                    className="w-10 h-10 text-center text-lg font-semibold bg-[#F0F0F0] border-[3px] border-[#E6E6E6] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#43573B] focus:bg-white text-gray-900"
-                  />
-                ))}
+            <form
+              className={isCompact ? 'space-y-4' : 'space-y-5'}
+              onSubmit={(event) => {
+                event.preventDefault();
+                verifyCode();
+              }}
+            >
+              <div className="space-y-3 text-center" data-node-id="8:3635">
+                <h2 className={titleClass} style={headingFont}>
+                  <span className="text-white">OTP </span>
+                  <span className="text-[#16a34a]">Verification</span>
+                </h2>
+                <p className={subtitleClass} style={bodyFont}>
+                  OTP has been send to {maskOtpDestination(email)}
+                </p>
               </div>
-              
-              <div className="flex justify-center pt-2">
+
+              <div className={isCompact ? 'space-y-5' : 'space-y-8'} data-node-id="8:3638">
+                <div className={isCompact ? 'grid grid-cols-6 gap-1.5' : 'grid grid-cols-6 gap-2'} data-node-id="8:3639">
+                  {Array.from({ length: OTP_LENGTH }).map((_, index) => (
+                    <div key={index} className={isCompact ? 'flex h-[28px] flex-col justify-between' : 'flex h-[31px] flex-col justify-between'}>
+                      <input
+                        id={`otp-${index}`}
+                        type="text"
+                        inputMode="numeric"
+                        autoComplete={index === 0 ? 'one-time-code' : 'off'}
+                        maxLength={1}
+                        value={verificationCode[index] || ''}
+                        onChange={(event) => handleOtpChange(index, event.target.value)}
+                        onKeyDown={(event) => handleOtpKeyDown(event, index)}
+                        placeholder="0"
+                        className={isCompact
+                          ? 'h-4 w-full bg-transparent text-center text-[13px] leading-none text-[#868686] outline-none placeholder:text-[#868686] focus:text-white'
+                          : 'h-5 w-full bg-transparent text-center text-[16px] leading-none text-[#868686] outline-none placeholder:text-[#868686] focus:text-white'}
+                        style={bodyFont}
+                      />
+                      <div className="h-px w-full bg-white/70" />
+                    </div>
+                  ))}
+                </div>
+
                 <button
-                  onClick={verifyCode}
-                  disabled={loading || verificationCode.length < 6}
-                  className={`py-2 px-4 rounded-full font-semibold text-sm ${loading ? 'bg-gray-400' : 'bg-[#43573B] hover:bg-[#2d4a3a]'} text-white transition-colors`}
+                  type="submit"
+                  disabled={loading || verificationCode.length !== OTP_LENGTH}
+                  className={buttonClass}
+                  style={bodyFont}
+                  data-node-id="8:3658"
                 >
-                  {loading ? 'Verifying...' : 'Verify OTP'}
+                  {loading ? 'Verifying...' : 'Verify'}
                 </button>
-              </div>
-              
-              <div className="text-center">
-                <p className="text-gray-500 text-sm">
-                  Didn't receive mail?{' '}
+
+                <p className={isCompact ? 'text-center text-[12px] text-[#868686]' : 'text-center text-[14px] text-[#868686]'} style={bodyFont} data-node-id="8:3659">
+                  Don&apos;t receive?{' '}
                   <button
+                    type="button"
                     onClick={sendForgotPasswordEmail}
                     disabled={loading}
-                    className="text-gray-900 font-semibold hover:underline"
+                    className="font-medium text-[#16a34a] underline underline-offset-2 transition hover:text-[#22c55e] disabled:cursor-not-allowed disabled:opacity-60"
                   >
                     Resend OTP
                   </button>
                 </p>
               </div>
-            </div>
+            </form>
           )}
-          
+
           {step === 3 && (
-            <div className="space-y-6">
-              <h2 className="text-2xl font-semibold text-center text-gray-900">Create New Password</h2>
-              
-              <p className="text-gray-500 text-sm text-center leading-relaxed">
-                Generate a password using 8 unique characters,<br />
-                including letters, numbers, and symbols.
-              </p>
-              
-              <div>
-                <div className="flex justify-between items-center mb-2">
-                  <label className="block text-sm font-medium text-gray-700">New Password</label>
-                  <span className="text-xs text-gray-400">0/8</span>
-                </div>
-                <div className="relative">
-                  <input
-                    type={showNewPassword ? "text" : "password"}
-                    value={newPassword}
-                    onChange={e => setNewPassword(e.target.value)}
-                    className="w-full px-4 py-2 pr-10 bg-[#F0F0F0] border-[3px] border-[#E6E6E6] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#43573B] focus:bg-white text-gray-900 placeholder-gray-400 text-sm"
-                    placeholder="jazleen@gmail.com"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowNewPassword(!showNewPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
-                  >
-                    {showNewPassword ? (
-                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88" />
-                      </svg>
-                    ) : (
-                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                      </svg>
-                    )}
-                  </button>
-                </div>
+            <form
+              className={isCompact ? 'space-y-5' : 'space-y-8'}
+              onSubmit={(event) => {
+                event.preventDefault();
+                resetPassword();
+              }}
+            >
+              <div className="space-y-3 text-center">
+                <h2 className={titleClass} style={headingFont}>
+                  <span className="text-white">Create </span>
+                  <span className="text-[#16a34a]">New Password</span>
+                </h2>
+                <p className={subtitleClass} style={bodyFont}>
+                  Use at least 8 characters with letters,
+                  <br />
+                  numbers, and symbols.
+                </p>
               </div>
-              
-              <div>
-                <div className="flex justify-between items-center mb-2">
-                  <label className="block text-sm font-medium text-gray-700">Confirm Password</label>
-                  <span className="text-xs text-gray-400">0/8</span>
+
+              <div className={isCompact ? 'space-y-5' : 'space-y-7'}>
+                <div className={isCompact ? 'space-y-2' : 'space-y-3'}>
+                  <label className={labelClass} style={bodyFont}>
+                    New Password
+                  </label>
+                  <div className="flex items-center gap-2 border-b border-white/65 pb-2.5 transition-colors focus-within:border-white">
+                    <input
+                      type={showNewPassword ? 'text' : 'password'}
+                      value={newPassword}
+                      onChange={(event) => setNewPassword(event.target.value)}
+                      placeholder="Enter new password"
+                      autoComplete="new-password"
+                      className={inputClass}
+                      style={bodyFont}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowNewPassword((value) => !value)}
+                      className="text-white/55 transition hover:text-white/90"
+                      aria-label={showNewPassword ? 'Hide new password' : 'Show new password'}
+                    >
+                      <EyeIcon slashed={!showNewPassword} />
+                    </button>
+                  </div>
                 </div>
-                <div className="relative">
-                  <input
-                    type={showConfirmPassword ? "text" : "password"}
-                    value={confirmNewPassword}
-                    onChange={e => setConfirmNewPassword(e.target.value)}
-                    className="w-full px-4 py-2 pr-10 bg-[#F0F0F0] border-[3px] border-[#E6E6E6] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#43573B] focus:bg-white text-gray-900 placeholder-gray-400 text-sm"
-                    placeholder="Complete"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
-                  >
-                    {showConfirmPassword ? (
-                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88" />
-                      </svg>
-                    ) : (
-                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                      </svg>
-                    )}
-                  </button>
+
+                <div className={isCompact ? 'space-y-2' : 'space-y-3'}>
+                  <label className={labelClass} style={bodyFont}>
+                    Confirm Password
+                  </label>
+                  <div className="flex items-center gap-2 border-b border-white/65 pb-2.5 transition-colors focus-within:border-white">
+                    <input
+                      type={showConfirmPassword ? 'text' : 'password'}
+                      value={confirmNewPassword}
+                      onChange={(event) => setConfirmNewPassword(event.target.value)}
+                      placeholder="Confirm new password"
+                      autoComplete="new-password"
+                      className={inputClass}
+                      style={bodyFont}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowConfirmPassword((value) => !value)}
+                      className="text-white/55 transition hover:text-white/90"
+                      aria-label={showConfirmPassword ? 'Hide confirm password' : 'Show confirm password'}
+                    >
+                      <EyeIcon slashed={!showConfirmPassword} />
+                    </button>
+                  </div>
                 </div>
-              </div>
-              
-              <div className="flex justify-center pt-2">
+
                 <button
-                  onClick={resetPassword}
+                  type="submit"
                   disabled={loading}
-                  className={`py-2.5 px-10 rounded-full font-semibold text-sm ${loading ? 'bg-gray-400' : 'bg-[#43573B] hover:bg-[#2d4a3a]'} text-white transition-colors`}
+                  className={buttonClass}
+                  style={bodyFont}
                 >
                   {loading ? 'Saving...' : 'Save Password'}
                 </button>
               </div>
-            </div>
+            </form>
           )}
         </div>
       </div>
+    </section>
+  );
+}
 
-      {/* Right Illustration - Positioned to overlap towards center */}
-      <div className="hidden lg:block absolute right-0 bottom-0 w-[38%] z-0">
-        <img 
-          src="/assets/illustation_right.svg" 
-          alt="Social Media Illustration" 
-          className="w-full h-full object-contain"
-          style={{ objectPosition: 'left bottom' }}
-        />
-      </div>
+export default function ForgotPasswordPage() {
+  return (
+    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-[#010402] px-4 py-8 text-white sm:px-6">
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_84%_84%,rgba(22,163,74,0.26),rgba(1,4,2,0)_46%)]" />
+      <div className="absolute left-[-12rem] top-[-12rem] h-[28rem] w-[28rem] rounded-full bg-[#0f6b34]/20 blur-[120px]" />
 
-      {/* Toast Container */}
+      <ForgotPasswordCard />
+
       <ToastContainer
         position="top-right"
         autoClose={3000}
-        hideProgressBar={false}
+        hideProgressBar={true}
         newestOnTop={false}
         closeOnClick
         rtl={false}
         pauseOnFocusLoss
         draggable
         pauseOnHover
-        theme="light"
+        theme="dark"
       />
     </div>
   );
-};
-
-export default ForgotPassword;
+}

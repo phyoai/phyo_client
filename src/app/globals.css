@@ -1,5 +1,5 @@
 html, body {
-  overflow-x: hidden;
+  overflow-x: clip;
 }
 
 /* Dark Mode Base */
@@ -33,6 +33,7 @@ html.dark body {
     --green: #169B00;
     --dark-green: #226839;
     --sea-green: #C2E695;
+  --button-stroke: background: linear-gradient(270deg, #16A34A 0%, #FFF 52.88%, #16A34A 100%);;
 }
 
 input[type=number] {

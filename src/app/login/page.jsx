@@ -1,39 +1,221 @@
 'use client';
 
-import { useForm } from 'react-hook-form';
-import { useState, useEffect, Suspense } from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
-import { useRouter, useSearchParams } from 'next/navigation';
-import { useAuth } from '../context/AuthContext';
+import { Suspense, useEffect, useState } from 'react';
+import { useForm } from 'react-hook-form';
 import { GoogleLogin, GoogleOAuthProvider } from '@react-oauth/google';
-import { authUtils } from '../../utils/api';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { ToastContainer, toast } from 'react-toastify';
+import { useAuth } from '../context/AuthContext';
+import { ForgotPasswordCard } from '../forgot-password/page';
+import { authUtils } from '../../utils/api';
 import 'react-toastify/dist/ReactToastify.css';
+
 
 const formFields = [
     {
         name: 'email',
-        label: 'Email/Phone number',
+        label: 'Email',
         type: 'email',
-        placeholder: 'john@example.com',
-        validation: { 
+        autoComplete: 'email',
+        validation: {
             required: 'Email is required',
             pattern: {
                 value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                message: 'Invalid email address'
-            }
+                message: 'Invalid email address',
+            },
         },
-        icon: '✉️'
     },
     {
         name: 'password',
         label: 'Password',
         type: 'password',
-        placeholder: 'Enter your password',
+        autoComplete: 'current-password',
         validation: { required: 'Password is required' },
-        icon: '🔒'
     },
 ];
+
+const welcomeCopy =
+    'It Was Popularised In The 1960s With The Release Of Letraset Sheets Containing Lorem Ipsum Passages. It Was Popularised In The 1960s With The Release Of Letraset Sheets Containing.';
+
+const loginCopy =
+    'It Was Popularised In The 1960s With The Release Of Letraset Sheets Containing Lorem Ipsum Passages.';
+
+const checkboxCopy =
+    'The Banking And Finance Industry Is At The Forefront Of Digital Changeover.';
+
+function getDefaultRedirect(userData) {
+    if (userData?.type === 'USER') {
+        if (userData.brandRegistrationStatus === 'COMPLETED') {
+            return '/brand/dashboard';
+        }
+
+        if (userData.influencerRegistrationStatus === 'COMPLETED') {
+            return '/influencer/dashboard';
+        }
+
+        return '/user/dashboard';
+    }
+
+    if (userData?.type === 'BRAND') {
+        return '/brand/dashboard';
+    }
+
+    if (userData?.type === 'INFLUENCER') {
+        return '/influencer/dashboard';
+    }
+
+    return '/';
+}
+
+function PhyoLogo({ priority = false, className = '' }) {
+    return (
+        <Image
+            src="/landing/phyo_logo.svg"
+            alt="Phyo"
+            width={113}
+            height={30}
+            priority={priority}
+            className={className}
+        />
+    );
+}
+
+function AuthLoadingScreen() {
+    return (
+        <div className="flex min-h-screen items-center justify-center bg-[#010402]">
+            <div className="h-16 w-16 animate-spin rounded-full border-4 border-white/15 border-t-[#10af56]"></div>
+        </div>
+    );
+}
+
+function EyeIcon({ slashed = false }) {
+    return (
+        <svg
+            aria-hidden="true"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.5"
+            className="h-5 w-5"
+        >
+            {slashed ? (
+                <>
+                    <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M3 3l18 18m-8.879-8.879a3 3 0 104.243 4.243M9.88 9.88A3 3 0 0114.12 14.12"
+                    />
+                    <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M10.73 5.08A10.94 10.94 0 0112 5c4.73 0 8.72 2.95 10 7a10.96 10.96 0 01-4.04 5.19M6.61 6.61A10.95 10.95 0 002 12c1.28 4.05 5.27 7 10 7 1.31 0 2.57-.23 3.74-.65"
+                    />
+                </>
+            ) : (
+                <>
+                    <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M2.04 12.32a1.01 1.01 0 010-.64C3.42 7.51 7.36 4.5 12 4.5s8.58 3.01 9.96 7.18a1 1 0 010 .64C20.58 16.49 16.64 19.5 12 19.5S3.42 16.49 2.04 12.32z"
+                    />
+                    <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                    />
+                </>
+            )}
+        </svg>
+    );
+}
+
+function CheckIcon() {
+    return (
+        <svg aria-hidden="true" viewBox="0 0 16 16" fill="none" className="h-2.5 w-2.5">
+            <path
+                d="M3.5 8.5l2.25 2.25L12.5 4"
+                stroke="currentColor"
+                strokeWidth="1.8"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+            />
+        </svg>
+    );
+}
+
+function GoogleIcon() {
+    return (
+        <svg aria-hidden="true" className="h-5 w-5" viewBox="0 0 24 24">
+            <path
+                d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                fill="#4285F4"
+            />
+            <path
+                d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                fill="#34A853"
+            />
+            <path
+                d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
+                fill="#FBBC05"
+            />
+            <path
+                d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+                fill="#EA4335"
+            />
+        </svg>
+    );
+}
+
+function AuthArtworkPanel() {
+    return (
+        <section className="relative hidden min-h-screen flex-1 overflow-hidden rounded-r-[42px] lg:flex">
+            <div className="absolute inset-0 bg-[linear-gradient(180deg,#03200c_0%,#03170a_58%,#030603_100%)]"></div>
+            <div
+                className="absolute inset-0 opacity-40"
+                style={{
+                    backgroundImage:
+                        'linear-gradient(to right, rgba(126, 182, 143, 0.14) 1px, transparent 1px), linear-gradient(to bottom, rgba(126, 182, 143, 0.1) 1px, transparent 1px)',
+                    backgroundSize: '120px 100%, 100% 120px',
+                    backgroundPosition: '48px 0, 0 100px',
+                }}
+            />
+            <div className="absolute left-[-20%] top-[56%] h-24 w-[34rem] rotate-45 bg-[#124424]/25 blur-2xl"></div>
+            <div className="absolute left-[30%] top-[52%] h-10 w-[20rem] bg-white/5 blur-xl"></div>
+            <div className="absolute right-[-8%] top-[-10%] h-[26rem] w-[26rem] rounded-full bg-[#0c5227]/20 blur-[120px]"></div>
+            <div className="absolute left-3 top-[142px] h-px w-28 bg-white/10"></div>
+            <div className="absolute left-[36%] top-[53%] h-px w-44 bg-white/10"></div>
+            <div className="absolute right-[-10px] bottom-10 h-px w-72 bg-white/12"></div>
+            <div className="absolute right-[12%] bottom-[22%] h-40 w-px bg-white/10"></div>
+            <div className="relative flex h-full w-full flex-col justify-between px-[56px] py-[60px] xl:px-[72px]">
+                <PhyoLogo priority className="h-[30px] w-auto" />
+                <div className="max-w-[540px] space-y-5 pb-2 mb-[110px]">
+                    <h1
+                        className="max-w-[440px] text-[42px] font-medium leading-[1.08] tracking-[-0.04em] text-white xl:text-[50px]"
+                        style={{ fontFamily: 'var(--font-bricolage-grotesque)' }}
+                    >
+                        Welcome To The <span className="font-semibold">Phyo.AI</span>
+                    </h1>
+                    <p
+                        className="max-w-[540px] text-[18px] leading-[1.55] text-white/52"
+                        style={{ fontFamily: 'var(--font-inter)' }}
+                    >
+                        {welcomeCopy}
+                    </p>
+
+                    <Image
+                        src="/login_page/bg_image.png"
+                        alt="Login Artwork"
+                        width={720}
+                        height={1280}
+                        className="absolute right-0 top-1/2 w-auto -translate-y-1/2 object-contain opacity-65 bg-cover bg-center bg-no-repeat mix-blend-luminosity"
+                    />
+                </div>
+            </div>
+        </section>
+    );
+}
 
 function LoginForm() {
     const {
@@ -45,66 +227,74 @@ function LoginForm() {
     const [loading, setLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
     const [googleLoading, setGoogleLoading] = useState(false);
+    const [forgotModalOpen, setForgotModalOpen] = useState(false);
     const router = useRouter();
     const searchParams = useSearchParams();
     const { isAuthenticated } = useAuth();
 
-    // Check for verification success message
     const verified = searchParams.get('verified');
-    // Check for expired session
     const expired = searchParams.get('expired');
 
-    // Check if user is already authenticated
     useEffect(() => {
-        if (isAuthenticated()) {
-            let redirect = searchParams.get('redirect');
-            if (!redirect) {
-                // Check user type from localStorage
-                const userDataStr = localStorage.getItem('userData');
-                if (userDataStr) {
-                    try {
-                        const userData = JSON.parse(userDataStr);
-                        if (userData.type === 'USER') {
-                            // Check registration status for regular users
-                            if (userData.brandRegistrationStatus === 'COMPLETED') {
-                                redirect = '/brand/dashboard';
-                            } else if (userData.influencerRegistrationStatus === 'COMPLETED') {
-                                redirect = '/influencer/dashboard';
-                            } else {
-                                redirect = '/user/dashboard';
-                            }
-                        } else if (userData.type === 'BRAND') {
-                            redirect = '/brand/dashboard';
-                        } else if (userData.type === 'INFLUENCER') {
-                            redirect = '/influencer/dashboard';
-                        } else {
-                            redirect = '/';
-                        }
-                    } catch (e) {
-                        redirect = '/';
-                    }
-                } else {
+        if (!isAuthenticated()) {
+            return;
+        }
+
+        let redirect = searchParams.get('redirect');
+
+        if (!redirect) {
+            const userDataStr = localStorage.getItem('userData');
+
+            if (userDataStr) {
+                try {
+                    redirect = getDefaultRedirect(JSON.parse(userDataStr));
+                } catch (error) {
                     redirect = '/';
                 }
+            } else {
+                redirect = '/';
             }
-            
-            // Only redirect if we're not already on the login page with a redirect param
-            // This prevents infinite loops
-            if (redirect) {
-                router.push(redirect);
-            }
+        }
+
+        if (redirect) {
+            router.push(redirect);
         }
     }, [isAuthenticated, router, searchParams]);
 
-    // Show success message for verified email
     useEffect(() => {
         if (verified) {
             toast.success('Email verified successfully! Please sign in with your credentials.');
         }
     }, [verified]);
 
+    useEffect(() => {
+        if (expired) {
+            toast.info('Your session expired. Please sign in again.');
+        }
+    }, [expired]);
+
+    useEffect(() => {
+        if (!forgotModalOpen) {
+            return undefined;
+        }
+
+        const previousBodyOverflow = document.body.style.overflow;
+        const previousHtmlOverflow = document.documentElement.style.overflow;
+        const previousOverscroll = document.body.style.overscrollBehavior;
+
+        document.body.style.overflow = 'hidden';
+        document.documentElement.style.overflow = 'hidden';
+        document.body.style.overscrollBehavior = 'none';
+
+        return () => {
+            document.body.style.overflow = previousBodyOverflow;
+            document.documentElement.style.overflow = previousHtmlOverflow;
+            document.body.style.overscrollBehavior = previousOverscroll;
+        };
+    }, [forgotModalOpen]);
+
     const loginAPI = async (email, password) => {
-        console.log('Attempting login for:', email); // Debug log
+        console.log('Attempting login for:', email);
 
         const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://api.phyo.ai/api';
         const response = await fetch(`${apiUrl}/auth/login`, {
@@ -112,22 +302,22 @@ function LoginForm() {
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ email, password })
+            body: JSON.stringify({ email, password }),
         });
 
         const data = await response.json();
-        console.log('Login API Response:', data); // Debug log
-        console.log('Response status:', response.status); // Debug log
-        
+        console.log('Login API Response:', data);
+        console.log('Response status:', response.status);
+
         if (!response.ok) {
             throw new Error(data.message || `HTTP error! status: ${response.status}`);
         }
-        
+
         return data;
     };
 
     const googleLoginAPI = async (idToken) => {
-        console.log('Attempting Google login'); // Debug log
+        console.log('Attempting Google login');
 
         const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://api.phyo.ai/api';
         const response = await fetch(`${apiUrl}/auth/google`, {
@@ -135,19 +325,19 @@ function LoginForm() {
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ 
+            body: JSON.stringify({
                 idToken,
-                type: 'USER' // Default user type, can be modified based on your needs
-            })
+                type: 'USER',
+            }),
         });
 
         const data = await response.json();
-        console.log('Google Login API Response:', data); // Debug log
-        
+        console.log('Google Login API Response:', data);
+
         if (!response.ok) {
             throw new Error(data.message || `HTTP error! status: ${response.status}`);
         }
-        
+
         return data;
     };
 
@@ -155,22 +345,17 @@ function LoginForm() {
         setGoogleLoading(true);
 
         try {
-            console.log('Google credential received'); // Debug log
+            console.log('Google credential received');
             const result = await googleLoginAPI(credentialResponse.credential);
-            
-            // Handle successful login
+
             if (result.token) {
-                console.log('Google login successful'); // Debug log
-                
-                // Store the authentication token in both localStorage and cookies
+                console.log('Google login successful');
                 authUtils.setToken(result.token);
-                
-                // Store user data if provided
-                // Backend returns data in result.data (not result.user)
+
                 const userData = result.user || result.data?.user || result.data;
-                console.log('Google API Response:', result); // Debug: Full response
-                console.log('Google userData:', userData); // Debug: User data
-                console.log('Google userType:', userData?.type); // Debug: User type
+                console.log('Google API Response:', result);
+                console.log('Google userData:', userData);
+                console.log('Google userType:', userData?.type);
 
                 if (userData) {
                     localStorage.setItem('userData', JSON.stringify(userData));
@@ -181,39 +366,15 @@ function LoginForm() {
 
                 toast.success('Successfully signed in with Google!');
 
-                // Determine redirect based on user type and registration status
-                let redirect = searchParams.get('redirect');
-                if (!redirect) {
-                    const userType = userData?.type;
-                    console.log('Google: Determining redirect - userType:', userType); // Debug
-                    
-                    if (userType === 'USER') {
-                        // Check registration status for regular users
-                        if (userData.brandRegistrationStatus === 'COMPLETED') {
-                            redirect = '/brand/dashboard';
-                        } else if (userData.influencerRegistrationStatus === 'COMPLETED') {
-                            redirect = '/influencer/dashboard';
-                        } else {
-                            // User hasn't completed any registration
-                            redirect = '/user/dashboard';
-                        }
-                    } else if (userType === 'BRAND') {
-                        redirect = '/brand/dashboard';
-                    } else if (userType === 'INFLUENCER') {
-                        redirect = '/influencer/dashboard';
-                    } else {
-                        redirect = '/';
-                    }
-                }
-                console.log('Google: Final redirect URL:', redirect); // Debug: Final redirect
+                const redirect = searchParams.get('redirect') || getDefaultRedirect(userData);
+                console.log('Google: Final redirect URL:', redirect);
                 setTimeout(() => router.push(redirect), 1000);
-
             } else {
-                console.log('Google login failed with result:', result); // Debug log
+                console.log('Google login failed with result:', result);
                 toast.error(result.message || 'Google login failed');
             }
         } catch (error) {
-            console.error('Google login error:', error); // Debug log
+            console.error('Google login error:', error);
             toast.error(error.message || 'Failed to sign in with Google');
         } finally {
             setGoogleLoading(false);
@@ -229,257 +390,296 @@ function LoginForm() {
         setLoading(true);
 
         try {
-            console.log('Submitting login form'); // Debug log
+            console.log('Submitting login form');
             const result = await loginAPI(data.email, data.password);
-            
-            // Handle successful login
+
             if (result.success || result.token || result.data?.token) {
-                console.log('Login successful'); // Debug log
-                
-                // Store the authentication token in both localStorage and cookies
+                console.log('Login successful');
+
                 const token = result.token || result.data?.token;
                 if (token) {
                     authUtils.setToken(token);
                     localStorage.setItem('userEmail', data.email);
                 }
-                
-                // Store user data if provided
-                // Backend returns data in result.data (not result.user)
-                let userData = result.user || result.data?.user || result.data;
-                console.log('Full API Response:', result); // Debug: Full response
-                console.log('Extracted userData:', userData); // Debug: Extracted user data
-                console.log('User type:', userData?.type); // Debug: User type
+
+                const userData = result.user || result.data?.user || result.data;
+                console.log('Full API Response:', result);
+                console.log('Extracted userData:', userData);
+                console.log('User type:', userData?.type);
 
                 if (userData) {
                     localStorage.setItem('userData', JSON.stringify(userData));
-                    console.log('✅ userData stored in localStorage:', userData); // Debug: Stored
+                    console.log('userData stored in localStorage:', userData);
                 } else {
-                    console.warn('⚠️ WARNING: No userData in response!'); // Debug: Missing userData
+                    console.warn('WARNING: No userData in response!');
                 }
 
                 toast.success('Login successful! Welcome back!');
 
-                // Determine redirect based on user type and registration status
-                let redirect = searchParams.get('redirect');
-                if (!redirect) {
-                    const userType = userData?.type;
-                    console.log('Determining redirect - userType:', userType); // Debug
-
-                    if (userType === 'USER') {
-                        // Check registration status for regular users
-                        if (userData.brandRegistrationStatus === 'COMPLETED') {
-                            redirect = '/brand/dashboard';
-                        } else if (userData.influencerRegistrationStatus === 'COMPLETED') {
-                            redirect = '/influencer/dashboard';
-                        } else {
-                            // User hasn't completed any registration
-                            redirect = '/user/dashboard';
-                        }
-                    } else if (userType === 'BRAND') {
-                        redirect = '/brand/dashboard';
-                    } else if (userType === 'INFLUENCER') {
-                        redirect = '/influencer/dashboard';
-                    } else {
-                        redirect = '/';
-                    }
-                }
-                console.log('Final redirect URL:', redirect); // Debug: Final redirect
+                const redirect = searchParams.get('redirect') || getDefaultRedirect(userData);
+                console.log('Final redirect URL:', redirect);
                 setTimeout(() => router.push(redirect), 1000);
-
             } else {
-                console.log('Login failed with result:', result); // Debug log
+                console.log('Login failed with result:', result);
                 toast.error(result.message || 'Login failed');
             }
         } catch (error) {
-            console.error('Login error:', error); // Debug log
+            console.error('Login error:', error);
             toast.error(error.message || 'An unexpected error occurred');
         } finally {
             setLoading(false);
         }
     };
 
-    // Show loading if checking authentication
-    if (isAuthenticated()) {
-        return (
-            <div className="min-h-screen flex items-center justify-center bg-white">
-                <div className="animate-spin rounded-full h-16 w-16 border-4 border-[#00897B] border-t-transparent"></div>
-            </div>
+    const handleGoogleButtonClick = () => {
+        const googleButton = document.querySelector(
+            '.phyo-hidden-google-login div[role="button"][aria-labelledby]'
         );
+
+        if (googleButton) {
+            googleButton.click();
+            return;
+        }
+
+        toast.error('Google Sign-In is still loading. Please try again.');
+    };
+
+    if (isAuthenticated()) {
+        return <AuthLoadingScreen />;
     }
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-white relative overflow-hidden">
-            {/* Logo - Top Left - Fixed Position */}
-            <div className="absolute top-6 left-8 z-20">
-                <img 
-                    src="/logo.png" 
-                    alt="Phyo Logo" 
-                    className="h-10 w-auto object-contain"
-                />
-            </div>
+        <div className="relative min-h-screen overflow-hidden bg-[#010402] text-white">
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(7,96,39,0.34)_0%,rgba(2,15,8,0.28)_34%,rgba(1,4,2,1)_65%)]"></div>
+            <div className="absolute right-[-18rem] top-[-18rem] h-[50rem] w-[50rem] rounded-full bg-[#0b662e]/20 blur-[120px]"></div>
 
-            {/* Left Illustration - Positioned to overlap towards center */}
-            <div className="hidden lg:block absolute left-[-5%] bottom-0 w-[55%] h-[90%] z-0">
-                <img 
-                    src="/assets/right_illustration.svg" 
-                    alt="Welcome Illustration" 
-                    className="w-full h-full object-contain object-right-bottom"
-                    style={{ objectPosition: 'right bottom' }}
-                />
-            </div>
+            <div className="relative mx-auto flex min-h-screen w-full max-w-[1440px] flex-col lg:flex-row">
+                <AuthArtworkPanel />
 
-            {/* Middle Section - Login Form */}
-            <div className="w-full max-w-[30%] flex items-center justify-center p-4 z-10">
-                <div className="w-full bg-white rounded-2xl shadow-xl py-6 px-6 border border-gray-100">
-                    <div className="mb-6">
-                        <h2 className="text-2xl font-bold text-gray-900 mb-1">Welcome Back</h2>
-                        <p className="text-gray-500 text-sm">
-                            Login to your account
-                        </p>
-                    </div>
+                <section className="relative flex min-h-screen flex-1 items-center px-6 py-10 sm:px-10 lg:items-start lg:px-[60px] lg:py-[60px] xl:px-[92px]">
+                    <div className="absolute inset-0 lg:hidden bg-[radial-gradient(circle_at_top,rgba(9,97,41,0.25),rgba(1,4,2,0)_48%)]"></div>
 
-                    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-                        {formFields.map((field) => (
-                            <div key={field.name}>
-                                <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                                    {field.label}
-                                </label>
-                                <div className="relative">
-                                    <input
-                                        type={field.name === 'password' && showPassword ? 'text' : field.type}
-                                        placeholder={field.placeholder}
-                                        {...register(field.name, field.validation)}
-                                        className="w-full px-4 py-1.5 bg-[#F0F0F0]  border-4 rounded-lg focus:ring-2 focus:ring-[#43573B] focus:bg-white outline-none transition-all text-gray-900 placeholder-gray-400 text-sm"
-                                    />
-                                    {field.name === 'password' && (
-                                        <button
-                                            type="button"
-                                            onClick={() => setShowPassword(!showPassword)}
-                                            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors "
-                                        >
-                                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                {showPassword ? (
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
-                                                ) : (
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                    <div className="relative mx-auto w-full max-w-[540px] lg:ml-auto lg:mr-0">
+                        <PhyoLogo priority className="mb-12 h-[30px] w-auto lg:hidden" />
+
+                        <div className="mb-10 space-y-4 lg:mb-9">
+                            <h2
+                                className="text-[48px] leading-none tracking-[-0.04em] text-white sm:text-[56px]"
+                                style={{ fontFamily: 'var(--font-bricolage-grotesque)' }}
+                            >
+                                Login
+                            </h2>
+                            <p
+                                className="max-w-[540px] text-base leading-[1.65] text-white/52 sm:text-[18px]"
+                                style={{ fontFamily: 'var(--font-inter)' }}
+                            >
+                                {loginCopy}
+                            </p>
+                        </div>
+
+                        <form onSubmit={handleSubmit(onSubmit)} className="space-y-8" noValidate>
+                            <div className="space-y-6">
+                                {formFields.map((field) => {
+                                    const error = errors[field.name];
+
+                                    return (
+                                        <div key={field.name}>
+                                            <div className="relative border-b border-white/45 pb-3 transition-colors focus-within:border-white/80">
+                                                <label
+                                                    htmlFor={field.name}
+                                                    className="block text-[15px] leading-none text-white/48"
+                                                    style={{ fontFamily: 'var(--font-inter)' }}
+                                                >
+                                                    {field.label}
+                                                </label>
+                                                <input
+                                                    id={field.name}
+                                                    type={
+                                                        field.name === 'password' && showPassword
+                                                            ? 'text'
+                                                            : field.type
+                                                    }
+                                                    autoComplete={field.autoComplete}
+                                                    spellCheck={field.name === 'email' ? false : undefined}
+                                                    aria-invalid={error ? 'true' : 'false'}
+                                                    {...register(field.name, field.validation)}
+                                                    className="mt-4 w-full bg-transparent text-[18px] leading-none text-white outline-none placeholder:text-white/18"
+                                                    style={{ fontFamily: 'var(--font-inter)' }}
+                                                />
+
+                                                {field.name === 'password' && (
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => setShowPassword((value) => !value)}
+                                                        className="absolute right-0 top-0 text-white/40 transition hover:text-white/75"
+                                                        aria-label={
+                                                            showPassword
+                                                                ? 'Hide password'
+                                                                : 'Show password'
+                                                        }
+                                                    >
+                                                        <EyeIcon slashed={!showPassword} />
+                                                    </button>
                                                 )}
-                                            </svg>
-                                        </button>
-                                    )}
-                                </div>
-                                {errors[field.name] && (
-                                    <p className="text-red-500 text-xs mt-1">
-                                        {errors[field.name].message}
+                                            </div>
+
+                                            {field.name === 'password' && (
+                                                <div className="pt-3 text-right">
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => setForgotModalOpen(true)}
+                                                        className="text-[14px] text-[#10af56] transition hover:text-[#34d27a]"
+                                                        style={{
+                                                            fontFamily: 'var(--font-inter)',
+                                                        }}
+                                                    >
+                                                        Forget Password?
+                                                    </button>
+                                                </div>
+                                            )}
+
+                                            {error && (
+                                                <p
+                                                    className="pt-2 text-sm text-[#ff8f8f]"
+                                                    style={{ fontFamily: 'var(--font-inter)' }}
+                                                >
+                                                    {error.message}
+                                                </p>
+                                            )}
+                                        </div>
+                                    );
+                                })}
+                            </div>
+
+                            <div className="space-y-3">
+                                <label htmlFor="terms" className="flex cursor-pointer items-start gap-3">
+                                    <input
+                                        id="terms"
+                                        type="checkbox"
+                                        {...register('terms', {
+                                            required: 'Please check the box to continue.',
+                                        })}
+                                        className="peer sr-only"
+                                    />
+                                    <span className="mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-[3px] border border-white/55 bg-transparent text-transparent transition peer-checked:border-[#10af56] peer-checked:bg-[#10af56]/10 peer-checked:text-[#10af56] peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-[#10af56]">
+                                        <CheckIcon />
+                                    </span>
+                                    <span
+                                        className="max-w-[460px] text-[13px] leading-[1.4] text-white/40"
+                                        style={{ fontFamily: 'var(--font-inter)' }}
+                                    >
+                                        {checkboxCopy}
+                                    </span>
+                                </label>
+
+                                {errors.terms && (
+                                    <p
+                                        className="text-sm text-[#ff8f8f]"
+                                        style={{ fontFamily: 'var(--font-inter)' }}
+                                    >
+                                        {errors.terms.message}
                                     </p>
                                 )}
                             </div>
-                        ))}
 
-                        <div className="flex items-center justify-end pt-1">
-                            <Link 
-                                href="/forgot-password" 
-                                className="text-sm text-gray-900 hover:text-gray-700 font-semibold hover:underline"
-                            >
-                                forgot password?
-                            </Link>
-                        </div>
+                            <div className="space-y-10 pt-1">
+                                <button
+                                    type="submit"
+                                    disabled={loading}
+                                    className="flex h-12 w-full items-center justify-center rounded-full border border-white bg-transparent px-5 text-[18px] font-medium text-white transition hover:border-[#10af56] hover:text-[#10af56] disabled:cursor-not-allowed disabled:opacity-50"
+                                    style={{ fontFamily: 'var(--font-inter)' }}
+                                >
+                                    {loading ? (
+                                        <span className="flex items-center gap-3">
+                                            <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white"></span>
+                                            Signing In...
+                                        </span>
+                                    ) : (
+                                        'Login'
+                                    )}
+                                </button>
 
-                        {/* Terms and Conditions Checkbox */}
-                        <div className="flex items-start pt-2 pb-2">
-                            <input
-                                type="checkbox"
-                                id="terms"
-                                required
-                                className="mt-0.5 w-5 h-5 text-[#43573B] bg-white border-2 border-gray-300 rounded focus:ring-2 focus:ring-[#43573B] checked:bg-[#43573B] checked:border-[#43573B] cursor-pointer"
-                                style={{
-                                    accentColor: '#43573B'
-                                }}
-                            />
-                            <label htmlFor="terms" className="ml-3 text-xs text-gray-500 leading-relaxed cursor-pointer">
-                                by signing in you agree to <span className="text-gray-600 font-bold">Terms of Service</span> and{' '}
-                                <span className="text-gray-600 font-bold">Privacy Policy.</span>
-                            </label>
-                        </div>
-
-                        <button 
-                            type="submit" 
-                            disabled={loading}
-                            className="w-full bg-[#43573B] hover:bg-[#2d4a3a] text-white font-semibold py-3 rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed mt-4"
-                        >
-                            {loading ? (
-                                <div className="flex items-center justify-center">
-                                    <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent mr-2"></div>
-                                    Signing In...
+                                <div className="flex items-center gap-3 text-white/28">
+                                    <span className="h-px flex-1 bg-white/18"></span>
+                                    <span
+                                        className="text-sm text-white/42"
+                                        style={{ fontFamily: 'var(--font-inter)' }}
+                                    >
+                                        Or
+                                    </span>
+                                    <span className="h-px flex-1 bg-white/18"></span>
                                 </div>
-                            ) : (
-                                'Login'
-                            )}
-                        </button>
 
-                        <div className="relative my-5">
-                            <div className="absolute inset-0 flex items-center">
-                                {/* <div className="w-full border-t border-gray-300"></div> */}
+                                <div className="space-y-6">
+                                    <button
+                                        type="button"
+                                        onClick={handleGoogleButtonClick}
+                                        disabled={googleLoading || loading}
+                                        className="flex h-12 w-full items-center justify-center gap-3 rounded-full border border-white bg-transparent px-5 text-[18px] font-medium text-white transition hover:border-[#10af56] hover:text-[#10af56] disabled:cursor-not-allowed disabled:opacity-50"
+                                        style={{ fontFamily: 'var(--font-inter)' }}
+                                    >
+                                        {googleLoading ? (
+                                            <span className="flex items-center gap-3">
+                                                <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white"></span>
+                                                Connecting To Google...
+                                            </span>
+                                        ) : (
+                                            <>
+                                                <GoogleIcon />
+                                                <span>Continue With Google</span>
+                                            </>
+                                        )}
+                                    </button>
+
+                                    <p
+                                        className="text-center text-[14px] text-white/42"
+                                        style={{ fontFamily: 'var(--font-inter)' }}
+                                    >
+                                        Didn&apos;t Have An Account?{' '}
+                                        <Link
+                                            href="/signup"
+                                            className="font-medium text-[#10af56] underline underline-offset-4 transition hover:text-[#34d27a]"
+                                        >
+                                            Let&apos;s Create Your Account
+                                        </Link>
+                                    </p>
+                                </div>
                             </div>
-                            <div className="relative flex justify-center text-sm">
-                                <span className="px-3 bg-white text-gray-500 text-xs font-bold">or login with</span>
-                            </div>
+                        </form>
+
+                        <div
+                            className="phyo-hidden-google-login absolute h-0 w-0 overflow-hidden opacity-0"
+                            aria-hidden="true"
+                        >
+                            <GoogleLogin
+                                onSuccess={handleGoogleSuccess}
+                                onError={handleGoogleError}
+                                useOneTap={false}
+                            />
                         </div>
 
-                        {/* Google Sign-In Button */}
-                        <div className="w-full">
-                            <button
-                                type="button"
-                                onClick={() => {
-                                    // Trigger the hidden Google login button
-                                    const googleBtn = document.querySelector('div[role="button"][aria-labelledby]');
-                                    if (googleBtn) {
-                                        googleBtn.click();
-                                    }
-                                }}
-                                className="w-full flex items-center justify-center gap-3 px-4 py-2.5 bg-white border-[#43573B] border-2 rounded-lg hover:bg-gray-50 transition-all duration-200 font-medium text-gray-700 text-sm shadow-sm"
-                            >
-                                <svg className="w-5 h-5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
-                                    <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
-                                    <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
-                                    <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
-                                </svg>
-                                Continue with Google
-                            </button>
-                            {/* Hidden Google Login for actual functionality */}
-                            <div className="hidden">
-                                <GoogleLogin
-                                    onSuccess={handleGoogleSuccess}
-                                    onError={handleGoogleError}
-                                    useOneTap={false}
+                        {forgotModalOpen && (
+                            <div className="fixed inset-0 z-[80] flex items-center justify-center bg-black/60 backdrop-blur-md p-4 sm:p-6">
+                                <button
+                                    type="button"
+                                    className="absolute inset-0 cursor-default"
+                                    aria-label="Close forgot password modal backdrop"
+                                    onClick={() => setForgotModalOpen(false)}
                                 />
+
+                                <div className="relative z-10 w-full max-w-[520px]">
+                                    <ForgotPasswordCard
+                                        isModal={true}
+                                        onClose={() => setForgotModalOpen(false)}
+                                        onCompleted={() => setForgotModalOpen(false)}
+                                    />
+                                </div>
                             </div>
-                        </div>
-
-                        {/* Don't have account link */}
-                        <div className="text-center mt-5">
-                            <p className="text-sm text-gray-600">
-                                Didn't have an account?{' '}
-                                <Link href="/signup" className="text-gray-900 font-semibold hover:underline">
-                                    Let's create your account
-                                </Link>
-                            </p>
-                        </div>
-                    </form>
-                </div>
+                        )}
+                    </div>
+                </section>
             </div>
 
-            {/* Right Illustration - Positioned to overlap towards center */}
-            <div className="hidden lg:block absolute right-0 bottom-0 w-[38%] z-0">
-                <img 
-                    src="/assets/illustation_right.svg" 
-                    alt="Social Media Illustration" 
-                    className="w-full h-full object-contain"
-                    style={{ objectPosition: 'left bottom' }}
-                />
-            </div>
-
-            {/* Toast Container */}
             <ToastContainer
                 position="top-right"
                 autoClose={3000}
@@ -490,22 +690,20 @@ function LoginForm() {
                 pauseOnFocusLoss
                 draggable
                 pauseOnHover
-                theme="light"
+                theme="dark"
             />
         </div>
     );
 }
 
 export default function LoginPage() {
-    const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || '1056581199715-rk69h1nevsldlek1sb3oft4itnnd5qoo.apps.googleusercontent.com';
-    
+    const clientId =
+        process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ||
+        '1056581199715-rk69h1nevsldlek1sb3oft4itnnd5qoo.apps.googleusercontent.com';
+
     return (
         <GoogleOAuthProvider clientId={clientId}>
-            <Suspense fallback={
-                <div className="min-h-screen flex items-center justify-center bg-white">
-                    <div className="animate-spin rounded-full h-16 w-16 border-4 border-[#00897B] border-t-transparent"></div>
-                </div>
-            }>
+            <Suspense fallback={<AuthLoadingScreen />}>
                 <LoginForm />
             </Suspense>
         </GoogleOAuthProvider>
