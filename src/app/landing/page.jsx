@@ -919,7 +919,7 @@ export default function LandingPage() {
               aria-hidden
               className="pointer-events-none absolute inset-0 hidden opacity-[1] lg:block"
             >
-              <div className="absolute left-[586.72px] top-[93.56px] h-[225px] w-[400px]">
+              <div className="absolute left-[586.72px] top-[93.56px] h-[225px] w-[200.247px]">
                 <Image
                   src="/figma/488070c5e4feeacbe70331ccd64a0c4e3af2546a.svg"
                   alt=""
@@ -943,7 +943,7 @@ export default function LandingPage() {
                   className="object-contain"
                 />
               </div>
-              <div className="absolute left-0 top-[52.06px] h-[232.08px] w-[187.071px]">
+              <div className="absolute left-0 top-[38px] h-[246.146px] w-[174.06px]">
                 <Image
                   src="/figma/1dffafc9921ed3ef97ca4b7cf666e6d6bcf16e2f.svg"
                   alt=""
@@ -1054,7 +1054,10 @@ export default function LandingPage() {
         </div>
       </section>
 
-      <section id="faq" className={`${pageSectionClass} mt-[100px] mb-[100px]`}>
+<div className=" mt-[100px] mb-[100px]">
+
+
+      <section id="faq" className={`${pageSectionClass}`}>
         <div className="grid gap-10 xl:grid-cols-[590px_570px] xl:items-stretch">
           <div className="flex flex-col gap-10 xl:self-stretch">
             <div>
@@ -1108,6 +1111,7 @@ export default function LandingPage() {
         </div>
       </section>
 
+</div>
       <section className={pageSectionClass}>
         <div className="text-center">
           <h2 className="font-bricolage text-[34px] leading-[1.2] text-white sm:text-[36px]">
@@ -1138,9 +1142,12 @@ export default function LandingPage() {
         </div>
       </section>
 
+<div className="mt-[100px] mb-[100px]">
+
+
       <section
         id="testimonials"
-        className={` ${pageSectionClass} mt-[100px] mb-[100px]`}
+        className={` ${pageSectionClass}`}
       >
         <div className="mx-auto max-w-[900px] text-center">
           <h2 className="font-bricolage text-[34px] leading-[1.2] text-white sm:text-[36px]">
@@ -1182,7 +1189,7 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
-
+</div>
       <Footer />
 
       {showLoginModal && (
