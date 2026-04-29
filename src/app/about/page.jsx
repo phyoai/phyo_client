@@ -1,10 +1,12 @@
 import Image from "next/image";
-import Link from "next/link";
-import { ArrowRight, ChevronLeft, ChevronRight, Play } from "lucide-react";
+import { ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
 
 import Navbar from "@/app/landing/components/Navbar";
 import Footer from "@/app/landing/components/Footer";
+import LandingAccentGridPatterns from "@/components/shared/LandingAccentGridPatterns";
+import LandingHeroBackground from "@/components/shared/LandingHeroBackground";
 import MilestoneCards from "@/components/shared/MilestoneCards";
+import OutlineGlowButton from "@/components/shared/OutlineGlowButton";
 
 const processSteps = [
   {
@@ -49,9 +51,11 @@ function CTAButton({
   className = "",
 }) {
   return (
-    <Link
+    <OutlineGlowButton
       href={href}
-      className={`inline-flex h-12 items-center justify-center rounded-[40px] border border-white px-7 text-[16px] text-white transition duration-200 hover:bg-white/10 ${className}`}
+      className={`h-12 px-7 normal-case ${className}`}
+      baseSurfaceClassName="bg-transparent bg-[#0f7434]"
+      glowSurfaceClassName="bg-white/10"
     >
       <span
         className={`inline-flex items-center gap-3 ${
@@ -61,7 +65,7 @@ function CTAButton({
         {icon}
         <span className="leading-[1.2]">{children}</span>
       </span>
-    </Link>
+    </OutlineGlowButton>
   );
 }
 
@@ -95,22 +99,7 @@ export default function AboutPage() {
       className="relative isolate overflow-hidden bg-[#050505] font-inter text-white"
       style={{ fontFamily: "var(--font-inter)" }}
     >
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-[1100px]">
-        <div className="absolute inset-0 grid-lines-overlay" />
-        <div className="absolute left-[1038.57px] top-[-161px] h-[487.04px] w-[380.73px]">
-          <div className="absolute left-1/2 top-1/2 -ml-[240px] h-[449px] w-[194px] -translate-x-1/2 -translate-y-1/2 rotate-[27.85deg]">
-            <div className="absolute" style={{ inset: "-55.73% -129.14%" }}>
-              <img
-                src="/figma/landing/8bf76859d5c6f4da4ac2c1d3f52e99a58e026fce.svg"
-                alt=""
-                aria-hidden="true"
-                className="block h-full w-full max-w-none"
-              />
-            </div>
-          </div>
-        </div>
-        <div className="absolute left-1/2 top-[-180px] h-[560px] w-[560px] -translate-x-1/2 rounded-full bg-[#16a34a]/10 blur-3xl" />
-      </div>
+      <LandingHeroBackground />
 
       <div className="relative z-10">
         <Navbar />
@@ -135,6 +124,7 @@ export default function AboutPage() {
             </div>
 
             <MilestoneCards />
+            <LandingAccentGridPatterns />
           </section>
 
           <section id="features" className="pt-16 lg:pt-20">
@@ -353,7 +343,15 @@ export default function AboutPage() {
                       href="/"
                       iconOnLeft
                       className="w-[180px]"
-                      icon={<Play className="h-[14px] w-[13px] stroke-[1.8]" />}
+                      icon={
+                        <Image
+                          src="/landing/play_btn.svg"
+                          alt=""
+                          width={14}
+                          height={14}
+                          className="h-[13px] w-[13px]"
+                        />
+                      }
                     >
                       Watch Demo
                     </CTAButton>
@@ -370,7 +368,7 @@ export default function AboutPage() {
                   />
                 </div>
 
-                <div className="pointer-events-none absolute right-[30px] top-[58px] hidden h-[600px] w-[512px] lg:block">
+                <div className="pointer-events-none absolute right-[30px] top-[58px] hidden h-[628px] w-[520px] lg:block">
                   <img
                     src="/about/6376729d72436fb01b2532b7163f98fa334da9cd.png"
                     alt="Phyo product preview"
@@ -407,7 +405,15 @@ export default function AboutPage() {
                     <p className="mt-2 text-[16px] leading-[1.6] text-[#c8e9d4]">
                       UIUX Designer
                     </p>
-                    <div className="pointer-events-none absolute -bottom-8 -right-6 h-24 w-24 rounded-full bg-[#178a3f]" />
+                    {/* <div className="pointer-events-none absolute -bottom-8 -right-6 h-24 w-24 rounded-full bg-[#178a3f]" /> */}
+
+                    <Image
+                      src="/about/card_bottom.svg"
+                      alt="Team member avatar"
+                      width={157.222}
+                      height={145}
+                      className="absolute bottom-0 top-[35px] right-0 h-[100px] w-[100px] object-contain mt-[6px]"
+                    />
                   </article>
 
                   <article className="relative overflow-hidden rounded-[16px] bg-[#16a34a] p-4">
@@ -426,11 +432,17 @@ export default function AboutPage() {
                         Xd
                       </span>
                     </div>
-                    <div className="pointer-events-none absolute -bottom-8 -right-6 h-24 w-24 rounded-full bg-[#178a3f]" />
+                    <Image
+                      src="/about/card_bottom.svg"
+                      alt="Team member avatar"
+                      width={157.222}
+                      height={145}
+                      className="absolute bottom-0 top-[35px] right-0 h-[100px] w-[100px] object-contain mt-[6px]"
+                    />
                   </article>
                 </div>
 
-                <article className="relative min-h-[368px] overflow-hidden rounded-[16px] bg-[linear-gradient(125deg,#16a34a_0%,#0f7135_70%,#073618_100%)] px-8 py-9">
+                <article className="relative min-h-[368px] overflow-hidden rounded-[16px] bg-[linear-gradient(180deg,#16A34A_0%,#083D1C_100%)] px-8 py-9">
                   <p className="text-[72px] leading-none text-white">&ldquo;</p>
                   <p className="max-w-[614px] text-[16px] leading-[1.6] text-[#d9eadf]">
                     To empower businesses through cutting-edge digital
@@ -439,24 +451,26 @@ export default function AboutPage() {
                   </p>
 
                   <div className="absolute bottom-5 right-5 flex items-center gap-3">
-                    <button
-                      type="button"
-                      className="grid h-14 w-14 place-items-center rounded-full border border-white/80 text-white"
+                    <OutlineGlowButton
+                      className="h-14 w-14 rounded-full p-0"
                       aria-label="Previous testimonial"
+                      baseSurfaceClassName="bg-transparent bg-[#0b5526]"
+                      glowSurfaceClassName="bg-white/10"
                     >
                       <ChevronLeft className="h-6 w-6" />
-                    </button>
-                    <button
-                      type="button"
-                      className="grid h-14 w-14 place-items-center rounded-full border border-white/80 text-white"
+                    </OutlineGlowButton>
+                    <OutlineGlowButton
+                      className="h-14 w-14 rounded-full p-0"
                       aria-label="Next testimonial"
+                      baseSurfaceClassName="bg-transparent bg-[#0b5526]"
+                      glowSurfaceClassName="bg-white/10"
                     >
                       <ChevronRight className="h-6 w-6" />
-                    </button>
+                    </OutlineGlowButton>
                   </div>
 
                   <div className="pointer-events-none absolute -bottom-14 -left-8 h-[176px] w-[176px] rounded-full bg-[#13a54b] opacity-70" />
-                  <div className="pointer-events-none absolute bottom-16 left-16 h-[58px] w-[58px] rounded-full bg-[#13a54b] opacity-70" />
+                  <div className="pointer-events-none absolute bottom-16 left-16 h-[58px] w-[58px] rounded-full bg-[#13a54b] opacity-70 top-[217px]" />
                 </article>
               </div>
 

@@ -9,6 +9,7 @@ import { ArrowRight, Minus, Play, Plus, Search } from "lucide-react";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import LoginModal from "./components/loginModal";
+import LandingHeroBackground from "@/components/shared/LandingHeroBackground";
 import MilestoneCards from "@/components/shared/MilestoneCards";
 import GridPattern from "@/components/shared/gridLines";
 
@@ -633,29 +634,7 @@ export default function LandingPage() {
       style={{ fontFamily: "var(--font-inter)" }}
     >
       <div className="relative isolate overflow-hidden">
-        <Image
-          src="landing/header_grid_lines.svg"
-          alt=""
-          width={1400}
-          height={550}
-          className="absolute inset-0 -z-10 h-[550px] w-full object-cover"
-        />
-        <div className="pointer-events-none absolute inset-x-0 top-0 h-[1100px]">
-          <div className="absolute inset-0 grid-lines-overlay" />
-          <div className="absolute left-[1038.57px] top-[-161px] h-[487.04px] w-[380.73px]">
-            <div className="absolute left-1/2 top-1/2 -ml-[240px] h-[449px] w-[194px] -translate-x-1/2 -translate-y-1/2 rotate-[27.85deg]">
-              <div className="absolute" style={{ inset: "-55.73% -129.14%" }}>
-                <img
-                  src="/figma/landing/8bf76859d5c6f4da4ac2c1d3f52e99a58e026fce.svg"
-                  alt=""
-                  aria-hidden="true"
-                  className="block h-full w-full max-w-none"
-                />
-              </div>
-            </div>
-          </div>
-          <div className="absolute left-1/2 top-[-180px] h-[560px] w-[560px] -translate-x-1/2 rounded-full bg-[#0c3617]/20 blur-3xl" />
-        </div>
+        <LandingHeroBackground />
 
         <div className="relative mx-auto max-w-[1440px]">
           <Navbar />
@@ -707,7 +686,7 @@ export default function LandingPage() {
                 </div>
               </div>
             </form>
-            <div className="max-w-[1050px] mx-auto">
+            <div className="mx-auto">
               <MilestoneCards />
             </div>
 
@@ -940,7 +919,7 @@ export default function LandingPage() {
               aria-hidden
               className="pointer-events-none absolute inset-0 hidden opacity-[1] lg:block"
             >
-              <div className="absolute left-[586.72px] top-[93.56px] h-[225px] w-[400px]">
+              <div className="absolute left-[586.72px] top-[93.56px] h-[225px] w-[200.247px]">
                 <Image
                   src="/figma/488070c5e4feeacbe70331ccd64a0c4e3af2546a.svg"
                   alt=""
@@ -964,7 +943,7 @@ export default function LandingPage() {
                   className="object-contain"
                 />
               </div>
-              <div className="absolute left-0 top-[52.06px] h-[232.08px] w-[187.071px]">
+              <div className="absolute left-0 top-[38px] h-[246.146px] w-[174.06px]">
                 <Image
                   src="/figma/1dffafc9921ed3ef97ca4b7cf666e6d6bcf16e2f.svg"
                   alt=""
@@ -1075,7 +1054,10 @@ export default function LandingPage() {
         </div>
       </section>
 
-      <section id="faq" className={`${pageSectionClass} mt-[100px] mb-[100px]`}>
+<div className=" mt-[100px] mb-[100px]">
+
+
+      <section id="faq" className={`${pageSectionClass}`}>
         <div className="grid gap-10 xl:grid-cols-[590px_570px] xl:items-stretch">
           <div className="flex flex-col gap-10 xl:self-stretch">
             <div>
@@ -1129,6 +1111,7 @@ export default function LandingPage() {
         </div>
       </section>
 
+</div>
       <section className={pageSectionClass}>
         <div className="text-center">
           <h2 className="font-bricolage text-[34px] leading-[1.2] text-white sm:text-[36px]">
@@ -1159,9 +1142,12 @@ export default function LandingPage() {
         </div>
       </section>
 
+<div className="mt-[100px] mb-[100px]">
+
+
       <section
         id="testimonials"
-        className={` ${pageSectionClass} mt-[100px] mb-[100px]`}
+        className={` ${pageSectionClass}`}
       >
         <div className="mx-auto max-w-[900px] text-center">
           <h2 className="font-bricolage text-[34px] leading-[1.2] text-white sm:text-[36px]">
@@ -1203,7 +1189,7 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
-
+</div>
       <Footer />
 
       {showLoginModal && (

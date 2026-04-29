@@ -170,47 +170,33 @@ function GoogleIcon() {
 
 function AuthArtworkPanel() {
     return (
-        <section className="relative hidden min-h-screen flex-1 overflow-hidden rounded-r-[42px] lg:flex">
-            <div className="absolute inset-0 bg-[linear-gradient(180deg,#03200c_0%,#03170a_58%,#030603_100%)]"></div>
+        <section className="relative hidden min-h-screen flex-1 overflow-hidden rounded-tr-[40px] rounded-br-[40px] lg:flex" style={{ backgroundImage: "linear-gradient(134.8deg, rgb(0, 48, 18) 1.03%, rgb(0, 0, 0) 100%)" }}>
             <div
-                className="absolute inset-0 opacity-40"
-                style={{
-                    backgroundImage:
-                        'linear-gradient(to right, rgba(126, 182, 143, 0.14) 1px, transparent 1px), linear-gradient(to bottom, rgba(126, 182, 143, 0.1) 1px, transparent 1px)',
-                    backgroundSize: '120px 100%, 100% 120px',
-                    backgroundPosition: '48px 0, 0 100px',
-                }}
-            />
-            <div className="absolute left-[-20%] top-[56%] h-24 w-[34rem] rotate-45 bg-[#124424]/25 blur-2xl"></div>
-            <div className="absolute left-[30%] top-[52%] h-10 w-[20rem] bg-white/5 blur-xl"></div>
-            <div className="absolute right-[-8%] top-[-10%] h-[26rem] w-[26rem] rounded-full bg-[#0c5227]/20 blur-[120px]"></div>
-            <div className="absolute left-3 top-[142px] h-px w-28 bg-white/10"></div>
-            <div className="absolute left-[36%] top-[53%] h-px w-44 bg-white/10"></div>
-            <div className="absolute right-[-10px] bottom-10 h-px w-72 bg-white/12"></div>
-            <div className="absolute right-[12%] bottom-[22%] h-40 w-px bg-white/10"></div>
+                className="absolute inset-0 opacity-40 mix-blend-luminosity"
+            >
+                <Image
+                    src="/login_page/bg_image.png"
+                    alt="Login Artwork"
+                    width={720}
+                    height={1280}
+                    className="w-full h-full object-cover"
+                />
+            </div>
             <div className="relative flex h-full w-full flex-col justify-between px-[56px] py-[60px] xl:px-[72px]">
                 <PhyoLogo priority className="h-[30px] w-auto" />
-                <div className="max-w-[540px] space-y-5 pb-2 mb-[110px]">
+                <div className="max-w-[540px] space-y-4">
                     <h1
-                        className="max-w-[440px] text-[42px] font-medium leading-[1.08] tracking-[-0.04em] text-white xl:text-[50px]"
+                        className="max-w-[540px] text-[36px] font-normal leading-[1.2] text-white"
                         style={{ fontFamily: 'var(--font-bricolage-grotesque)' }}
                     >
-                        Welcome To The <span className="font-semibold">Phyo.AI</span>
+                        Welcome to the <span className="font-extrabold">phyo.aI</span>
                     </h1>
                     <p
-                        className="max-w-[540px] text-[18px] leading-[1.55] text-white/52"
+                        className="max-w-[540px] text-[16px] leading-[1.6] text-[#9b9b9b]"
                         style={{ fontFamily: 'var(--font-inter)' }}
                     >
                         {welcomeCopy}
                     </p>
-
-                    <Image
-                        src="/login_page/bg_image.png"
-                        alt="Login Artwork"
-                        width={720}
-                        height={1280}
-                        className="absolute right-0 top-1/2 w-auto -translate-y-1/2 object-contain opacity-65 bg-cover bg-center bg-no-repeat mix-blend-luminosity"
-                    />
                 </div>
             </div>
         </section>
@@ -449,28 +435,27 @@ function LoginForm() {
     }
 
     return (
-        <div className="relative min-h-screen overflow-hidden bg-[#010402] text-white">
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(7,96,39,0.34)_0%,rgba(2,15,8,0.28)_34%,rgba(1,4,2,1)_65%)]"></div>
+        <div className="relative min-h-screen overflow-hidden bg-black text-white">
             <div className="absolute right-[-18rem] top-[-18rem] h-[50rem] w-[50rem] rounded-full bg-[#0b662e]/20 blur-[120px]"></div>
 
             <div className="relative mx-auto flex min-h-screen w-full max-w-[1440px] flex-col lg:flex-row">
                 <AuthArtworkPanel />
 
-                <section className="relative flex min-h-screen flex-1 items-center px-6 py-10 sm:px-10 lg:items-start lg:px-[60px] lg:py-[60px] xl:px-[92px]">
+                <section className="relative flex min-h-screen flex-1 items-center px-6 py-10 sm:px-10 lg:items-center lg:px-[60px] lg:py-[60px] xl:px-[92px]">
                     <div className="absolute inset-0 lg:hidden bg-[radial-gradient(circle_at_top,rgba(9,97,41,0.25),rgba(1,4,2,0)_48%)]"></div>
 
-                    <div className="relative mx-auto w-full max-w-[540px] lg:ml-auto lg:mr-0">
+                    <div className="relative w-full max-w-[540px]">
                         <PhyoLogo priority className="mb-12 h-[30px] w-auto lg:hidden" />
 
-                        <div className="mb-10 space-y-4 lg:mb-9">
+                        <div className="mb-8 space-y-4 lg:mb-8">
                             <h2
-                                className="text-[48px] leading-none tracking-[-0.04em] text-white sm:text-[56px]"
+                                className="text-[36px] font-normal leading-[1.2] text-white"
                                 style={{ fontFamily: 'var(--font-bricolage-grotesque)' }}
                             >
                                 Login
                             </h2>
                             <p
-                                className="max-w-[540px] text-base leading-[1.65] text-white/52 sm:text-[18px]"
+                                className="max-w-[540px] text-[16px] leading-[1.6] text-[#9b9b9b]"
                                 style={{ fontFamily: 'var(--font-inter)' }}
                             >
                                 {loginCopy}
@@ -478,62 +463,64 @@ function LoginForm() {
                         </div>
 
                         <form onSubmit={handleSubmit(onSubmit)} className="space-y-8" noValidate>
-                            <div className="space-y-6">
+                            <div className="space-y-7">
                                 {formFields.map((field) => {
                                     const error = errors[field.name];
 
                                     return (
                                         <div key={field.name}>
-                                            <div className="relative border-b border-white/45 pb-3 transition-colors focus-within:border-white/80">
+                                            <div className="flex flex-col gap-3">
                                                 <label
                                                     htmlFor={field.name}
-                                                    className="block text-[15px] leading-none text-white/48"
+                                                    className="text-[16px] text-[#868686] leading-none"
                                                     style={{ fontFamily: 'var(--font-inter)' }}
                                                 >
                                                     {field.label}
                                                 </label>
-                                                <input
-                                                    id={field.name}
-                                                    type={
-                                                        field.name === 'password' && showPassword
-                                                            ? 'text'
-                                                            : field.type
-                                                    }
-                                                    autoComplete={field.autoComplete}
-                                                    spellCheck={field.name === 'email' ? false : undefined}
-                                                    aria-invalid={error ? 'true' : 'false'}
-                                                    {...register(field.name, field.validation)}
-                                                    className="mt-4 w-full bg-transparent text-[18px] leading-none text-white outline-none placeholder:text-white/18"
-                                                    style={{ fontFamily: 'var(--font-inter)' }}
-                                                />
-
-                                                {field.name === 'password' && (
-                                                    <button
-                                                        type="button"
-                                                        onClick={() => setShowPassword((value) => !value)}
-                                                        className="absolute right-0 top-0 text-white/40 transition hover:text-white/75"
-                                                        aria-label={
-                                                            showPassword
-                                                                ? 'Hide password'
-                                                                : 'Show password'
+                                                <div className="relative">
+                                                    <input
+                                                        id={field.name}
+                                                        type={
+                                                            field.name === 'password' && showPassword
+                                                                ? 'text'
+                                                                : field.type
                                                         }
-                                                    >
-                                                        <EyeIcon slashed={!showPassword} />
-                                                    </button>
-                                                )}
+                                                        autoComplete={field.autoComplete}
+                                                        spellCheck={field.name === 'email' ? false : undefined}
+                                                        aria-invalid={error ? 'true' : 'false'}
+                                                        {...register(field.name, field.validation)}
+                                                        className="w-full bg-transparent text-[16px] leading-none text-white outline-none placeholder:text-white/18 pb-3 border-b border-white/28 transition focus:border-white/60"
+                                                        style={{ fontFamily: 'var(--font-inter)' }}
+                                                    />
+
+                                                    {field.name === 'password' && (
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => setShowPassword((value) => !value)}
+                                                            className="absolute right-0 bottom-3 text-white/40 transition hover:text-white/75"
+                                                            aria-label={
+                                                                showPassword
+                                                                    ? 'Hide password'
+                                                                    : 'Show password'
+                                                            }
+                                                        >
+                                                            <EyeIcon slashed={!showPassword} />
+                                                        </button>
+                                                    )}
+                                                </div>
                                             </div>
 
                                             {field.name === 'password' && (
-                                                <div className="pt-3 text-right">
+                                                <div className="pt-2 text-right">
                                                     <button
                                                         type="button"
                                                         onClick={() => setForgotModalOpen(true)}
-                                                        className="text-[14px] text-[#10af56] transition hover:text-[#34d27a]"
+                                                        className="text-[14px] text-[#16a34a] transition hover:text-[#34d27a]"
                                                         style={{
                                                             fontFamily: 'var(--font-inter)',
                                                         }}
                                                     >
-                                                        Forget Password?
+                                                        Forget password?
                                                     </button>
                                                 </div>
                                             )}
@@ -552,7 +539,7 @@ function LoginForm() {
                             </div>
 
                             <div className="space-y-3">
-                                <label htmlFor="terms" className="flex cursor-pointer items-start gap-3">
+                                <label htmlFor="terms" className="flex cursor-pointer items-start gap-2">
                                     <input
                                         id="terms"
                                         type="checkbox"
@@ -561,11 +548,11 @@ function LoginForm() {
                                         })}
                                         className="peer sr-only"
                                     />
-                                    <span className="mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-[3px] border border-white/55 bg-transparent text-transparent transition peer-checked:border-[#10af56] peer-checked:bg-[#10af56]/10 peer-checked:text-[#10af56] peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-[#10af56]">
+                                    <span className="mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-[2px] border border-[#9b9b9b] bg-transparent text-transparent transition peer-checked:border-[#16a34a] peer-checked:bg-[#16a34a]/10 peer-checked:text-[#16a34a] peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-[#16a34a]">
                                         <CheckIcon />
                                     </span>
                                     <span
-                                        className="max-w-[460px] text-[13px] leading-[1.4] text-white/40"
+                                        className="max-w-[460px] text-[12px] leading-[1.4] text-[#868686]"
                                         style={{ fontFamily: 'var(--font-inter)' }}
                                     >
                                         {checkboxCopy}
@@ -582,11 +569,11 @@ function LoginForm() {
                                 )}
                             </div>
 
-                            <div className="space-y-10 pt-1">
+                            <div className="space-y-8 pt-1">
                                 <button
                                     type="submit"
                                     disabled={loading}
-                                    className="flex h-12 w-full items-center justify-center rounded-full border border-white bg-transparent px-5 text-[18px] font-medium text-white transition hover:border-[#10af56] hover:text-[#10af56] disabled:cursor-not-allowed disabled:opacity-50"
+                                    className="flex h-12 w-full items-center justify-center rounded-[40px] border border-white bg-transparent px-5 text-[16px] font-medium text-white transition hover:border-[#16a34a] hover:text-[#16a34a] disabled:cursor-not-allowed disabled:opacity-50"
                                     style={{ fontFamily: 'var(--font-inter)' }}
                                 >
                                     {loading ? (
@@ -599,48 +586,48 @@ function LoginForm() {
                                     )}
                                 </button>
 
-                                <div className="flex items-center gap-3 text-white/28">
+                                <div className="flex items-center gap-3">
                                     <span className="h-px flex-1 bg-white/18"></span>
                                     <span
-                                        className="text-sm text-white/42"
+                                        className="text-[12px] text-[#868686]"
                                         style={{ fontFamily: 'var(--font-inter)' }}
                                     >
-                                        Or
+                                        or
                                     </span>
                                     <span className="h-px flex-1 bg-white/18"></span>
                                 </div>
 
-                                <div className="space-y-6">
+                                <div className="space-y-5">
                                     <button
                                         type="button"
                                         onClick={handleGoogleButtonClick}
                                         disabled={googleLoading || loading}
-                                        className="flex h-12 w-full items-center justify-center gap-3 rounded-full border border-white bg-transparent px-5 text-[18px] font-medium text-white transition hover:border-[#10af56] hover:text-[#10af56] disabled:cursor-not-allowed disabled:opacity-50"
+                                        className="flex h-12 w-full items-center justify-center gap-2 rounded-[48px] border border-white bg-transparent px-5 text-[16px] font-medium text-white transition hover:border-[#16a34a] hover:text-[#16a34a] disabled:cursor-not-allowed disabled:opacity-50"
                                         style={{ fontFamily: 'var(--font-inter)' }}
                                     >
                                         {googleLoading ? (
                                             <span className="flex items-center gap-3">
                                                 <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white"></span>
-                                                Connecting To Google...
+                                                Connecting...
                                             </span>
                                         ) : (
                                             <>
                                                 <GoogleIcon />
-                                                <span>Continue With Google</span>
+                                                <span>Continue with google</span>
                                             </>
                                         )}
                                     </button>
 
                                     <p
-                                        className="text-center text-[14px] text-white/42"
+                                        className="text-center text-[14px] text-[#868686]"
                                         style={{ fontFamily: 'var(--font-inter)' }}
                                     >
-                                        Didn&apos;t Have An Account?{' '}
+                                        Didn&apos;t have an account?{' '}
                                         <Link
                                             href="/signup"
-                                            className="font-medium text-[#10af56] underline underline-offset-4 transition hover:text-[#34d27a]"
+                                            className="font-medium text-[#16a34a] underline decoration-solid transition hover:text-[#34d27a]"
                                         >
-                                            Let&apos;s Create Your Account
+                                            Let&apos;s create your account
                                         </Link>
                                     </p>
                                 </div>

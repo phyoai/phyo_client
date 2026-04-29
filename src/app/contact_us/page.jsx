@@ -2,6 +2,8 @@ import Image from "next/image";
 
 import Navbar from "@/app/landing/components/Navbar";
 import Footer from "@/app/landing/components/Footer";
+import LandingAccentGridPatterns from "@/components/shared/LandingAccentGridPatterns";
+import LandingHeroBackground from "@/components/shared/LandingHeroBackground";
 import MilestoneCards from "@/components/shared/MilestoneCards";
 
 function ContactField({
@@ -14,18 +16,19 @@ function ContactField({
   const fieldId = name || label.toLowerCase().replace(/[^a-z0-9]+/g, "-");
 
   return (
-    <div className="space-y-3">
-      <label htmlFor={fieldId} className="text-[16px] text-[#868686]">
+    <div className="space-y-1">
+      <label htmlFor={fieldId} className="text-[14px] text-[#868686]">
         {label}
         {required ? <span className="text-[#16a34a]">*</span> : null}
       </label>
+
       {multiline ? (
         <textarea
           id={fieldId}
           name={name || fieldId}
           required={required}
-          rows={3}
-          className="w-full resize-none border-b border-[#5f5f5f] bg-transparent pb-2 text-[16px] leading-[1.4] text-white outline-none placeholder:text-[#5f5f5f] focus:border-[#16a34a]"
+          rows={2}
+          className="w-full resize-none border-b border-[#5f5f5f] bg-transparent pb-1 text-[14px] leading-[1.3] text-white outline-none placeholder:text-[#5f5f5f] focus:border-[#16a34a]"
         />
       ) : (
         <input
@@ -33,7 +36,7 @@ function ContactField({
           name={name || fieldId}
           type={type}
           required={required}
-          className="w-full border-b border-[#5f5f5f] bg-transparent pb-2 text-[16px] leading-[1.4] text-white outline-none placeholder:text-[#5f5f5f] focus:border-[#16a34a]"
+          className="h-7 w-full border-b border-[#5f5f5f] bg-transparent pb-1 text-[14px] leading-[1.3] text-white outline-none placeholder:text-[#5f5f5f] focus:border-[#16a34a]"
         />
       )}
     </div>
@@ -47,22 +50,7 @@ export default function ContactUsPage() {
       className="relative isolate overflow-hidden bg-[#050505] font-inter text-white"
       style={{ fontFamily: "var(--font-inter)" }}
     >
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-[1100px]">
-        <div className="absolute inset-0 grid-lines-overlay" />
-        <div className="absolute left-[1038.57px] top-[-161px] h-[487.04px] w-[380.73px]">
-          <div className="absolute left-1/2 top-1/2 -ml-[240px] h-[449px] w-[194px] -translate-x-1/2 -translate-y-1/2 rotate-[27.85deg]">
-            <div className="absolute" style={{ inset: "-55.73% -129.14%" }}>
-              <img
-                src="/figma/landing/8bf76859d5c6f4da4ac2c1d3f52e99a58e026fce.svg"
-                alt=""
-                aria-hidden="true"
-                className="block h-full w-full max-w-none"
-              />
-            </div>
-          </div>
-        </div>
-        <div className="absolute left-1/2 top-[-180px] h-[560px] w-[560px] -translate-x-1/2 rounded-full bg-[#16a34a]/10 blur-3xl" />
-      </div>
+      <LandingHeroBackground />
 
       <div className="relative z-10">
         <Navbar />
@@ -87,9 +75,10 @@ export default function ContactUsPage() {
             </div>
 
             <MilestoneCards />
+            <LandingAccentGridPatterns />
           </section>
 
-          <section id="testimonials" className="pt-16 lg:pt-20">
+          <section id="testimonials" className="pt-2 lg:pt-2">
             <div className="grid gap-10 lg:grid-cols-[500px_640px] lg:justify-between">
               <div className="pt-1">
                 <h2 className="font-bricolage text-[36px] leading-[1.4] text-white">
@@ -167,7 +156,7 @@ export default function ContactUsPage() {
                   platform.
                 </p>
 
-                <form className="mt-8 space-y-8">
+                <form className="mt-4 space-y-6">
                   <ContactField
                     label="Full Name"
                     name="fullName"
