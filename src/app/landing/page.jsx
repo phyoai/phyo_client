@@ -686,7 +686,7 @@ export default function LandingPage() {
                 </div>
               </div>
             </form>
-            <div className="max-w-[1050px] mx-auto">
+            <div className="mx-auto">
               <MilestoneCards />
             </div>
 
