@@ -137,9 +137,9 @@ export default function ContactUsPage() {
                         className="mt-0.5"
                       />
                       <p className="text-[14px] leading-[1.4] text-white">
-                        H-32, Shanti Bhawan, Sai-Dulajab, Saket,
+                        E-12/2, 3rd Floor, Block E, Sector-1, Noida
                         <br />
-                        New Delhi - 110030
+                        Uttar Pradesh - 201301
                       </p>
                     </div>
                   </div>

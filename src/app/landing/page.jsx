@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -244,6 +244,71 @@ const pressWhiteFillButtonClass = "active:!bg-white active:text-[#16A34A]";
 const pageSectionClass =
   "mx-auto max-w-[1440px] sm:px-6 lg:px-[120px] mt-[20px]";
 
+function FaqItemCard({
+  active,
+  question,
+  answer,
+  onClick,
+  triggerRef,
+  contentRef,
+}) {
+  return (
+    <div
+      className={`overflow-hidden rounded-[18px] transition-all duration-300 ease-in-out ${
+        active
+          ? "bg-[#D7F5DF] text-[#07140B]"
+          : "bg-[#181818] text-white"
+      }`}
+    >
+      <button
+        type="button"
+        ref={triggerRef}
+        onClick={onClick}
+        className="flex min-h-[64px] w-full items-center justify-between gap-5 px-6 py-5 text-left"
+      >
+        <span
+          className={`font-bricolage text-[22px] font-semibold leading-[1.35] transition-colors duration-300 ${
+            active ? "text-[#07140B]" : "text-white"
+          }`}
+        >
+          {question}
+        </span>
+
+        <span
+          className={`grid h-6 w-6 shrink-0 place-items-center rounded-full text-[18px] leading-none transition-all duration-300 ${
+            active
+              ? "bg-[#16A34A] text-white"
+              : "bg-[#2B2B2B] text-white"
+          }`}
+        >
+          {active ? (
+            <Minus aria-hidden className="h-[15px] w-[15px] stroke-[2.2]" />
+          ) : (
+            <Plus aria-hidden className="h-[15px] w-[15px] stroke-[2.2]" />
+          )}
+        </span>
+      </button>
+
+      <div
+        className={`grid transition-all duration-300 ease-in-out ${
+          active ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
+        }`}
+      >
+        <div className="overflow-hidden">
+          <p
+            ref={contentRef}
+            className={`max-w-[560px] px-6 pb-6 text-[14px] leading-[1.75] transition-colors duration-300 ${
+              active ? "text-[#425046]" : "text-[#9b9b9b]"
+            }`}
+          >
+            {answer}
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function ButtonChrome({
   button_bg_color,
   active_bg_color_class = "",
@@ -472,55 +537,11 @@ function PricingCard({ billingCycle, plan }) {
   );
 }
 
-function FaqItem({ active, answer, onClick, question }) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={`w-full rounded-[24px] border border-white/5 px-5 py-5 text-left transition duration-200 ${
-        active
-          ? "bg-[linear-gradient(120deg,#d4f5e0_0%,#cfe9da_100%)] text-black"
-          : "bg-[#181818] text-white hover:border-[#16a34a]/40"
-      }`}
-    >
-      <div className="flex items-start justify-between gap-4">
-        <div className="min-w-0 flex-1">
-          <h3
-            className={`font-bricolage text-[24px] font-medium leading-[1.2] ${
-              active ? "text-black" : "text-white"
-            }`}
-          >
-            {question}
-          </h3>
-          <p
-            className={`mt-3 text-[16px] leading-[1.6] ${
-              active ? "text-[#4e4d4d]" : "text-[#9b9b9b]"
-            }`}
-          >
-            {answer}
-          </p>
-        </div>
-        <span
-          className={`grid h-8 w-8 shrink-0 place-items-center rounded-full ${
-            active ? "bg-[#16a34a] text-white" : "bg-white/15 text-white/70"
-          }`}
-        >
-          {active ? (
-            <Minus className="h-4 w-4" />
-          ) : (
-            <Plus className="h-4 w-4" />
-          )}
-        </span>
-      </div>
-    </button>
-  );
-}
-
 function TestimonialCard({ location, name, quote }) {
   return (
     <article className="group relative min-h-[220px] w-[min(88vw,360px)] shrink-0 overflow-hidden rounded-[23px] bg-[#141414] p-6 transition-all duration-500 ease-out hover:border-[#16a34a]/35 hover:shadow-[0_18px_42px_rgba(22,163,74,0.16)] hover:bg-[#d1eedd] sm:w-[420px] sm:p-7 lg:min-h-[240px] lg:w-[460px] lg:p-8">
-      <div className="absolute left-8 top-5 h-20 w-px bg-[#16a34a]" />
-      <p className="max-w-[508px] pl-5 text-[16px] leading-[1.6] text-[#9b9b9b] transition-colors duration-500 group-hover:text-black">
+      <div className="absolute left-8 top-[36px] h-20 w-px bg-[#16a34a]" />
+      <p className="max-w-[508px] pl-5 text-[16px] leading-[1.6] text-[#9b9b9b] transition-colors duration-500 group-hover:text-black] group-hover:text-[#181818]">
         {quote}
       </p>
 
@@ -565,10 +586,11 @@ function ComparisonRow({ row }) {
 
   return (
     <>
-      <div className="flex min-w-0 items-center justify-center border-t border-[#0f2a16] bg-[#181818] px-3 py-4 text-center text-[12px] leading-[1.45] text-white sm:px-4 sm:py-5 sm:text-[14px] sm:leading-[1.5] lg:px-5 lg:py-6 lg:text-[16px] lg:leading-[1.6]">
-        <span className="min-w-0 break-words">{row.feature}</span>
+      <div className="flex min-w-0 items-center justify-start border-t border-transparent bg-[#181818] px-3 py-4 text-left text-[12px] leading-[1.45] text-white sm:px-4 sm:py-5 sm:text-[14px] sm:leading-[1.5] lg:px-5 lg:py-6 lg:text-[16px] lg:leading-[1.6]">
+        <span className="min-w-0 break-words text-left">{row.feature}</span>
       </div>
-      <div className="flex min-w-0 items-center justify-center gap-1.5 border-l border-t border-[#0f2a16] bg-[#181818] px-3 py-4 text-center text-[12px] leading-[1.45] text-[#909090] transition-colors duration-200 hover:bg-[#782626] hover:text-white sm:gap-2 sm:px-4 sm:py-5 sm:text-[14px] sm:leading-[1.5] lg:px-5 lg:py-6 lg:text-[16px] lg:leading-[1.6]">
+
+      <div className="flex min-w-0 items-center justify-start gap-1.5 border-l border-t border-transparent bg-[#181818] px-3 py-4 text-left text-[12px] leading-[1.45] text-[#909090] transition-colors duration-200 hover:bg-[#782626] hover:text-white sm:gap-2 sm:px-4 sm:py-5 sm:text-[14px] sm:leading-[1.5] lg:px-5 lg:py-6 lg:text-[16px] lg:leading-[1.6]">
         <Image
           src={featureAssets.comparisonCross}
           alt=""
@@ -576,10 +598,12 @@ function ComparisonRow({ row }) {
           height={12}
           className="h-[12px] w-[12px] shrink-0"
         />
-        <span className="min-w-0 break-words text-center">{row.other}</span>
+
+        <span className="min-w-0 break-words text-left">{row.other}</span>
       </div>
+
       <div
-        className={`group/phyo flex min-w-0 items-center justify-center gap-1.5 border-l border-t border-[#0f2a16] bg-[#181818] px-3 py-4 text-center text-[12px] leading-[1.45] text-[#909090] transition-colors duration-200 hover:text-white sm:gap-2 sm:px-4 sm:py-5 sm:text-[14px] sm:leading-[1.5] lg:px-5 lg:py-6 lg:text-[16px] lg:leading-[1.6] ${phyoHoverBackgroundClass}`}
+        className={`group/phyo flex min-w-0 items-center justify-start gap-1.5 border-l border-t border-transparent bg-[#181818] px-3 py-4 text-left text-[12px] leading-[1.45] text-[#909090] transition-colors duration-200 hover:text-white sm:gap-2 sm:px-4 sm:py-5 sm:text-[14px] sm:leading-[1.5] lg:px-5 lg:py-6 lg:text-[16px] lg:leading-[1.6] ${phyoHoverBackgroundClass}`}
       >
         <span className="relative h-[12px] w-[21px] shrink-0">
           <Image
@@ -589,6 +613,7 @@ function ComparisonRow({ row }) {
             height={12}
             className="absolute inset-0 h-[12px] w-[21px] opacity-100 transition-opacity duration-200 group-hover/phyo:opacity-0"
           />
+
           <Image
             src={featureAssets.comparisonTickWhite}
             alt=""
@@ -597,7 +622,8 @@ function ComparisonRow({ row }) {
             className="absolute inset-0 h-[12px] w-[21px] opacity-0 transition-opacity duration-200 group-hover/phyo:opacity-100"
           />
         </span>
-        <span className="min-w-0 break-words text-center">{row.phyo}</span>
+
+        <span className="min-w-0 break-words text-left">{row.phyo}</span>
       </div>
     </>
   );
@@ -607,8 +633,11 @@ export default function LandingPage() {
   const router = useRouter();
   const [billingCycle, setBillingCycle] = useState("annual");
   const [activeFaqIndex, setActiveFaqIndex] = useState(1);
+  const [faqListMinHeight, setFaqListMinHeight] = useState(0);
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const faqTriggerRefs = useRef([]);
+  const faqContentRefs = useRef([]);
 
   const handleOpenLoginModal = () => {
     setShowLoginModal(true);
@@ -627,6 +656,65 @@ export default function LandingPage() {
     event.preventDefault();
     handleOpenLoginModal();
   };
+
+  useLayoutEffect(() => {
+    const measureFaqListMinHeight = () => {
+      const triggerNodes = faqTriggerRefs.current.slice(0, faqItems.length);
+      const contentNodes = faqContentRefs.current.slice(0, faqItems.length);
+
+      if (
+        triggerNodes.length !== faqItems.length ||
+        contentNodes.length !== faqItems.length ||
+        triggerNodes.some((node) => !node) ||
+        contentNodes.some((node) => !node)
+      ) {
+        return;
+      }
+
+      const verticalGap = 12 * Math.max(faqItems.length - 1, 0);
+      const collapsedHeight = triggerNodes.reduce(
+        (totalHeight, node) => totalHeight + node.offsetHeight,
+        0,
+      );
+      const tallestAnswerHeight = contentNodes.reduce(
+        (maxHeight, node) => Math.max(maxHeight, node.scrollHeight),
+        0,
+      );
+      const nextMinHeight =
+        collapsedHeight + tallestAnswerHeight + verticalGap;
+
+      setFaqListMinHeight((currentHeight) =>
+        currentHeight === nextMinHeight ? currentHeight : nextMinHeight,
+      );
+    };
+
+    measureFaqListMinHeight();
+
+    const animationFrameId = window.requestAnimationFrame(
+      measureFaqListMinHeight,
+    );
+    let resizeObserver;
+
+    if (typeof ResizeObserver !== "undefined") {
+      resizeObserver = new ResizeObserver(() => {
+        measureFaqListMinHeight();
+      });
+
+      [...faqTriggerRefs.current, ...faqContentRefs.current].forEach((node) => {
+        if (node) {
+          resizeObserver.observe(node);
+        }
+      });
+    }
+
+    window.addEventListener("resize", measureFaqListMinHeight);
+
+    return () => {
+      window.cancelAnimationFrame(animationFrameId);
+      resizeObserver?.disconnect();
+      window.removeEventListener("resize", measureFaqListMinHeight);
+    };
+  }, []);
 
   return (
     <main
@@ -984,7 +1072,7 @@ export default function LandingPage() {
       <section className="relative overflow-hidden bg-[linear-gradient(112deg,#16a34a_1.18%,#073618_80.36%)] h-[540px]">
         <div className="pointer-events-none absolute inset-0">
           <div className="absolute inset-y-0 right-0 w-[44%] bg-[linear-gradient(90deg,rgba(4,88,24,0)_0%,rgba(4,56,21,0.3)_35%,rgba(4,56,21,0.76)_100%)]" />
-          <div className="absolute -right-24 top-0 h-full w-[82%] opacity-90 lg:-right-10 lg:w-[58%]">
+          <div className="absolute -right-24 top-0 h-full w-[82%] opacity-40 lg:-right-10 lg:w-[58%]">
             <Image
               src="/landing/Group.svg"
               alt=""
@@ -1054,64 +1142,76 @@ export default function LandingPage() {
         </div>
       </section>
 
-<div className=" mt-[100px] mb-[100px]">
+      <div className=" mt-[100px] mb-[100px]">
+        <section id="faq" className={`${pageSectionClass}`}>
+          <div className="grid gap-10 xl:grid-cols-[590px_570px] xl:items-stretch">
+            <div className="flex flex-col gap-7 mb-1 xl:self-stretch">
+              <div>
+                <h2 className="font-bricolage text-[34px] leading-[1.25] text-white sm:text-[36px] sm:leading-[1.4]">
+                  Frequently Asked{" "}
+                  <span className="font-semibold text-[#16a34a]">
+                    Questions
+                  </span>
+                </h2>
+                <p className="mt-3 max-w-[590px] text-[16px] leading-[1.6] text-[#9b9b9b] [text-transform:capitalize]">
+                  It was popularised in the 1960s of the release of Letraset
+                  sheets containing Lorem Ipsum passages, and more recently with
+                  desktop publishing software like Aldus PageMaker including
+                  versions of Lorem Ipsum.
+                </p>
+              </div>
 
-
-      <section id="faq" className={`${pageSectionClass}`}>
-        <div className="grid gap-10 xl:grid-cols-[590px_570px] xl:items-stretch">
-          <div className="flex flex-col gap-10 xl:self-stretch">
-            <div>
-              <h2 className="font-bricolage text-[34px] leading-[1.25] text-white sm:text-[36px] sm:leading-[1.4]">
-                Frequently Asked{" "}
-                <span className="font-semibold text-[#16a34a]">Questions</span>
-              </h2>
-              <p className="mt-3 max-w-[590px] text-[16px] leading-[1.6] text-[#9b9b9b] [text-transform:capitalize]">
-                It was popularised in the 1960s of the release of Letraset
-                sheets containing Lorem Ipsum passages, and more recently with
-                desktop publishing software like Aldus PageMaker including
-                versions of Lorem Ipsum.
-              </p>
+              <div className="rounded-[24px] bg-[linear-gradient(122deg,#16a34a_1.95%,#073618_95.26%)] px-8 py-9 xl:sticky xl:top-6 xl:self-start">
+                <h3 className="font-bricolage text-[24px] font-medium leading-[1.2] text-white">
+                  Still Have Questions?
+                </h3>
+                <p className="mt-4 max-w-[430px] text-[16px] leading-[1.6] text-[#f8f2f2]">
+                  See how Phyo helps you find the right influencers, track
+                  campaigns, and scale faster all in one place.
+                </p>
+                <ActionButton
+                  href="#home"
+                  className="mt-8"
+                  widthClass="w-[180px]"
+                  iconPosition="left"
+                  icon={<Play className="h-[14px] w-[13px] stroke-[1.8]" />}
+                >
+                  Watch Demo
+                </ActionButton>
+              </div>
             </div>
 
-            <div className="rounded-[24px] bg-[linear-gradient(122deg,#16a34a_1.95%,#073618_95.26%)] px-8 py-9 xl:sticky xl:top-6 xl:self-start">
-              <h3 className="font-bricolage text-[24px] font-medium leading-[1.2] text-white">
-                Still Have Questions?
-              </h3>
-              <p className="mt-4 max-w-[430px] text-[16px] leading-[1.6] text-[#f8f2f2]">
-                See how Phyo helps you find the right influencers, track
-                campaigns, and scale faster all in one place.
-              </p>
-              <ActionButton
-                href="#home"
-                className="mt-8"
-                widthClass="w-[180px]"
-                iconPosition="left"
-                icon={<Play className="h-[14px] w-[13px] stroke-[1.8]" />}
-              >
-                Watch Demo
-              </ActionButton>
+            <div
+              className="space-y-3"
+              style={
+                faqListMinHeight > 0
+                  ? { minHeight: faqListMinHeight }
+                  : undefined
+              }
+            >
+              {faqItems.map((item, index) => (
+                <FaqItemCard
+                  key={item.question}
+                  active={activeFaqIndex === index}
+                  question={item.question}
+                  answer={item.answer}
+                  triggerRef={(node) => {
+                    faqTriggerRefs.current[index] = node;
+                  }}
+                  contentRef={(node) => {
+                    faqContentRefs.current[index] = node;
+                  }}
+                  onClick={() =>
+                    setActiveFaqIndex((currentIndex) =>
+                      currentIndex === index ? -1 : index,
+                    )
+                  }
+                />
+              ))}
             </div>
           </div>
-
-          <div className="space-y-3">
-            {faqItems.map((item, index) => (
-              <FaqItem
-                key={item.question}
-                active={activeFaqIndex === index}
-                question={item.question}
-                answer={item.answer}
-                onClick={() =>
-                  setActiveFaqIndex((currentIndex) =>
-                    currentIndex === index ? -1 : index,
-                  )
-                }
-              />
-            ))}
-          </div>
-        </div>
-      </section>
-
-</div>
+        </section>
+      </div>
       <section className={pageSectionClass}>
         <div className="text-center">
           <h2 className="font-bricolage text-[34px] leading-[1.2] text-white sm:text-[36px]">
@@ -1126,7 +1226,7 @@ export default function LandingPage() {
               {["Feature", "Other Platform", "Phyo"].map((heading) => (
                 <div
                   key={heading}
-                  className="min-w-0 break-words bg-[#16a34a] px-3 py-4 text-center font-bricolage text-[16px] font-bold leading-[1.2] text-white sm:px-4 sm:py-5 sm:text-[20px] lg:px-5 lg:py-6 lg:text-[28px]"
+                  className="min-w-0 break-words bg-[#16a34a] px-3 py-4 text-left font-bricolage text-[16px] font-bold leading-[1.2] text-white sm:px-4 sm:py-5 sm:text-[20px] lg:px-5 lg:py-6 lg:text-[28px]"
                 >
                   {heading}
                 </div>
@@ -1142,54 +1242,49 @@ export default function LandingPage() {
         </div>
       </section>
 
-<div className="mt-[100px] mb-[100px]">
+      <div className="mt-[100px] mb-[100px]">
+        <section id="testimonials" className={` ${pageSectionClass}`}>
+          <div className="mx-auto max-w-[900px] text-center">
+            <h2 className="font-bricolage text-[34px] leading-[1.2] text-white sm:text-[36px]">
+              Simple Scalable{" "}
+              <span className="font-semibold text-[#16a34a]">Powerful</span>
+            </h2>
+            <p className="mt-4 text-[16px] leading-[1.2] text-[#9b9b9b]">
+              From free tools to full-scale execution Phyo&apos;s pricing plans
+              are designed to grow with your goals, not limit them.
+            </p>
+          </div>
 
+          <div className="relative mt-10">
+            <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-12 bg-gradient-to-r from-black via-black/85 to-transparent sm:w-20" />
+            <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-12 bg-gradient-to-l from-black via-black/85 to-transparent sm:w-20" />
 
-      <section
-        id="testimonials"
-        className={` ${pageSectionClass}`}
-      >
-        <div className="mx-auto max-w-[900px] text-center">
-          <h2 className="font-bricolage text-[34px] leading-[1.2] text-white sm:text-[36px]">
-            Simple Scalable{" "}
-            <span className="font-semibold text-[#16a34a]">Powerful</span>
-          </h2>
-          <p className="mt-4 text-[16px] leading-[1.2] text-[#9b9b9b]">
-            From free tools to full-scale execution Phyo&apos;s pricing plans
-            are designed to grow with your goals, not limit them.
-          </p>
-        </div>
-
-        <div className="relative mt-10">
-          <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-12 bg-gradient-to-r from-black via-black/85 to-transparent sm:w-20" />
-          <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-12 bg-gradient-to-l from-black via-black/85 to-transparent sm:w-20" />
-
-          <div className="overflow-hidden">
-            <div
-              className="testimonial-carousel-track flex w-max [transform:translate3d(0,0,0)] hover:[animation-play-state:paused]"
-              style={{ "--testimonial-carousel-duration": "34s" }}
-            >
-              {[0, 1].map((trackIndex) => (
-                <div
-                  key={`testimonial-track-${trackIndex}`}
-                  className="flex shrink-0 gap-5 pr-5"
-                  aria-hidden={trackIndex === 1}
-                >
-                  {testimonials.map((testimonial) => (
-                    <TestimonialCard
-                      key={`${testimonial.id}-${trackIndex}`}
-                      quote={testimonial.quote}
-                      name={testimonial.name}
-                      location={testimonial.location}
-                    />
-                  ))}
-                </div>
-              ))}
+            <div className="overflow-hidden">
+              <div
+                className="testimonial-carousel-track flex w-max [transform:translate3d(0,0,0)] hover:[animation-play-state:paused]"
+                style={{ "--testimonial-carousel-duration": "34s" }}
+              >
+                {[0, 1].map((trackIndex) => (
+                  <div
+                    key={`testimonial-track-${trackIndex}`}
+                    className="flex shrink-0 gap-5 pr-5"
+                    aria-hidden={trackIndex === 1}
+                  >
+                    {testimonials.map((testimonial) => (
+                      <TestimonialCard
+                        key={`${testimonial.id}-${trackIndex}`}
+                        quote={testimonial.quote}
+                        name={testimonial.name}
+                        location={testimonial.location}
+                      />
+                    ))}
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
-        </div>
-      </section>
-</div>
+        </section>
+      </div>
       <Footer />
 
       {showLoginModal && (

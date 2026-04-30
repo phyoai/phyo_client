@@ -88,7 +88,7 @@ describe('ErrorBoundary Component', () => {
       );
 
       // Should show recovery button
-      expect(screen.getByRole('button')).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /try again/i })).toBeInTheDocument();
     });
   });
 
