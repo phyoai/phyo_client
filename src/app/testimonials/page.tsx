@@ -106,7 +106,7 @@ export default function TestimonialsPage() {
                 Search Engine
               </h1>
 
-              <p className="text-[16px] leading-[1.6] text-[#9b9b9b]">
+              <p className="text-[16px] leading-[1.8] text-[#9b9b9b]">
                 It Has Survived Not Only Five Centuries, But Also The Leap Into
                 Electronic Typesetting, Remaining Essentially Unchanged. It Was
                 Popularised In The 1960s With The Release Of Letraset Sheets
