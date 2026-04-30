@@ -1,185 +1,210 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { verifyEmailOtp, resendEmailOtp } from '@/store/slices/authSlice';
-import Button from '@/components/ui/Button';
-import OTPInput from '@/components/ui/OTPInput';
-import Spinner from '@/components/ui/Spinner';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { useDispatch, useSelector } from 'react-redux';
+import { useEffect, useState } from 'react';
+import OtpVerificationCard from '@/components/auth/OtpVerificationCard';
+import {
+  clearError,
+  resendEmailOtp,
+  verifyEmailOtp,
+} from '@/store/slices/authSlice';
+import { authUtils } from '@/utils/api';
+
+const headingFont = { fontFamily: 'var(--font-bricolage-grotesque)' };
+const bodyFont = { fontFamily: 'var(--font-inter)' };
+
+function OTPPageShell({ children }) {
+  return (
+    <div className="flex min-h-screen items-center justify-center overflow-hidden bg-[#010402] px-4 py-8 text-white sm:px-6">
+      {children}
+    </div>
+  );
+}
+
+function LoadingState() {
+  return (
+    <OTPPageShell>
+      <section className="relative flex min-h-[621px] w-full max-w-[520px] items-center justify-center overflow-hidden rounded-[24px] bg-[#001a0a] px-6 pb-8 pt-10 shadow-[0_30px_90px_rgba(0,0,0,0.45)] sm:px-10 sm:pb-10">
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute bottom-[-296px] right-[-350px] h-[830px] w-[824px] rounded-full bg-[#16a34a]/30 blur-[125px]"
+          style={{ transform: 'rotate(27.85deg)' }}
+        />
+        <div className="relative z-10 h-8 w-8 animate-spin rounded-full border-2 border-white/30 border-t-[#16a34a]" />
+      </section>
+    </OTPPageShell>
+  );
+}
+
+function MissingEmailState() {
+  return (
+    <OTPPageShell>
+      <section className="relative w-full max-w-[520px] overflow-hidden rounded-[24px] bg-[#001a0a] px-6 pb-8 pt-10 shadow-[0_30px_90px_rgba(0,0,0,0.45)] sm:min-h-[621px] sm:px-10 sm:pb-10">
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute bottom-[-296px] right-[-350px] h-[830px] w-[824px] rounded-full bg-[#16a34a]/30 blur-[125px]"
+          style={{ transform: 'rotate(27.85deg)' }}
+        />
+
+        <div className="relative z-10 flex min-h-[541px] flex-col items-center justify-center gap-8 text-center">
+          <div className="space-y-3">
+            <h1
+              className="text-[36px] font-medium leading-[1.2]"
+              style={headingFont}
+            >
+              <span className="text-white">OTP </span>
+              <span className="text-[#16a34a]">Verification</span>
+            </h1>
+
+            <p
+              className="text-[16px] leading-[1.6] text-[#9b9b9b]"
+              style={bodyFont}
+            >
+              No email was found for OTP verification.
+            </p>
+          </div>
+
+          <Link
+            href="/login"
+            className="flex h-12 w-full max-w-[440px] items-center justify-center rounded-[40px] border border-white bg-transparent px-5 text-[16px] font-medium leading-[1.2] text-white transition hover:border-[#16a34a] hover:text-[#16a34a] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#16a34a]"
+            style={bodyFont}
+          >
+            Back to login
+          </Link>
+        </div>
+      </section>
+    </OTPPageShell>
+  );
+}
 
 export default function OTPPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const dispatch = useDispatch();
 
-  const { loading, error, otpVerified, user } = useSelector((state) => state.auth);
+  const { loading, error, otpVerified, token, user } = useSelector(
+    (state) => state.auth
+  );
+
   const [email, setEmail] = useState('');
-  const [otp, setOtp] = useState('');
+  const [hasResolvedEmail, setHasResolvedEmail] = useState(false);
   const [resendCountdown, setResendCountdown] = useState(0);
-  const [successMessage, setSuccessMessage] = useState('');
+  const [statusMessage, setStatusMessage] = useState('');
   const [validationError, setValidationError] = useState('');
 
   useEffect(() => {
-    // Get email from localStorage if available
-    const storedEmail = localStorage.getItem('pendingEmail');
-    if (storedEmail) {
-      setEmail(storedEmail);
-    } else {
-      // Redirect if no pending email
-      router.push('/login');
-    }
-  }, [router]);
+    dispatch(clearError());
+
+    const emailFromQuery = searchParams.get('email')?.trim();
+    const pendingEmail = localStorage.getItem('pendingEmail');
+    const userEmail = localStorage.getItem('userEmail');
+
+    setEmail(emailFromQuery || pendingEmail || userEmail || '');
+    setHasResolvedEmail(true);
+  }, [dispatch, searchParams]);
 
   useEffect(() => {
-    if (otpVerified && user) {
-      setSuccessMessage('OTP verified successfully! Redirecting...');
-      setTimeout(() => {
-        localStorage.removeItem('pendingEmail');
-        router.push('/dashboard');
-      }, 2000);
+    if (!otpVerified) {
+      return;
     }
-  }, [otpVerified, user, router]);
+
+    if (token) {
+      authUtils.setToken(token);
+    }
+
+    if (user) {
+      localStorage.setItem('userData', JSON.stringify(user));
+    }
+
+    if (email) {
+      localStorage.setItem('userEmail', email);
+    }
+
+    setStatusMessage('OTP verified successfully. Redirecting...');
+
+    const timer = setTimeout(() => {
+      localStorage.removeItem('pendingEmail');
+      router.push('/dashboard');
+    }, 1500);
+
+    return () => clearTimeout(timer);
+  }, [email, otpVerified, router, token, user]);
 
   useEffect(() => {
-    if (resendCountdown > 0) {
-      const timer = setTimeout(() => setResendCountdown(resendCountdown - 1), 1000);
-      return () => clearTimeout(timer);
+    if (resendCountdown <= 0) {
+      return undefined;
     }
+
+    const timer = setTimeout(() => {
+      setResendCountdown((value) => value - 1);
+    }, 1000);
+
+    return () => clearTimeout(timer);
   }, [resendCountdown]);
 
-  const handleVerify = async (e) => {
-    e.preventDefault();
+  const handleVerifyOtp = async (otpCode) => {
     setValidationError('');
+    setStatusMessage('');
+    dispatch(clearError());
 
-    if (!otp || otp.length < 6) {
-      setValidationError('Please enter a valid 6-digit OTP');
-      return;
+    const result = await dispatch(verifyEmailOtp({ email, otp: otpCode }));
+
+    if (result.type.endsWith('/fulfilled')) {
+      return true;
     }
 
-    if (!email) {
-      setValidationError('Email not found. Please sign up again.');
-      return;
-    }
-
-    const result = await dispatch(
-      verifyEmailOtp({
-        email,
-        otp,
-      })
-    );
-
-    if (result.type.endsWith('/rejected')) {
-      setValidationError(result.payload || 'Invalid OTP. Please try again.');
-    }
+    setValidationError(result.payload || 'Invalid OTP. Please try again.');
+    return false;
   };
 
   const handleResendOtp = async () => {
-    if (!email) return;
+    if (!email || loading || resendCountdown > 0) {
+      return false;
+    }
+
+    setValidationError('');
+    setStatusMessage('');
+    dispatch(clearError());
 
     const result = await dispatch(resendEmailOtp({ email }));
 
     if (result.type.endsWith('/fulfilled')) {
-      setSuccessMessage('OTP sent successfully! Check your email.');
-      setOtp('');
       setResendCountdown(60);
-      setTimeout(() => setSuccessMessage(''), 3000);
+      setStatusMessage('A new OTP has been sent to your email.');
+      return true;
     }
+
+    setValidationError(result.payload || 'Failed to resend OTP.');
+    return false;
   };
 
+  if (!hasResolvedEmail) {
+    return <LoadingState />;
+  }
+
+  if (!email) {
+    return <MissingEmailState />;
+  }
+
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-slate-900 to-slate-800 px-4">
-      <div className="w-full max-w-md">
-        <div className="bg-white rounded-lg shadow-lg p-8">
-          <div className="mb-8 text-center">
-            <div className="inline-flex items-center justify-center w-12 h-12 bg-blue-100 rounded-full mb-4">
-              <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-              </svg>
-            </div>
-            <h1 className="text-3xl font-bold text-gray-900">Verify Your Email</h1>
-            <p className="text-gray-600 mt-2">
-              We sent a verification code to
-              <br />
-              <strong>{email || 'your email'}</strong>
-            </p>
-          </div>
-
-          {error && (
-            <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
-              <p className="text-red-700 text-sm">{error}</p>
-            </div>
-          )}
-
-          {validationError && (
-            <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
-              <p className="text-red-700 text-sm">{validationError}</p>
-            </div>
-          )}
-
-          {successMessage && (
-            <div className="mb-4 p-4 bg-green-50 border border-green-200 rounded-lg">
-              <p className="text-green-700 text-sm">{successMessage}</p>
-            </div>
-          )}
-
-          <form onSubmit={handleVerify} className="space-y-6">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-3">
-                Enter 6-Digit Code
-              </label>
-              <OTPInput
-                length={6}
-                value={otp}
-                onChange={setOtp}
-                disabled={loading}
-              />
-              <p className="text-xs text-gray-500 mt-2">
-                Enter the code from the email
-              </p>
-            </div>
-
-            <Button
-              type="submit"
-              className="w-full"
-              disabled={loading || otp.length < 6}
-            >
-              {loading ? (
-                <Spinner size="sm" />
-              ) : (
-                'Verify Email'
-              )}
-            </Button>
-          </form>
-
-          <div className="mt-6 pt-6 border-t border-gray-200">
-            <div className="space-y-3">
-              <p className="text-center text-gray-600 text-sm">
-                Didn't receive the code?
-              </p>
-              <Button
-                variant="outlined"
-                className="w-full"
-                onClick={handleResendOtp}
-                disabled={loading || resendCountdown > 0}
-              >
-                {resendCountdown > 0
-                  ? `Resend in ${resendCountdown}s`
-                  : 'Resend Code'}
-              </Button>
-            </div>
-          </div>
-
-          <div className="mt-6 text-center">
-            <p className="text-sm text-gray-600">
-              Wrong email?{' '}
-              <Link href="/signup" className="text-blue-600 hover:text-blue-700 font-semibold">
-                Sign up again
-              </Link>
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
+    <OTPPageShell>
+      <OtpVerificationCard
+        email={email}
+        loading={loading}
+        resendDisabled={resendCountdown > 0}
+        resendLabel={
+          resendCountdown > 0
+            ? `Resend OTP (${resendCountdown}s)`
+            : 'Resend OTP'
+        }
+        errorMessage={validationError || error || ''}
+        statusMessage={statusMessage}
+        inputIdPrefix="otp-page-digit"
+        onVerify={handleVerifyOtp}
+        onResend={handleResendOtp}
+      />
+    </OTPPageShell>
   );
 }

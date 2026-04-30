@@ -39,6 +39,8 @@ const testimonials = [
   },
 ];
 
+const CARD_REVEAL_OFFSET = 40;
+
 export default function StackingTestimonials() {
   const sectionRef = useRef(null);
   const cardsRef = useRef([]);
@@ -49,20 +51,9 @@ export default function StackingTestimonials() {
       const cards = cardsRef.current;
 
       cards.forEach((card, i) => {
-        gsap.to(card, {
-          scale: 0.86 + i * 0.03,
-          ease: "none",
-          scrollTrigger: {
-            trigger: card,
-            start: `top-=${40 * i} 35%`,
-            end: "top 15%",
-            scrub: true,
-          },
-        });
-
         ScrollTrigger.create({
           trigger: card,
-          start: `top-=${40 * i} 35%`,
+          start: `top-=${CARD_REVEAL_OFFSET * i} 35%`,
           endTrigger: endRef.current,
           end: "top center",
           pin: true,
@@ -78,14 +69,8 @@ export default function StackingTestimonials() {
   }, []);
 
   return (
-<section
-  ref={sectionRef}
-  className="relative w-full mt-[20px] h-full"
->
-
-      
+    <section ref={sectionRef} className="relative mt-[20px] h-full w-full">
       <div className="mx-auto w-full max-w-[460px] px-2 sm:px-0">
-        
         <div className="relative">
           {testimonials.map((item, index) => (
             <div
@@ -93,15 +78,18 @@ export default function StackingTestimonials() {
               ref={(el) => {
                 cardsRef.current[index] = el;
               }}
-              className="relative z-20 mb-8 min-h-[220px] w-full origin-top rounded-[24px] bg-[#141414] px-7 py-7 shadow-[0_20px_80px_rgba(0,0,0,0.45)]"
+              className="relative mb-8 flex h-[236px] w-full origin-top flex-col justify-between overflow-hidden rounded-[24px] bg-[#141414] px-7 py-7 shadow-[0_20px_80px_rgba(0,0,0,0.45)]"
+              style={{ zIndex: index + 1 }}
             >
               <div className="absolute left-8 top-7 h-[74px] w-[2px] rounded-full bg-[#16A34A]" />
 
-              <p className="max-w-3xl pl-5 text-[17px] leading-[1.7] text-[#A8A8A8] md:text-[18px]">
-                {item.text}
-              </p>
+              <div className="min-h-0 pl-5 pr-10">
+                <p className="line-clamp-4 text-[17px] leading-[1.7] text-[#A8A8A8] md:text-[18px]">
+                  {item.text}
+                </p>
+              </div>
 
-              <div className="mt-10 flex items-center gap-4">
+              <div className="relative z-10 flex items-center gap-4">
                 <img
                   src={item.image}
                   alt={item.name}

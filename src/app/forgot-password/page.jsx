@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { ToastContainer, toast } from 'react-toastify';
+import OutlineGlowButton from '@/components/shared/OutlineGlowButton';
 import 'react-toastify/dist/ReactToastify.css';
 
 const OTP_LENGTH = 6;
@@ -14,10 +15,14 @@ const bodyFont = { fontFamily: 'var(--font-inter)' };
 function ForgotIllustration({ compact = false }) {
   return (
     <div
-      className={`relative overflow-hidden ${compact ? 'h-[150px] w-[138px]' : 'h-[240px] w-[220px]'}`}
+      className={`relative overflow-hidden ${
+        compact
+          ? 'h-[150px] w-[138px] aspect-[11/12]'
+          : 'h-[240px] w-[220px] aspect-[11/12]'
+      }`}
       data-node-id="8:3026"
     >
-      <img src={FORGOT_ILLUSTRATION} alt="" className="absolute h-full w-full object-fill" />
+      <img src={FORGOT_ILLUSTRATION} alt="" className="absolute h-full w-full object-fill aspect-[11/12]" />
     </div>
   );
 }
@@ -215,32 +220,41 @@ export function ForgotPasswordCard({ isModal = false, onClose, onCompleted }) {
     }
   };
 
-  const modalHeightClass =
-    step === 1 ? 'sm:h-[610px]' : step === 2 ? 'sm:h-[621px]' : 'sm:h-[669px]';
+  const modalHeightClass = 'sm:h-[610px]';
+  const frameNodeId =
+    step === 1 ? '8:3022' : step === 2 ? '8:3471' : '8:3241';
+  const desktopPaddingClass =
+    step === 1 ? 'sm:px-10 sm:pb-10 sm:pt-10' : 'sm:px-10 sm:pb-6 sm:pt-6';
 
   const cardClass = isCompact
     ? 'relative w-full max-w-[320px] overflow-hidden rounded-[18px] bg-[#001a0a] px-5 pb-6 pt-5 shadow-[0_30px_90px_rgba(0,0,0,0.45)] sm:min-h-0 sm:px-5 sm:pb-6 sm:pt-5'
-    : `relative w-full max-w-[520px] overflow-hidden rounded-[24px] bg-[#001a0a] px-6 pb-8 pt-8 shadow-[0_30px_90px_rgba(0,0,0,0.45)] ${modalHeightClass} sm:px-10 sm:pb-10 sm:pt-10`;
+    : `relative w-full max-w-[520px] overflow-hidden rounded-[24px] bg-[#001a0a] px-6 pb-8 pt-8 shadow-[0_30px_90px_rgba(0,0,0,0.45)] ${modalHeightClass} ${desktopPaddingClass}`;
 
-  const contentGapClass = isCompact ? 'gap-5' : 'gap-8 sm:gap-10';
+  const contentGapClass =
+    isCompact ? 'gap-5' : step === 1 ? 'gap-[40px]' : 'gap-6';
   const contentWidthClass = isCompact ? 'w-full max-w-[280px]' : 'w-full max-w-[440px]';
   const titleClass = isCompact
     ? 'text-[40px] font-medium leading-[1.15] tracking-[-0.02em]'
-    : 'text-[36px] font-medium leading-[1.2] tracking-[-0.02em]';
+    : 'text-[36px] font-medium leading-[1.2]';
   const subtitleClass = isCompact ? 'text-[12px] leading-[1.5] text-[#9b9b9b]' : 'text-[16px] leading-[1.6] text-[#9b9b9b]';
   const labelClass = isCompact ? 'block text-[12px] leading-[1.2] text-[#868686]' : 'block text-[16px] leading-[1.2] text-[#868686]';
   const inputClass = isCompact
     ? 'w-full bg-transparent text-[14px] leading-none text-white outline-none placeholder:text-white/25'
-    : 'w-full bg-transparent text-[18px] leading-none text-white outline-none placeholder:text-white/25';
-  const buttonClass = isCompact
-    ? 'flex h-10 w-full items-center justify-center rounded-[40px] border border-white text-[14px] font-medium text-white transition hover:border-[#16a34a] hover:text-[#16a34a] disabled:cursor-not-allowed disabled:opacity-55'
-    : 'flex h-12 w-full items-center justify-center rounded-[40px] border border-white text-[16px] font-medium text-white transition hover:border-[#16a34a] hover:text-[#16a34a] disabled:cursor-not-allowed disabled:opacity-55';
+    : 'w-full bg-transparent text-[16px] leading-[1.2] text-white outline-none placeholder:text-white/25';
+  const otpFormSpacingClass = isCompact ? 'space-y-4' : 'space-y-6';
+  const otpContentSpacingClass = isCompact ? 'space-y-5' : 'space-y-6';
+  const resetFormSpacingClass = isCompact ? 'space-y-5' : 'space-y-6';
+  const resetContentSpacingClass = isCompact ? 'space-y-5' : 'space-y-6';
+  const resetFieldSpacingClass = isCompact ? 'space-y-5' : 'space-y-5';
 
   return (
-    <section className={cardClass} data-node-id="8:3022">
-      <div className="pointer-events-none absolute bottom-[-210px] right-[-210px] h-[620px] w-[620px] rounded-full bg-[radial-gradient(circle,rgba(22,163,74,0.45)_0%,rgba(0,26,10,0)_68%)]" />
+    <section className={cardClass} data-node-id={frameNodeId}>
+      <div
+        className="pointer-events-none absolute bottom-[-307px] right-[-350px] h-[830px] w-[824px] rounded-full bg-[#16a34a]/30 blur-[125px]"
+        style={{ transform: 'rotate(27.85deg)' }}
+      />
 
-      {isModal && onClose && (
+      {/* {isModal && onClose && (
         <button
           type="button"
           onClick={onClose}
@@ -249,7 +263,7 @@ export function ForgotPasswordCard({ isModal = false, onClose, onCompleted }) {
         >
           <span className="text-lg leading-none">&times;</span>
         </button>
-      )}
+      )} */}
 
       <div className={`relative z-10 flex h-full flex-col items-center ${contentGapClass}`}>
         <ForgotIllustration compact={isCompact} />
@@ -257,7 +271,7 @@ export function ForgotPasswordCard({ isModal = false, onClose, onCompleted }) {
         <div className={contentWidthClass}>
           {step === 1 && (
             <form
-              className={isCompact ? 'space-y-5' : 'space-y-8'}
+              className={isCompact ? 'space-y-5' : 'space-y-[32px]'}
               onSubmit={(event) => {
                 event.preventDefault();
                 sendForgotPasswordEmail();
@@ -279,40 +293,52 @@ export function ForgotPasswordCard({ isModal = false, onClose, onCompleted }) {
                 </p>
               </div>
 
-              <div className={isCompact ? 'space-y-5' : 'space-y-8'}>
+              <div className={isCompact ? 'space-y-5' : 'space-y-[32px]'}>
                 <div className={isCompact ? 'space-y-2' : 'space-y-3'}>
                   <label className={labelClass} style={bodyFont}>
                     Enter Your Email
                   </label>
-                  <div className="border-b border-white/65 pb-2.5 transition-colors focus-within:border-white">
+                  <div className="border-b border-white/65 transition-colors focus-within:border-white" style={{
+                    marginTop:'0px'
+                  }}>
                     <input
                       type="email"
                       autoComplete="email"
                       value={email}
                       onChange={(event) => setEmail(event.target.value)}
-                      placeholder="name@email.com"
+                      placeholder=""
                       className={inputClass}
                       style={bodyFont}
                     />
                   </div>
                 </div>
 
-                <button
+                <OutlineGlowButton
                   type="submit"
                   disabled={loading}
-                  className={buttonClass}
-                  style={bodyFont}
+                  className={`${isCompact ? 'h-10 text-[14px]' : 'h-12 text-[16px]'} w-full px-5 normal-case disabled:cursor-not-allowed disabled:opacity-50`}
+                  baseSurfaceClassName="bg-[#063e1b]"
+                  glowSurfaceClassName="bg-[#16A34A]"
                   data-node-id="8:3191"
                 >
-                  {loading ? 'Sending...' : 'Send OTP'}
-                </button>
+                  <span style={bodyFont} className="inline-flex items-center justify-center gap-3">
+                    {loading ? (
+                      <>
+                        <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white"></span>
+                        Sending...
+                      </>
+                    ) : (
+                      'Send OTP'
+                    )}
+                  </span>
+                </OutlineGlowButton>
               </div>
             </form>
           )}
 
           {step === 2 && (
             <form
-              className={isCompact ? 'space-y-4' : 'space-y-5'}
+              className={otpFormSpacingClass}
               onSubmit={(event) => {
                 event.preventDefault();
                 verifyCode();
@@ -328,7 +354,7 @@ export function ForgotPasswordCard({ isModal = false, onClose, onCompleted }) {
                 </p>
               </div>
 
-              <div className={isCompact ? 'space-y-5' : 'space-y-8'} data-node-id="8:3638">
+              <div className={otpContentSpacingClass} data-node-id="8:3638">
                 <div className={isCompact ? 'grid grid-cols-6 gap-1.5' : 'grid grid-cols-6 gap-2'} data-node-id="8:3639">
                   {Array.from({ length: OTP_LENGTH }).map((_, index) => (
                     <div key={index} className={isCompact ? 'flex h-[28px] flex-col justify-between' : 'flex h-[31px] flex-col justify-between'}>
@@ -352,15 +378,25 @@ export function ForgotPasswordCard({ isModal = false, onClose, onCompleted }) {
                   ))}
                 </div>
 
-                <button
+                <OutlineGlowButton
                   type="submit"
                   disabled={loading || verificationCode.length !== OTP_LENGTH}
-                  className={buttonClass}
-                  style={bodyFont}
+                  className={`${isCompact ? 'h-10 text-[14px]' : 'h-12 text-[16px]'} w-full px-5 normal-case disabled:cursor-not-allowed disabled:opacity-50`}
+                  baseSurfaceClassName="bg-[#063f1b]"
+                  glowSurfaceClassName="bg-[#16A34A]"
                   data-node-id="8:3658"
                 >
-                  {loading ? 'Verifying...' : 'Verify'}
-                </button>
+                  <span style={bodyFont} className="inline-flex items-center justify-center gap-3">
+                    {loading ? (
+                      <>
+                        <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white"></span>
+                        Verifying...
+                      </>
+                    ) : (
+                      'Verify'
+                    )}
+                  </span>
+                </OutlineGlowButton>
 
                 <p className={isCompact ? 'text-center text-[12px] text-[#868686]' : 'text-center text-[14px] text-[#868686]'} style={bodyFont} data-node-id="8:3659">
                   Don&apos;t receive?{' '}
@@ -379,7 +415,7 @@ export function ForgotPasswordCard({ isModal = false, onClose, onCompleted }) {
 
           {step === 3 && (
             <form
-              className={isCompact ? 'space-y-5' : 'space-y-8'}
+              className={resetFormSpacingClass}
               onSubmit={(event) => {
                 event.preventDefault();
                 resetPassword();
@@ -387,75 +423,98 @@ export function ForgotPasswordCard({ isModal = false, onClose, onCompleted }) {
             >
               <div className="space-y-3 text-center">
                 <h2 className={titleClass} style={headingFont}>
-                  <span className="text-white">Create </span>
-                  <span className="text-[#16a34a]">New Password</span>
+                  <span className="text-white">Reset </span>
+                  <span className="text-[#16a34a]">Password</span>
                 </h2>
                 <p className={subtitleClass} style={bodyFont}>
-                  Use at least 8 characters with letters,
+                  We'll send you an email with instruction to
                   <br />
-                  numbers, and symbols.
+                  reset your password.
                 </p>
               </div>
 
-              <div className={isCompact ? 'space-y-5' : 'space-y-7'}>
-                <div className={isCompact ? 'space-y-2' : 'space-y-3'}>
-                  <label className={labelClass} style={bodyFont}>
-                    New Password
-                  </label>
-                  <div className="flex items-center gap-2 border-b border-white/65 pb-2.5 transition-colors focus-within:border-white">
-                    <input
-                      type={showNewPassword ? 'text' : 'password'}
-                      value={newPassword}
-                      onChange={(event) => setNewPassword(event.target.value)}
-                      placeholder="Enter new password"
-                      autoComplete="new-password"
-                      className={inputClass}
-                      style={bodyFont}
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowNewPassword((value) => !value)}
-                      className="text-white/55 transition hover:text-white/90"
-                      aria-label={showNewPassword ? 'Hide new password' : 'Show new password'}
-                    >
-                      <EyeIcon slashed={!showNewPassword} />
-                    </button>
+              <div className={resetContentSpacingClass}>
+                <div className={resetFieldSpacingClass}>
+                  <div className={isCompact ? 'space-y-2' : 'space-y-3'}>
+                    <div className="flex items-center justify-between gap-4">
+                      <label htmlFor="forgot-new-password" className={labelClass} style={bodyFont}>
+                        Enter New Password
+                      </label>
+                      <button
+                        type="button"
+                        onClick={() => setShowNewPassword((value) => !value)}
+                        className="flex h-5 w-5 shrink-0 items-center justify-center text-[#868686] transition hover:text-white/90"
+                        aria-label={showNewPassword ? 'Hide new password' : 'Show new password'}
+                      >
+                        <EyeIcon slashed={!showNewPassword} />
+                      </button>
+                    </div>
+                    <div className="border-b border-white/65 transition-colors focus-within:border-white mt-0" style={{
+                      marginTop:'0px'
+                    }}>
+                      <input
+                        id="forgot-new-password"
+                        type={showNewPassword ? 'text' : 'password'}
+                        value={newPassword}
+                        onChange={(event) => setNewPassword(event.target.value)}
+                        placeholder=""
+                        autoComplete="new-password"
+                        className={inputClass}
+                        style={bodyFont}
+                      />
+                    </div>
+                  </div>
+
+                  <div className={isCompact ? 'space-y-2' : 'space-y-3'}>
+                    <div className="flex items-center justify-between gap-4">
+                      <label htmlFor="forgot-confirm-password" className={labelClass} style={bodyFont}>
+                        Re-Enter New Password
+                      </label>
+                      <button
+                        type="button"
+                        onClick={() => setShowConfirmPassword((value) => !value)}
+                        className="flex h-5 w-5 shrink-0 items-center justify-center text-[#868686] transition hover:text-white/90"
+                        aria-label={showConfirmPassword ? 'Hide confirm password' : 'Show confirm password'}
+                      >
+                        <EyeIcon slashed={!showConfirmPassword} />
+                      </button>
+                    </div>
+                    <div className="border-b border-white/65 transition-colors focus-within:border-white mt-0" style={{
+                      marginTop:'0px'
+                    }}>
+                      <input
+                        id="forgot-confirm-password"
+                        type={showConfirmPassword ? 'text' : 'password'}
+                        value={confirmNewPassword}
+                        onChange={(event) => setConfirmNewPassword(event.target.value)}
+                        placeholder=""
+                        autoComplete="new-password"
+                        className={inputClass}
+                        style={bodyFont}
+                      />
+                    </div>
                   </div>
                 </div>
 
-                <div className={isCompact ? 'space-y-2' : 'space-y-3'}>
-                  <label className={labelClass} style={bodyFont}>
-                    Confirm Password
-                  </label>
-                  <div className="flex items-center gap-2 border-b border-white/65 pb-2.5 transition-colors focus-within:border-white">
-                    <input
-                      type={showConfirmPassword ? 'text' : 'password'}
-                      value={confirmNewPassword}
-                      onChange={(event) => setConfirmNewPassword(event.target.value)}
-                      placeholder="Confirm new password"
-                      autoComplete="new-password"
-                      className={inputClass}
-                      style={bodyFont}
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowConfirmPassword((value) => !value)}
-                      className="text-white/55 transition hover:text-white/90"
-                      aria-label={showConfirmPassword ? 'Hide confirm password' : 'Show confirm password'}
-                    >
-                      <EyeIcon slashed={!showConfirmPassword} />
-                    </button>
-                  </div>
-                </div>
-
-                <button
+                <OutlineGlowButton
                   type="submit"
                   disabled={loading}
-                  className={buttonClass}
-                  style={bodyFont}
+                  className={`${isCompact ? 'h-10 text-[14px]' : 'h-12 text-[16px]'} w-full px-5 normal-case disabled:cursor-not-allowed disabled:opacity-50`}
+                  baseSurfaceClassName="bg-[#06401b]"
+                  glowSurfaceClassName="bg-[#16A34A]"
+                  data-node-id="8:3421"
                 >
-                  {loading ? 'Saving...' : 'Save Password'}
-                </button>
+                  <span style={bodyFont} className="inline-flex items-center justify-center gap-3">
+                    {loading ? (
+                      <>
+                        <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white"></span>
+                        Updating...
+                      </>
+                    ) : (
+                      'Update Password'
+                    )}
+                  </span>
+                </OutlineGlowButton>
               </div>
             </form>
           )}
