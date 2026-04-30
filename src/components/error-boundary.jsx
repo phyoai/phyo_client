@@ -20,7 +20,6 @@ export class ErrorBoundary extends React.Component {
       hasError: false,
       error: null,
       errorInfo: null,
-      isClient: false,
     };
   }
 
@@ -31,13 +30,12 @@ export class ErrorBoundary extends React.Component {
   componentDidCatch(error, errorInfo) {
     // Log error details for debugging
     console.error('ErrorBoundary caught an error:', error);
-    console.error('Error Info:', errorInfo);
+    console.error('Error Info:', errorInfo ?? null);
 
     // Update state with error information
     this.setState({
       error,
       errorInfo,
-      isClient: true,
     });
 
     // In production, you might want to log to an error reporting service
@@ -62,7 +60,7 @@ export class ErrorBoundary extends React.Component {
   };
 
   render() {
-    if (this.state.hasError && this.state.isClient) {
+    if (this.state.hasError) {
       const isDevelopment = process.env.NODE_ENV === 'development';
 
       return (

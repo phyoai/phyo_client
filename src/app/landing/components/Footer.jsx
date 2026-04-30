@@ -6,16 +6,16 @@ import { Facebook, Instagram, Twitter } from "lucide-react";
 import LogoIcon from "@/components/Icons/logo";
 
 const footerQuickLinks = [
-  { href: "#home", label: "Home" },
-  { href: "#features", label: "About" },
-  { href: "#testimonials", label: "Testimonials" },
-  { href: "#footer", label: "Contact" },
+  { href: "/", label: "Home" },
+  { href: "/about", label: "About" },
+  { href: "/testimonials", label: "Testimonials" },
+  { href: "/contact", label: "Contact" },
 ];
 
 const footerOtherLinks = [
   { href: "/", label: "Terms & Conditions" },
   { href: "/", label: "Privacy Policy" },
-  { href: "#faq", label: "FAQs" },
+  { href: "/faq", label: "FAQs" },
 ];
 
 const socialLinks = [
@@ -48,7 +48,7 @@ export default function Footer() {
                 <li key={link.label}>
                   <Link
                     href={link.href}
-                    className="transition duration-200 hover:text-white"
+                    className="transition duration-200 hover:text-[#16a34a]"
                   >
                     {link.label}
                   </Link>
@@ -66,7 +66,7 @@ export default function Footer() {
                 <li key={link.label}>
                   <Link
                     href={link.href}
-                    className="transition duration-200 hover:text-white"
+                    className="transition duration-200 hover:text-[#16a34a]"
                   >
                     {link.label}
                   </Link>
@@ -91,7 +91,7 @@ export default function Footer() {
                 aria-label={label}
                 className="grid h-11 w-11 place-items-center rounded-full bg-white/8 text-white transition duration-200 hover:bg-white/14"
               >
-                <img src={Icon} alt={`${label} icon`} className="h-10 w-10" />
+                <img src={Icon} alt={`${label} icon`} className="h-10 w-10 hover:bg-[#16a34a] hover:rounded-full" />
               </Link>
             ))}
           </div>
