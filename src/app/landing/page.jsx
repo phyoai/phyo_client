@@ -1084,7 +1084,7 @@ export default function LandingPage() {
 
         <div className="relative mx-auto flex min-h-[560px] w-full max-w-[1440px] items-center px-4 py-12 sm:px-6 lg:min-h-[600px] lg:px-[120px]">
           <div className="grid w-full items-center gap-8 lg:grid-cols-[minmax(0,620px)_minmax(0,1fr)]">
-            <div className="max-w-[620px]">
+            <div className="max-w-[620px] mb-[54px]">
               <h2 className="font-bricolage text-[34px] font-normal leading-[1.3] text-white sm:text-[36px] sm:leading-[1.35]">
                 <span className="block">AI Search. Verified Influencers.</span>
                 <span className="block">Real Results.</span>

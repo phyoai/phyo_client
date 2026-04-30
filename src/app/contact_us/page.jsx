@@ -1,3 +1,6 @@
+"use client";
+
+import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -45,6 +48,38 @@ function ContactField({
 }
 
 export default function ContactUsPage() {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    const form = e.currentTarget;
+    const formData = new FormData(form);
+    formData.append("access_key", process.env.NEXT_PUBLIC_FORM_KEY);
+
+    setIsSubmitting(true);
+
+    try {
+      const response = await fetch("https://api.web3forms.com/submit", {
+        method: "POST",
+        body: formData,
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        alert("Success! Your message has been sent.");
+        form.reset();
+      } else {
+        alert(`Error: ${data.message || "Unable to send message."}`);
+      }
+    } catch {
+      alert("Something went wrong. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
     <div
       id="home"
@@ -56,7 +91,7 @@ export default function ContactUsPage() {
       <div className="relative z-10">
         <Navbar />
 
-        <main className="mx-auto max-w-[1440px] px-4 pb-20 sm:px-6 lg:px-[120px] lg:pb-24">
+        <main className="mx-auto max-w-[1440px] px-4 pb-20 sm:px-6 lg:px-[120px] lg:pb-20">
           <section className="pt-14 lg:pt-20">
             <div className="grid items-center gap-10 lg:grid-cols-[minmax(0,514px)_minmax(0,560px)] lg:justify-between lg:gap-[126px]">
               <h1 className="bg-[linear-gradient(94.6421deg,#16a34a_3.4033%,#ffffff_57.976%,#16a34a_97.641%)] bg-clip-text font-bricolage text-[44px] leading-[1.2] text-transparent sm:text-[50px] lg:text-[56px]">
@@ -79,7 +114,7 @@ export default function ContactUsPage() {
             <LandingAccentGridPatterns />
           </section>
 
-          <section id="testimonials" className="pt-2 lg:pt-2">
+          <section id="testimonials" className="pt-4">
             <div className="grid gap-10 lg:grid-cols-[500px_640px] lg:justify-between">
               <div className="pt-1">
                 <h2 className="font-bricolage text-[36px] leading-[1.4] text-white">
@@ -146,7 +181,7 @@ export default function ContactUsPage() {
                         className="mt-0.5"
                       />
                       <Link
-                        href="https://maps.app.goo.gl/xiLApjzXmi3XHdKs6?g_st=ic"
+                        href="https://maps.app.goo.gl/yXPkgrGsrKALML6w5"
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-[14px] leading-[1.4] text-white transition hover:text-[#16A34A]"
@@ -171,7 +206,7 @@ export default function ContactUsPage() {
                   platform.
                 </p>
 
-                <form className="mt-4 space-y-6">
+                <form id="form" className="mt-4 space-y-6" onSubmit={handleSubmit}>
                   <ContactField
                     label="Full Name"
                     name="fullName"
@@ -210,10 +245,11 @@ export default function ContactUsPage() {
                   </label>
 
                   <button
-                    type="button"
+                    type="submit"
+                    disabled={isSubmitting}
                     className="inline-flex h-10 w-[180px] items-center justify-center rounded-[40px] border border-[#16a34a] text-[16px] text-[#16a34a] transition hover:bg-[#16a34a]/10"
                   >
-                    Submit Now
+                    {isSubmitting ? "Sending..." : "Submit Now"}
                   </button>
                 </form>
               </article>
