@@ -42,7 +42,7 @@ const pricingPlans = [
   {
     name: "Silver",
     monthlyPrice: "Rs. 1,900",
-    annualPrice: "Rs. 1,615",
+    annualPrice: "Rs. 1,425",
     period: "/ Month",
     description: "Best for freelancers, boutique agencies, or small teams.",
     buttonLabel: "Start Free",
@@ -64,7 +64,7 @@ const pricingPlans = [
   {
     name: "Gold",
     monthlyPrice: "Rs. 7,900",
-    annualPrice: "Rs. 6,715",
+    annualPrice: "Rs. 5,925",
     period: "/ Month",
     description: "Perfect for growing brands and mid-size teams.",
     buttonLabel: "Start Free",
@@ -86,7 +86,7 @@ const pricingPlans = [
   {
     name: "Premium",
     monthlyPrice: "Rs. 19,900",
-    annualPrice: "Rs. 16,915",
+    annualPrice: "Rs. 14,925",
     period: "/ Month",
     description: "Perfect for global agencies managing multiple campaigns.",
     buttonLabel: "Start Free",
@@ -984,7 +984,7 @@ export default function LandingPage() {
                       : "bg-[#3b3b3b] text-[#e3e3e3]"
                   }`}
                 >
-                  Save 15%
+                  Save 25%
                 </span>
               </span>
             </button>

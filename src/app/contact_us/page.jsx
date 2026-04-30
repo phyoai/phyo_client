@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 
 import Navbar from "@/app/landing/components/Navbar";
 import Footer from "@/app/landing/components/Footer";
@@ -89,8 +90,8 @@ export default function ContactUsPage() {
                 </h2>
                 <p className="mt-4 text-[16px] leading-[1.6] text-[#9b9b9b]">
                   It Was Popularised In The 1960s With The Release Of Letraset
-                  Sheets Containing Lorem Ipsum Passages, And More Recently
-                  With Desktop Publishing Software.
+                  Sheets Containing Lorem Ipsum Passages, And More Recently With
+                  Desktop Publishing Software.
                 </p>
 
                 <div className="mt-12 space-y-10">
@@ -106,9 +107,14 @@ export default function ContactUsPage() {
                           width={26}
                           height={19}
                         />
-                        <p className="text-[14px] leading-[1.2] text-white">
-                          info@pyromedia.com
-                        </p>
+                        <Link
+                          href="https://mail.google.com/mail/?view=cm&fs=1&to=phyo.aiofficial@gmail.com"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-[14px] leading-[1.2] text-white transition hover:text-[#16A34A]"
+                        >
+                          phyo.aiofficial@gmail.com
+                        </Link>
                       </div>
                       <div className="flex items-center gap-3">
                         <Image
@@ -117,9 +123,12 @@ export default function ContactUsPage() {
                           width={18}
                           height={24}
                         />
-                        <p className="text-[14px] leading-[1.2] text-white">
-                          +91 00000 00000
-                        </p>
+                        <Link
+                          href="tel:+919315732227"
+                          className="text-[14px] leading-[1.2] text-white transition hover:text-[#16A34A]"
+                        >
+                          +91 9315732227
+                        </Link>
                       </div>
                     </div>
                   </div>
@@ -136,11 +145,17 @@ export default function ContactUsPage() {
                         height={24}
                         className="mt-0.5"
                       />
-                      <p className="text-[14px] leading-[1.4] text-white">
-                        E-12/2, 3rd Floor, Block E, Sector-1, Noida
+                      <Link
+                        href="https://maps.app.goo.gl/xiLApjzXmi3XHdKs6?g_st=ic"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-[14px] leading-[1.4] text-white transition hover:text-[#16A34A]"
+                        aria-label="Open office location in Google Maps"
+                      >
+                        E-12/2, 3rd Floor, Block E, Sector-1, Near GAIL, Noida
                         <br />
                         Uttar Pradesh - 201301
-                      </p>
+                      </Link>
                     </div>
                   </div>
                 </div>
