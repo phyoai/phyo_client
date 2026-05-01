@@ -70,7 +70,7 @@ export default function StackingTestimonials() {
 
   return (
     <section ref={sectionRef} className="relative mt-[20px] h-full w-full">
-      <div className="mx-auto w-full max-w-[460px] px-2 sm:px-0">
+      <div className="mx-auto w-full max-w-[660px] px-2 sm:px-0">
         <div className="relative">
           {testimonials.map((item, index) => (
             <div

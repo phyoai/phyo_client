@@ -240,7 +240,7 @@ export default function TestimonialsPage() {
   className="relative bg-[#050505] py-16 pb-[400px] lg:py-20 lg:pb-[460px]"
 >
   {/* Sticky heading */}
-  <div className="sticky top-20 z-30 mb-16 bg-[#050505] pb-6">
+  <div className="sticky top-20 z-30 pb-10 bg-[#050505]">
     <CenteredHeading
       prefix="Voices That "
       highlight="Trust Us"
@@ -249,7 +249,7 @@ export default function TestimonialsPage() {
   </div>
 
   {/* Cards */}
-  <div className="relative z-20 grid items-start justify-items-center gap-5 lg:grid-cols-2 lg:gap-8 top-[30px] ">
+  <div className="relative z-20 grid items-start justify-items-center gap-5 lg:grid-cols-2 lg:gap-8 ">
     <StackingTestimonials />
     <StackingTestimonials />
   </div>
