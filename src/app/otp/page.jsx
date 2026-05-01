@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useDispatch, useSelector } from 'react-redux';
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import OtpVerificationCard from '@/components/auth/OtpVerificationCard';
 import {
   clearError,
@@ -79,7 +79,7 @@ function MissingEmailState() {
   );
 }
 
-export default function OTPPage() {
+function OTPPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const dispatch = useDispatch();
@@ -206,5 +206,13 @@ export default function OTPPage() {
         onResend={handleResendOtp}
       />
     </OTPPageShell>
+  );
+}
+
+export default function OTPPage() {
+  return (
+    <Suspense fallback={<LoadingState />}>
+      <OTPPageContent />
+    </Suspense>
   );
 }
