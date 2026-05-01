@@ -297,7 +297,7 @@ function FaqItemCard({
         <div className="overflow-hidden">
           <p
             ref={contentRef}
-            className={`max-w-[560px] px-6 pb-6 text-[14px] leading-[1.75] transition-colors duration-300 ${
+            className={`max-w-[560px] px-6 pb-6 text-[16px] leading-[1.75] transition-colors duration-300 ${
               active ? "text-[#425046]" : "text-[#9b9b9b]"
             }`}
           >
