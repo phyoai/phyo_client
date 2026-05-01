@@ -862,7 +862,7 @@ export default function LandingPage() {
                 </p>
               </div>
 
-              <div className="absolute right-6 top-5 hidden h-44 w-44 rounded-full bg-[#16a34a]/15 blur-2xl sm:block" />
+              <div className="absolute right-6 top-5 hidden h-44 w-44 rounded-full blur-2xl sm:block" />
               <div className="relative mt-8 h-[180px] sm:absolute sm:right-5 sm:top-1/2 sm:mt-0 sm:h-[215px] sm:w-[355px] sm:-translate-y-1/2">
                 <Image
                   src="/landing/card_laptop1.png"
