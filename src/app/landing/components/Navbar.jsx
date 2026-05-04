@@ -15,7 +15,7 @@ const navItems = [
 export default function Navbar() {
   return (
     <header className="px-4 pt-4 sm:px-6 lg:px-[60px] lg:pt-5">
-      <div className="relative isolate h-[80px] overflow-hidden rounded-[32px] border border-white/10 bg-white/[0.04] backdrop-blur-md sm:rounded-[40px] lg:rounded-[50px]">
+      <div className="relative isolate overflow-hidden rounded-[32px] border border-white/10 bg-white/[0.04] backdrop-blur-md sm:rounded-[40px] lg:rounded-[50px]">
         <div
           aria-hidden
           className="pointer-events-none absolute inset-0 rounded-[inherit]"
@@ -24,14 +24,14 @@ export default function Navbar() {
           <div className="absolute inset-0 bg-[radial-gradient(45%_160%_at_72%_50%,rgba(22,163,74,0.34)_0%,rgba(22,163,74,0.1)_45%,rgba(0,0,0,0)_80%)]" />
         </div>
 
-        <div className="relative z-10 flex h-full flex-wrap items-center justify-between gap-4 px-5 py-0 sm:px-8 lg:px-[46px]">
-          <Link href="/" aria-label="Phyo Home">
+        <div className="relative z-10 flex min-h-[80px] flex-col items-center justify-center gap-5 px-5 py-5 text-center sm:px-8 sm:py-6 lg:flex-row lg:justify-between lg:gap-4 lg:px-[46px] lg:py-0 lg:text-left">
+          <Link href="/" aria-label="Phyo Home" className="shrink-0">
             <LogoIcon className="h-auto w-[110px] sm:w-[124px]" />
           </Link>
 
-          <div className="flex flex-wrap items-center gap-4 sm:gap-6 lg:gap-9">
+          <div className="flex w-full flex-col items-center gap-4 sm:gap-5 lg:w-auto lg:flex-row lg:gap-9">
             <nav
-              className="font-inter flex flex-wrap items-center gap-4 text-sm font-normal text-white sm:gap-6 sm:text-base lg:gap-9"
+              className="font-inter flex flex-wrap items-center justify-center gap-x-5 gap-y-3 text-sm font-normal text-white sm:gap-x-6 sm:text-base lg:justify-start lg:gap-9"
               style={{ fontFamily: "var(--font-inter)" }}
             >
               {navItems.map((item) => (
@@ -47,7 +47,7 @@ export default function Navbar() {
 
             <OutlineGlowButton
               href="/login?expired=true"
-              className="h-10 w-[100px]"
+              className="h-10 w-full max-w-[220px] sm:w-[120px]"
             >
               Sign In
             </OutlineGlowButton>

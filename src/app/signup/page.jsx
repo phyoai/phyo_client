@@ -228,16 +228,16 @@ function AuthArtworkPanel() {
         />
       </div>
       <div className="relative z-10 flex h-full w-full flex-col justify-between px-8 py-10 lg:px-10 lg:py-12 xl:px-[72px] xl:py-[60px]">
-        <PhyoLogo priority className="h-[30px] w-[200px] ml-[32.5px]" />
-        <div className="w-[740px] pl-[80px]">
+        <PhyoLogo priority className="h-[30px] w-auto max-w-[200px] lg:ml-4 xl:ml-[32.5px]" />
+        <div className="max-w-[540px] lg:pl-6 xl:pl-[80px]">
           <h1
-            className="max-w-[540px] text-[32px] font-normal leading-[1.2] text-white xl:text-[36px]"
+            className="text-[32px] font-normal leading-[1.5] text-white xl:text-[36px]"
             style={{ fontFamily: "var(--font-bricolage-grotesque)" }}
           >
             Welcome to the <span className="font-extrabold">phyo.aI</span>
           </h1>
           <p
-            className="max-w-[540px] text-[15px] leading-[1.6] text-[#9b9b9b] xl:text-[16px]"
+            className="mt-4 text-[15px] leading-[1.9] text-[#9b9b9b] xl:text-[16px]"
             style={{ fontFamily: "var(--font-inter)" }}
           >
             {welcomeCopy}
@@ -633,7 +633,7 @@ function SignupForm() {
         <AuthArtworkPanel />
 
         <section className="relative flex min-h-screen items-start justify-center px-4 py-6 sm:px-6 sm:py-8 md:px-8 md:py-10 lg:w-1/2 lg:items-center lg:px-10 lg:py-12 xl:px-[92px]">
-          <div className="absolute inset-0 lg:hidden bg-[radial-gradient(circle_at_top,rgba(9,97,41,0.25),rgba(1,4,2,0)_48%)]"></div>
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(9,97,41,0.25),rgba(1,4,2,0)_48%)] lg:hidden"></div>
 
           <div className="relative w-full max-w-[540px] rounded-[28px] border border-white/10 bg-white/[0.03] p-5 shadow-[0_20px_60px_rgba(0,0,0,0.35)] backdrop-blur-sm sm:p-7 lg:rounded-none lg:border-0 lg:bg-transparent lg:p-0 lg:shadow-none lg:backdrop-blur-0">
             <PhyoLogo
@@ -704,7 +704,7 @@ function SignupForm() {
                     <CheckIcon />
                   </span>
                   <span
-                    className="flex-1 whitespace-nowrap text-[12px] leading-[1.4] text-[#868686] sm:text-[13px]"
+                    className="flex-1 text-[12px] leading-[1.5] text-[#868686] sm:text-[13px]"
                     style={{ fontFamily: "var(--font-inter)" }}
                   >
                     {checkboxCopy}
