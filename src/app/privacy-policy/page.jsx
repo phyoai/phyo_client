@@ -565,25 +565,20 @@ export default function PrivacyPolicyPage() {
 
         <div className="mx-auto max-w-[1440px] px-4 pb-16 pt-12 sm:px-6 sm:pb-20 sm:pt-16 lg:px-[120px] lg:pb-24 lg:pt-20">
           <section className="max-w-[1200px]">
-<div className="inline-block">
-  <p className="capitalize font-bricolage text-[56px] font-normal leading-[1.2]">
-    <span className="text-[#16A34A]">Privacy </span>
-    <span
-      className="bg-clip-text text-transparent"
-      style={{
-        fontVariationSettings: "'opsz' 14, 'wdth' 100",
-        backgroundImage:
-          "linear-gradient(90deg, #FFFFFF 0%, #FFFFFF 55%, #16A34A 100%)",
-      }}
-    >
-      Policy
-    </span>
-  </p>
+            <h1
+              className="inline-block w-fit bg-clip-text font-bricolage text-[40px] font-normal leading-[1.2] text-transparent capitalize sm:text-[48px] lg:text-[56px]"
+              style={{
+                fontVariationSettings: "'opsz' 14, 'wdth' 100",
+                backgroundImage:
+                  "linear-gradient(102.272deg, #16A34A 3.4%, #FFFFFF 58%, #16A34A 97.64%)",
+              }}
+            >
+              Privacy Policy
+            </h1>
 
             <p className="mt-4 text-[14px] leading-[1.6] text-[#9b9b9b] sm:text-[16px]">
               Last updated: {lastUpdated}
             </p>
-</div>
           </section>
 
           <div className="mt-12 max-w-[1200px] space-y-9 sm:mt-14 sm:space-y-10">
