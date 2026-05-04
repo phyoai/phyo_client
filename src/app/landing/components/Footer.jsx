@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { Facebook, Instagram, Twitter } from "lucide-react";
 
 import LogoIcon from "@/components/Icons/logo";
 
@@ -13,15 +12,15 @@ const footerQuickLinks = [
 ];
 
 const footerOtherLinks = [
-  { href: "/", label: "Terms & Conditions" },
-  { href: "/", label: "Privacy Policy" },
-  { href: "/faq", label: "FAQs" },
+  { href: "/term-and-conditions", label: "Terms & Conditions" },
+  { href: "/privacy-policy", label: "Privacy Policy" },
+  { href: "/faqs", label: "FAQs" },
 ];
 
 const socialLinks = [
-  { href: "/", icon: '/footer/fb.svg', label: "Facebook" },
-  { href: "/", icon: '/footer/ig.svg', label: "Instagram" },
-  { href: "/", icon: '/footer/tw.svg', label: "Twitter" },
+  { href: "/", icon: "/footer/fb.svg", label: "Facebook" },
+  { href: "/", icon: "/footer/ig.svg", label: "Instagram" },
+  { href: "/", icon: "/footer/tw.svg", label: "Twitter" },
 ];
 
 export default function Footer() {

@@ -746,10 +746,10 @@ export default function LandingPage() {
             </div>
 
             <form
-              className="mx-auto mt-10 max-w-[800px] px-4"
+              className="mx-auto mt-10 max-w-[920px] px-4"
               onSubmit={handleSearchSubmit}
             >
-              <div className="relative rounded-full bg-[linear-gradient(270deg,#16A34A_0%,#FFFFFF_52.88%,#16A34A_100%)] p-[1px] shadow-[0_0_28px_rgba(22,163,74,0.45)]">
+              <div className="relative overflow-hidden rounded-full bg-[linear-gradient(270deg,#16A34A_0%,#FFFFFF_52.88%,#16A34A_100%)] p-[1px] shadow-[0_0_28px_rgba(22,163,74,0.45)]">
                 {/* Soft outer glow */}
                 <div className="pointer-events-none absolute inset-0 rounded-full bg-[#16A34A]/25 blur-l" />
 

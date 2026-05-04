@@ -237,7 +237,7 @@ export default function TestimonialsPage() {
 
 <section
   id="testimonials"
-  className="relative bg-[#050505] py-16 pb-[400px] lg:py-20 lg:pb-[460px]"
+  className="relative bg-[#050505] py-16 pb-[400px] lg:py-20 lg:pb-[380px]"
 >
   {/* Sticky heading */}
   <div className="sticky top-20 z-30 pb-10 bg-[#050505]">
@@ -249,7 +249,7 @@ export default function TestimonialsPage() {
   </div>
 
   {/* Cards */}
-  <div className="relative z-20 grid items-start justify-items-center gap-5 lg:grid-cols-2 lg:gap-8 ">
+  <div className="relative z-20 grid items-start justify-items-center gap-5 lg:grid-cols-2 lg:gap-8 pt-[15px]">
     <StackingTestimonials />
     <StackingTestimonials />
   </div>
