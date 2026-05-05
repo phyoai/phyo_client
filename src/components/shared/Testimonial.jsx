@@ -78,13 +78,13 @@ export default function StackingTestimonials() {
               ref={(el) => {
                 cardsRef.current[index] = el;
               }}
-              className="relative mb-8 flex h-[236px] w-full origin-top flex-col justify-between overflow-hidden rounded-[24px] bg-[#141414] px-7 py-7 shadow-[0_20px_80px_rgba(0,0,0,0.45)]"
+              className="group relative mb-8 flex h-[236px] w-full origin-top flex-col justify-between overflow-hidden rounded-[24px] bg-[#141414] px-7 py-7 shadow-[0_20px_80px_rgba(0,0,0,0.45)] transition-all duration-500 ease-out hover:border-[#16a34a]/35 hover:bg-[#d1eedd] hover:shadow-[0_18px_42px_rgba(22,163,74,0.16)]"
               style={{ zIndex: index + 1 }}
             >
               <div className="absolute left-8 top-7 h-[74px] w-[2px] rounded-full bg-[#16A34A]" />
 
               <div className="min-h-0 pl-5 pr-10">
-                <p className="line-clamp-4 text-[17px] leading-[1.7] text-[#A8A8A8] md:text-[18px]">
+                <p className="line-clamp-4 text-[17px] leading-[1.7] text-[#a8a8a8] transition-colors duration-500 group-hover:text-[#181818] md:text-[18px]">
                   {item.text}
                 </p>
               </div>
@@ -97,10 +97,12 @@ export default function StackingTestimonials() {
                 />
 
                 <div>
-                  <h3 className="text-[20px] font-semibold text-[#16A34A]">
+                  <h3 className="text-[20px] font-semibold text-[#16a34a] transition-colors duration-500 group-hover:text-black">
                     {item.name}
                   </h3>
-                  <p className="text-[16px] text-[#9B9B9B]">{item.location}</p>
+                  <p className="text-[16px] text-[#9b9b9b] transition-colors duration-500 group-hover:text-black">
+                    {item.location}
+                  </p>
                 </div>
               </div>
 

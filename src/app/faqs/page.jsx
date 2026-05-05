@@ -23,16 +23,16 @@ const faqItems = [
   {
     question: "How Secure Is My Data On Phyo?",
     answer:
-      "Your data security is our top priority. We use enterprise-grade encryption, secure servers, and follow industry best practices..",
+      "Your data security is our top priority. We use enterprise-grade encryption, secure servers, and follow industry best practices and compliance standards to protect your information at all times.  ",
   },
   {
     question: "Can I Cancel My Subscription Anytime?",
     answer:
-      "Absolutely! You can cancel your subscription at any time with no hidden fees or penalties. Your account will remain...",
+      "Absolutely! You can cancel your subscription at any time with no hidden fees or penalties. Your account will remain active until the end of your current billing cycle.",
   },
   {
     question: "Can Phyo Actually Help Me Grow My Brand Fast?",
-    answer: "Yes! Our platform is designed to accelerate brand growth...",
+    answer: "Yes! Our platform is designed to accelerate brand growth and help you reach the right audience faster with AI-powered influencer discovery and campaign optimization.",
   },
 ];
 

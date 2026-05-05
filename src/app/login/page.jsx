@@ -154,17 +154,17 @@ function CheckIcon() {
 function GoogleIcon({ isWhite = false }) {
   const fill = isWhite
     ? {
-        blue: "#FFFFFF",
-        green: "#FFFFFF",
-        yellow: "#FFFFFF",
-        red: "#FFFFFF",
-      }
+      blue: "#FFFFFF",
+      green: "#FFFFFF",
+      yellow: "#FFFFFF",
+      red: "#FFFFFF",
+    }
     : {
-        blue: "#4285F4",
-        green: "#34A853",
-        yellow: "#FBBC05",
-        red: "#EA4335",
-      };
+      blue: "#4285F4",
+      green: "#34A853",
+      yellow: "#FBBC05",
+      red: "#EA4335",
+    };
 
   return (
     <svg aria-hidden="true" className="h-5 w-5" viewBox="0 0 24 24">
@@ -220,7 +220,7 @@ function AuthArtworkPanel() {
           </h1>
 
           <p
-            className="mt-4 text-[15px] leading-[1.9] text-[#9b9b9b] xl:text-[16px]"
+            className="mt-4 text-[16px] leading-[1.9] text-[#9b9b9b] xl:text-[16px]"
             style={{ fontFamily: "var(--font-inter)" }}
           >
             {welcomeCopy}
@@ -614,7 +614,11 @@ function LoginForm() {
                     className="peer sr-only"
                   />
 
-                  <span className="mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-[2px] border border-[#9b9b9b] bg-transparent text-transparent transition peer-checked:border-[#16a34a] peer-checked:bg-[#16a34a]/10 peer-checked:text-[#16a34a] peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-[#16a34a]">
+                  <span className="mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-[2px] border border-[#9b9b9b] bg-transparent text-transparent transition 
+peer-checked:border-[#16a34a] 
+peer-checked:bg-[#16a34a]   // 👈 full green fill
+peer-checked:text-white     // 👈 white tick
+peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-[#16a34a]">
                     <CheckIcon />
                   </span>
 
