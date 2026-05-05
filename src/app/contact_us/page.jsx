@@ -9,6 +9,7 @@ import Footer from "@/app/landing/components/Footer";
 import LandingAccentGridPatterns from "@/components/shared/LandingAccentGridPatterns";
 import LandingHeroBackground from "@/components/shared/LandingHeroBackground";
 import MilestoneCards from "@/components/shared/MilestoneCards";
+import OutlineGlowButton from "@/components/shared/OutlineGlowButton";
 
 function ContactField({
   label,
@@ -146,7 +147,7 @@ export default function ContactUsPage() {
                           href="https://mail.google.com/mail/?view=cm&fs=1&to=phyo.aiofficial@gmail.com"
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-[14px] leading-[1.2] text-white transition hover:text-[#16A34A]"
+                          className="text-[16px] leading-[1.2] text-white transition hover:text-[#16A34A]"
                         >
                           phyo.aiofficial@gmail.com
                         </Link>
@@ -160,7 +161,7 @@ export default function ContactUsPage() {
                         />
                         <Link
                           href="tel:+919315732227"
-                          className="text-[14px] leading-[1.2] text-white transition hover:text-[#16A34A]"
+                          className="text-[16px] leading-[1.2] text-white transition hover:text-[#16A34A]"
                         >
                           +91 9315732227
                         </Link>
@@ -184,7 +185,7 @@ export default function ContactUsPage() {
                         href="https://maps.app.goo.gl/yXPkgrGsrKALML6w5"
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-[14px] leading-[1.4] text-white transition hover:text-[#16A34A]"
+                        className="text-[16px] leading-[1.4] text-white transition hover:text-[#16A34A]"
                         aria-label="Open office location in Google Maps"
                       >
                         E-12/2, 3rd Floor, Block E, Sector-1, Near GAIL, Noida
@@ -244,13 +245,20 @@ export default function ContactUsPage() {
                     Digital Changeover.
                   </label>
 
-                  <button
+                  {/* <button
                     type="submit"
                     disabled={isSubmitting}
                     className="inline-flex h-10 w-[180px] items-center justify-center rounded-[40px] border border-[#16a34a] text-[16px] text-[#16a34a] transition hover:bg-[#16a34a]/10"
                   >
                     {isSubmitting ? "Sending..." : "Submit Now"}
-                  </button>
+                  </button> */}
+                  <OutlineGlowButton
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="inline-flex h-10 w-[180px] items-center justify-center rounded-[40px] border border-[#16a34a] text-[16px] text-[#16a34a] transition hover:bg-[#16a34a]/10"
+                  >
+                    {isSubmitting ? "Sending..." : "Submit Now"}
+                  </OutlineGlowButton>
                 </form>
               </article>
             </div>

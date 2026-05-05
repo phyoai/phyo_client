@@ -123,16 +123,16 @@ const faqItems = [
   {
     question: "How Secure Is My Data On Phyo?",
     answer:
-      "Your data security is our top priority. We use enterprise-grade encryption, secure servers, and follow industry best practices..",
+      "Your data security is our top priority. We use enterprise-grade encryption, secure servers, and follow industry best practices and compliance standards to protect your information at all times.  ",
   },
   {
     question: "Can I Cancel My Subscription Anytime?",
     answer:
-      "Absolutely! You can cancel your subscription at any time with no hidden fees or penalties. Your account will remain...",
+      "Absolutely! You can cancel your subscription at any time with no hidden fees or penalties. Your account will remain active until the end of your current billing cycle.",
   },
   {
     question: "Can Phyo Actually Help Me Grow My Brand Fast?",
-    answer: "Yes! Our platform is designed to accelerate brand growth...",
+    answer: "Yes! Our platform is designed to accelerate brand growth and help you reach the right audience faster with AI-powered influencer discovery and campaign optimization.",
   },
 ];
 
@@ -627,7 +627,7 @@ export default function LandingPage() {
                 <div className="pointer-events-none absolute inset-0 rounded-full bg-[#16A34A]/25 blur-l" />
 
                 {/* Search box */}
-                <div className="relative flex h-[68px] items-center gap-3 rounded-full bg-[#010a04]/90 px-5 py-2 backdrop-blur-md sm:pl-6 sm:pr-[10px]">
+                <div className="relative flex h-[72px] items-center gap-3 rounded-full bg-[#010a04]/90 px-5 py-2 backdrop-blur-md sm:pl-6 sm:pr-[10px]">
                   <input
                     type="text"
                     value={searchQuery}
@@ -639,9 +639,9 @@ export default function LandingPage() {
 
                   <button
                     type="submit"
-                    className="inline-flex h-[48px] shrink-0 items-center gap-2 rounded-full bg-[#16A34A] px-4 text-sm text-white transition duration-200 hover:bg-[#12803A] sm:px-5"
+                    className="inline-flex w-[115px] h-[48px] shrink-0 items-center gap-2 rounded-full bg-[#16A34A] px-2 text-base text-white transition duration-200 hover:bg-[#12803A]"
                   >
-                    <Search className="h-4 w-4" />
+                    <Search className="h-6 w-6" />
                     <span>Search</span>
                   </button>
                 </div>

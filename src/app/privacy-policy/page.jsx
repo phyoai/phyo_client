@@ -487,7 +487,7 @@ function ContentSection({ section }) {
   );
 
   return (
-    <section className="space-y-6 border-b border-white/8 pb-9 last:border-b-0 last:pb-0 sm:space-y-7 sm:pb-11">
+    <section className="space-y-6 pb-9 last:border-b-0 last:pb-0 sm:space-y-7 sm:pb-11">
       <SectionTitle>{section.title}</SectionTitle>
 
       {!hasStructuredContent
@@ -586,7 +586,7 @@ export default function PrivacyPolicyPage() {
               <ContentSection key={section.title} section={section} />
             ))}
 
-            <section className="grid gap-8 border-b border-white/8 pb-9 sm:pb-11 lg:grid-cols-[minmax(0,1fr)_472px] lg:items-start lg:gap-[60px]">
+            <section className="grid gap-8  pb-9 sm:pb-11 lg:grid-cols-[minmax(0,1fr)_472px] lg:items-start lg:gap-[60px]">
               <div className="space-y-6 sm:space-y-7">
                 <SectionTitle>Contact Us</SectionTitle>
                 <BodyText>
