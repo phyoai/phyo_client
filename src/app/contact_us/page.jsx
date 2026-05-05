@@ -245,17 +245,14 @@ export default function ContactUsPage() {
                     Digital Changeover.
                   </label>
 
-                  {/* <button
-                    type="submit"
-                    disabled={isSubmitting}
-                    className="inline-flex h-10 w-[180px] items-center justify-center rounded-[40px] border border-[#16a34a] text-[16px] text-[#16a34a] transition hover:bg-[#16a34a]/10"
-                  >
-                    {isSubmitting ? "Sending..." : "Submit Now"}
-                  </button> */}
                   <OutlineGlowButton
                     type="submit"
                     disabled={isSubmitting}
-                    className="inline-flex h-10 w-[180px] items-center justify-center rounded-[40px] border border-[#16a34a] text-[16px] text-[#16a34a] transition hover:bg-[#16a34a]/10"
+                    className="inline-flex h-[38px] min-w-[138px] items-center justify-center rounded-[40px] px-8 transition-colors duration-200 hover:bg-[#16a34a]/10 disabled:cursor-not-allowed disabled:opacity-60"
+                    baseSurfaceClassName="bg-[#141414]"
+                    glowSurfaceClassName="bg-[#141414]"
+                    outlineClassName="bg-[#16a34a]"
+                    textClassName="text-[14px] leading-none text-[#16a34a] transition-colors duration-200 group-active:text-white"
                   >
                     {isSubmitting ? "Sending..." : "Submit Now"}
                   </OutlineGlowButton>
