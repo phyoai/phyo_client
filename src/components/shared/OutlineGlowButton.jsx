@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 const baseClassName =
-  "group relative isolate inline-flex items-center justify-center overflow-visible rounded-[40px] bg-transparent font-inter text-[16px] font-normal capitalize leading-[1.2] text-white transition-colors duration-300 ease-out hover:bg-[#141615] active:bg-[#16A34A] active:text-white";
+  "group relative isolate inline-flex items-center justify-center overflow-visible rounded-[40px] bg-transparent font-inter font-normal capitalize leading-[1.2] transition-colors duration-300 ease-out hover:bg-[#141615] active:bg-[#16A34A]";
 
 function joinClasses(...classNames) {
   return classNames.filter(Boolean).join(" ");
@@ -11,6 +11,8 @@ function ButtonLayers({
   children,
   baseSurfaceClassName,
   glowSurfaceClassName,
+  outlineClassName,
+  textClassName,
 }) {
   return (
     <>
@@ -27,7 +29,10 @@ function ButtonLayers({
       </span>
       <span
         aria-hidden
-        className="pointer-events-none absolute inset-0 rounded-[40px] bg-white p-px transition-all duration-300 ease-out group-hover:bg-[linear-gradient(270deg,#16A34A_0%,#FFF_52.88%,#16A34A_100%)] group-hover:p-[2px] group-active:bg-transparent group-active:p-0 group-active:opacity-0 hover:shadow-[0_0_18px_rgba(22,163,74,0.5)]"
+        className={joinClasses(
+          "pointer-events-none absolute inset-0 rounded-[40px] p-px transition-all duration-300 ease-out group-hover:bg-[linear-gradient(270deg,#16A34A_0%,#FFF_52.88%,#16A34A_100%)] group-hover:p-[2px] group-active:bg-transparent group-active:p-0 group-active:opacity-0 hover:shadow-[0_0_18px_rgba(22,163,74,0.5)]",
+          outlineClassName
+        )}
       >
         <span
           className={joinClasses(
@@ -36,7 +41,9 @@ function ButtonLayers({
           )}
         />
       </span>
-      <span className="relative z-10 leading-[1.2]">{children}</span>
+      <span className={joinClasses("relative z-10 leading-[1.2]", textClassName)}>
+        {children}
+      </span>
     </>
   );
 }
@@ -47,6 +54,8 @@ export default function OutlineGlowButton({
   children,
   baseSurfaceClassName = "bg-[#102919]",
   glowSurfaceClassName = "bg-[#141615]",
+  outlineClassName = "bg-white",
+  textClassName = "text-[16px] text-white group-active:text-white",
   type = "button",
   ...props
 }) {
@@ -58,6 +67,8 @@ export default function OutlineGlowButton({
         <ButtonLayers
           baseSurfaceClassName={baseSurfaceClassName}
           glowSurfaceClassName={glowSurfaceClassName}
+          outlineClassName={outlineClassName}
+          textClassName={textClassName}
         >
           {children}
         </ButtonLayers>
@@ -70,6 +81,8 @@ export default function OutlineGlowButton({
       <ButtonLayers
         baseSurfaceClassName={baseSurfaceClassName}
         glowSurfaceClassName={glowSurfaceClassName}
+        outlineClassName={outlineClassName}
+        textClassName={textClassName}
       >
         {children}
       </ButtonLayers>
