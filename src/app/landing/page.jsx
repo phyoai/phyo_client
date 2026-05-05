@@ -619,7 +619,7 @@ export default function LandingPage() {
             </div>
 
             <form
-              className="mx-auto mt-10 max-w-[920px] px-4"
+              className="mx-auto mt-10 max-w-[1120px] px-4"
               onSubmit={handleSearchSubmit}
             >
               <div className="relative overflow-hidden rounded-full bg-[linear-gradient(270deg,#16A34A_0%,#FFFFFF_52.88%,#16A34A_100%)] p-[1px] shadow-[0_0_28px_rgba(22,163,74,0.45)]">
@@ -627,19 +627,19 @@ export default function LandingPage() {
                 <div className="pointer-events-none absolute inset-0 rounded-full bg-[#16A34A]/25 blur-l" />
 
                 {/* Search box */}
-                <div className="relative flex h-[56px] items-center gap-3 rounded-full bg-[#010a04]/90 px-4 py-2 backdrop-blur-md sm:pl-5 sm:pr-[8px]">
+                <div className="relative flex h-[68px] items-center gap-3 rounded-full bg-[#010a04]/90 px-5 py-2 backdrop-blur-md sm:pl-6 sm:pr-[10px]">
                   <input
                     type="text"
                     value={searchQuery}
                     onChange={(event) => setSearchQuery(event.target.value)}
                     placeholder="Search influencers (e.g. i need influencers in Mumbai)..."
                     autoComplete="off"
-                    className="min-w-0 flex-1 bg-transparent text-left text-sm leading-[1.6] text-white outline-none placeholder:text-[#9B9B9B] sm:text-[14px]"
+                    className="min-w-0 flex-1 bg-transparent text-left text-sm leading-[1.6] text-white outline-none placeholder:text-[#9B9B9B] sm:text-[15px]"
                   />
 
                   <button
                     type="submit"
-                    className="inline-flex h-[40px] shrink-0 items-center gap-1 rounded-full bg-[#16A34A] px-3 text-sm text-white transition duration-200 hover:bg-[#12803A] sm:px-4"
+                    className="inline-flex h-[48px] shrink-0 items-center gap-2 rounded-full bg-[#16A34A] px-4 text-sm text-white transition duration-200 hover:bg-[#12803A] sm:px-5"
                   >
                     <Search className="h-4 w-4" />
                     <span>Search</span>
