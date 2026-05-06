@@ -5,7 +5,7 @@ import Link from "next/link";
 import { Minus, Play, Plus } from "lucide-react";
 
 const DEFAULT_FAQ_INTRO =
-  "It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.";
+  "It was popularised in the 1960s of the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.";
 const DEFAULT_CTA_DESCRIPTION =
   "See how Phyo helps you find the right influencers, track campaigns, and scale faster all in one place.";
 
@@ -34,7 +34,7 @@ function FaqItemCard({
         className="flex min-h-[64px] w-full items-center justify-between gap-5 px-6 py-5 text-left"
       >
         <span
-          className={`font-bricolage text-[18px] font-medium leading-[1.2] transition-colors duration-300 sm:text-[22px] sm:leading-[1.35] ${
+          className={`font-bricolage text-[22px] font-semibold leading-[1.35] transition-colors duration-300 ${
             active ? "text-[#07140B]" : "text-white"
           }`}
         >
@@ -62,7 +62,7 @@ function FaqItemCard({
         <div className="overflow-hidden">
           <p
             ref={contentRef}
-            className={`max-w-[560px] px-6 pb-6 text-[14px] leading-[1.6] transition-colors duration-300 sm:text-[16px] sm:leading-[1.75] ${
+            className={`max-w-[560px] px-6 pb-6 text-[16px] leading-[1.75] transition-colors duration-300 ${
               active ? "text-[#425046]" : "text-[#9b9b9b]"
             }`}
           >
@@ -208,22 +208,22 @@ export default function FaqSection({
       <div className="grid gap-10 xl:grid-cols-[590px_570px] xl:items-stretch">
         <div className="flex flex-col gap-7 mb-1 xl:self-stretch">
           <div>
-            <h2 className="font-bricolage text-[20px] leading-[1.4] text-white sm:text-[34px] sm:leading-[1.25] lg:text-[36px] lg:leading-[1.4]">
+            <h2 className="font-bricolage text-[34px] leading-[1.25] text-white sm:text-[36px] sm:leading-[1.4]">
               {titlePrefix}{" "}
               <span className="font-semibold text-[#16a34a]">
                 {titleHighlight}
               </span>
             </h2>
-            <p className="mt-3 max-w-[590px] text-[14px] leading-[1.6] text-[#9b9b9b] sm:text-[16px]">
+            <p className="mt-3 max-w-[590px] text-[16px] leading-[1.6] text-[#9b9b9b] [text-transform:capitalize]">
               {intro}
             </p>
           </div>
 
-          <div className="rounded-[24px] bg-[linear-gradient(122deg,#16a34a_1.95%,#073618_95.26%)] px-5 py-6 sm:px-8 sm:py-9 xl:sticky xl:top-6 xl:self-start">
-            <h3 className="font-bricolage text-[20px] font-medium leading-[1.2] text-white sm:text-[24px]">
+          <div className="rounded-[24px] bg-[linear-gradient(122deg,#16a34a_1.95%,#073618_95.26%)] px-8 py-9 xl:sticky xl:top-6 xl:self-start">
+            <h3 className="font-bricolage text-[24px] font-medium leading-[1.2] text-white">
               {ctaTitle}
             </h3>
-            <p className="mt-4 max-w-[430px] text-[14px] leading-[1.6] text-[#f8f2f2] sm:text-[16px]">
+            <p className="mt-4 max-w-[430px] text-[16px] leading-[1.6] text-[#f8f2f2]">
               {ctaDescription}
             </p>
             <FaqActionButton href={ctaHref} className="mt-8">
