@@ -9,7 +9,7 @@ const milestoneCardData = [
 
 const MilestoneCards = () => {
   return (
-    <section className="mx-auto w-full max-w-[1180px] px-4 py-12">
+    <section className="mx-auto w-full max-w-[380px] py-0 lg:max-w-[1180px] lg:px-4">
       <style>{`
         @keyframes milestoneBorderSpin {
           0% {
@@ -72,7 +72,7 @@ const MilestoneCards = () => {
         }
       `}</style>
 
-      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-2 gap-5 lg:grid-cols-4 lg:gap-6">
         {milestoneCardData.map((item, index) => (
           <div
             key={index}
@@ -80,12 +80,12 @@ const MilestoneCards = () => {
           >
             <div className="milestone-border" />
 
-            <div className="milestone-content flex h-[139px] flex-col items-center justify-center rounded-[23px] bg-black px-5 text-center">
-              <h3 className="milestone-title font-bricolage text-[36px] font-semibold capitalize leading-[1.2] text-[#4E4D4D]">
+            <div className="milestone-content flex h-[120px] flex-col items-center justify-center rounded-[23px] bg-black px-4 text-center lg:h-[139px] lg:px-5">
+              <h3 className="milestone-title font-bricolage text-[28px] font-semibold capitalize leading-[1.2] text-[#4E4D4D] lg:text-[36px]">
                 {item.title}
               </h3>
 
-              <p className="milestone-description mt-1 font-inter text-[16px] font-normal capitalize leading-[1.6] text-[#4E4D4D]">
+              <p className="milestone-description mt-1 font-inter text-[14px] font-normal capitalize leading-[1.6] text-[#4E4D4D] lg:text-[16px]">
                 {item.description}
               </p>
             </div>
