@@ -243,7 +243,7 @@ const outlineGlowButtonClass =
 const pressGreenButtonClass = "active:bg-[#16A34A] active:text-white";
 const pressWhiteFillButtonClass = "active:!bg-white active:text-[#16A34A]";
 const pageSectionClass =
-  "mx-auto max-w-[1440px] sm:px-6 lg:px-[120px] mt-[20px]";
+  "mx-auto mt-5 w-full px-4 sm:px-6 lg:max-w-[1440px] lg:px-[120px]";
 
 function ButtonChrome({
   button_bg_color,
@@ -347,7 +347,7 @@ function PricingCard({ billingCycle, plan }) {
 
   return (
     <article
-      className={`group/pricing relative isolate min-h-[907px] min-w-[285px] overflow-hidden rounded-[24px] border px-5 pb-6 pt-5 transition-all duration-300 ${
+      className={`group/pricing relative isolate min-h-[711px] w-[285px] shrink-0 overflow-hidden rounded-[24px] border px-5 pb-6 pt-5 transition-all duration-300 lg:min-h-[907px] ${
         isHighlight
           ? "border-[#16a34a] shadow-[0_0_0_1px_rgba(22,163,74,0.4)]"
           : "border-white/5"
@@ -375,33 +375,35 @@ function PricingCard({ billingCycle, plan }) {
       />
 
       {plan.highlight ? (
-        <div className="absolute right-0 top-7 z-20">
-          <img
+        <div className="absolute right-0 top-5 z-20 lg:top-7">
+          <Image
             src="/landing/most_popular.svg"
             alt="Most Popular"
-            className="w-[110px] h-[30px]"
+            width={110}
+            height={30}
+            className="h-7 w-[103px] lg:h-[30px] lg:w-[110px]"
           />
         </div>
       ) : null}
 
       <div className="relative z-10">
-        <h3 className="font-bricolage text-[36px] font-semibold leading-[1.2] text-white">
+        <h3 className="font-bricolage text-[20px] font-semibold leading-[1.2] text-white lg:text-[36px]">
           {plan.name}
         </h3>
 
-        <div className="mt-3 flex items-end gap-3">
-          <p className="font-bricolage text-[36px] font-semibold leading-[1.2] text-white">
+        <div className="mt-3 flex items-end gap-2 lg:gap-3">
+          <p className="font-bricolage text-[32px] font-semibold leading-[1.2] text-white lg:text-[36px]">
             {price}
           </p>
           <p
-            className={`pb-1 text-base leading-[1.6] transition-colors duration-300 ${secondaryTextClass}`}
+            className={`pb-1 text-[14px] leading-[1.6] transition-colors duration-300 lg:text-base ${secondaryTextClass}`}
           >
             {plan.period}
           </p>
         </div>
 
         <p
-          className={`mt-3 text-[16px] leading-[1.6] transition-colors duration-300 ${secondaryTextClass}`}
+          className={`mt-3 text-[14px] leading-[1.6] transition-colors duration-300 lg:text-[16px] ${secondaryTextClass}`}
         >
           {plan.description}
         </p>
@@ -409,7 +411,7 @@ function PricingCard({ billingCycle, plan }) {
         <div className="mt-8 flex flex-col items-center gap-3">
           <button
             type="button"
-            className={`${outlineGlowButtonClass} ${pressWhiteFillButtonClass} h-12 w-full text-[16px] focus-visible:outline-none ${pricingButtonSurfaceClass}`}
+            className={`${outlineGlowButtonClass} ${pressWhiteFillButtonClass} h-10 w-full text-[14px] focus-visible:outline-none lg:h-12 lg:text-[16px] ${pricingButtonSurfaceClass}`}
           >
             <ButtonChrome
               button_bg_color={pricingButtonBgClass}
@@ -426,7 +428,7 @@ function PricingCard({ billingCycle, plan }) {
           </p>
         </div>
 
-        <div className="mt-10">
+        <div className="mt-8 lg:mt-10">
           <h4 className="font-bricolage text-[20px] font-semibold leading-[1.2] text-white">
             {plan.featuresTitle}
           </h4>
@@ -460,7 +462,7 @@ function PricingCard({ billingCycle, plan }) {
                   ) : null}
                 </span>
                 <span
-                  className={`text-[16px] leading-[1.6] transition-colors duration-300 ${secondaryTextClass}`}
+                  className={`text-[14px] leading-[1.6] transition-colors duration-300 lg:text-[16px] ${secondaryTextClass}`}
                 >
                   {feature}
                 </span>
@@ -475,13 +477,13 @@ function PricingCard({ billingCycle, plan }) {
 
 function TestimonialCard({ location, name, quote }) {
   return (
-    <article className="group relative min-h-[220px] w-[min(88vw,360px)] shrink-0 overflow-hidden rounded-[23px] bg-[#141414] p-6 transition-all duration-500 ease-out hover:border-[#16a34a]/35 hover:shadow-[0_18px_42px_rgba(22,163,74,0.16)] hover:bg-[#d1eedd] sm:w-[420px] sm:p-7 lg:min-h-[240px] lg:w-[460px] lg:p-8">
-      <div className="absolute left-8 top-[36px] h-20 w-px bg-[#16a34a]" />
-      <p className="max-w-[508px] pl-5 text-[16px] leading-[1.6] text-[#9b9b9b] transition-colors duration-500 group-hover:text-black] group-hover:text-[#181818]">
+    <article className="group relative min-h-[200px] w-[360px] shrink-0 overflow-hidden rounded-[24px] bg-[#141414] p-5 transition-all duration-500 ease-out hover:border-[#16a34a]/35 hover:shadow-[0_18px_42px_rgba(22,163,74,0.16)] hover:bg-[#d1eedd] sm:p-7 lg:min-h-[240px] lg:w-[460px] lg:p-8">
+      <div className="absolute left-6 top-7 h-20 w-px bg-[#16a34a] lg:left-8 lg:top-[36px]" />
+      <p className="max-w-[308px] pl-4 text-[14px] leading-[1.6] text-[#9b9b9b] transition-colors duration-500 group-hover:text-[#181818] sm:max-w-[508px] sm:pl-5 sm:text-[16px]">
         {quote}
       </p>
 
-      <div className="mt-10 flex items-center gap-3">
+      <div className="mt-8 flex items-center gap-3 lg:mt-10">
         <div className="relative h-[60px] w-[60px] overflow-hidden rounded-full">
           <Image
             alt={`${name} testimonial profile`}
@@ -492,10 +494,10 @@ function TestimonialCard({ location, name, quote }) {
           />
         </div>
         <div>
-          <p className="text-[20px] font-medium leading-[1.4] text-[#16a34a] transition-colors duration-500 group-hover:text-black hover:text-[#16a34a]/80">
+          <p className="text-[20px] font-medium leading-[1.4] text-[#16a34a] transition-colors duration-500 group-hover:text-black">
             {name}
           </p>
-          <p className="text-[16px] leading-[1.4] text-[#9b9b9b] transition-colors duration-500 group-hover:text-black">
+          <p className="text-[14px] leading-[1.4] text-[#9b9b9b] transition-colors duration-500 group-hover:text-black sm:text-[16px]">
             {location}
           </p>
         </div>
@@ -506,7 +508,7 @@ function TestimonialCard({ location, name, quote }) {
       </span>
       <span
         aria-hidden
-        className="pointer-events-none absolute bottom-[-12px] right-5 font-bricolage text-[11rem] leading-none text-[#16a34a]/20"
+        className="pointer-events-none absolute bottom-[-10px] right-4 font-bricolage text-[7rem] leading-none text-[#16a34a]/20 sm:bottom-[-12px] sm:right-5 sm:text-[11rem]"
       >
         &rdquo;
       </span>
@@ -522,11 +524,11 @@ function ComparisonRow({ row }) {
 
   return (
     <>
-      <div className="flex min-w-0 items-center justify-start border-t border-transparent bg-[#181818] px-3 py-4 text-left text-[12px] leading-[1.45] text-white sm:px-4 sm:py-5 sm:text-[14px] sm:leading-[1.5] lg:px-5 lg:py-6 lg:text-[16px] lg:leading-[1.6]">
+      <div className="flex min-w-0 items-center justify-start border-t border-transparent bg-[#181818] px-4 py-5 text-left text-[14px] leading-[1.6] text-white lg:px-5 lg:py-6 lg:text-[16px]">
         <span className="min-w-0 break-words text-left">{row.feature}</span>
       </div>
 
-      <div className="flex min-w-0 items-center justify-start gap-1.5 border-l border-t border-transparent bg-[#181818] px-3 py-4 text-left text-[12px] leading-[1.45] text-[#909090] transition-colors duration-200 hover:bg-[#782626] hover:text-white sm:gap-2 sm:px-4 sm:py-5 sm:text-[14px] sm:leading-[1.5] lg:px-5 lg:py-6 lg:text-[16px] lg:leading-[1.6]">
+      <div className="flex min-w-0 items-center justify-start gap-2 border-l border-t border-transparent bg-[#181818] px-4 py-5 text-left text-[14px] leading-[1.6] text-[#909090] transition-colors duration-200 hover:bg-[#782626] hover:text-white lg:px-5 lg:py-6 lg:text-[16px]">
         <Image
           src={featureAssets.comparisonCross}
           alt=""
@@ -539,7 +541,7 @@ function ComparisonRow({ row }) {
       </div>
 
       <div
-        className={`group/phyo flex min-w-0 items-center justify-start gap-1.5 border-l border-t border-transparent bg-[#181818] px-3 py-4 text-left text-[12px] leading-[1.45] text-[#909090] transition-colors duration-200 hover:text-white sm:gap-2 sm:px-4 sm:py-5 sm:text-[14px] sm:leading-[1.5] lg:px-5 lg:py-6 lg:text-[16px] lg:leading-[1.6] ${phyoHoverBackgroundClass}`}
+        className={`group/phyo flex min-w-0 items-center justify-start gap-2 border-l border-t border-transparent bg-[#181818] px-4 py-5 text-left text-[14px] leading-[1.6] text-[#909090] transition-colors duration-200 hover:text-white lg:px-5 lg:py-6 lg:text-[16px] ${phyoHoverBackgroundClass}`}
       >
         <span className="relative h-[12px] w-[21px] shrink-0">
           <Image
@@ -602,65 +604,67 @@ export default function LandingPage() {
 
           <section
             id="home"
-            className="px-4 pb-10 pt-16 sm:px-6 lg:px-[120px] lg:pt-20"
+            className="px-4 pb-8 pt-8 sm:px-6 sm:pb-10 lg:px-[120px] lg:pt-20"
           >
-            <div className="mx-auto max-w-[918px] text-center">
-              <h1 className="bg-[linear-gradient(102.272deg,#16a34a_3.4%,#ffffff_58%,#16a34a_97.64%)] bg-clip-text font-bricolage text-[40px] font-normal leading-[1.15] text-transparent sm:text-[48px] lg:text-[56px] lg:leading-[1.2]">
+            <div className="mx-auto max-w-[380px] text-center sm:max-w-[918px]">
+              <h1 className="bg-[linear-gradient(102.272deg,#16a34a_3.4%,#ffffff_58%,#16a34a_97.64%)] bg-clip-text font-bricolage text-[36px] font-normal leading-[1.2] text-transparent sm:text-[48px] lg:text-[56px] lg:leading-[1.2]">
                 <span className="block">
                   World&apos;s First AI Powered Influencer
                 </span>
                 <span className="block">Search Engine</span>
               </h1>
 
-              <p className="mx-auto mt-4 max-w-[720px] text-[15px] leading-[1.2] text-[#9b9b9b] sm:text-base">
-                Search Influencers in seconds with Phyo and reach the right
-                Audience faster.
+              <p className="mx-auto mt-4 max-w-[380px] text-[14px] leading-[1.6] text-[#9b9b9b] sm:max-w-[720px] sm:text-base">
+                Search Influencers in Seconds with Phyo and Reach the Right
+                Audience Faster.
               </p>
             </div>
 
             <form
-              className="mx-auto mt-10 max-w-[1120px] px-4"
+              className="mx-auto mt-6 max-w-[380px] px-0 sm:mt-10 sm:max-w-[1120px] sm:px-4"
               onSubmit={handleSearchSubmit}
             >
-              <div className="relative overflow-hidden rounded-full bg-[linear-gradient(270deg,#16A34A_0%,#FFFFFF_52.88%,#16A34A_100%)] p-[1px] shadow-[0_0_28px_rgba(22,163,74,0.45)]">
-                {/* Soft outer glow */}
+              <div className="relative overflow-hidden rounded-full bg-[linear-gradient(270deg,#16A34A_0%,#FFFFFF_52.88%,#16A34A_100%)] p-[0.8px] shadow-[0_0_28px_rgba(22,163,74,0.45)]">
                 <div className="pointer-events-none absolute inset-0 rounded-full bg-[#16A34A]/25 blur-l" />
 
-                {/* Search box */}
-                <div className="relative flex h-[72px] items-center gap-3 rounded-full bg-[#010a04]/90 px-5 py-2 backdrop-blur-md sm:pl-6 sm:pr-[10px]">
+                <div className="relative flex h-[60px] items-center gap-3 rounded-full bg-[#010a04]/90 px-4 py-2 backdrop-blur-[12px] transition-colors duration-200 focus-within:bg-[#010a04]/90 sm:h-[72px] sm:px-5 sm:pl-6 sm:pr-[10px]">
                   <input
                     type="text"
                     value={searchQuery}
                     onChange={(event) => setSearchQuery(event.target.value)}
-                    placeholder="Search influencers (e.g. i need influencers in Mumbai)..."
+                    placeholder="Search influencers (e.g. i need influencers in mumbai)..."
                     autoComplete="off"
-                    className="min-w-0 flex-1 bg-transparent text-left text-sm leading-[1.6] text-white outline-none placeholder:text-[#9B9B9B] sm:text-[15px]"
+                    className="min-w-0 flex-1 bg-transparent text-left text-[15px] leading-[1.2] text-white outline-none placeholder:text-[16px] placeholder:text-[#9B9B9B] sm:text-[15px]"
                   />
 
                   <button
                     type="submit"
-                    className="inline-flex w-[115px] h-[48px] shrink-0 items-center gap-2 rounded-full bg-[#16A34A] px-2 text-base text-white transition duration-200 hover:bg-[#12803A]"
+                    className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#16A34A] text-white transition duration-200 hover:bg-[#12803A] sm:h-[48px] sm:w-[115px] sm:gap-2 sm:px-2 sm:text-base"
                   >
-                    <Search className="h-6 w-6" />
-                    <span>Search</span>
+                    <Search className="h-5 w-5 sm:h-6 sm:w-6" />
+                    <span className="hidden sm:inline">Search</span>
                   </button>
                 </div>
               </div>
             </form>
-            <div className="mx-auto">
+
+            <div className="mx-auto mt-8">
               <MilestoneCards />
             </div>
 
-            <div className="mx-auto my-5 max-w-[1050px] text-center">
-              {/* public\landing\grid_lines.svg */}
+            <div className="relative mx-auto mt-8 max-w-[1050px] text-center">
+              <GridPattern className="absolute left-0 top-8 hidden h-[519.2px] w-[649px] lg:block" />
+              <GridPattern className="absolute left-[930px] top-8 hidden h-[519.2px] w-[649px] lg:block" />
 
-              <div>
-                <GridPattern className="absolute h-[519.2px] w-[649px] left-[0rem] mt-10 z-1000" />
-              </div>
-              <div>
-                <GridPattern className="absolute h-[519.2px] w-[649px] left-[930px] mt-10 z-1000" />
-              </div>
+              <p
+                className="mx-auto max-w-[380px] text-center text-[23px] leading-[1.32] text-[#9b9b9b] lg:hidden"
+                style={{ fontFamily: "'Bell MT', Georgia, serif" }}
+              >
+                Phyo simplifies influencer discover, analysis & campaign
+                launches so you spend less time planning & more time scaling.
+              </p>
 
+              <div className="hidden lg:block">
               {aboutSegmentLines.map((line, lineIndex) => (
                 <p
                   key={`about-line-${lineIndex}`}
@@ -691,6 +695,7 @@ export default function LandingPage() {
                   })}
                 </p>
               ))}
+              </div>
             </div>
           </section>
         </div>
@@ -698,101 +703,101 @@ export default function LandingPage() {
 
       <section id="features" className={pageSectionClass}>
         <div className="grid gap-5 lg:items-start lg:grid-cols-[340px_minmax(0,1fr)]">
-          <article className="relative overflow-hidden rounded-[24px] bg-[linear-gradient(180deg,#16a34a_0%,#073618_100%)] p-5 lg:sticky lg:top-6 lg:h-[542px] lg:self-start">
-            <div className="max-w-[300px]">
-              <h2 className="font-bricolage text-[24px] font-medium leading-[1.2] text-white">
+          <article className="relative h-[468px] overflow-hidden rounded-[24px] bg-[linear-gradient(180deg,#16a34a_0%,#073618_100%)] p-5 lg:sticky lg:top-6 lg:h-[542px] lg:self-start">
+            <div className="max-w-[340px]">
+              <h2 className="font-bricolage text-[20px] font-medium leading-[1.2] text-white lg:text-[24px]">
                 Launch Smarter Campaigns With AI
               </h2>
-              <p className="mt-3 text-[16px] leading-[1.6] text-[#e5e5e5]">
+              <p className="mt-3 text-[14px] leading-[1.6] text-[#e5e5e5] lg:text-[16px]">
                 From finding the right influencers to tracking performance
                 everything you need to run high-impact campaigns in one
                 platform.
               </p>
             </div>
-            <div className="mt-[50px] h-[417px] w-[386px] pr-[66px]">
+            <div className="-ml-5 mt-9 h-[324px] w-[380px] lg:mt-[50px] lg:h-[417px] lg:w-[386px] lg:pr-[66px]">
               <Image
                 src="/landing/card_phone1.png"
                 alt="Phyo platform features composite preview"
                 width={386.109}
                 height={417.5}
-                className="object-contain"
+                className="h-full w-full object-contain"
               />
             </div>
           </article>
 
           <div className="grid gap-5">
-            <article className="group relative overflow-hidden rounded-[24px] bg-[#181818] p-5 transition-colors duration-300 hover:bg-[linear-gradient(115deg,#def6e5_0%,#6f907a_100%)] md:min-h-[275px]">
-              <div className="max-w-[454px]">
-                <h3 className="font-bricolage text-[24px] font-medium leading-[1.2] text-white transition-colors duration-300 group-hover:text-black">
+            <article className="group relative min-h-[320px] overflow-hidden rounded-[24px] bg-[#181818] p-5 transition-colors duration-300 hover:bg-[linear-gradient(115deg,#def6e5_0%,#6f907a_100%)] lg:min-h-[275px]">
+              <div className="max-w-[340px]">
+                <h3 className="font-bricolage text-[20px] font-medium leading-[1.2] text-white transition-colors duration-300 group-hover:text-black lg:text-[24px]">
                   Find Creators{" "}
                   <span className="text-white transition-colors duration-300 group-hover:text-[#16a34a]">
                     In Seconds
                   </span>
                 </h3>
-                <p className="mt-3 max-w-[460px] text-[16px] leading-[1.6] text-[#9b9b9b] transition-colors duration-300 group-hover:text-black/70">
+                <p className="mt-3 max-w-[340px] text-[14px] leading-[1.6] text-[#9b9b9b] transition-colors duration-300 group-hover:text-black/70 lg:max-w-[460px] lg:text-[16px]">
                   No more scrolling for hours. Just type your niche, and our AI
                   shows you the best and right influencers in seconds.
                 </p>
               </div>
 
-              <div className="absolute right-6 top-5 hidden h-44 w-44 rounded-full blur-2xl sm:block" />
-              <div className="relative mt-8 h-[180px] sm:absolute sm:right-5 sm:top-1/2 sm:mt-0 sm:h-[215px] sm:w-[355px] sm:-translate-y-1/2">
+              <div className="absolute right-6 top-5 hidden h-44 w-44 rounded-full blur-2xl lg:block" />
+              <div className="relative mx-auto mt-6 h-[178px] w-[294px] lg:absolute lg:right-5 lg:top-1/2 lg:mt-0 lg:h-[215px] lg:w-[355px] lg:-translate-y-1/2">
                 <Image
                   src="/landing/card_laptop1.png"
                   alt="Creator discovery tablet preview"
                   fill
-                  className="object-contain drop-shadow-[0_18px_30px_rgba(0,0,0,0.24)] mt-[35px] ml-[21px]"
-                  sizes="(min-width: 640px) 355px, 100vw"
+                  className="object-contain drop-shadow-[0_18px_30px_rgba(0,0,0,0.24)] lg:mt-[35px] lg:ml-[21px]"
+                  sizes="(min-width: 1024px) 355px, 294px"
                 />
               </div>
             </article>
 
-            <article className="group relative overflow-hidden rounded-[24px] bg-[#181818] p-5 transition-colors duration-300 hover:bg-[linear-gradient(115deg,#def6e5_0%,#6f907a_100%)] md:min-h-[275px]">
-              <div className="max-w-[454px]">
-                <h3 className="font-bricolage text-[24px] font-medium leading-[1.2] text-white transition-colors duration-300 group-hover:text-black">
+            <article className="group relative min-h-[320px] overflow-hidden rounded-[24px] bg-[#181818] p-5 transition-colors duration-300 hover:bg-[linear-gradient(115deg,#def6e5_0%,#6f907a_100%)] lg:min-h-[275px]">
+              <div className="max-w-[340px]">
+                <h3 className="font-bricolage text-[20px] font-medium leading-[1.2] text-white transition-colors duration-300 group-hover:text-black lg:text-[24px]">
                   Tracking Your{" "}
                   <span className="text-white transition-colors duration-300 group-hover:text-[#16a34a]">
                     Campaigns Live
                   </span>
                 </h3>
-                <p className="mt-3 max-w-[454px] text-[16px] leading-[1.6] text-[#9b9b9b] transition-colors duration-300 group-hover:text-black/70">
+                <p className="mt-3 max-w-[340px] text-[14px] leading-[1.6] text-[#9b9b9b] transition-colors duration-300 group-hover:text-black/70 lg:max-w-[454px] lg:text-[16px]">
                   See clear performance reports and accurate ROI tracking from
                   start to finish.
                 </p>
               </div>
 
-              <div className="relative mt-8 h-[220px] sm:absolute sm:right-2 sm:top-1/2 sm:mt-0 sm:h-[378px] sm:w-[309px] sm:-translate-y-1/2">
+              <div className="relative mx-auto mt-6 h-[252px] w-[272px] lg:absolute lg:right-2 lg:top-1/2 lg:mt-0 lg:h-[378px] lg:w-[309px] lg:-translate-y-1/2">
                 <Image
                   src="/landing/card_phone2.png"
                   alt="Campaign tracking phone preview"
                   fill
-                  className="object-contain mt-[34px]"
-                  sizes="309px"
+                  className="object-contain lg:mt-[34px]"
+                  sizes="(min-width: 1024px) 309px, 272px"
                 />
               </div>
             </article>
 
-            <article className="group relative overflow-hidden rounded-[24px] bg-[#181818] p-5 transition-colors duration-300 hover:bg-[linear-gradient(115deg,#def6e5_0%,#6f907a_100%)] md:min-h-[275px]">
-              <div className="max-w-[454px]">
-                <h3 className="font-bricolage text-[24px] font-medium leading-[1.2] text-white transition-colors duration-300 group-hover:text-black">
+            <article className="group relative min-h-[320px] overflow-hidden rounded-[24px] bg-[#181818] p-5 transition-colors duration-300 hover:bg-[linear-gradient(115deg,#def6e5_0%,#6f907a_100%)] lg:min-h-[275px]">
+              <div className="max-w-[340px]">
+                <h3 className="font-bricolage text-[20px] font-medium leading-[1.2] text-white transition-colors duration-300 group-hover:text-black lg:text-[24px]">
                   Fully{" "}
                   <span className="text-white transition-colors duration-300 group-hover:text-[#16a34a]">
                     Managed Campaigns
                   </span>
                 </h3>
-                <p className="mt-3 max-w-[454px] text-[16px] leading-[1.6] text-[#9b9b9b] transition-colors duration-300 group-hover:text-black/70">
+                <p className="mt-3 max-w-[340px] text-[14px] leading-[1.6] text-[#9b9b9b] transition-colors duration-300 group-hover:text-black/70 lg:max-w-[454px] lg:text-[16px]">
                   From Delhi to Dubai, LA to London get access to 300k+ real
                   influencers across 15+ countries and 95+ languages.
                 </p>
               </div>
 
-              <div className="relative mt-8 h-[220px] sm:absolute sm:right-4 sm:top-1/2 sm:mt-0 sm:h-[323px] sm:w-[372px] sm:-translate-y-1/2">
+              <div className="relative mx-auto mt-6 h-[252px] w-[290px] lg:absolute lg:right-4 lg:top-1/2 lg:mt-0 lg:h-[323px] lg:w-[372px] lg:-translate-y-1/2">
                 <Image
                   src="/landing/card_phone3.png"
                   alt="Managed campaigns phone preview"
                   fill
-                  className="object-contain mt-[28px] ml-[14px]"
-                  sizes="372px"
+                  className="object-contain lg:mt-[28px] lg:ml-[14px]"
+                  sizes="(min-width: 1024px) 372px, 290px"
                 />
               </div>
             </article>
@@ -801,24 +806,24 @@ export default function LandingPage() {
       </section>
 
       <section id="pricing" className={pageSectionClass}>
-        <div className="mx-auto max-w-[900px] text-center pt-[80px]">
-          <h2 className="font-bricolage text-[34px] leading-[1.2] text-white sm:text-[36px]">
+        <div className="mx-auto max-w-[327px] pt-8 text-center sm:max-w-[900px] lg:pt-[80px]">
+          <h2 className="font-bricolage text-[20px] leading-[1.2] text-white sm:text-[36px]">
             Simple Scalable{" "}
             <span className="font-semibold text-[#16a34a]">Powerful</span>
           </h2>
-          <p className="mt-4 text-[16px] leading-[1.2] text-[#9b9b9b]">
+          <p className="mt-4 text-[14px] leading-[1.6] text-[#9b9b9b] sm:text-[16px] sm:leading-[1.2]">
             From free tools to full-scale execution Phyo&apos;s pricing plans
             are designed to grow with your goals, not limit them.
           </p>
         </div>
 
-        <div className="mt-10 flex justify-center">
-          <div className="flex flex-wrap items-center justify-center gap-5">
+        <div className="mt-6 flex justify-center sm:mt-10">
+          <div className="flex w-[312px] items-center justify-center gap-3 sm:w-auto sm:flex-wrap sm:gap-5">
             <button
               type="button"
               onClick={() => setBillingCycle("monthly")}
               aria-pressed={billingCycle === "monthly"}
-              className={`${outlineGlowButtonClass} ${pressGreenButtonClass} h-12 w-[140px] text-[16px] ${
+              className={`${outlineGlowButtonClass} ${pressGreenButtonClass} h-10 w-[120px] text-[16px] sm:h-12 sm:w-[140px] ${
                 billingCycle === "monthly"
                   ? "!bg-[#159b46] hover:!bg-[#159b46]"
                   : ""
@@ -836,7 +841,7 @@ export default function LandingPage() {
               type="button"
               onClick={() => setBillingCycle("annual")}
               aria-pressed={billingCycle === "annual"}
-              className={`${outlineGlowButtonClass} ${pressGreenButtonClass} h-12 w-[200px] ${
+              className={`${outlineGlowButtonClass} ${pressGreenButtonClass} h-10 w-[180px] sm:h-12 sm:w-[200px] ${
                 billingCycle === "annual"
                   ? "!bg-[#159b46] hover:!bg-[#159b46]"
                   : ""
@@ -848,7 +853,7 @@ export default function LandingPage() {
                 }
                 hide_border={billingCycle === "annual"}
               />
-              <span className="relative z-10 inline-flex items-center gap-3 leading-[1.2]">
+              <span className="relative z-10 inline-flex items-center gap-2 leading-[1.2] sm:gap-3">
                 <span className="text-[16px]">Annually</span>
                 <span
                   className={`inline-flex h-7 w-[83px] items-center justify-center rounded-full text-[12px] font-normal leading-[1.2] ${
@@ -864,7 +869,7 @@ export default function LandingPage() {
           </div>
         </div>
 
-        <div className="mx-auto mt-10 flex w-full flex-nowrap gap-[20px] overflow-x-auto pb-2 scrollbar-hide xl:relative xl:left-1/2 xl:w-[1200px] xl:max-w-none xl:-translate-x-1/2 xl:justify-start xl:overflow-visible xl:pb-0">
+        <div className="-mx-4 mt-6 flex w-auto flex-nowrap gap-5 overflow-x-auto px-4 pb-2 scrollbar-hide sm:mx-auto sm:mt-10 sm:w-full sm:px-0 xl:relative xl:left-1/2 xl:w-[1200px] xl:max-w-none xl:-translate-x-1/2 xl:justify-start xl:overflow-visible xl:pb-0">
           {pricingPlans.map((plan) => (
             <PricingCard
               key={plan.name}
@@ -874,8 +879,8 @@ export default function LandingPage() {
           ))}
         </div>
 
-        <div className="mb-[100px]">
-          <div className="relative mt-10 min-h-[170px] overflow-hidden rounded-[24px] bg-[#181818] lg:h-[170px] xl:left-1/2 xl:w-[1200px] xl:max-w-none xl:-translate-x-1/2">
+        <div className="mb-16 lg:mb-[100px]">
+          <div className="relative mt-8 min-h-[220px] overflow-hidden rounded-[24px] bg-[#181818] lg:mt-10 lg:min-h-[170px] lg:h-[170px] xl:left-1/2 xl:w-[1200px] xl:max-w-none xl:-translate-x-1/2">
             <div
               aria-hidden
               className="pointer-events-none absolute inset-0 hidden opacity-[1] lg:block"
@@ -913,13 +918,21 @@ export default function LandingPage() {
                 />
               </div>
             </div>
-            <div className="relative flex h-full flex-col justify-center gap-4 px-6 py-6 sm:px-10 lg:flex-row lg:items-center lg:justify-between lg:px-10 lg:py-0">
-              <div className="w-full max-w-[604px]">
-                <h3 className="font-bricolage text-[32px] leading-[1.2] text-white sm:text-[36px]">
+            <Image
+              aria-hidden
+              src="/landing/phyo.png"
+              alt=""
+              width={379}
+              height={148}
+              className="pointer-events-none absolute bottom-0 right-0 h-auto w-[379px] opacity-[0.14] lg:hidden"
+            />
+            <div className="relative flex h-full flex-col justify-center gap-4 px-5 py-5 sm:px-10 sm:py-6 lg:flex-row lg:items-center lg:justify-between lg:px-10 lg:py-0">
+              <div className="w-full max-w-[340px] lg:max-w-[604px]">
+                <h3 className="font-bricolage text-[20px] leading-[1.2] text-white sm:text-[36px]">
                   Custom Pricing{" "}
                   <span className="font-semibold text-[#16a34a]">For ALL</span>
                 </h3>
-                <p className="mt-4 text-[16px] leading-[1.2] text-[#9b9b9b]">
+                <p className="mt-4 text-[14px] leading-[1.6] text-[#9b9b9b] sm:text-[16px] sm:leading-[1.2]">
                   Powerful Customizable Plans For Agencies Brands, & Enterprise
                   Teams.
                 </p>
@@ -927,11 +940,11 @@ export default function LandingPage() {
 
               <button
                 type="button"
-                className={`${outlineGlowButtonClass} ${pressGreenButtonClass} h-12 w-[245px] shrink-0 text-[16px]`}
+                className={`${outlineGlowButtonClass} ${pressGreenButtonClass} mt-2 h-10 w-[245px] shrink-0 text-[14px] sm:h-12 sm:text-[16px]`}
               >
                 <ButtonChrome active_bg_color_class="group-active:bg-[#16A34A]" />
                 <span
-                  className="relative z-10 font-inter text-[16px] leading-[1.2]"
+                  className="relative z-10 font-inter text-[14px] leading-[1.2] sm:text-[16px]"
                   style={{ fontFamily: "var(--font-inter)" }}
                 >
                   Get In Touch Now
@@ -942,10 +955,10 @@ export default function LandingPage() {
         </div>
       </section>
 
-      <section className="relative overflow-hidden bg-[linear-gradient(112deg,#16a34a_1.18%,#073618_80.36%)] h-[540px]">
+      <section className="relative overflow-hidden bg-[linear-gradient(112deg,#16a34a_1.18%,#073618_80.36%)]">
         <div className="pointer-events-none absolute inset-0">
-          <div className="absolute inset-y-0 right-0 w-[44%] bg-[linear-gradient(90deg,rgba(4,88,24,0)_0%,rgba(4,56,21,0.3)_35%,rgba(4,56,21,0.76)_100%)]" />
-          <div className="absolute -right-24 top-0 h-full w-[82%] opacity-40 lg:-right-10 lg:w-[58%]">
+          <div className="absolute inset-y-0 right-0 hidden w-[44%] bg-[linear-gradient(90deg,rgba(4,88,24,0)_0%,rgba(4,56,21,0.3)_35%,rgba(4,56,21,0.76)_100%)] lg:block" />
+          <div className="absolute -right-10 top-0 h-full w-full opacity-40 lg:-right-10 lg:w-[58%]">
             <Image
               src="/landing/Group.svg"
               alt=""
@@ -955,7 +968,55 @@ export default function LandingPage() {
           </div>
         </div>
 
-        <div className="relative mx-auto flex min-h-[560px] w-full max-w-[1440px] items-center px-4 py-12 sm:px-6 lg:min-h-[600px] lg:px-[120px]">
+        <div className="relative mx-auto max-w-[412px] px-4 py-10 lg:hidden">
+          <div className="relative min-h-[560px] overflow-hidden">
+            <div className="max-w-[341px]">
+              <h2 className="font-bricolage text-[20px] font-normal leading-[1.4] text-white">
+                <span className="block">AI Search. Verified Influencers.</span>
+                <span className="block">Real Results.</span>
+              </h2>
+              <p className="mt-4 max-w-[341px] text-[14px] leading-[1.6] text-[#dcdcdc]">
+                From discovery to campaign execution everything you need to run
+                high-performing influencer campaigns in one platform.
+              </p>
+
+              <div className="mt-8 flex flex-col gap-3">
+                <ActionButton
+                  href="/signup"
+                  widthClass="w-[240px]"
+                  className="h-10"
+                  iconPosition="right"
+                  icon={
+                    <ArrowRight className="h-[14px] w-[14px] stroke-[1.8]" />
+                  }
+                >
+                  Start With Free Trial
+                </ActionButton>
+                <ActionButton
+                  href="/contact_us"
+                  widthClass="w-[180px]"
+                  className="h-10"
+                  iconPosition="left"
+                  icon={<Play className="h-[14px] w-[13px] stroke-[1.8]" />}
+                >
+                  Watch Demo
+                </ActionButton>
+              </div>
+            </div>
+
+            <div className="pointer-events-none absolute bottom-[-22px] left-[52%] w-[340px] -translate-x-1/2">
+              <Image
+                src="/landing/iPhone_16_Pro.png"
+                alt="Phyo product preview for campaign workflow"
+                width={340}
+                height={282}
+                className="h-auto w-full"
+              />
+            </div>
+          </div>
+        </div>
+
+        <div className="relative mx-auto hidden min-h-[560px] w-full max-w-[1440px] items-center px-4 py-12 sm:px-6 lg:flex lg:min-h-[600px] lg:px-[120px]">
           <div className="grid w-full items-center gap-8 lg:grid-cols-[minmax(0,620px)_minmax(0,1fr)]">
             <div className="max-w-[620px] mb-[54px]">
               <h2 className="font-bricolage text-[34px] font-normal leading-[1.3] text-white sm:text-[36px] sm:leading-[1.35]">
@@ -993,9 +1054,11 @@ export default function LandingPage() {
               className="relative flex justify-end lg:-mb-[162px] w-[600px] h-[480px] overflow-hidden"
               style={{ marginBottom: "0px" }}
             >
-              <img
+              <Image
                 src="/landing/iPhone_16_Pro.png"
                 alt="Phyo product preview for campaign workflow"
+                width={780}
+                height={550}
                 className="h-auto w-full w-[780px] mr-[48px]"
               />
               {/* <Image
@@ -1015,7 +1078,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      <div className=" mt-[100px] mb-[100px]">
+      <div className="mb-16 mt-16 lg:mb-[100px] lg:mt-[100px]">
         <FaqSection
           sectionClassName={pageSectionClass}
           faqItems={faqItems}
@@ -1024,26 +1087,26 @@ export default function LandingPage() {
       </div>
       <section className={pageSectionClass}>
         <div className="text-center">
-          <h2 className="font-bricolage text-[34px] leading-[1.2] text-white sm:text-[36px]">
+          <h2 className="font-bricolage text-[20px] leading-[1.4] text-white sm:text-[36px]">
             Comparison Reveals{" "}
             <span className="text-[#16a34a]">Differences & Similarities.</span>
           </h2>
         </div>
 
-        <div className="mt-10 overflow-hidden rounded-[24px] border border-[#16a34a] bg-[#181818]">
-          <div>
-            <div className="grid grid-cols-3">
+        <div className="-mx-4 mt-8 overflow-x-auto px-4 pb-1 sm:mx-0 sm:mt-10 sm:px-0">
+          <div className="w-[840px] overflow-hidden rounded-[24px] border border-[#16a34a] bg-[#181818] lg:w-auto">
+            <div className="grid grid-cols-[280px_280px_280px] lg:grid-cols-3">
               {["Feature", "Other Platform", "Phyo"].map((heading) => (
                 <div
                   key={heading}
-                  className="min-w-0 break-words bg-[#16a34a] px-3 py-4 text-left font-bricolage text-[16px] font-bold leading-[1.2] text-white sm:px-4 sm:py-5 sm:text-[20px] lg:px-5 lg:py-6 lg:text-[28px]"
+                  className="min-w-0 break-words bg-[#16a34a] px-4 py-5 text-left font-bricolage text-[20px] font-bold leading-[1.2] text-white lg:px-5 lg:py-6 lg:text-[28px]"
                 >
                   {heading}
                 </div>
               ))}
             </div>
 
-            <div className="grid grid-cols-3">
+            <div className="grid grid-cols-[280px_280px_280px] lg:grid-cols-3">
               {comparisonRows.map((row) => (
                 <ComparisonRow key={row.feature} row={row} />
               ))}
@@ -1052,20 +1115,32 @@ export default function LandingPage() {
         </div>
       </section>
 
-      <div className="mt-[100px] mb-[100px]">
+      <div className="mb-16 mt-16 lg:mb-[100px] lg:mt-[100px]">
         <section id="testimonials" className={` ${pageSectionClass}`}>
-          <div className="mx-auto max-w-[900px] text-center">
-            <h2 className="font-bricolage text-[34px] leading-[1.2] text-white sm:text-[36px]">
+          <div className="mx-auto max-w-[380px] text-center sm:max-w-[900px]">
+            <h2 className="font-bricolage text-[20px] leading-[1.2] text-white sm:text-[36px]">
               Simple Scalable{" "}
               <span className="font-semibold text-[#16a34a]">Powerful</span>
             </h2>
-            <p className="mt-4 text-[16px] leading-[1.2] text-[#9b9b9b]">
+            <p className="mt-4 text-[14px] leading-[1.6] text-[#9b9b9b] sm:text-[16px] sm:leading-[1.2]">
               From free tools to full-scale execution Phyo&apos;s pricing plans
               are designed to grow with your goals, not limit them.
             </p>
           </div>
 
-          <div className="relative mt-10">
+          <div className="-mx-4 mt-8 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-1 lg:hidden">
+            {testimonials.map((testimonial) => (
+              <div key={`${testimonial.id}-mobile`} className="snap-start">
+                <TestimonialCard
+                  quote={testimonial.quote}
+                  name={testimonial.name}
+                  location={testimonial.location}
+                />
+              </div>
+            ))}
+          </div>
+
+          <div className="relative mt-10 hidden lg:block">
             <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-12 bg-gradient-to-r from-black via-black/85 to-transparent sm:w-20" />
             <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-12 bg-gradient-to-l from-black via-black/85 to-transparent sm:w-20" />
 

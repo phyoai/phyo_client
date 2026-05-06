@@ -1,0 +1,425 @@
+- generic [ref=e1]:
+  - button "Open Next.js Dev Tools" [ref=e610] [cursor=pointer]:
+    - img [ref=e611]
+  - alert [ref=e614]
+  - main [ref=e615]:
+    - generic [ref=e616]:
+      - img
+      - generic:
+        - generic:
+          - generic:
+            - generic:
+              - img
+      - generic [ref=e617]:
+        - generic [ref=e1219]:
+          - generic [ref=e1220]:
+            - link "Phyo Home" [ref=e1221] [cursor=pointer]:
+              - /url: /
+              - img [ref=e1222]
+            - button "Open menu" [ref=e1229] [cursor=pointer]
+          - generic:
+            - navigation:
+              - link:
+                - /url: /
+                - text: Home
+              - link:
+                - /url: /about
+                - text: About
+              - link:
+                - /url: /testimonials
+                - text: Testimonials
+              - link:
+                - /url: /contact_us
+                - text: Contact
+            - link:
+              - /url: /login?expired=true
+              - generic: Sign In
+        - generic [ref=e638]:
+          - generic [ref=e639]:
+            - heading "World's First AI Powered Influencer Search Engine" [level=1] [ref=e640]:
+              - generic [ref=e641]: World's First AI Powered Influencer
+              - generic [ref=e642]: Search Engine
+            - paragraph [ref=e643]: Search Influencers in Seconds with Phyo and Reach the Right Audience Faster.
+          - generic [ref=e646]:
+            - textbox "Search influencers..." [active] [ref=e647]
+            - button [ref=e1234] [cursor=pointer]:
+              - img [ref=e649]
+          - generic [ref=e655]:
+            - generic [ref=e658]:
+              - heading "50K" [level=3] [ref=e659]
+              - paragraph [ref=e660]: Authentic influencers
+            - generic [ref=e663]:
+              - heading "15+" [level=3] [ref=e664]
+              - paragraph [ref=e665]: Countries covered
+            - generic [ref=e668]:
+              - heading "300+" [level=3] [ref=e669]
+              - paragraph [ref=e670]: Brands trust to scale fast
+            - generic [ref=e673]:
+              - heading "97.8%" [level=3] [ref=e674]
+              - paragraph [ref=e675]: Average TAT reduced
+          - paragraph [ref=e1235]: Phyo simplifies influencer discover, analysis & campaign launches so you spend less time planning & more time scaling.
+    - generic [ref=e700]:
+      - article [ref=e701]:
+        - generic [ref=e702]:
+          - heading "Launch Smarter Campaigns With AI" [level=2] [ref=e703]
+          - paragraph [ref=e704]: From finding the right influencers to tracking performance everything you need to run high-impact campaigns in one platform.
+        - img "Phyo platform features composite preview" [ref=e706]
+      - generic [ref=e707]:
+        - article [ref=e708]:
+          - generic [ref=e709]:
+            - heading "Find Creators In Seconds" [level=3] [ref=e710]
+            - paragraph [ref=e711]: No more scrolling for hours. Just type your niche, and our AI shows you the best and right influencers in seconds.
+          - img "Creator discovery tablet preview" [ref=e714]
+        - article [ref=e715]:
+          - generic [ref=e716]:
+            - heading "Tracking Your Campaigns Live" [level=3] [ref=e717]
+            - paragraph [ref=e718]: See clear performance reports and accurate ROI tracking from start to finish.
+          - img "Campaign tracking phone preview" [ref=e720]
+        - article [ref=e721]:
+          - generic [ref=e722]:
+            - heading "Fully Managed Campaigns" [level=3] [ref=e723]
+            - paragraph [ref=e724]: From Delhi to Dubai, LA to London get access to 300k+ real influencers across 15+ countries and 95+ languages.
+          - img "Managed campaigns phone preview" [ref=e726]
+    - generic [ref=e727]:
+      - generic [ref=e728]:
+        - heading "Simple Scalable Powerful" [level=2] [ref=e729]
+        - paragraph [ref=e730]: From free tools to full-scale execution Phyo's pricing plans are designed to grow with your goals, not limit them.
+      - generic [ref=e732]:
+        - button "Monthly" [ref=e733] [cursor=pointer]:
+          - generic [ref=e734]: Monthly
+        - button "Annually Save 25%" [pressed] [ref=e735] [cursor=pointer]:
+          - generic [ref=e736]:
+            - generic [ref=e737]: Annually
+            - generic [ref=e738]: Save 25%
+      - generic [ref=e739]:
+        - article [ref=e740]:
+          - img
+          - generic [ref=e741]:
+            - heading "Bronze" [level=3] [ref=e742]
+            - generic [ref=e743]:
+              - paragraph [ref=e744]: Rs.0
+              - paragraph [ref=e745]: Free Forever
+            - paragraph [ref=e746]: Perfect for early-stage creators, startups, and curious users.
+            - generic [ref=e747]:
+              - button "Start Free" [ref=e748] [cursor=pointer]:
+                - generic [ref=e749]: Start Free
+              - paragraph [ref=e750]: Billed Annually.
+            - generic [ref=e751]:
+              - heading "Free Plan Includes" [level=4] [ref=e752]
+              - list [ref=e753]:
+                - listitem [ref=e754]:
+                  - generic [ref=e756]: 10 Credits/Month
+                - listitem [ref=e757]:
+                  - generic [ref=e759]: 5 Influencer Searches
+                - listitem [ref=e760]:
+                  - generic [ref=e762]: Creator Insights (Basic)
+                - listitem [ref=e763]:
+                  - generic [ref=e765]: Access To All Supported Platforms
+                - listitem [ref=e766]:
+                  - generic [ref=e768]: Limited AI Report Access (Preview Mode)
+                - listitem [ref=e769]:
+                  - generic [ref=e771]: "Credit Validity: 45 Days"
+        - article [ref=e772]:
+          - img
+          - img "Most Popular" [ref=e774]
+          - generic [ref=e775]:
+            - heading "Silver" [level=3] [ref=e776]
+            - generic [ref=e777]:
+              - paragraph [ref=e778]: Rs. 1,425
+              - paragraph [ref=e779]: / Month
+            - paragraph [ref=e780]: Best for freelancers, boutique agencies, or small teams.
+            - generic [ref=e781]:
+              - button "Start Free" [ref=e782] [cursor=pointer]:
+                - generic [ref=e783]: Start Free
+              - paragraph [ref=e784]: Billed Annually.
+            - generic [ref=e785]:
+              - heading "Silver Plan Includes" [level=4] [ref=e786]
+              - list [ref=e787]:
+                - listitem [ref=e788]:
+                  - generic [ref=e790]: 50 Credits/Month
+                - listitem [ref=e791]:
+                  - generic [ref=e793]: 10 Advanced Searches
+                - listitem [ref=e794]:
+                  - generic [ref=e796]: 4 Campaign Reports
+                - listitem [ref=e797]:
+                  - generic [ref=e799]: Creator Insights (Advanced)
+                - listitem [ref=e800]:
+                  - generic [ref=e802]: AI-Powered Report Analyzer
+                - listitem [ref=e803]:
+                  - generic [ref=e805]: Add Up To 2 Team Members
+                - listitem [ref=e806]:
+                  - generic [ref=e808]: Historical Data Access (Up To 3 Months)
+                - listitem [ref=e809]:
+                  - generic [ref=e811]: Access To All Platforms
+                - listitem [ref=e812]:
+                  - generic [ref=e814]: Email Support
+        - article [ref=e815]:
+          - img
+          - generic [ref=e816]:
+            - heading "Gold" [level=3] [ref=e817]
+            - generic [ref=e818]:
+              - paragraph [ref=e819]: Rs. 5,925
+              - paragraph [ref=e820]: / Month
+            - paragraph [ref=e821]: Perfect for growing brands and mid-size teams.
+            - generic [ref=e822]:
+              - button "Start Free" [ref=e823] [cursor=pointer]:
+                - generic [ref=e824]: Start Free
+              - paragraph [ref=e825]: Billed Annually.
+            - generic [ref=e826]:
+              - heading "Gold Plan Includes" [level=4] [ref=e827]
+              - list [ref=e828]:
+                - listitem [ref=e829]:
+                  - generic [ref=e831]: 250 Credits/Month
+                - listitem [ref=e832]:
+                  - generic [ref=e834]: 20 Deep Searches
+                - listitem [ref=e835]:
+                  - generic [ref=e837]: 10 AI-Powered Campaign Reports
+                - listitem [ref=e838]:
+                  - generic [ref=e840]: Dedicated Chat Support
+                - listitem [ref=e841]:
+                  - generic [ref=e843]: AI Optimizes Campaigns
+                - listitem [ref=e844]:
+                  - generic [ref=e846]: Unlimited Users
+                - listitem [ref=e847]:
+                  - generic [ref=e849]: Historical Data (Up To 6 Months)
+                - listitem [ref=e850]:
+                  - generic [ref=e852]: Exportable Analytics (CSV/PDF)
+                - listitem [ref=e853]:
+                  - generic [ref=e855]: AI Smart Creators, Niche, Region, Top
+                - listitem [ref=e856]:
+                  - generic [ref=e858]: Multi-Platform Aggregated Creator Profiles
+        - article [ref=e859]:
+          - img
+          - generic [ref=e860]:
+            - heading "Premium" [level=3] [ref=e861]
+            - generic [ref=e862]:
+              - paragraph [ref=e863]: Rs. 14,925
+              - paragraph [ref=e864]: / Month
+            - paragraph [ref=e865]: Perfect for global agencies managing multiple campaigns.
+            - generic [ref=e866]:
+              - button "Start Free" [ref=e867] [cursor=pointer]:
+                - generic [ref=e868]: Start Free
+              - paragraph [ref=e869]: Billed Annually.
+            - generic [ref=e870]:
+              - heading "Premium Plan Includes" [level=4] [ref=e871]
+              - list [ref=e872]:
+                - listitem [ref=e873]:
+                  - generic [ref=e875]: Unlimited Credits/Month
+                - listitem [ref=e876]:
+                  - generic [ref=e878]: 100 Smart Searches
+                - listitem [ref=e879]:
+                  - generic [ref=e881]: AI Competitor Analysis (Track 5 Competitors)
+                - listitem [ref=e882]:
+                  - generic [ref=e884]: Trend Analyzer (5 Trends/Month)
+                - listitem [ref=e885]:
+                  - generic [ref=e887]: Campaign Auto-Optimization Insights
+                - listitem [ref=e888]:
+                  - generic [ref=e890]: Reusable Campaign Templates
+                - listitem [ref=e891]:
+                  - generic [ref=e893]: Dedicated Account Workspace
+                - listitem [ref=e894]:
+                  - generic [ref=e896]: Priority Access To New Features
+                - listitem [ref=e897]:
+                  - generic [ref=e899]: Team Analytics Dashboard
+                - listitem [ref=e900]:
+                  - generic [ref=e902]: Global Creator Index Access
+                - listitem [ref=e903]:
+                  - generic [ref=e905]: 24/7 Priority Support
+      - generic [ref=e907]:
+        - img
+        - generic [ref=e908]:
+          - generic [ref=e909]:
+            - heading "Custom Pricing For ALL" [level=3] [ref=e910]
+            - paragraph [ref=e911]: Powerful Customizable Plans For Agencies Brands, & Enterprise Teams.
+          - button "Get In Touch Now" [ref=e912] [cursor=pointer]:
+            - generic [ref=e913]: Get In Touch Now
+    - generic [ref=e1237]:
+      - generic [ref=e1238]:
+        - heading "AI Search. Verified Influencers. Real Results." [level=2] [ref=e1239]:
+          - generic [ref=e1240]: AI Search. Verified Influencers.
+          - generic [ref=e1241]: Real Results.
+        - paragraph [ref=e1242]: From discovery to campaign execution everything you need to run high-performing influencer campaigns in one platform.
+        - generic [ref=e1243]:
+          - link "Start With Free Trial" [ref=e1244] [cursor=pointer]:
+            - /url: /signup
+            - generic [ref=e1245]:
+              - img [ref=e1247]
+              - generic [ref=e1249]: Start With Free Trial
+          - link "Watch Demo" [ref=e1250] [cursor=pointer]:
+            - /url: /contact_us
+            - generic [ref=e1251]:
+              - img [ref=e1253]
+              - generic [ref=e1255]: Watch Demo
+      - generic:
+        - img "Phyo product preview for campaign workflow"
+    - generic [ref=e939]:
+      - generic [ref=e940]:
+        - generic [ref=e941]:
+          - heading "Frequently Asked Questions" [level=2] [ref=e942]
+          - paragraph [ref=e943]: It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.
+        - generic [ref=e944]:
+          - heading "Still Have Questions?" [level=3] [ref=e945]
+          - paragraph [ref=e946]: See how Phyo helps you find the right influencers, track campaigns, and scale faster all in one place.
+          - link "Watch Demo" [ref=e947] [cursor=pointer]:
+            - /url: "#home"
+            - generic [ref=e948]:
+              - img [ref=e950]
+              - generic [ref=e952]: Watch Demo
+      - generic [ref=e953]:
+        - generic [ref=e954]:
+          - button "How Do Credits Work?" [ref=e955] [cursor=pointer]:
+            - generic [ref=e956]: How Do Credits Work?
+            - img [ref=e958]
+          - paragraph [ref=e959]: Credits are used all around Phyo for transparent usage and maximum flexibility.
+        - generic [ref=e960]:
+          - button "Can I Try Phyo Before Subscribing?" [ref=e961] [cursor=pointer]:
+            - generic [ref=e962]: Can I Try Phyo Before Subscribing?
+            - img [ref=e964]
+          - paragraph [ref=e967]: Yes, we offer a free trial period where you can explore all features and see how Phyo can help grow your brand before committing to a subscription.
+        - generic [ref=e968]:
+          - button "How Secure Is My Data On Phyo?" [ref=e969] [cursor=pointer]:
+            - generic [ref=e970]: How Secure Is My Data On Phyo?
+            - img [ref=e972]
+          - paragraph [ref=e973]: Your data security is our top priority. We use enterprise-grade encryption, secure servers, and follow industry best practices and compliance standards to protect your information at all times.
+        - generic [ref=e974]:
+          - button "Can I Cancel My Subscription Anytime?" [ref=e975] [cursor=pointer]:
+            - generic [ref=e976]: Can I Cancel My Subscription Anytime?
+            - img [ref=e978]
+          - paragraph [ref=e979]: Absolutely! You can cancel your subscription at any time with no hidden fees or penalties. Your account will remain active until the end of your current billing cycle.
+        - generic [ref=e980]:
+          - button "Can Phyo Actually Help Me Grow My Brand Fast?" [ref=e981] [cursor=pointer]:
+            - generic [ref=e982]: Can Phyo Actually Help Me Grow My Brand Fast?
+            - img [ref=e984]
+          - paragraph [ref=e985]: Yes! Our platform is designed to accelerate brand growth and help you reach the right audience faster with AI-powered influencer discovery and campaign optimization.
+    - generic [ref=e986]:
+      - heading "Comparison Reveals Differences & Similarities." [level=2] [ref=e988]
+      - generic [ref=e990]:
+        - generic [ref=e991]:
+          - generic [ref=e992]: Feature
+          - generic [ref=e993]: Other Platform
+          - generic [ref=e994]: Phyo
+        - generic [ref=e995]:
+          - generic [ref=e997]: Turnaround Time
+          - generic [ref=e999]: 1-2 Days For Campaign Completion
+          - generic [ref=e1002]: 30-Minute Campaign Setup And Execution
+          - generic [ref=e1004]: Data Sources
+          - generic [ref=e1006]: Outdated Or Estimated Data
+          - generic [ref=e1009]: Real-Time Data Via Meta & Google Partnerships
+          - generic [ref=e1011]: Influencer Analytics
+          - generic [ref=e1013]: Basic Follower/Engagement Metrics
+          - generic [ref=e1016]: In-Depth Analytics (ROI, Virality, Content Affinity)
+          - generic [ref=e1018]: Content Affinity Insights
+          - generic [ref=e1020]: Not Available
+          - generic [ref=e1023]: Analyzes Audience Preferences For Content Types
+          - generic [ref=e1025]: AI Matchmaking
+          - generic [ref=e1027]: Manual Searches Or Basic Filters
+          - generic [ref=e1030]: AI-Driven Recommendations Based On Brands
+          - generic [ref=e1032]: Influencer Database
+          - generic [ref=e1034]: Limited Creators (Under 50k)
+          - generic [ref=e1037]: 300,000+ Vetted Influencers Globally
+          - generic [ref=e1039]: Global Reach
+          - generic [ref=e1041]: Limited To Local Markets
+          - generic [ref=e1044]: Influencers Across 15+ Countries
+          - generic [ref=e1046]: Performance Estimation
+          - generic [ref=e1048]: No Predictive Tools
+          - generic [ref=e1051]: Predicts Campaign Success With AI
+          - generic [ref=e1053]: Campaign Reports
+          - generic [ref=e1055]: Basic Engagement Summaries
+          - generic [ref=e1058]: Detailed Reports (ROI, Audience Sentiment, Platform-Wise Sharing)
+          - generic [ref=e1060]: Language Support
+          - generic [ref=e1062]: Limited To Major Languages
+          - generic [ref=e1065]: Supports 95+ Languages For Global Campaigns
+    - generic [ref=e1067]:
+      - generic [ref=e1068]:
+        - heading "Simple Scalable Powerful" [level=2] [ref=e1069]
+        - paragraph [ref=e1070]: From free tools to full-scale execution Phyo's pricing plans are designed to grow with your goals, not limit them.
+      - generic [ref=e1256]:
+        - article [ref=e1258]:
+          - paragraph [ref=e1260]: Phyo cut our creator discovery time from days to minutes. The AI recommendations were strong enough that our shortlist was ready in a single review.
+          - generic [ref=e1261]:
+            - img "Ava M. testimonial profile" [ref=e1263]
+            - generic [ref=e1264]:
+              - paragraph [ref=e1265]: Ava M.
+              - paragraph [ref=e1266]: New York
+          - generic [ref=e1267]: ”
+          - generic: ”
+        - article [ref=e1269]:
+          - paragraph [ref=e1271]: We used to bounce between spreadsheets, screenshots, and DMs. Now the whole campaign workflow feels cleaner and much easier to manage.
+          - generic [ref=e1272]:
+            - img "Jordan T. testimonial profile" [ref=e1274]
+            - generic [ref=e1275]:
+              - paragraph [ref=e1276]: Jordan T.
+              - paragraph [ref=e1277]: Toronto
+          - generic [ref=e1278]: ”
+          - generic: ”
+        - article [ref=e1280]:
+          - paragraph [ref=e1282]: The audience-fit signals helped us avoid weak matches early. That alone saved budget and made our first campaign feel much more intentional.
+          - generic [ref=e1283]:
+            - img "Priya R. testimonial profile" [ref=e1285]
+            - generic [ref=e1286]:
+              - paragraph [ref=e1287]: Priya R.
+              - paragraph [ref=e1288]: Mumbai
+          - generic [ref=e1289]: ”
+          - generic: ”
+        - article [ref=e1291]:
+          - paragraph [ref=e1293]: Reporting used to be a scramble at the end of every launch. With Phyo, performance, creator activity, and campaign status all stay in one place.
+          - generic [ref=e1294]:
+            - img "Daniel K. testimonial profile" [ref=e1296]
+            - generic [ref=e1297]:
+              - paragraph [ref=e1298]: Daniel K.
+              - paragraph [ref=e1299]: Sydney
+          - generic [ref=e1300]: ”
+          - generic: ”
+        - article [ref=e1302]:
+          - paragraph [ref=e1304]: For a lean team, Phyo feels like adding an operations layer without hiring one. Search, vetting, and campaign coordination are all noticeably faster.
+          - generic [ref=e1305]:
+            - img "Nina C. testimonial profile" [ref=e1307]
+            - generic [ref=e1308]:
+              - paragraph [ref=e1309]: Nina C.
+              - paragraph [ref=e1310]: Singapore
+          - generic [ref=e1311]: ”
+          - generic: ”
+    - generic [ref=e1177]:
+      - generic [ref=e1178]:
+        - generic [ref=e1179]:
+          - img [ref=e1180]
+          - paragraph [ref=e1187]: It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.
+        - generic [ref=e1188]:
+          - heading "Quick Links" [level=3] [ref=e1189]
+          - list [ref=e1190]:
+            - listitem [ref=e1191]:
+              - link "Home" [ref=e1192] [cursor=pointer]:
+                - /url: /
+            - listitem [ref=e1193]:
+              - link "About" [ref=e1194] [cursor=pointer]:
+                - /url: /about
+            - listitem [ref=e1195]:
+              - link "Testimonials" [ref=e1196] [cursor=pointer]:
+                - /url: /testimonials
+            - listitem [ref=e1197]:
+              - link "Contact" [ref=e1198] [cursor=pointer]:
+                - /url: /contact_us
+        - generic [ref=e1199]:
+          - heading "Other Links" [level=3] [ref=e1200]
+          - list [ref=e1201]:
+            - listitem [ref=e1202]:
+              - link "Terms & Conditions" [ref=e1203] [cursor=pointer]:
+                - /url: /term-and-conditions
+            - listitem [ref=e1204]:
+              - link "Privacy Policy" [ref=e1205] [cursor=pointer]:
+                - /url: /privacy-policy
+            - listitem [ref=e1206]:
+              - link "FAQs" [ref=e1207] [cursor=pointer]:
+                - /url: /faqs
+      - generic [ref=e1209]:
+        - paragraph [ref=e1210]: © All Rights Reserve At 2026 PHYO TECHNOLOGIES LLP
+        - generic [ref=e1211]:
+          - link "Facebook" [ref=e1212] [cursor=pointer]:
+            - /url: /
+            - img "Facebook icon" [ref=e1213]
+          - link "Instagram" [ref=e1214] [cursor=pointer]:
+            - /url: /
+            - img "Instagram icon" [ref=e1215]
+          - link "Twitter" [ref=e1216] [cursor=pointer]:
+            - /url: /
+            - img "Twitter icon" [ref=e1217]
