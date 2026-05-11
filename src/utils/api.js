@@ -1,4 +1,5 @@
 import axios from 'axios';
+import secureAuthStorage from './secure-auth';
 
 // Create axios instance with base configuration
 const api = axios.create({
@@ -6,20 +7,17 @@ const api = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
+  withCredentials: true, // Include httpOnly cookies in requests
 });
 
-// Request interceptor to add auth token
+// Request interceptor to add auth token from httpOnly cookies
 api.interceptors.request.use(
   (config) => {
-    // Get token from localStorage or cookies (only in browser)
-    if (typeof window !== 'undefined') {
-      let token = null;
-      // Use adminToken for admin routes, else use authToken
-      if (window.location.pathname.startsWith('/admin')) {
-        token = localStorage.getItem('adminToken');
-      } else {
-        token = localStorage.getItem('authToken') || getCookie('authToken');
-      }
+    // Tokens should be in httpOnly cookies (set by backend)
+    // Browser automatically sends them with credentials: true
+    // For development, add Authorization header if available
+    if (process.env.NODE_ENV === 'development') {
+      const token = secureAuthStorage.getToken();
       if (token) {
         config.headers.Authorization = `Bearer ${token}`;
       }
@@ -38,21 +36,13 @@ api.interceptors.response.use(
     // Handle 401 (Unauthorized) and 403 (Forbidden - Invalid/Expired Token)
     const status = error.response?.status;
     const errorMessage = error.response?.data?.message || '';
-    
+
     // Check for authentication errors (401) or token expiry/invalid (403)
     if (status === 401 || (status === 403 && (errorMessage.includes('Invalid or expired token') || errorMessage.includes('token')))) {
       // Clear all auth data
-      localStorage.removeItem('authToken');
-      localStorage.removeItem('adminToken');
-      localStorage.removeItem('adminInfo');
-      localStorage.removeItem('userInfo');
-      localStorage.removeItem('landing_search_results');
-      localStorage.removeItem('landing_search_prompt');
-      
+      secureAuthStorage.clearAuth();
+
       if (typeof window !== 'undefined') {
-        // Clear cookies
-        document.cookie = 'authToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
-        
         // Redirect based on current path
         if (window.location.pathname.startsWith('/admin')) {
           window.location.href = '/admin/login';

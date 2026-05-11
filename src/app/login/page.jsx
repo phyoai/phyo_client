@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useEffect, useState, useCallback, useMemo } from "react";
 import { createPortal } from "react-dom";
 import { useForm } from "react-hook-form";
 import { GoogleLogin, GoogleOAuthProvider } from "@react-oauth/google";
@@ -11,8 +11,32 @@ import { ToastContainer, toast } from "react-toastify";
 import OutlineGlowButton from "@/components/shared/OutlineGlowButton";
 import { useAuth } from "../context/AuthContext";
 import { ForgotPasswordCard } from "../forgot-password/page";
-import { authUtils } from "../../utils/api";
+import secureAuthStorage from "../../utils/secure-auth";
+import inputValidation from "../../utils/input-validation";
 import "react-toastify/dist/ReactToastify.css";
+
+// Initialize Facebook SDK
+const initFacebookSDK = (facebookAppId) => {
+  if (typeof window === "undefined") return;
+
+  if (window.fbAsyncInit) return;
+
+  window.fbAsyncInit = function () {
+    FB.init({
+      appId: facebookAppId,
+      xfbml: true,
+      version: "v18.0",
+    });
+  };
+
+  // Load Facebook SDK script
+  const script = document.createElement("script");
+  script.async = true;
+  script.defer = true;
+  script.crossOrigin = "anonymous";
+  script.src = "https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v18.0";
+  document.head.appendChild(script);
+};
 
 const formFields = [
   {
@@ -188,6 +212,19 @@ function GoogleIcon({ isWhite = false }) {
   );
 }
 
+function InstagramIcon({ isWhite = false }) {
+  const fill = isWhite ? "#FFFFFF" : "#E1306C";
+
+  return (
+    <svg aria-hidden="true" className="h-5 w-5" viewBox="0 0 24 24">
+      <path
+        d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.266.069 1.646.069 4.85 0 3.204-.012 3.584-.07 4.85-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zM5.838 12a6.162 6.162 0 1112.324 0 6.162 6.162 0 01-12.324 0zM12 16a4 4 0 100-8 4 4 0 000 8zm4.965-10.322a1.44 1.44 0 11-2.881 0 1.44 1.44 0 012.881 0z"
+        fill={fill}
+      />
+    </svg>
+  );
+}
+
 function AuthArtworkPanel() {
   return (
     <section
@@ -263,18 +300,28 @@ function ForgotPasswordModal({ open, onClose }) {
   );
 }
 
-function LoginForm() {
+function LoginForm({ facebookAppId }) {
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm();
 
-  const [loading, setLoading] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
-  const [googleLoading, setGoogleLoading] = useState(false);
-  const [forgotModalOpen, setForgotModalOpen] = useState(false);
-  const [googleIconWhite, setGoogleIconWhite] = useState(false);
+  // Consolidated state for better performance
+  const [uiState, setUiState] = useState({
+    loading: false,
+    showPassword: false,
+    googleLoading: false,
+    instagramLoading: false,
+    forgotModalOpen: false,
+    googleIconWhite: false,
+    instagramIconWhite: false,
+  });
+
+  // Memoized state setters
+  const updateUiState = useCallback((updates) => {
+    setUiState((prev) => ({ ...prev, ...updates }));
+  }, []);
 
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -282,6 +329,12 @@ function LoginForm() {
 
   const verified = searchParams.get("verified");
   const expired = searchParams.get("expired");
+
+  useEffect(() => {
+    if (facebookAppId) {
+      initFacebookSDK(facebookAppId);
+    }
+  }, [facebookAppId]);
 
   useEffect(() => {
     if (!isAuthenticated()) {
@@ -324,7 +377,7 @@ function LoginForm() {
   }, [expired]);
 
   useEffect(() => {
-    if (!forgotModalOpen) {
+    if (!uiState.forgotModalOpen) {
       return undefined;
     }
 
@@ -341,38 +394,76 @@ function LoginForm() {
       document.documentElement.style.overflow = previousHtmlOverflow;
       document.body.style.overscrollBehavior = previousOverscroll;
     };
-  }, [forgotModalOpen]);
+  }, [uiState.forgotModalOpen]);
 
-  const loginAPI = async (email, password) => {
+  const loginAPI = useCallback(async (email, password) => {
+    // Input validation
+    const emailValidation = inputValidation.validateEmail(email);
+    if (!emailValidation.valid) {
+      throw new Error(emailValidation.error);
+    }
+
+    const passwordValidation = inputValidation.validatePassword(password);
+    if (!passwordValidation.valid) {
+      throw new Error(passwordValidation.error);
+    }
+
+    // Rate limiting check
+    if (!inputValidation.checkRateLimit('login_attempts', 5, 60000)) {
+      throw new Error('Too many login attempts. Please try again in 1 minute.');
+    }
+
     const apiUrl = process.env.NEXT_PUBLIC_API_URL || "https://api.phyo.ai/api";
 
     const response = await fetch(`${apiUrl}/auth/login`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ email, password }),
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify({ email: emailValidation.value, password }),
     });
 
     const data = await response.json();
 
     if (!response.ok) {
-      throw new Error(data.message || `HTTP error! status: ${response.status}`);
+      throw new Error(data.message || `Login failed`);
     }
 
     return data;
-  };
+  }, []);
 
-  const googleLoginAPI = async (idToken) => {
+  const googleLoginAPI = useCallback(async (idToken) => {
+    if (!idToken) {
+      throw new Error('Invalid Google credentials');
+    }
+
     const apiUrl = process.env.NEXT_PUBLIC_API_URL || "https://api.phyo.ai/api";
 
     const response = await fetch(`${apiUrl}/auth/google`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify({ idToken, type: "USER" }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.message || "Google login failed");
+    }
+
+    return data;
+  }, []);
+
+  const instagramLoginAPI = async (accessToken) => {
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || "https://api.phyo.ai/api";
+
+    const response = await fetch(`${apiUrl}/auth/instagram`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        idToken,
+        accessToken,
         type: "USER",
       }),
     });
@@ -386,11 +477,62 @@ function LoginForm() {
     return data;
   };
 
-  const handleGoogleSuccess = async (credentialResponse) => {
-    setGoogleLoading(true);
+  const handleGoogleSuccess = useCallback(async (credentialResponse) => {
+    updateUiState({ googleLoading: true });
 
     try {
       const result = await googleLoginAPI(credentialResponse.credential);
+
+      if (result.token) {
+        const userData = result.user || result.data?.user || result.data;
+
+        secureAuthStorage.setToken(result.token);
+        secureAuthStorage.setUserData(userData);
+
+        toast.success("Successfully signed in with Google!");
+
+        const redirect = searchParams.get("redirect") || getDefaultRedirect(userData);
+        setTimeout(() => router.push(redirect), 1000);
+      } else {
+        toast.error(result.message || "Google login failed");
+      }
+    } catch (error) {
+      toast.error(error.message || "Failed to sign in with Google");
+    } finally {
+      updateUiState({ googleLoading: false, googleIconWhite: false });
+    }
+  }, [googleLoginAPI, searchParams, router, updateUiState]);
+
+  const handleGoogleError = () => {
+    setGoogleIconWhite(false);
+    toast.error("Google Sign-In was unsuccessful. Please try again.");
+  };
+
+  const handleInstagramLogin = () => {
+    if (!window.FB) {
+      toast.error("Instagram SDK is not loaded. Please try again.");
+      return;
+    }
+
+    window.FB.login(
+      (response) => {
+        if (response.authResponse) {
+          handleInstagramSuccess(response.authResponse.accessToken);
+        } else {
+          handleInstagramError("User cancelled login or did not fully authorize.");
+        }
+      },
+      {
+        scope: "user_profile,user_media",
+      }
+    );
+  };
+
+  const handleInstagramSuccess = async (accessToken) => {
+    setInstagramLoading(true);
+
+    try {
+      const result = await instagramLoginAPI(accessToken);
 
       if (result.token) {
         authUtils.setToken(result.token);
@@ -405,63 +547,59 @@ function LoginForm() {
           }
         }
 
-        toast.success("Successfully signed in with Google!");
+        toast.success("Successfully signed in with Instagram!");
 
         const redirect =
           searchParams.get("redirect") || getDefaultRedirect(userData);
 
         setTimeout(() => router.push(redirect), 1000);
       } else {
-        toast.error(result.message || "Google login failed");
+        toast.error(result.message || "Instagram login failed");
       }
     } catch (error) {
-      toast.error(error.message || "Failed to sign in with Google");
+      toast.error(error.message || "Failed to sign in with Instagram");
     } finally {
-      setGoogleLoading(false);
-      setGoogleIconWhite(false);
+      setInstagramLoading(false);
+      setInstagramIconWhite(false);
     }
   };
 
-  const handleGoogleError = () => {
-    setGoogleIconWhite(false);
-    toast.error("Google Sign-In was unsuccessful. Please try again.");
+  const handleInstagramError = (errorMsg) => {
+    setInstagramIconWhite(false);
+    setInstagramLoading(false);
+    toast.error(errorMsg || "Instagram Sign-In was unsuccessful. Please try again.");
   };
 
-  const onSubmit = async (data) => {
-    setLoading(true);
+  const onSubmit = useCallback(async (data) => {
+    updateUiState({ loading: true });
 
     try {
       const result = await loginAPI(data.email, data.password);
 
       if (result.success || result.token || result.data?.token) {
         const token = result.token || result.data?.token;
-
-        if (token) {
-          authUtils.setToken(token);
-          localStorage.setItem("userEmail", data.email);
-        }
-
         const userData = result.user || result.data?.user || result.data;
 
-        if (userData) {
-          localStorage.setItem("userData", JSON.stringify(userData));
+        if (token && userData) {
+          secureAuthStorage.setToken(token);
+          secureAuthStorage.setUserData(userData);
+
+          toast.success("Login successful! Welcome back!");
+
+          const redirect = searchParams.get("redirect") || getDefaultRedirect(userData);
+          setTimeout(() => router.push(redirect), 1000);
+        } else {
+          toast.error("Login failed - missing credentials");
         }
-
-        toast.success("Login successful! Welcome back!");
-
-        const redirect =
-          searchParams.get("redirect") || getDefaultRedirect(userData);
-
-        setTimeout(() => router.push(redirect), 1000);
       } else {
         toast.error(result.message || "Login failed");
       }
     } catch (error) {
       toast.error(error.message || "An unexpected error occurred");
     } finally {
-      setLoading(false);
+      updateUiState({ loading: false });
     }
-  };
+  }, [loginAPI, searchParams, router, updateUiState]);
 
   const handleGoogleButtonClick = () => {
     setGoogleIconWhite(true);
@@ -543,7 +681,7 @@ function LoginForm() {
                           <input
                             id={field.name}
                             type={
-                              field.name === "password" && showPassword
+                              field.name === "password" && uiState.showPassword
                                 ? "text"
                                 : field.type
                             }
@@ -560,13 +698,13 @@ function LoginForm() {
                           {field.name === "password" && (
                             <button
                               type="button"
-                              onClick={() => setShowPassword((value) => !value)}
+                              onClick={() => updateUiState({ showPassword: !uiState.showPassword })}
                               className="absolute bottom-2 right-0 text-white/40 transition hover:text-white/75"
                               aria-label={
-                                showPassword ? "Hide password" : "Show password"
+                                uiState.showPassword ? "Hide password" : "Show password"
                               }
                             >
-                              <EyeIcon slashed={!showPassword} />
+                              <EyeIcon slashed={!uiState.showPassword} />
                             </button>
                           )}
                         </div>
@@ -576,7 +714,7 @@ function LoginForm() {
                         <div className="text-right">
                           <button
                             type="button"
-                            onClick={() => setForgotModalOpen(true)}
+                            onClick={() => updateUiState({ forgotModalOpen: true })}
                             className="text-[14px] text-[#16a34a] transition hover:text-[#34d27a] mt-[2px]"
                             style={{
                               fontFamily: "var(--font-inter)",
@@ -643,12 +781,12 @@ peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outli
               <div className="space-y-6 pt-1 sm:space-y-8">
                 <OutlineGlowButton
                   type="submit"
-                  disabled={loading}
+                  disabled={uiState.loading}
                   className="h-12 w-full px-5 normal-case disabled:cursor-not-allowed disabled:opacity-50 sm:text-[16px]"
                   baseSurfaceClassName="bg-[#000000]"
                   glowSurfaceClassName="bg-[#16A34A]"
                 >
-                  {loading ? (
+                  {uiState.loading ? (
                     <span
                       className="inline-flex items-center justify-center gap-3"
                       style={{ fontFamily: "var(--font-inter)" }}
@@ -680,29 +818,51 @@ peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outli
                 </div>
 
                 <div className="space-y-4 sm:space-y-5">
-                  <OutlineGlowButton
-                    type="button"
-                    onMouseDown={() => setGoogleIconWhite(true)}
-                    onClick={handleGoogleButtonClick}
-                    disabled={googleLoading || loading}
-                    className="h-12 w-full px-5 normal-case disabled:cursor-not-allowed disabled:opacity-50 sm:text-[16px]"
-                    baseSurfaceClassName="bg-[#000000]"
-                    glowSurfaceClassName="bg-[#16A34A]"
-                  >
-                    {googleLoading ? (
-                      <span className="inline-flex items-center gap-3">
-                        <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
-                        Connecting...
-                      </span>
-                    ) : (
-                      <span className="inline-flex items-center justify-center gap-2">
-                        <GoogleIcon isWhite={googleIconWhite} />
-                        <span className="pt-[2px] text-center">
-                          Continue with google
+                  <div className="grid grid-cols-2 gap-3 sm:gap-4">
+                    <OutlineGlowButton
+                      type="button"
+                      onMouseDown={() => updateUiState({ googleIconWhite: true })}
+                      onClick={handleGoogleButtonClick}
+                      disabled={uiState.googleLoading || uiState.loading || uiState.instagramLoading}
+                      className="h-12 w-full px-3 normal-case disabled:cursor-not-allowed disabled:opacity-50 sm:text-[14px]"
+                      baseSurfaceClassName="bg-[#000000]"
+                      glowSurfaceClassName="bg-[#16A34A]"
+                    >
+                      {uiState.googleLoading ? (
+                        <span className="inline-flex items-center gap-2">
+                          <span className="h-3 w-3 animate-spin rounded-full border-2 border-white/30 border-t-white" />
+                          <span className="text-xs">Connecting...</span>
                         </span>
-                      </span>
-                    )}
-                  </OutlineGlowButton>
+                      ) : (
+                        <span className="inline-flex flex-col items-center justify-center gap-1">
+                          <GoogleIcon isWhite={uiState.googleIconWhite} />
+                          <span className="text-xs text-center">Google</span>
+                        </span>
+                      )}
+                    </OutlineGlowButton>
+
+                    <OutlineGlowButton
+                      type="button"
+                      onMouseDown={() => updateUiState({ instagramIconWhite: true })}
+                      onClick={handleInstagramLogin}
+                      disabled={uiState.instagramLoading || uiState.loading || uiState.googleLoading}
+                      className="h-12 w-full px-3 normal-case disabled:cursor-not-allowed disabled:opacity-50 sm:text-[14px]"
+                      baseSurfaceClassName="bg-[#000000]"
+                      glowSurfaceClassName="bg-[#16A34A]"
+                    >
+                      {uiState.instagramLoading ? (
+                        <span className="inline-flex items-center gap-2">
+                          <span className="h-3 w-3 animate-spin rounded-full border-2 border-white/30 border-t-white" />
+                          <span className="text-xs">Connecting...</span>
+                        </span>
+                      ) : (
+                        <span className="inline-flex flex-col items-center justify-center gap-1">
+                          <InstagramIcon isWhite={uiState.instagramIconWhite} />
+                          <span className="text-xs text-center">Instagram</span>
+                        </span>
+                      )}
+                    </OutlineGlowButton>
+                  </div>
 
                   <p
                     className="text-center text-[13px] leading-[1.6] text-[#868686] sm:text-[14px]"
@@ -735,8 +895,8 @@ peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outli
       </div>
 
       <ForgotPasswordModal
-        open={forgotModalOpen}
-        onClose={() => setForgotModalOpen(false)}
+        open={uiState.forgotModalOpen}
+        onClose={() => updateUiState({ forgotModalOpen: false })}
       />
 
       <ToastContainer
@@ -760,10 +920,12 @@ export default function LoginPage() {
     process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ||
     "1056581199715-rk69h1nevsldlek1sb3oft4itnnd5qoo.apps.googleusercontent.com";
 
+  const facebookAppId = process.env.NEXT_PUBLIC_FACEBOOK_APP_ID;
+
   return (
     <GoogleOAuthProvider clientId={clientId}>
       <Suspense fallback={<AuthLoadingScreen />}>
-        <LoginForm />
+        <LoginForm facebookAppId={facebookAppId} />
       </Suspense>
     </GoogleOAuthProvider>
   );

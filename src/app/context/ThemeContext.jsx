@@ -1,16 +1,17 @@
 'use client';
 
-import { createContext, useContext, useEffect, useState } from 'react';
+import { createContext, useContext, useEffect, useState, useCallback, useMemo } from 'react';
 
 /**
- * Enhanced Theme Context
+ * Enhanced Theme Context with Memoization
  * Manages application-wide theme with system preference detection
+ * Uses memoization to prevent unnecessary re-renders
  *
  * Usage:
  * const { theme, toggleTheme, setTheme } = useTheme();
  */
 
-const ThemeContext = createContext();
+const ThemeContext = createContext(null);
 
 export function ThemeProvider({ children }) {
   const [theme, setThemeState] = useState('light');
@@ -64,7 +65,8 @@ export function ThemeProvider({ children }) {
     };
   }, []);
 
-  const applyTheme = (newTheme) => {
+  // Memoized applyTheme function
+  const applyTheme = useCallback((newTheme) => {
     if (typeof window === 'undefined') return;
 
     const root = document.documentElement;
@@ -77,23 +79,44 @@ export function ThemeProvider({ children }) {
       document.documentElement.style.colorScheme = 'light';
     }
 
-    localStorage.setItem('theme', newTheme);
-  };
+    try {
+      localStorage.setItem('theme', newTheme);
+    } catch (e) {
+      console.error('Failed to save theme preference:', e);
+    }
+  }, []);
 
-  const toggleTheme = () => {
+  // Memoized toggleTheme function
+  const toggleTheme = useCallback(() => {
     const newTheme = theme === 'light' ? 'dark' : 'light';
     setThemeState(newTheme);
     applyTheme(newTheme);
-  };
+  }, [theme, applyTheme]);
 
-  const toggleDarkMode = () => {
+  // Memoized toggleDarkMode function (backward compatibility)
+  const toggleDarkMode = useCallback(() => {
     toggleTheme();
-  };
+  }, [toggleTheme]);
 
-  const setTheme = (newTheme) => {
+  // Memoized setTheme function
+  const setTheme = useCallback((newTheme) => {
+    if (!['light', 'dark'].includes(newTheme)) {
+      console.warn(`Invalid theme: ${newTheme}. Using 'light' as default.`);
+      newTheme = 'light';
+    }
     setThemeState(newTheme);
     applyTheme(newTheme);
-  };
+  }, [applyTheme]);
+
+  // Memoized context value to prevent unnecessary re-renders
+  const contextValue = useMemo(() => ({
+    theme,
+    toggleTheme,
+    setTheme,
+    systemTheme,
+    darkMode: theme === 'dark',
+    toggleDarkMode,
+  }), [theme, toggleTheme, setTheme, systemTheme, toggleDarkMode]);
 
   // Prevent flash of unstyled content
   if (!mounted) {
@@ -101,18 +124,7 @@ export function ThemeProvider({ children }) {
   }
 
   return (
-    <ThemeContext.Provider
-      value={{
-        // New API
-        theme,
-        toggleTheme,
-        setTheme,
-        systemTheme,
-        // Backward compatibility
-        darkMode,
-        toggleDarkMode,
-      }}
-    >
+    <ThemeContext.Provider value={contextValue}>
       {children}
     </ThemeContext.Provider>
   );

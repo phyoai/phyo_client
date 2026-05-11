@@ -97,11 +97,23 @@ const nextConfig = {
     generateEtags: true,
 
     // Headers for security and performance
+    async redirects() {
+        return [
+            {
+                source: '/contact_us',
+                destination: '/contact-us',
+                permanent: true,
+            },
+        ];
+    },
+
+    // Headers for security and performance
     async headers() {
         return [
             {
                 source: '/:path*',
                 headers: [
+                    // Security Headers
                     {
                         key: 'X-Content-Type-Options',
                         value: 'nosniff',
@@ -117,6 +129,21 @@ const nextConfig = {
                     {
                         key: 'Referrer-Policy',
                         value: 'strict-origin-when-cross-origin',
+                    },
+                    // Strict Transport Security
+                    {
+                        key: 'Strict-Transport-Security',
+                        value: 'max-age=31536000; includeSubDomains; preload',
+                    },
+                    // Content Security Policy - Prevent XSS
+                    {
+                        key: 'Content-Security-Policy',
+                        value: "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://connect.facebook.net https://apis.google.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' http://localhost:* https://api.phyo.ai https://accounts.google.com https://graph.instagram.com; frame-src 'self' https://accounts.google.com; object-src 'none'; base-uri 'self'; form-action 'self'",
+                    },
+                    // Prevent Clickjacking
+                    {
+                        key: 'Permissions-Policy',
+                        value: 'geolocation=(), microphone=(), camera=(), payment=()',
                     },
                 ],
             },

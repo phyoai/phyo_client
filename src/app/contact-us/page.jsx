@@ -32,8 +32,8 @@ function ContactField({
           id={fieldId}
           name={name || fieldId}
           required={required}
-          rows={2}
-          className="w-full resize-none border-b border-[#5f5f5f] bg-transparent pb-1 text-[14px] leading-[1.3] text-white outline-none placeholder:text-[#5f5f5f] focus:border-[#16a34a]"
+          rows={3}
+          className="w-full resize-none border-b border-[#5f5f5f] bg-transparent pb-1 text-[14px] leading-[1.4] text-white outline-none placeholder:text-[#5f5f5f] focus:border-[#16a34a]"
         />
       ) : (
         <input
@@ -41,7 +41,7 @@ function ContactField({
           name={name || fieldId}
           type={type}
           required={required}
-          className="h-7 w-full border-b border-[#5f5f5f] bg-transparent pb-1 text-[14px] leading-[1.3] text-white outline-none placeholder:text-[#5f5f5f] focus:border-[#16a34a]"
+          className="h-7 w-full border-b border-[#5f5f5f] bg-transparent pb-1 text-[14px] leading-[1.4] text-white outline-none placeholder:text-[#5f5f5f] focus:border-[#16a34a]"
         />
       )}
     </div>
@@ -50,32 +50,54 @@ function ContactField({
 
 export default function ContactUsPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitState, setSubmitState] = useState({
+    tone: "idle",
+    message: "",
+  });
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleSubmit = async (event) => {
+    event.preventDefault();
 
-    const form = e.currentTarget;
+    const form = event.currentTarget;
     const formData = new FormData(form);
-    formData.append("access_key", process.env.NEXT_PUBLIC_FORM_KEY);
+    const payload = {
+      fullName: String(formData.get("fullName") || "").trim(),
+      email: String(formData.get("email") || "").trim(),
+      phoneNumber: String(formData.get("phoneNumber") || "").trim(),
+      message: String(formData.get("message") || "").trim(),
+    };
 
     setIsSubmitting(true);
+    setSubmitState({ tone: "idle", message: "" });
 
     try {
-      const response = await fetch("https://api.web3forms.com/submit", {
+      const response = await fetch("/api/contact", {
         method: "POST",
-        body: formData,
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
       });
 
       const data = await response.json();
 
-      if (response.ok) {
-        alert("Success! Your message has been sent.");
-        form.reset();
-      } else {
-        alert(`Error: ${data.message || "Unable to send message."}`);
+      if (!response.ok) {
+        throw new Error(data?.message || "Unable to send message right now.");
       }
-    } catch {
-      alert("Something went wrong. Please try again.");
+
+      form.reset();
+      setSubmitState({
+        tone: "success",
+        message: "Thanks for reaching out. We will get back to you shortly.",
+      });
+    } catch (error) {
+      setSubmitState({
+        tone: "error",
+        message:
+          error instanceof Error
+            ? error.message
+            : "Something went wrong. Please try again.",
+      });
     } finally {
       setIsSubmitting(false);
     }
@@ -102,12 +124,9 @@ export default function ContactUsPage() {
               </h1>
 
               <p className="text-[16px] leading-[1.8] text-[#9b9b9b]">
-                It Has Survived Not Only Five Centuries, But Also The Leap Into
-                Electronic Typesetting, Remaining Essentially Unchanged. It Was
-                Popularised In The 1960s With The Release Of Letraset Sheets
-                Containing Lorem Ipsum Passages, And More Recently With Desktop
-                Publishing Software Like Aldus PageMaker Including Versions Of
-                Lorem Ipsum.
+                Reach out for influencer discovery, campaign strategy, or
+                product support. Our team can help you plan the right next step
+                and connect you with the right Phyo workflow.
               </p>
             </div>
 
@@ -115,7 +134,7 @@ export default function ContactUsPage() {
             <LandingAccentGridPatterns />
           </section>
 
-          <section id="testimonials" className="pt-4">
+          <section className="pt-4">
             <div className="grid gap-10 lg:grid-cols-[500px_640px] lg:justify-between">
               <div className="pt-1">
                 <h2 className="font-bricolage text-[36px] leading-[1.4] text-white">
@@ -125,9 +144,8 @@ export default function ContactUsPage() {
                   </span>
                 </h2>
                 <p className="mt-4 text-[16px] leading-[1.6] text-[#9b9b9b]">
-                  It Was Popularised In The 1960s With The Release Of Letraset
-                  Sheets Containing Lorem Ipsum Passages, And More Recently With
-                  Desktop Publishing Software.
+                  Tell us what you are building, what kind of creators you need,
+                  or where your current campaign flow is getting stuck.
                 </p>
 
                 <div className="mt-12 space-y-10">
@@ -144,9 +162,7 @@ export default function ContactUsPage() {
                           height={19}
                         />
                         <Link
-                          href="https://mail.google.com/mail/?view=cm&fs=1&to=phyo.aiofficial@gmail.com"
-                          target="_blank"
-                          rel="noopener noreferrer"
+                          href="mailto:phyo.aiofficial@gmail.com"
                           className="text-[16px] leading-[1.2] text-white transition hover:text-[#16A34A]"
                         >
                           phyo.aiofficial@gmail.com
@@ -202,12 +218,11 @@ export default function ContactUsPage() {
                   Get In Touch
                 </h3>
                 <p className="mt-3 text-[16px] leading-[1.6] text-[#9b9b9b]">
-                  From finding the right influencers to tracking performance
-                  everything you need to run high-impact campaigns in one
-                  platform.
+                  Share your goals and we will route your message to the right
+                  team.
                 </p>
 
-                <form id="form" className="mt-4 space-y-6" onSubmit={handleSubmit}>
+                <form className="mt-4 space-y-6" onSubmit={handleSubmit}>
                   <ContactField
                     label="Full Name"
                     name="fullName"
@@ -234,16 +249,29 @@ export default function ContactUsPage() {
                     label="How Can We Help You?"
                     name="message"
                     multiline
+                    required
                   />
 
                   <label className="flex items-center gap-2 text-[12px] text-[#868686]">
                     <input
                       type="checkbox"
+                      required
                       className="h-4 w-4 rounded-[2px] border border-[#9b9b9b] bg-transparent accent-[#16a34a]"
                     />
-                    The Banking And Finance Industry Is At The Forefront Of
-                    Digital Changeover.
+                    I agree to be contacted about my request.
                   </label>
+
+                  {submitState.message ? (
+                    <p
+                      className={`text-sm ${
+                        submitState.tone === "success"
+                          ? "text-[#7ee49f]"
+                          : "text-[#f6a4a4]"
+                      }`}
+                    >
+                      {submitState.message}
+                    </p>
+                  ) : null}
 
                   <OutlineGlowButton
                     type="submit"

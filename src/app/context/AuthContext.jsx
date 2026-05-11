@@ -1,9 +1,9 @@
 'use client'
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
-import { authUtils } from '../../utils/api';
+import secureAuthStorage from '../../utils/secure-auth';
 
-const AuthContext = createContext();
+const AuthContext = createContext(null);
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
@@ -16,179 +16,160 @@ export const useAuth = () => {
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [token, setToken] = useState(null);
   const [mounted, setMounted] = useState(false);
   const router = useRouter();
 
-  // Check for existing token on mount
+  // Initialize auth on mount - MEMOIZED
   useEffect(() => {
-    setMounted(true);
-    const checkAuth = () => {
-      if (typeof window === 'undefined') {
-        setLoading(false);
-        return;
-      }
-      
-      const storedToken = localStorage.getItem('authToken') || getCookie('authToken');
-      const storedUserData = localStorage.getItem('userData');
-      
-      if (storedToken && storedUserData) {
-        try {
-          const userData = JSON.parse(storedUserData);
-          setToken(storedToken);
-          setUser(userData);
-        } catch (error) {
-          // If parsing fails, clear everything
-          console.error('Failed to parse user data:', error);
-          localStorage.removeItem('authToken');
-          localStorage.removeItem('userData');
-          document.cookie = 'authToken=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
-        }
-      }
+    if (typeof window === 'undefined') {
       setLoading(false);
-    };
+      setMounted(true);
+      return;
+    }
 
-    checkAuth();
+    try {
+      const userData = secureAuthStorage.getUserData();
+      if (userData) {
+        setUser(userData);
+      }
+    } catch (error) {
+      if (process.env.NODE_ENV === 'development') {
+        console.error('[AUTH] Failed to initialize auth:', error);
+      }
+    } finally {
+      setLoading(false);
+      setMounted(true);
+    }
   }, []);
 
-  // Helper function to get cookie
-  const getCookie = (name) => {
-    if (typeof document === 'undefined') return null;
-    const value = `; ${document.cookie}`;
-    const parts = value.split(`; ${name}=`);
-    if (parts.length === 2) return parts.pop().split(';').shift();
-    return null;
-  };
-
-  // Login function
-  const login = async (email, password) => {
+  // Memoized login function
+  const login = useCallback(async (email, password) => {
     try {
+      // Input validation
+      if (!email || !password) {
+        return { success: false, error: 'Email and password are required' };
+      }
+
       const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://api.phyo.ai/api';
       const response = await fetch(`${apiUrl}/auth/login`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include', // Include httpOnly cookies
         body: JSON.stringify({ email, password }),
       });
 
       const data = await response.json();
-      console.log('Login API Response:', data); // Debug log
 
-      if (response.ok) {
-        const authToken = data.token;
-        const userData = data.user || data.data || { email, token: authToken };
-        
-        setToken(authToken);
+      if (response.ok && data.token) {
+        const userData = data.user || data.data || { email };
+
+        // Store securely
+        secureAuthStorage.setToken(data.token);
+        secureAuthStorage.setUserData(userData);
         setUser(userData);
-        
-        // Store token and user data in localStorage and cookie using authUtils
-        authUtils.setToken(authToken);
-        if (typeof window !== 'undefined') {
-          localStorage.setItem('userData', JSON.stringify(userData));
-        }
-        
-        // Determine redirect path based on user type and registration status
+
+        // Determine redirect path
         let redirectPath = '/';
-        
         if (userData.type === 'USER') {
-          // Regular user - check if they need to complete registration
-          if (userData.brandRegistrationStatus === 'COMPLETED') {
-            redirectPath = '/brand/dashboard';
-          } else if (userData.influencerRegistrationStatus === 'COMPLETED') {
-            redirectPath = '/influencer/dashboard';
-          } else {
-            // User hasn't completed any registration
-            redirectPath = '/user/dashboard';
-          }
+          redirectPath = userData.brandRegistrationStatus === 'COMPLETED'
+            ? '/brand/dashboard'
+            : userData.influencerRegistrationStatus === 'COMPLETED'
+            ? '/influencer/dashboard'
+            : '/user/dashboard';
         } else if (userData.type === 'BRAND') {
           redirectPath = '/brand/dashboard';
         } else if (userData.type === 'INFLUENCER') {
           redirectPath = '/influencer/dashboard';
         }
-        
-        return { success: true, data, redirectPath };
+
+        if (process.env.NODE_ENV === 'development') {
+          console.log('[AUTH] Login successful');
+        }
+
+        return { success: true, redirectPath };
       } else {
-        return { success: false, error: data.message || 'Login failed' };
+        const errorMsg = data.message || 'Login failed';
+        if (process.env.NODE_ENV === 'development') {
+          console.warn('[AUTH] Login failed:', errorMsg);
+        }
+        return { success: false, error: errorMsg };
       }
     } catch (error) {
-      console.error('Login error:', error);
-      return { success: false, error: 'Network error' };
+      console.error('[AUTH] Login error:', error.message);
+      return { success: false, error: 'Network error. Please try again.' };
     }
-  };
+  }, []);
 
-  // Signup function
-  const signup = async (userData) => {
+  // Memoized signup function
+  const signup = useCallback(async (formData) => {
     try {
+      if (!formData.email || !formData.password) {
+        return { success: false, error: 'Email and password are required' };
+      }
+
       const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://api.phyo.ai/api';
       const response = await fetch(`${apiUrl}/auth/signup`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(userData),
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify(formData),
       });
 
       const data = await response.json();
 
-      if (response.ok) {
-        const authToken = data.token;
-        setToken(authToken);
-        setUser(data.data || data.user || { email: userData.email, token: authToken });
-        
-        // Store token in localStorage and cookie using authUtils
-        authUtils.setToken(authToken);
-        
+      if (response.ok && data.token) {
+        const userData = data.user || data.data || { email: formData.email };
+
+        secureAuthStorage.setToken(data.token);
+        secureAuthStorage.setUserData(userData);
+        setUser(userData);
+
+        if (process.env.NODE_ENV === 'development') {
+          console.log('[AUTH] Signup successful');
+        }
+
         return { success: true, data };
       } else {
         return { success: false, error: data.message || 'Signup failed' };
       }
     } catch (error) {
-      return { success: false, error: 'Network error' };
+      console.error('[AUTH] Signup error:', error.message);
+      return { success: false, error: 'Network error. Please try again.' };
     }
-  };
+  }, []);
 
-  // Logout function
-  const logout = () => {
-    if (typeof window !== 'undefined') {
-      // Clear localStorage first
-      localStorage.removeItem('authToken');
-      localStorage.removeItem('userData');
-      localStorage.removeItem('userEmail');
-      
-      // Clear cookies
-      document.cookie = 'authToken=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
-    }
-    
-    // Clear all auth state after clearing storage
+  // Memoized logout function
+  const logout = useCallback(() => {
+    secureAuthStorage.clearAuth();
     setUser(null);
-    setToken(null);
-  };
 
-  // Check if user is authenticated
-  const isAuthenticated = () => {
-    return !!token && !!user;
-  };
+    if (process.env.NODE_ENV === 'development') {
+      console.log('[AUTH] User logged out');
+    }
+  }, []);
 
-  // Get user type
-  const getUserType = () => {
+  // Memoized check functions
+  const isAuthenticated = useCallback(() => {
+    return secureAuthStorage.isAuthenticated();
+  }, []);
+
+  const getUserType = useCallback(() => {
     return user?.type || user?.userType || null;
-  };
+  }, [user]);
 
-  // Check if user is a brand
-  const isBrand = () => {
+  const isBrand = useCallback(() => {
     return getUserType() === 'BRAND';
-  };
+  }, [getUserType]);
 
-  // Check if user is an influencer
-  const isInfluencer = () => {
+  const isInfluencer = useCallback(() => {
     return getUserType() === 'INFLUENCER';
-  };
+  }, [getUserType]);
 
-  const value = {
+  // Memoize context value to prevent unnecessary re-renders
+  const value = useMemo(() => ({
     user,
-    token,
     loading,
+    mounted,
     login,
     signup,
     logout,
@@ -196,7 +177,11 @@ export const AuthProvider = ({ children }) => {
     getUserType,
     isBrand,
     isInfluencer,
-  };
+  }), [user, loading, mounted, login, signup, logout, isAuthenticated, getUserType, isBrand, isInfluencer]);
+
+  if (!mounted) {
+    return null; // Prevent hydration mismatch
+  }
 
   return (
     <AuthContext.Provider value={value}>

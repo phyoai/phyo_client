@@ -38,16 +38,22 @@ export const debugAuth = () => {
   console.log('  Path:', window.location.pathname);
 };
 
-// Also expose a function to manually set debug data
-export const setDebugAuth = (type = 'BRAND') => {
-  const testData = {
-    _id: '123456',
-    email: 'test@example.com',
-    type: type,
-    name: 'Test User'
+// Debug function - DEVELOPMENT ONLY
+// This function is only available in development mode
+// DO NOT USE IN PRODUCTION
+if (process.env.NODE_ENV === 'development') {
+  export const setDebugAuth = (type = 'BRAND') => {
+    const testData = {
+      _id: '123456',
+      email: 'test@example.com',
+      type: type,
+      name: 'Test User'
+    };
+    // Use secure storage instead of localStorage
+    if (typeof window !== 'undefined') {
+      sessionStorage.setItem('userData', JSON.stringify(testData));
+      console.log('✅ Debug auth set (dev only):', testData);
+    }
+    return testData;
   };
-  localStorage.setItem('authToken', 'test-token-12345');
-  localStorage.setItem('userData', JSON.stringify(testData));
-  console.log('✅ Debug auth set:', testData);
-  return testData;
-};
+}

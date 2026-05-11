@@ -475,9 +475,9 @@ function PricingCard({ billingCycle, plan }) {
 
 function TestimonialCard({ location, name, quote }) {
   return (
-    <article className="group relative min-h-[220px] w-[min(88vw,360px)] shrink-0 overflow-hidden rounded-[23px] bg-[#141414] p-6 transition-all duration-500 ease-out hover:border-[#16a34a]/35 hover:shadow-[0_18px_42px_rgba(22,163,74,0.16)] hover:bg-[#d1eedd] sm:w-[420px] sm:p-7 lg:min-h-[240px] lg:w-[460px] lg:p-8">
+    <article className="group relative min-h-[220px] w-[min(88vw,360px)] shrink-0 overflow-hidden rounded-[23px] bg-[#141414] p-6 hover:border-[#16a34a]/35 hover:shadow-[0_18px_42px_rgba(22,163,74,0.16)] hover:bg-[#d1eedd] sm:w-[420px] sm:p-7 lg:min-h-[240px] lg:w-[460px] lg:p-8">
       <div className="absolute left-8 top-[36px] h-20 w-px bg-[#16a34a]" />
-      <p className="max-w-[508px] pl-5 text-[16px] leading-[1.6] text-[#9b9b9b] transition-colors duration-500 group-hover:text-black] group-hover:text-[#181818]">
+      <p className="max-w-[508px] pl-5 text-[16px] leading-[1.6] text-[#9b9b9b] group-hover:text-[#181818]">
         {quote}
       </p>
 
@@ -492,10 +492,10 @@ function TestimonialCard({ location, name, quote }) {
           />
         </div>
         <div>
-          <p className="text-[20px] font-medium leading-[1.4] text-[#16a34a] transition-colors duration-500 group-hover:text-black hover:text-[#16a34a]/80">
+          <p className="text-[20px] font-medium leading-[1.4] text-[#16a34a] group-hover:text-black">
             {name}
           </p>
-          <p className="text-[16px] leading-[1.4] text-[#9b9b9b] transition-colors duration-500 group-hover:text-black">
+          <p className="text-[16px] leading-[1.4] text-[#9b9b9b] group-hover:text-black">
             {location}
           </p>
         </div>
@@ -978,8 +978,8 @@ export default function LandingPage() {
                 >
                   Start With Free Trial
                 </ActionButton>
-                <ActionButton
-                  href="/contact_us"
+                  <ActionButton
+                    href="/contact-us"
                   widthClass="w-full sm:w-[180px]"
                   iconPosition="left"
                   icon={<Play className="h-[14px] w-[13px] stroke-[1.8]" />}
@@ -1072,7 +1072,7 @@ export default function LandingPage() {
             <div className="overflow-hidden">
               <div
                 className="testimonial-carousel-track flex w-max [transform:translate3d(0,0,0)] hover:[animation-play-state:paused]"
-                style={{ "--testimonial-carousel-duration": "34s" }}
+                style={{ "--testimonial-carousel-duration": "45s" }}
               >
                 {[0, 1].map((trackIndex) => (
                   <div

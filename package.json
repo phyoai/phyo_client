@@ -12,7 +12,9 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
-    "analyze": "cross-env ANALYZE=true next build"
+    "analyze": "cross-env ANALYZE=true next build",
+    "perf": "node scripts/performance-test.js",
+    "perf:check": "node scripts/performance-test.js && echo 'Performance check complete!'"
   },
   "dependencies": {
     "@phyoofficial/phyo-icon-library": "^1.0.8",
@@ -25,6 +27,7 @@
     "lottie-react": "^2.4.1",
     "lucide-react": "^0.469.0",
     "next": "^16.0.8",
+    "nodemailer": "^8.0.7",
     "razorpay": "^2.9.6",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
