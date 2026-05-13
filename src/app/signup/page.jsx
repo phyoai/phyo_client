@@ -690,7 +690,7 @@ function SignupForm() {
               <div className="space-y-3">
                 <label
                   htmlFor="terms"
-                  className="flex w-full cursor-pointer items-start gap-3"
+                  className="flex w-full cursor-pointer items-center gap-2 text-[12px] text-[#868686] sm:text-[13px]"
                 >
                   <input
                     id="terms"
@@ -698,17 +698,9 @@ function SignupForm() {
                     {...register("terms", {
                       required: "Please check the box to continue.",
                     })}
-                    className="peer sr-only"
+                    className="h-4 w-4 rounded-[2px] border border-[#9b9b9b] bg-transparent accent-[#16a34a]"
                   />
-                  <span className="mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-[2px] border border-[#9b9b9b] bg-transparent text-transparent transition peer-checked:border-[#16a34a] peer-checked:bg-[#16a34a]/10 peer-checked:text-[#16a34a] peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-[#16a34a]">
-                    <CheckIcon />
-                  </span>
-                  <span
-                    className="flex-1 text-[12px] leading-[1.5] text-[#868686] sm:text-[13px]"
-                    style={{ fontFamily: "var(--font-inter)" }}
-                  >
-                    {checkboxCopy}
-                  </span>
+                  {checkboxCopy}
                 </label>
 
                 {errors.terms && (

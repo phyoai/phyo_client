@@ -1,6 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -571,6 +573,102 @@ export default function LandingPage() {
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
 
+  const aboutRef = useRef(null);
+
+  useEffect(() => {
+    gsap.registerPlugin(ScrollTrigger);
+
+    const container = aboutRef.current;
+    if (!container) return;
+
+    const chars = container.querySelectorAll(".about-char");
+    if (!chars.length) return;
+
+    gsap.set(chars, {
+      rotateX: -90,
+      opacity: 0,
+      transformPerspective: 1200,
+      transformOrigin: "50% 100% -10px",
+    });
+
+    const tl = gsap.timeline({
+      scrollTrigger: {
+        trigger: container,
+        start: "top 78%",
+        once: true,
+      },
+    });
+
+    // Reveal each line in sequence so the text cascades in naturally
+    [0, 1, 2].forEach((lineIdx) => {
+      const lineChars = container.querySelectorAll(
+        `.about-word[data-about-line="${lineIdx}"] .about-char`
+      );
+      if (!lineChars.length) return;
+      tl.to(
+        lineChars,
+        {
+          rotateX: 0,
+          opacity: 1,
+          duration: 0.65,
+          stagger: 0.018,
+          ease: "power3.out",
+        },
+        lineIdx * 0.1
+      );
+    });
+
+    // After the full reveal, spin-highlight key segments with a green gradient
+    tl.add(() => {
+      const keywords = [
+        container.querySelector('.about-word[data-about-line="0"][data-about-segment="0"]'),
+        container.querySelector('.about-word[data-about-line="2"][data-about-segment="1"]'),
+      ].filter(Boolean);
+
+      keywords.forEach((word, i) => {
+        const wordChars = word.querySelectorAll(".about-char");
+        gsap.fromTo(
+  wordChars,
+  {
+    rotateX: 0,
+    color: "#565656",
+    transformPerspective: 1200,
+    transformOrigin: "50% 50%",
+  },
+  {
+    rotateX: 360,
+    color: "#86efac",
+    duration: 0.65,
+    stagger: 0.025,
+    ease: "power2.out",
+    delay: i * 0.15,
+            onUpdate() {
+  gsap.to(wordChars, {
+    filter: "drop-shadow(0 0 8px rgba(22,163,74,0.28))",
+    duration: 0.2,
+  });
+},
+
+onComplete() {
+  gsap.to(wordChars, {
+    color: "#565656",
+    filter: "drop-shadow(0 0 0px rgba(22,163,74,0))",
+    duration: 0.4,
+    stagger: 0.015,
+    ease: "power2.out",
+  });
+},
+          }
+        );
+      });
+    }, "+=0.08");
+
+    return () => {
+      tl.kill();
+      ScrollTrigger.getAll().forEach((t) => t.kill());
+    };
+  }, []);
+
   const handleOpenLoginModal = () => {
     setShowLoginModal(true);
   };
@@ -634,12 +732,12 @@ export default function LandingPage() {
                     onChange={(event) => setSearchQuery(event.target.value)}
                     placeholder="Search influencers (e.g. i need influencers in Mumbai)..."
                     autoComplete="off"
-                    className="min-w-0 flex-1 bg-transparent text-left text-sm leading-[1.6] text-white outline-none placeholder:text-[#9B9B9B] sm:text-[15px]"
+                    className="min-w-0 flex-1 bg-transparent text-left text-base leading-[1.6] text-white outline-none placeholder:text-[#9B9B9B] sm:text-[15px]"
                   />
 
                   <button
                     type="submit"
-                    className="inline-flex w-[115px] h-[48px] shrink-0 items-center gap-2 rounded-full bg-[#16A34A] px-2 text-base text-white transition duration-200 hover:bg-[#12803A]"
+                    className="inline-flex w-[115px] h-[48px] shrink-0 items-center gap-2 rounded-full bg-[#16A34A] px-3 text-base text-white transition duration-200 hover:bg-[#12803A]"
                   >
                     <Search className="h-6 w-6" />
                     <span>Search</span>
@@ -651,7 +749,7 @@ export default function LandingPage() {
               <MilestoneCards />
             </div>
 
-            <div className="mx-auto my-5 max-w-[1050px] text-center">
+            <div ref={aboutRef} className="mx-auto my-5 max-w-[1050px] text-center">
               {/* public\landing\grid_lines.svg */}
 
               <div>
@@ -677,9 +775,23 @@ export default function LandingPage() {
                         {/* Keeps original space/width */}
                         <span className="invisible">{text}</span>
 
-                        {/* Normal text */}
+                        {/* Normal text — char split for GSAP spin */}
                         <span className="absolute inset-0 text-[#565656] transition-opacity duration-300 ease-in-out group-hover:opacity-0">
-                          {text}
+                          <span
+                            className="about-word inline-block transition-all duration-200"
+                            data-about-line={lineIndex}
+                            data-about-segment={segmentIndex}
+                          >
+                            {text.split("").map((char, charIndex) => (
+                              <span
+                                key={charIndex}
+                                className="about-char inline-block"
+                                style={{ display: char === " " ? "inline" : "inline-block" }}
+                              >
+                                {char === " " ? "\u00A0" : char}
+                              </span>
+                            ))}
+                          </span>
                         </span>
 
                         {/* Gradient hover text */}
@@ -942,7 +1054,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      <section className="relative overflow-hidden bg-[linear-gradient(112deg,#16a34a_1.18%,#073618_80.36%)] h-[540px]">
+      <section className="landing-banner relative overflow-hidden bg-[linear-gradient(112deg,#16a34a_1.18%,#073618_80.36%)] h-[540px]">
         <div className="pointer-events-none absolute inset-0">
           <div className="absolute inset-y-0 right-0 w-[44%] bg-[linear-gradient(90deg,rgba(4,88,24,0)_0%,rgba(4,56,21,0.3)_35%,rgba(4,56,21,0.76)_100%)]" />
           <div className="absolute -right-24 top-0 h-full w-[82%] opacity-40 lg:-right-10 lg:w-[58%]">
@@ -955,9 +1067,9 @@ export default function LandingPage() {
           </div>
         </div>
 
-        <div className="relative mx-auto flex min-h-[560px] w-full max-w-[1440px] items-center px-4 py-12 sm:px-6 lg:min-h-[600px] lg:px-[120px]">
-          <div className="grid w-full items-center gap-8 lg:grid-cols-[minmax(0,620px)_minmax(0,1fr)]">
-            <div className="max-w-[620px] mb-[54px]">
+        <div className="landing-banner-inner relative mx-auto flex min-h-[560px] w-full max-w-[1440px] items-center px-4 py-12 sm:px-6 lg:min-h-[600px] lg:px-[120px]">
+          <div className="landing-banner-grid grid w-full items-center gap-8 lg:grid-cols-[minmax(0,620px)_minmax(0,1fr)]">
+            <div className="landing-banner-copy max-w-[620px] mb-[54px]">
               <h2 className="font-bricolage text-[34px] font-normal leading-[1.3] text-white sm:text-[36px] sm:leading-[1.35]">
                 <span className="block">AI Search. Verified Influencers.</span>
                 <span className="block">Real Results.</span>
@@ -967,7 +1079,7 @@ export default function LandingPage() {
                 high-performing influencer campaigns in one platform.
               </p>
 
-              <div className="mt-10 flex flex-wrap items-center gap-4">
+              <div className="landing-banner-actions mt-10 flex flex-wrap items-center gap-4">
                 <ActionButton
                   href="/signup"
                   widthClass="w-full sm:w-[240px]"
@@ -990,13 +1102,13 @@ export default function LandingPage() {
             </div>
 
             <div
-              className="relative flex justify-end lg:-mb-[162px] w-[600px] h-[480px] overflow-hidden"
+              className="landing-banner-visual relative flex justify-end lg:-mb-[162px] w-[600px] h-[480px] overflow-hidden"
               style={{ marginBottom: "0px" }}
             >
               <img
                 src="/landing/iPhone_16_Pro.png"
                 alt="Phyo product preview for campaign workflow"
-                className="h-auto w-full w-[780px] mr-[48px]"
+                className="landing-banner-phone h-auto w-[780px] mr-[48px]"
               />
               {/* <Image
                 src="/landing/iPhone_16_Pro.png"
@@ -1015,15 +1127,17 @@ export default function LandingPage() {
         </div>
       </section>
 
-      <div className=" mt-[100px] mb-[100px]">
+      <div className="landing-faq-wrap mt-[100px] mb-[100px]">
         <FaqSection
           sectionClassName={pageSectionClass}
           faqItems={faqItems}
           ctaHref="#home"
         />
       </div>
-      <section className={pageSectionClass}>
-        <div className="text-center">
+      <section className={
+        `${pageSectionClass} landing-comparison-section`
+      }>
+        <div className="landing-comparison-title text-center">
           <h2 className="font-bricolage text-[34px] leading-[1.2] text-white sm:text-[36px]">
             Comparison Reveals{" "}
             <span className="text-[#16a34a]">Differences & Similarities.</span>
@@ -1137,6 +1251,357 @@ export default function LandingPage() {
           .testimonial-carousel-track {
             animation: none;
             transform: none;
+          }
+        }
+
+        @media (max-width: 639px) {
+          .grid.grid-cols-1.gap-6 {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+          }
+
+          #home {
+            padding-left: 1rem;
+            padding-right: 1rem;
+            padding-top: 1.25rem;
+          }
+
+          #home > div:first-child {
+            max-width: 100%;
+          }
+
+          #home h1 {
+            font-size: 32px;
+            line-height: 1.15;
+          }
+
+          #home > div > p {
+            font-size: 14px;
+            line-height: 1.5;
+          }
+
+          #home form {
+            margin-top: 1.25rem;
+            padding-left: 0;
+            padding-right: 0;
+          }
+
+          #home form > div > div {
+            height: 58px;
+            flex-direction: row;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 0.75rem;
+            border-radius: 9999px;
+          }
+
+          #home form input {
+            width: auto;
+            min-width: 0;
+            font-size: 13px;
+          }
+
+          #home form button {
+            width: 92px;
+            height: 40px;
+            padding-left: 0.5rem;
+            padding-right: 0.5rem;
+          }
+
+          #home form button svg {
+            width: 18px;
+            height: 18px;
+          }
+
+          #home form button span {
+            font-size: 13px;
+          }
+
+          .landing-banner {
+            height: auto;
+          }
+
+          .landing-banner-inner {
+            min-height: auto;
+            padding-top: 2rem;
+            padding-bottom: 0;
+          }
+
+          .landing-banner-grid {
+            grid-template-columns: minmax(0, 1fr);
+            gap: 1rem;
+          }
+
+          .landing-banner-copy {
+            margin-bottom: 0;
+            max-width: 100%;
+          }
+
+          .landing-banner-copy h2 {
+            font-size: 30px;
+            line-height: 1.2;
+          }
+
+          .landing-banner-copy p {
+            font-size: 14px;
+            line-height: 1.5;
+          }
+
+          .landing-banner-actions {
+            margin-top: 1rem;
+            flex-direction: column;
+            align-items: stretch;
+            gap: 0.75rem;
+          }
+
+          .landing-banner-actions a {
+            width: 100% !important;
+          }
+
+          .landing-banner-actions a span {
+            justify-content: center;
+          }
+
+          .landing-banner-visual {
+            width: 100%;
+            height: auto;
+            justify-content: center;
+            overflow: visible;
+          }
+
+          .landing-banner-phone {
+            width: min(92vw, 340px);
+            margin-right: 0;
+          }
+
+          #home + div {
+            margin-top: 1rem;
+            margin-bottom: 2.5rem;
+          }
+
+          #home + div + section {
+            padding-left: 1rem;
+            padding-right: 1rem;
+          }
+
+          #home + div + section .grid {
+            grid-template-columns: minmax(0, 1fr);
+          }
+
+          #home + div + section .grid > article {
+            padding: 0.75rem;
+            min-height: auto;
+          }
+
+          #home + div + section .grid > article > div:first-child {
+            max-width: 100%;
+          }
+
+          #home + div + section .grid > article h3 {
+            font-size: 20px;
+          }
+
+          #home + div + section .grid > article p {
+            font-size: 14px;
+            line-height: 1.5;
+          }
+
+          #home + div + section .grid > article .relative.mt-8 {
+            margin-top: 1rem;
+          }
+
+          #home + div + section .grid > article .relative.mt-8 img {
+            margin-top: 0;
+            margin-left: 0;
+          }
+
+          #home + div + section img {
+            max-width: 100%;
+          }
+
+          #pricing {
+            padding-left: 1rem;
+            padding-right: 1rem;
+          }
+
+          #pricing > div:first-child {
+            padding-top: 3rem;
+          }
+
+          #pricing h2 {
+            font-size: 30px;
+          }
+
+          #pricing > div:nth-child(2) {
+            margin-top: 1.5rem;
+          }
+
+          #pricing > div:nth-child(3) {
+            gap: 0.875rem;
+            padding-bottom: 0.25rem;
+          }
+
+          #pricing > div:nth-child(3) > article {
+            min-width: min(84vw, 280px);
+            padding: 1rem;
+          }
+
+          #pricing > div:nth-child(4) {
+            margin-bottom: 4rem;
+          }
+
+          #pricing > div:nth-child(4) > div {
+            min-height: auto;
+            padding: 1rem;
+          }
+
+          #pricing > div:nth-child(4) h3 {
+            font-size: 24px;
+          }
+
+          #pricing > div:nth-child(4) p {
+            font-size: 14px;
+          }
+
+          #pricing > div:nth-child(4) ul {
+            margin-top: 1rem;
+          }
+
+          #pricing > div:nth-child(4) li {
+            gap: 0.5rem;
+          }
+
+          .landing-faq-wrap {
+            margin-top: 4rem;
+            margin-bottom: 4rem;
+          }
+
+          .landing-faq-wrap .grid {
+            grid-template-columns: minmax(0, 1fr);
+            gap: 1rem;
+          }
+
+          .landing-faq-wrap h2 {
+            font-size: 30px;
+            line-height: 1.2;
+          }
+
+          .landing-faq-wrap > section > div > div:first-child > div:last-child {
+            padding: 1rem;
+          }
+
+          .landing-faq-wrap > section > div > div:first-child > div:last-child h3 {
+            font-size: 20px;
+          }
+
+          .landing-faq-wrap > section > div > div:first-child > div:last-child p {
+            font-size: 14px;
+            line-height: 1.5;
+          }
+
+          .landing-faq-wrap > section > div > div:first-child > div:last-child a {
+            width: 100% !important;
+          }
+
+          .landing-faq-wrap > section > div > div:last-child {
+            min-height: auto !important;
+          }
+
+          .landing-faq-wrap > section > div > div:last-child > div {
+            gap: 0.75rem;
+          }
+
+          .landing-faq-wrap button {
+            min-height: 56px;
+            padding-left: 1rem;
+            padding-right: 1rem;
+          }
+
+          .landing-faq-wrap button span:first-child {
+            font-size: 16px;
+          }
+
+          .landing-faq-wrap button + div p {
+            padding-left: 1rem;
+            padding-right: 1rem;
+            padding-bottom: 1rem;
+            font-size: 13px;
+            line-height: 1.6;
+          }
+
+          .landing-comparison-section {
+            padding-left: 1rem;
+            padding-right: 1rem;
+          }
+
+          .landing-comparison-title h2 {
+            font-size: 30px;
+            line-height: 1.2;
+          }
+
+          .landing-comparison-section > div:nth-child(2) {
+            margin-top: 1rem;
+            overflow-x: auto;
+            overflow-y: hidden;
+            -webkit-overflow-scrolling: touch;
+            border-radius: 20px;
+            scrollbar-width: none;
+          }
+
+          .landing-comparison-section > div:nth-child(2)::-webkit-scrollbar {
+            display: none;
+          }
+
+          .landing-comparison-section > div:nth-child(2) > div {
+            min-width: 660px;
+          }
+
+          .landing-comparison-section .grid-cols-3 > div {
+            font-size: 11px;
+            line-height: 1.4;
+            padding-left: 0.75rem;
+            padding-right: 0.75rem;
+          }
+
+          .landing-comparison-section .grid-cols-3 > div:first-child {
+            min-width: 150px;
+          }
+
+          .landing-comparison-section .grid-cols-3 > div:nth-child(2),
+          .landing-comparison-section .grid-cols-3 > div:nth-child(3) {
+            min-width: 255px;
+          }
+
+          #testimonials {
+            padding-left: 1rem;
+            padding-right: 1rem;
+          }
+
+          #testimonials h2 {
+            font-size: 30px;
+          }
+
+          #testimonials > div:nth-child(2) {
+            margin-top: 1.5rem;
+          }
+
+          #testimonials .testimonial-carousel-track > div {
+            gap: 0.75rem;
+            padding-right: 0.75rem;
+          }
+
+          #testimonials article {
+            width: min(84vw, 320px);
+            min-height: auto;
+            padding: 0.875rem;
+          }
+
+          #testimonials article p {
+            font-size: 13px;
+          }
+
+          #footer .footer-shell {
+            padding-top: 2rem;
+            padding-bottom: 2rem;
           }
         }
       `}</style>
