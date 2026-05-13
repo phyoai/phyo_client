@@ -520,20 +520,31 @@ export default function AboutPage() {
 
           <section className="mt-10 lg:mt-20">
             <div className="relative overflow-hidden rounded-[44px] bg-[linear-gradient(108.717deg,#16a34a_1.18%,#073618_80.36%)] px-6 py-10 sm:px-8 lg:h-[500px] lg:px-0 lg:py-0">
-              <div className="pointer-events-none absolute inset-0 hidden lg:block">
-                <div className="absolute -right-[280px] -top-[320px] h-[980px] w-[954px] opacity-40">
+              <div className="pointer-events-none absolute inset-0">
+                {/* Wave lines — visible on all screen sizes */}
+                <div className="absolute inset-y-0 right-0 w-[55%] opacity-35">
+                  <Image
+                    src="/landing/Group.svg"
+                    alt=""
+                    fill
+                    className="object-contain object-right"
+                  />
+                </div>
+
+                {/* Extra depth layers on desktop */}
+                <div className="absolute -right-[280px] -top-[320px] hidden h-[980px] w-[954px] opacity-30 lg:block">
                   <Image
                     src="/about/c652761e329210d5433afb2c24ab85f66ceefb21.svg"
-                    alt="mt-10 lg:mt-20"
+                    alt=""
                     fill
                     className="object-contain"
                   />
                 </div>
 
-                <div className="absolute -right-[170px] -top-[300px] h-[956px] w-[920px] opacity-40">
+                <div className="absolute -right-[170px] -top-[300px] hidden h-[956px] w-[920px] opacity-25 lg:block">
                   <Image
                     src="/about/239f5bb47897874755850dc940d3258518715426.svg"
-                    alt="mt-10 lg:mt-20"
+                    alt=""
                     fill
                     className="object-contain"
                   />
