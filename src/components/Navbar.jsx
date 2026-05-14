@@ -1,3 +1,5 @@
+ "use client";
+
 import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -51,6 +53,7 @@ export default function Navbar({ token }) {
             <button
               onClick={() => setIsOpen(!isOpen)}
               className="p-2 rounded-md text-gray-700 hover:bg-gray-100 focus:outline-none"
+              aria-label="Open menu"
             >
               <svg
                 className="h-6 w-6"
@@ -73,35 +76,44 @@ export default function Navbar({ token }) {
 
       {/* Mobile Dropdown */}
       {isOpen && (
-        <div className="md:hidden bg-white shadow-lg">
-          <div className="px-4 py-4 space-y-4">
-            <Link href="/">
-              <p className="block text-gray-700 hover:text-[color:var(--dark-green)]">Home</p>
-            </Link>
-            <Link href="/">
-              <p className="block text-gray-700 hover:text-[color:var(--dark-green)]">About</p>
-            </Link>
-            <Link href="/">
-              <p className="block text-gray-700 hover:text-[color:var(--dark-green)]">Services</p>
-            </Link>
-            <Link href="/">
-              <p className="block text-gray-700 hover:text-[color:var(--dark-green)]">Contact</p>
-            </Link>
-            {token ? "" : <div className="flex space-x-4">
-              <Link href="/login">
-                <p className="w-full px-4 py-2 rounded-full border border-[color:var(--dark-green)] text-[color:var(--dark-green)] text-center hover:bg-[color:var(--dark-green)] hover:text-white">
-                  Login
-                </p>
-              </Link>
-              <Link href="/signup">
-                <p className="w-full px-4 py-2 rounded-full bg-[color:var(--dark-green)] text-white text-center hover:bg-blue-600">
-                  Sign Up
+        <div className="md:hidden fixed inset-0 z-50 bg-black/45 backdrop-blur-[3px]">
+          <div className="ml-auto mt-0 mr-0 h-full w-[280px] overflow-hidden rounded-l-[24px] bg-[#001a0a] shadow-2xl relative">
+            <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_82%_45%,_rgba(22,163,74,0.45),_transparent_60%)]" />
+            <div className="relative px-5 pt-5 pb-5">
+            <div className="mb-8 flex items-center justify-between">
+              <Image src={"/logo.png"} alt='logo' height={24} width={92} />
+              <button
+                onClick={() => setIsOpen(false)}
+                className="text-white text-[34px] leading-none"
+                aria-label="Close menu"
+              >
+                &times;
+              </button>
+            </div>
+
+            <div className="mobile-nav-panel px-0 pb-0 pt-0">
+              <nav className="mobile-nav-links flex flex-col gap-3 text-white">
+                <Link className="mobile-nav-link active" href="/" onClick={() => setIsOpen(false)}>Home</Link>
+                <Link className="mobile-nav-link" href="/about" onClick={() => setIsOpen(false)}>About</Link>
+                <Link className="mobile-nav-link" href="/testimonials" onClick={() => setIsOpen(false)}>Testimonials</Link>
+                <Link className="mobile-nav-link" href="/Career" onClick={() => setIsOpen(false)}>Careers</Link>
+                <Link className="mobile-nav-link" href="/contact-us" onClick={() => setIsOpen(false)}>Contact</Link>
+              </nav>
+            </div>
+
+            {token ? "" : <div className="mt-9">
+              <div className="mb-7 h-px w-full bg-white/20" />
+              <Link href="/login" onClick={() => setIsOpen(false)}>
+                <p className="mobile-signin w-full rounded-full border border-white py-2.5 text-center text-white leading-[1.2] font-normal">
+                  Sign In
                 </p>
               </Link>
             </div>}
+            </div>
           </div>
         </div>
       )}
     </nav>
   );
 }
+

@@ -503,15 +503,12 @@ function TestimonialCard({ location, name, quote }) {
         </div>
       </div>
 
-      <span className="absolute bottom-[-12px] right-5 font-bricolage text-[11rem] leading-none text-transparent">
-        ”
-      </span>
-      <span
+      <img
         aria-hidden
-        className="pointer-events-none absolute bottom-[-12px] right-5 font-bricolage text-[11rem] leading-none text-[#16a34a]/20"
-      >
-        &rdquo;
-      </span>
+        src="/Grouptestlanding.svg"
+        alt=""
+        className="pointer-events-none absolute bottom-5 right-5 w-[100px] opacity-60 group-hover:opacity-40"
+      />
     </article>
   );
 }
@@ -689,7 +686,7 @@ onComplete() {
 
   return (
     <main
-      className="bg-black font-inter text-white"
+      className="landing-blur bg-black font-inter text-white"
       style={{ fontFamily: "var(--font-inter)" }}
     >
       <div className="relative isolate overflow-hidden">
@@ -732,7 +729,7 @@ onComplete() {
                     onChange={(event) => setSearchQuery(event.target.value)}
                     placeholder="Search influencers (e.g. i need influencers in Mumbai)..."
                     autoComplete="off"
-                    className="min-w-0 flex-1 bg-transparent text-left text-base leading-[1.6] text-white outline-none placeholder:text-[#9B9B9B] sm:text-[15px]"
+                    className="min-w-0 flex-1 bg-transparent text-left text-base leading-[1.6] text-white outline-none placeholder:text-[#9B9B9B] sm:text-[16px]"
                   />
 
                   <button
