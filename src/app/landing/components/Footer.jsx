@@ -15,7 +15,7 @@ const footerOtherLinks = [
   { href: "/term-and-conditions", label: "Terms & Conditions" },
   { href: "/privacy-policy", label: "Privacy Policy" },
   { href: "/faqs", label: "FAQs" },
-  { href: "/careers", label: "Careers" },
+  { href: "/Career", label: "Careers" },
 ];
 
 const socialLinks = [
@@ -129,7 +129,7 @@ export default function Footer() {
   </svg>
 
   <span className="whitespace-nowrap">
-    +91-9315732227, +91 7888509409
+    +91-9315732227, +91-7888509409
   </span>
 </li>
 

@@ -1,10 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-import MenuFill from "@/components/Icons/MenuFill";
 import MenuUnfold4Line from "@/components/Icons/MenuUnfold4Line";
 import LogoIcon from "@/components/Icons/logo";
 import OutlineGlowButton from "@/components/shared/OutlineGlowButton";
@@ -15,15 +15,30 @@ const navItems = [
   { href: "/testimonials", label: "Testimonials" },
   {href: "/Career", label: "Career" },
   { href: "/contact-us", label: "Contact" },
-];; 
+];
 
 export default function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const pathname = usePathname();
 
+  useEffect(() => {
+    if (!isMobileMenuOpen) return;
+    const prevOverflow = document.body.style.overflow;
+    document.body.classList.add("menu-open");
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = prevOverflow;
+      document.body.classList.remove("menu-open");
+    };
+  }, [isMobileMenuOpen]);
+
   return (
-    <header className="mx-auto max-w-[1440px] px-4 pt-4 sm:px-6 lg:px-[60px] lg:pt-5">
-      <div className="relative isolate overflow-hidden rounded-[32px] border border-white/10 bg-white/[0.04] backdrop-blur-md sm:rounded-[40px] lg:rounded-[50px]">
+    <header className="relative z-[999999] mx-auto max-w-[1440px] px-4 pt-4 sm:px-6 lg:px-[60px] lg:pt-5">
+      <div
+        className={`relative isolate rounded-[32px] border border-white/10 bg-white/[0.04] backdrop-blur-md sm:rounded-[40px] lg:rounded-[50px] ${
+          isMobileMenuOpen ? "overflow-visible" : "overflow-hidden"
+        }`}
+      >
         <div
           aria-hidden
           className="pointer-events-none absolute inset-0 rounded-[inherit]"
@@ -43,17 +58,17 @@ export default function Navbar() {
               aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
               aria-expanded={isMobileMenuOpen}
               onClick={() => setIsMobileMenuOpen((open) => !open)}
-              className="mobile-menu-toggle hidden h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-white/5 text-white transition hover:bg-white/10"
+              className="mobile-menu-toggle inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-white/5 text-white transition hover:bg-white/10 sm:hidden"
             >
               {isMobileMenuOpen ? (
                 <MenuUnfold4Line width={22} height={22} fill="#ffffff" />
               ) : (
-                <MenuFill width={22} height={22} fill="#ffffff" />
+                <img src="/landing/Vector.png" alt="menu" width={22} height={22} />
               )}
             </button>
           </div>
 
-          <div className="desktop-nav flex w-full flex-col items-center gap-4 sm:gap-5 lg:w-auto lg:flex-row lg:gap-9">
+          <div className="desktop-nav hidden w-full flex-col items-center gap-4 sm:gap-5 lg:flex lg:w-auto lg:flex-row lg:gap-9">
             <nav
               className="font-inter flex flex-wrap items-center justify-center gap-x-5 gap-y-3 text-sm font-normal text-white sm:gap-x-6 sm:text-base lg:justify-start lg:gap-9"
               style={{ fontFamily: "var(--font-inter)" }}
@@ -86,60 +101,63 @@ export default function Navbar() {
           </div>
         </div>
 
-        {isMobileMenuOpen ? (
-          <div className="mobile-nav-panel hidden border-t border-white/10 px-5 pb-5 pt-3">
-            <nav
-              className="mobile-nav-links flex flex-col gap-3 font-inter text-[15px] font-normal text-white"
-              style={{ fontFamily: "var(--font-inter)" }}
-            >
-              {navItems.map((item) => (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="rounded-xl bg-white/5 px-4 py-3 transition duration-200 hover:bg-white/10 hover:text-[#bde7c8]"
+        {isMobileMenuOpen && createPortal(
+          <div className="fixed inset-0 z-[2147483647] sm:hidden">
+            <div className="absolute inset-0">
+              <div
+                className="absolute inset-0"
+                style={{ background: "rgba(0,0,0,0.40)", backdropFilter: "blur(3px)", WebkitBackdropFilter: "blur(3px)" }}
+              />
+              <button
+                aria-label="Close menu backdrop"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="absolute inset-0"
+              />
+            </div>
+
+            <div className="absolute right-4 top-4 z-[2147483647] h-[408px] w-[280px] overflow-hidden rounded-[24px] bg-[#001a0a] shadow-2xl">
+              <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_85%_12%,rgba(22,163,74,0.4),rgba(0,26,10,1)_62%)]" />
+              <div className="relative h-full px-5 pb-5 pt-5">
+                <div className="mb-6 flex items-center justify-between">
+                  <LogoIcon className="h-auto w-[92px]" />
+                  <button
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="text-[22px] leading-none text-white"
+                    aria-label="Close menu"
+                  >
+                    &times;
+                  </button>
+                </div>
+
+                <nav
+                  className="flex flex-col gap-6 text-[20px] leading-[1.2]"
+                  style={{ fontFamily: "var(--font-inter)" }}
                 >
-                  {item.label}
-                </Link>
-              ))}
-            </nav>
+                  {navItems.map((item) => {
+                    const isActive = pathname === item.href;
+                    return (
+                      <Link
+                        key={item.href}
+                        href={item.href}
+                        onClick={() => setIsMobileMenuOpen(false)}
+                        className={`transition ${
+                          isActive ? "text-white" : "text-[#9a9a9a] hover:text-white"
+                        }`}
+                      >
+                        {item.label}
+                      </Link>
+                    );
+                  })}
+                </nav>
 
-            <OutlineGlowButton
-              href="/login?expired=true"
-              className="mobile-signin mt-4 h-10 w-full max-w-none"
-            >
-              Sign In
-            </OutlineGlowButton>
+                <div className="mt-6 h-px w-full bg-white/20" />
+                <OutlineGlowButton href="/login?expired=true" className="mt-6 h-10 w-full max-w-none">
+                  Sign In
+                </OutlineGlowButton>
+              </div>
+            </div>
           </div>
-        ) : null}
-
-        <style>{`
-          @media (max-width: 639px) {
-            .mobile-menu-toggle {
-              display: inline-flex;
-            }
-
-            .desktop-nav {
-              display: none;
-            }
-
-            .mobile-nav-panel {
-              display: block;
-            }
-
-            .navbar-top {
-              gap: 0.75rem;
-            }
-
-            .mobile-nav-links {
-              font-size: 14px;
-            }
-
-            .mobile-signin {
-              max-width: none;
-            }
-          }
-        `}</style>
+        , document.body)}
       </div>
     </header>
   );

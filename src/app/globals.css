@@ -207,3 +207,36 @@ input::-webkit-inner-spin-button {
 .auth-gradient {
     background: linear-gradient(120deg, #4CAF50 0%, white 30%);
 }
+
+/* Mobile Navbar */
+.mobile-nav-links {
+    font-family: var(--font-inter), sans-serif;
+}
+
+.mobile-nav-link {
+    color: #9a9a9a;
+    font-size: 35px;
+    line-height: 1.2;
+    font-weight: 400;
+    transition: color 0.2s ease;
+}
+
+.mobile-nav-link.active {
+    color: #ffffff;
+}
+
+.mobile-signin {
+    font-family: var(--font-inter), sans-serif;
+    font-size: 32px;
+    line-height: 1.2;
+}
+
+@media (max-width: 380px) {
+    .mobile-nav-link {
+        font-size: clamp(28px, 8.8vw, 35px);
+    }
+
+    .mobile-signin {
+        font-size: clamp(24px, 7.2vw, 32px);
+    }
+}
