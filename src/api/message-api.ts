@@ -82,15 +82,31 @@ export const messageApi = {
     params?: Partial<{ page: number; limit: number }>
   ): Promise<{ conversations: IConversation[]; pagination: IPagination }> => {
     try {
-      const response = await api.get<IApiResponse<IConversationsResponse>>(
+      const response = await api.get<any>(
         '/messages/conversations',
         { params }
       );
 
-      const payload = response.data?.data;
+      const payload = response.data;
+
+      // Backend returns: { message: "...", data: [...conversations] }
+      const conversationsArray = Array.isArray(payload?.data)
+        ? payload.data.map((conv: any) => ({
+            id: conv._id || conv.id,
+            participantIds: conv.participantIds || [],
+            participants: conv.participants || [],
+            lastMessage: typeof conv.lastMessage === 'string'
+              ? { content: conv.lastMessage, createdAt: conv.lastMessageTime }
+              : conv.lastMessage,
+            lastMessageAt: conv.lastMessageTime || conv.lastMessageAt || conv.createdAt,
+            unreadCount: conv.unreadCount ?? 0,
+            createdAt: conv.createdAt,
+          }))
+        : [];
+
       return {
-        conversations: (payload?.data ?? []) as IConversation[],
-        pagination: payload?.pagination ?? defaultPagination,
+        conversations: conversationsArray as IConversation[],
+        pagination: defaultPagination,
       };
     } catch (error: any) {
       const errorMessage =
@@ -166,6 +182,42 @@ export const messageApi = {
   },
 
   /**
+   * Create a new conversation (handoff-compatible)
+   *
+   * Handoff API: POST /messages/conversations
+   * Payload: { participantId, message }
+   */
+  createConversationWithMessage: async (
+    participantId: string,
+    message?: string
+  ): Promise<IConversation> => {
+    try {
+      if (!participantId || typeof participantId !== 'string') {
+        throw new Error('Invalid participant ID');
+      }
+
+      // API handoff doc: response is payload?.conversation || payload?.data?.conversation || payload?.data || payload
+      const response = await api.post<any>(
+        '/messages/conversations',
+        { participantId, ...(message ? { message } : {}) }
+      );
+
+      const payload = response.data;
+      const conv = payload?.conversation || payload?.data?.conversation || payload?.data || payload;
+      if (!conv) {
+        throw new Error('Failed to create conversation');
+      }
+
+      return conv;
+    } catch (error: any) {
+      const errorMessage =
+        error.response?.data?.message || error.message || 'Failed to create conversation';
+      console.error('Error in createConversationWithMessage:', errorMessage);
+      throw error.response?.data || { message: errorMessage };
+    }
+  },
+
+  /**
    * Delete a conversation
    *
    * @param conversationId - The conversation ID to delete
@@ -212,15 +264,44 @@ export const messageApi = {
         throw new Error('Invalid conversation ID');
       }
 
-      const response = await api.get<IApiResponse<IMessagesResponse>>(
-        `/messages/conversations/${conversationId.trim()}/messages`,
+      // API handoff doc: ChatBoxScreen loads messages via GET /messages/:conversationId
+      const response = await api.get<any>(
+        `/messages/${conversationId.trim()}`,
         { params }
       );
 
-      const payload = response.data?.data;
+      const payload = response.data;
+
+      // Backend returns: { message: "...", data: { messages: [...], pagination: {...} } }
+      // Multi-fallback: messages can be at data.messages, messages, data.items, data, or payload itself
+      const rawList: any[] =
+        payload?.data?.messages ??
+        payload?.messages ??
+        payload?.data?.items ??
+        (Array.isArray(payload?.data) ? payload.data : null) ??
+        (Array.isArray(payload) ? payload : []);
+
+      const messagesArray = rawList.map((msg: any) => ({
+        id: msg._id || msg.id,
+        _id: msg._id || msg.id,
+        conversationId: msg.conversationId,
+        // Keep senderId as-is so InboxPage can extract _id from object or string
+        senderId: msg.senderId,
+        senderName: typeof msg.senderId === 'object' ? msg.senderId.name : '',
+        senderImage: typeof msg.senderId === 'object' ? msg.senderId.profilePicture || msg.senderId.image : '',
+        content: msg.content,
+        attachments: msg.attachments || [],
+        isRead: msg.isRead ?? false,
+        isDelivered: msg.isDelivered ?? true,
+        deliveredAt: msg.deliveredAt ?? null,
+        timestamp: msg.timestamp || msg.createdAt,
+        createdAt: msg.createdAt || msg.timestamp,
+        messageType: msg.messageType || 'text',
+      }));
+
       return {
-        messages: (payload?.data ?? []) as IMessage[],
-        pagination: payload?.pagination ?? defaultPagination,
+        messages: messagesArray as IMessage[],
+        pagination: payload?.data?.pagination ?? defaultPagination,
       };
     } catch (error: any) {
       const errorMessage =
@@ -249,16 +330,35 @@ export const messageApi = {
         throw new Error('Message content is required');
       }
 
-      const response = await api.post<IApiResponse<IMessage>>(
-        `/messages/conversations/${conversationId.trim()}/messages`,
-        { content: content.trim() }
-      );
+      // API handoff doc: POST /messages with { conversationId, content, message }
+      // Response: payload?.message || payload?.data?.message || payload?.data || payload
+      const trimmed = content.trim();
+      const response = await api.post<any>('/messages', {
+        conversationId: conversationId.trim(),
+        content: trimmed,
+        message: trimmed,
+      });
 
-      if (!response.data.data) {
+      const payload = response.data;
+      const raw = payload?.message || payload?.data?.message || payload?.data || payload;
+      if (!raw) {
         throw new Error('Failed to send message');
       }
-
-      return response.data.data;
+      // Normalise to same shape as getMessages
+      return {
+        id: raw._id || raw.id,
+        _id: raw._id || raw.id,
+        conversationId: raw.conversationId,
+        senderId: raw.senderId,
+        content: raw.content,
+        attachments: raw.attachments || [],
+        isRead: raw.isRead ?? false,
+        isDelivered: raw.isDelivered ?? true,
+        deliveredAt: raw.deliveredAt ?? null,
+        timestamp: raw.timestamp || raw.createdAt,
+        createdAt: raw.createdAt || raw.timestamp,
+        messageType: raw.messageType || 'text',
+      };
     } catch (error: any) {
       const errorMessage =
         error.response?.data?.message || error.message || 'Failed to send message';
@@ -291,15 +391,16 @@ export const messageApi = {
         throw new Error('Valid file is required');
       }
 
+      // API handoff doc: POST /messages/with-file
+      // Multipart: { conversationId, message, file }
       const formData = new FormData();
-      formData.append('content', content || '');
+      formData.append('conversationId', conversationId.trim());
+      formData.append('message', content || '');
       formData.append('file', file);
 
-      const response = await api.post<IApiResponse<IMessage>>(
-        `/messages/conversations/${conversationId.trim()}/messages/with-file`,
-        formData,
-        { headers: { 'Content-Type': 'multipart/form-data' } }
-      );
+      const response = await api.post<IApiResponse<IMessage>>('/messages/with-file', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
 
       if (!response.data.data) {
         throw new Error('Failed to send message with file');
@@ -329,16 +430,19 @@ export const messageApi = {
         throw new Error('Invalid message ID');
       }
 
-      const response = await api.patch<IApiResponse<IMessage>>(
+      // API handoff doc: response is payload?.message || payload?.data?.message || payload?.data || payload
+      const response = await api.patch<any>(
         `/messages/${messageId.trim()}/read`,
         {}
       );
 
-      if (!response.data.data) {
+      const payload = response.data;
+      const msg = payload?.message || payload?.data?.message || payload?.data || payload;
+      if (!msg) {
         throw new Error('Failed to mark message as read');
       }
 
-      return response.data.data;
+      return msg;
     } catch (error: any) {
       const errorMessage =
         error.response?.data?.message || error.message || 'Failed to mark as read';

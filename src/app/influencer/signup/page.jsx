@@ -156,7 +156,7 @@ export default function Page() {
         ],
     }]
     return (
-        <div className='min-h-screen bg-white flex items-center justify-center'>
+        <div className='min-h-screen bg-[#000201] flex items-center justify-center'>
             <div className='w-full h-screen max-w-full overflow-hidden'>
                 <Suspense fallback={
                     <div className="flex items-center justify-center h-full">

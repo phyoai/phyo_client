@@ -1,7 +1,8 @@
 'use client'
 import React from 'react';
 import { usePathname } from 'next/navigation';
-import BrandSidebar from '../../components/BrandSidebar';
+import InfluencerSidebar from '../../components/InfluencerSidebar';
+import BrandTopbar from '../../components/BrandTopbar';
 import { SidebarProvider, useSidebar } from '../context/SidebarContext';
 
 function InfluencerLayoutContent({ children, pathname }) {
@@ -10,36 +11,27 @@ function InfluencerLayoutContent({ children, pathname }) {
   const noSidebarRoutes = [
     '/influencer/signup',
     '/influencer/login',
-    '/influencer/campaigns/create-campaign',
-    '/influencer/campaigns/new-applications',
-    '/influencer/campaigns/all-campaigns',
-    '/influencer/campaigns/all-drafts',
     '/influencer/influencer-search',
     '/influencer/influencers',
-    '/influencer/notifications',
   ];
 
-  const isNoSidebarRoute =
-    noSidebarRoutes.some(r => pathname === r) ||
-    pathname.startsWith('/influencer/account/') ||
-    (pathname.startsWith('/influencer/campaigns/') &&
-      !pathname.includes('/create-campaign') &&
-      !pathname.includes('/new-applications') &&
-      !pathname.includes('/all-campaigns') &&
-      !pathname.includes('/all-drafts'));
+  const isNoSidebarRoute = noSidebarRoutes.some(r => pathname === r || pathname.startsWith(r + '/'));
 
   if (isNoSidebarRoute) {
     return <>{children}</>;
   }
 
   return (
-    <div className="flex min-h-screen bg-[#FFFFFF]">
-      <BrandSidebar />
-      <main className={`flex-1 bg-[#FFFFFF] transition-all duration-300 ease-in-out ${
-        isExpanded ? 'ml-[220px]' : 'ml-[96px]'
-      } h-screen overflow-y-auto`}>
-        {children}
-      </main>
+    <div className="flex h-screen bg-[#000201] overflow-hidden">
+      <InfluencerSidebar />
+      <div className={`flex flex-col flex-1 transition-all duration-300 ease-in-out overflow-hidden ${
+        isExpanded ? 'ml-[280px]' : 'ml-[72px]'
+      } pl-3`}>
+        <BrandTopbar />
+        <main className="flex-1 overflow-y-auto bg-[#000201]">
+          {children}
+        </main>
+      </div>
     </div>
   );
 }

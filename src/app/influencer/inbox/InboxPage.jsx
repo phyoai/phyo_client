@@ -215,7 +215,7 @@ const InboxPage = () => {
   };
 
   return (
-    <div className="flex h-screen overflow-hidden bg-gray-50">
+    <div className="flex h-screen overflow-hidden bg-[#000201]">
       {/* Left Sidebar - Invitations List */}
       <div className="w-full sm:w-[30%] bg-white border-r border-gray-200 flex flex-col overflow-hidden">
         {/* Sticky Header */}
@@ -261,8 +261,8 @@ const InboxPage = () => {
                   <div
                     key={conversation.id}
                     onClick={() => setSelectedConversation(conversation)}
-                    className={`px-4 py-3 border-b border-gray-100 cursor-pointer transition-colors hover:bg-gray-50 ${
-                      selectedConversation?.id === conversation.id ? 'bg-gray-50' : ''
+                    className={`px-4 py-3 border-b border-gray-100 cursor-pointer transition-colors hover:bg-[#000201] ${
+                      selectedConversation?.id === conversation.id ? 'bg-[#000201]' : ''
                     }`}
                   >
                     <div className="flex items-center gap-3">
@@ -312,7 +312,7 @@ const InboxPage = () => {
                   {newInvitations.map((invitation) => (
                     <div
                       key={invitation.id}
-                      className="flex items-center gap-3 py-2 hover:bg-gray-50 rounded-lg px-2 -mx-2 cursor-pointer transition-colors"
+                      className="flex items-center gap-3 py-2 hover:bg-[#000201] rounded-lg px-2 -mx-2 cursor-pointer transition-colors"
                     >
                       <img
                         src={invitation.avatar}
@@ -365,7 +365,7 @@ const InboxPage = () => {
                   {myRequests.map((request) => (
                     <div
                       key={request.id}
-                      className="flex items-center gap-3 py-2 hover:bg-gray-50 rounded-lg px-2 -mx-2 cursor-pointer transition-colors"
+                      className="flex items-center gap-3 py-2 hover:bg-[#000201] rounded-lg px-2 -mx-2 cursor-pointer transition-colors"
                     >
                       <img
                         src={request.avatar}
@@ -382,7 +382,7 @@ const InboxPage = () => {
                       </div>
                       <button
                         onClick={() => handleWithdraw(request.id)}
-                        className="px-3 py-1.5 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded-full hover:bg-gray-50 transition-colors flex-shrink-0"
+                        className="px-3 py-1.5 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded-full hover:bg-[#000201] transition-colors flex-shrink-0"
                       >
                         withdraw
                       </button>
@@ -501,7 +501,7 @@ const InboxPage = () => {
                     onChange={(e) => setMessageInput(e.target.value)}
                     onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
                     placeholder="type something here"
-                    className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-[#5B7553] focus:border-transparent text-sm"
+                    className="w-full px-4 py-2.5 bg-[#000201] border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-[#5B7553] focus:border-transparent text-sm"
                   />
                 </div>
                 
@@ -520,7 +520,7 @@ const InboxPage = () => {
                               animationDelay: `${index * 60}ms`
                             }}
                           >
-                            <div className="w-14 h-14 flex items-center justify-center rounded-full hover:bg-gray-50 transition-colors">
+                            <div className="w-14 h-14 flex items-center justify-center rounded-full hover:bg-[#000201] transition-colors">
                               <IconComponent width={28} height={28} className="text-[#787d73]" />
                             </div>
                             <span className="text-xs font-semibold text-[#787d73] whitespace-nowrap">

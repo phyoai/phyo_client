@@ -1,6 +1,6 @@
 'use client'
 import React, { Suspense, useState, useRef, useEffect } from 'react';
-import { Search, Bell, Heart, ChevronRight, ArrowLeft, Mic, MoreVertical } from 'lucide-react';
+import { Search, Heart, ChevronRight, ArrowLeft, Mic, MoreVertical } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useLanguage } from '@/app/context/LanguageContext';
 import { BookmarkLine, YoutubeFill, InstagramFill, TwitterXLine, UserAddLine, Message3Line, FacebookFill } from '@phyoofficial/phyo-icon-library';
@@ -10,12 +10,9 @@ import TrendingInfluencersSection from './sections/TrendingInfluencersSection';
 import ExploreBrandsSection from './sections/ExploreBrandsSection';
 import CampaignSection from './sections/CampaignSection';
 import InfluencerListSection from './sections/InfluencerListSection';
+import NearbyCampaignsSection from './sections/NearbyCampaignsSection';
 import InlineConversionCard from './sections/InlineConversionCard';
 
-// Reusable Components
-import SectionHeading from '@/components/SectionHeading';
-import CampaignCard from '@/components/cards/CampaignCard';
-import InfluencerAvatar from '@/components/cards/InfluencerAvatar';
 
 // Commented out old components - will integrate with APIs later
 // import CampaignReport from './CampaignReport';
@@ -40,19 +37,11 @@ function DashboardContent() {
     }, 300);
   };
 
-  // Mock data - will be replaced with API calls
   const searchSuggestions = [
     t('search_suggestion_1'),
     t('search_suggestion_2'),
     t('search_suggestion_3'),
   ];
-
-  const topInfluencers = Array(10).fill(null).map((_, i) => ({
-    id: i + 1,
-    name: 'Swagdeep',
-    avatar: '/dummyAvatar.jpg',
-    color: ['bg-red-400', 'bg-teal-600', 'bg-yellow-500', 'bg-blue-500', 'bg-teal-700', 'bg-red-500', 'bg-blue-600', 'bg-teal-500', 'bg-yellow-600', 'bg-blue-400'][i % 10]
-  }));
 
   return (
     <>
@@ -74,141 +63,73 @@ function DashboardContent() {
         }
       `}</style>
       
-      <div className={`h-full bg-[#FFFFFF] dark:bg-[#121212] text-black dark:text-white transition-all duration-300 ${
+      <div className={`min-h-screen bg-[#000201] text-white transition-all duration-300 ${
         isFadingOut ? 'fade-out-dashboard' : ''
       }`}>
-        {/* Sticky App Bar - Only Welcome header */}
-        <div className="sticky top-0 z-40 bg-[#FFFFFF] dark:bg-[#1e1e1e] border-b border-gray-100 dark:border-gray-700">
-          <div className="px-4 sm:px-6 lg:px-8 py-3">
-            <div className="flex items-center justify-between">
-              {/* Welcome Section */}
-              <div>
-                <h1 className="text-xl sm:text-2xl font-semibold text-gray-900 dark:text-white">{t('welcome')}</h1>
-                <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">{t('search_discover')}</p>
-              </div>
-
-              {/* Right Side - Notifications and Profile */}
-              <div className="flex items-center gap-2 sm:gap-4">
-                <button 
-                  onClick={() => router.push('/brand/notifications')}
-                  className="p-2 hover:bg-gray-100 rounded-full transition-colors relative"
-                >
-                  <Bell className="h-5 w-5 sm:h-6 sm:w-6 text-gray-600" />
-                  <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
-                </button>
-                <div className="w-8 h-8 sm:w-10 sm:h-10 bg-teal-600 rounded-full flex items-center justify-center text-white font-semibold text-sm sm:text-base">
-                  P
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
         {/* Scrollable Content Section */}
-        <div className="px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
-          {/* Search Bar - Clickable to activate search mode */}
-          <div className="flex justify-center mb-2">
-            <div 
-              className="relative w-full max-w-full sm:max-w-[70%] md:max-w-[60%] cursor-pointer"
-              onClick={handleSearchClick}
-            >
-              <Search className="absolute right-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-[#808080]" />
-              <input
-                type="text"
-                placeholder={t('search')}
-                value={searchQuery}
-                onChange={(e) => e.preventDefault()}
+        <div className="px-4 sm:px-6 lg:px-8 pt-6 pb-10">
+
+          {/* Search Bar */}
+          <div className="relative mb-[17px] cursor-pointer" onClick={handleSearchClick}>
+            <div className="absolute inset-0 rounded-full blur-[8px] border-2 border-[#16a34a] pointer-events-none" />
+            <div className="relative flex items-center bg-[rgba(255,255,255,0.08)] backdrop-blur-[6px] rounded-full border-[0.8px] border-[#16a34a] overflow-hidden pr-[9.6px] py-[10px] pl-[19.6px] gap-3 h-[60px]">
+              <span className="flex-1 text-[#9b9b9b] text-[16px] truncate leading-[1.6]" style={{ fontFamily: 'Inter, sans-serif' }}>
+                {t('search')} influencers (e.g. I need influencers in Mumbai)...
+              </span>
+              <button
                 onClick={handleSearchClick}
-                className="w-full pl-6 pr-12 py-3 bg-[#F0F0F0] dark:bg-[#2a2a2a] rounded-full border border-gray-200 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent cursor-pointer dark:text-white dark:placeholder-gray-400"
-                readOnly
-              />
+                className="flex items-center gap-2 bg-[#16a34a] text-white rounded-[20px] pl-[40px] pr-[16px] py-[8px] text-[16px] font-normal shrink-0 relative h-[40px]"
+                style={{ fontFamily: 'Inter, sans-serif' }}
+              >
+                <Search className="absolute left-[10px] h-[24px] w-[24px]" />
+                Search
+              </button>
             </div>
           </div>
 
-          {/* Search Suggestions */}
-          <div className="flex flex-col items-center gap-2 mb-8 sm:mb-12">
-            {searchSuggestions.map((suggestion, index) => (
+          {/* Prompt Suggestion Pills — pyramid: 640 / 580 / 520px, centered */}
+          <div className="flex flex-col items-center gap-[8px] mb-[68px]">
+            {[640, 580, 520].map((maxW, index) => (
               <div
                 key={index}
-                className="bg-[#C5CBC2] dark:bg-[#3a3a3a] text-gray-700 dark:text-gray-300 px-4 sm:px-6 py-2 sm:py-2.5 rounded-full text-xs sm:text-sm cursor-pointer hover:bg-gray-400 dark:hover:bg-[#4a4a4a] transition-colors max-w-full sm:max-w-[600px] text-center"
+                className="bg-[#181818] px-[12px] py-[8px] rounded-[64px] cursor-pointer hover:bg-[#222] transition-colors overflow-hidden"
+                style={{ width: '100%', maxWidth: `${maxW}px` }}
                 onClick={handleSearchClick}
               >
-                {suggestion}
+                <p
+                  className="text-[14px] font-medium text-[#808080] leading-[20px] tracking-[0.2px] overflow-hidden text-ellipsis whitespace-nowrap"
+                  style={{ fontFamily: 'Work Sans, sans-serif' }}
+                >
+                  {searchSuggestions[index]}
+                </p>
               </div>
             ))}
           </div>
 
-          {/* Influencers near you */}
-          <div className="mb-10">
-            <SectionHeading
-              title={t('influencers_near_you')}
-              onViewAll={() => router.push('/brand/influencers')}
+          {/* Sections — gap-[32px] between each per Figma */}
+          <div className="flex flex-col gap-[32px]">
+            <TrendingInfluencersSection />
+
+            <CampaignSection
+              title={t('top_campaigns')}
+              campaignsCount={3}
+              showFilters
             />
 
-            {/* Horizontal Scroll of Influencers */}
-            <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
-              {topInfluencers.map((influencer) => (
-                <InfluencerAvatar
-                  key={influencer.id}
-                  name={influencer.name}
-                  avatar={influencer.avatar}
-                  bgColor={influencer.color}
-                  onClick={() => router.push(`/brand/influencers/${influencer.id}`)}
-                />
-              ))}
-            </div>
+            <ExploreBrandsSection />
+
+            <InfluencerListSection title="Nearby Influencers" />
+
+            <NearbyCampaignsSection />
+
+            <InlineConversionCard
+              eyebrow={t('premium_access')}
+              title={t('boost_your_reach')}
+              description={t('upgrade_description')}
+              primaryButtonText={t('get_pro')}
+              secondaryButtonText={t('learn_more')}
+            />
           </div>
-
-          {/* Top Campaigns Section */}
-          <CampaignSection
-            title={t('top_campaigns')}
-            campaignsCount={3}
-          />
-
-          <InfluencerListSection
-            title={t('influencers_near_you')}
-          />
-
-          <ExploreBrandsSection />
-
-          <CampaignSection
-            title={t('campaigns_near_you')}
-            campaignsCount={2}
-          />
-
-          <InfluencerListSection
-            title={t('influencers_near_you')}
-          />
-
-          <InlineConversionCard
-            eyebrow={t('premium_access')}
-            title={t('boost_your_reach')}
-            description={t('upgrade_description')}
-            primaryButtonText={t('get_pro')}
-            secondaryButtonText={t('learn_more')}
-          />
-
-          <CampaignSection
-            title={t('lifestyle_campaigns')}
-            campaignsCount={3}
-          />
-
-          <InfluencerListSection
-            title={t('lifestyle_creators')}
-          />
-
-          <InlineConversionCard
-            eyebrow={t('premium_access')}
-            title={t('boost_your_reach')}
-            description={t('upgrade_description')}
-            primaryButtonText={t('get_pro')}
-            secondaryButtonText={t('learn_more')}
-          />
-
-          <CampaignSection
-            title={t('sports_campaigns')}
-            campaignsCount={3}
-          />
         </div>
       </div>
 

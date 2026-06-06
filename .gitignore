@@ -10,13 +10,24 @@
 !.yarn/releases
 !.yarn/versions
 
+# local tooling / workspace state
+/.claude/settings.local.json
+/.claude/worktrees/
+/.git-rewrite/
+/.vscode/
+.mcp.json
+
 # testing
 /coverage
+.nyc_output/
+playwright-report/
+test-results/
 
 # next.js
 /.next/
 /out/
 .next-cache-state.json
+/.turbo/
 
 # production
 /build
@@ -24,6 +35,9 @@
 # misc
 .DS_Store
 *.pem
+*.log
+*.tmp
+*.cache
 
 # debug
 npm-debug.log*

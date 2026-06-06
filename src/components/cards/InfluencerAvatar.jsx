@@ -1,52 +1,28 @@
-import React from 'react';
-
-/**
- * Reusable Influencer Avatar Component
- * Used for displaying influencer profile in circular format with scrollable lists
- */
-export default function InfluencerAvatar({ 
-  name, 
-  avatar, 
-  bgColor = 'bg-teal-600',
-  onClick,
-  size = 'md' // sm, md, lg
-}) {
-  const sizeClasses = {
-    sm: {
-      outer: 'w-14 h-14',
-      inner: 'w-12 h-12',
-      text: 'text-xs',
-      width: 'w-14'
-    },
-    md: {
-      outer: 'w-24 h-24',
-      inner: 'w-20 h-20',
-      text: 'text-xs',
-      width: 'w-24'
-    },
-    lg: {
-      outer: 'w-28 h-28',
-      inner: 'w-24 h-24',
-      text: 'text-sm',
-      width: 'w-28'
-    }
-  };
-
-  const currentSize = sizeClasses[size];
-
+export default function InfluencerAvatar({ name, avatar, bgColor = 'bg-[#2f2f2f]', onClick }) {
   return (
-    <div 
-      className={`flex flex-col items-center flex-shrink-0 cursor-pointer group ${currentSize.width}`}
+    <div
+      className="flex flex-col items-center gap-[8px] flex-shrink-0 cursor-pointer w-[120px]"
       onClick={onClick}
     >
-      <div className={`${currentSize.outer} ${bgColor} rounded-full flex items-center justify-center mb-2 group-hover:scale-105 transition-transform`}>
-        <img 
-          src={avatar} 
-          alt={name}
-          className={`${currentSize.inner} rounded-full object-cover`}
-        />
+      {/* Full-width circle avatar — aspect-square so it's always round */}
+      <div className={`w-full aspect-square ${bgColor} rounded-full overflow-hidden flex items-center justify-center`}>
+        {avatar ? (
+          <img
+            src={avatar}
+            alt={name}
+            className="w-full h-full object-cover rounded-full"
+            onError={(e) => { e.currentTarget.style.display = 'none'; }}
+          />
+        ) : (
+          <span className="text-white text-2xl font-semibold">
+            {name?.charAt(0)?.toUpperCase()}
+          </span>
+        )}
       </div>
-      <span className={`${currentSize.text} text-gray-800 font-medium text-center leading-tight`}>
+      <span
+        className="text-[16px] font-normal text-[#9A9A9A] capitalize text-center leading-[1.2] w-full truncate"
+        style={{ fontFamily: 'Inter, sans-serif' }}
+      >
         {name}
       </span>
     </div>

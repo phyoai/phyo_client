@@ -187,7 +187,7 @@ export class AuthService {
     payload: ResendOTPPayload
   ): Promise<APIResponse> {
     return apiClient.post(
-      AUTH_ENDPOINTS.RESEND_EMAIL_OTP,
+      AUTH_ENDPOINTS.RESEND_OTP,
       payload
     );
   }

@@ -1,296 +1,135 @@
 'use client'
-import React, { useState, useEffect } from 'react';
-import { ArrowLeft, Bell, MoreVertical, Check, X, ChevronRight, AlertCircle, Trash2 } from 'lucide-react';
-import { useRouter } from 'next/navigation';
+import { useState, useEffect } from 'react';
+import { Bell, CheckCheck } from 'lucide-react';
 import { notificationApi } from '@/api/notification-api';
 
-// Notification Skeleton Loader
-const NotificationSkeleton = () => (
-  <div className="bg-white border-b border-gray-100 animate-pulse">
-    <div className="flex items-center py-3 px-4">
-      <div className="w-12 h-12 bg-gray-300 rounded-full shrink-0 mr-4" />
-      <div className="flex-1">
-        <div className="h-4 bg-gray-300 rounded w-3/4 mb-2" />
-        <div className="h-3 bg-gray-200 rounded w-full" />
-      </div>
-    </div>
-  </div>
-);
+const TABS = ['All', 'Invitation Requests', 'New Campaigns Announcement'];
 
-function NotificationsPage() {
-  const router = useRouter();
-  const [activeFilter, setActiveFilter] = useState('All');
+function timeAgo(dateStr) {
+  if (!dateStr) return '';
+  const diff = Date.now() - new Date(dateStr).getTime();
+  const mins = Math.floor(diff / 60000);
+  if (mins < 1) return 'just now';
+  if (mins < 60) return mins + 'm ago';
+  const hrs = Math.floor(mins / 60);
+  if (hrs < 24) return hrs + 'h ago';
+  return Math.floor(hrs / 24) + 'd ago';
+}
+
+export default function NotificationsPage() {
+  const [activeTab, setActiveTab] = useState('All');
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [page, setPage] = useState(1);
-  const [pagination, setPagination] = useState(null);
 
-  const notificationTypes = ['All', 'campaign', 'application', 'message', 'system', 'payment'];
-  const filters = ['All', 'Campaign', 'Application', 'Message', 'System', 'Payment'];
+  useEffect(() => { fetchNotifications(); }, [activeTab]);
 
-  // Fetch notifications
-  useEffect(() => {
-    const fetchNotifications = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        const filter = activeFilter === 'All' ? {} : { type: activeFilter.toLowerCase() };
-        const response = await notificationApi.getNotifications({
-          ...filter,
-          page,
-          limit: 20
-        });
-        setNotifications(response.notifications || []);
-        setPagination(response.pagination);
-      } catch (err) {
-        console.error('Error fetching notifications:', err);
-        setError(err?.message || 'Failed to load notifications');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchNotifications();
-  }, [activeFilter, page]);
-
-  // Color mapping for notification types
-  const getTypeColor = (type) => {
-    const colors = {
-      'campaign': '#ff4f6d',
-      'application': '#02b523',
-      'message': '#0b4fd9',
-      'system': '#2375f0',
-      'payment': '#f4c10f'
-    };
-    return colors[type] || '#9ba194';
-  };
-
-  const handleMarkAsRead = async (notificationId) => {
+  const fetchNotifications = async () => {
+    setLoading(true);
     try {
-      await notificationApi.markAsRead(notificationId);
-      setNotifications(notifications.map(n =>
-        n.id === notificationId ? { ...n, isRead: true } : n
-      ));
+      const filter = activeTab === 'All' ? {} : { type: activeTab };
+      const res = await notificationApi.getNotifications({ ...filter, page: 1, limit: 50 });
+      setNotifications(res.notifications || res.data || []);
     } catch (err) {
-      console.error('Error marking notification as read:', err);
+      console.error(err);
+      setNotifications([]);
+    } finally {
+      setLoading(false);
     }
   };
 
-  const handleDelete = async (notificationId) => {
+  const markRead = async (id) => {
     try {
-      await notificationApi.deleteNotification(notificationId);
-      setNotifications(notifications.filter(n => n.id !== notificationId));
-    } catch (err) {
-      console.error('Error deleting notification:', err);
-    }
+      await notificationApi.markAsRead(id);
+      setNotifications(prev => prev.map(n => (n._id === id || n.id === id) ? { ...n, isRead: true } : n));
+    } catch (err) { console.error(err); }
   };
 
-  const handleMarkAllAsRead = async () => {
+  const markAllRead = async () => {
     try {
       await notificationApi.markAllAsRead();
-      setNotifications(notifications.map(n => ({ ...n, isRead: true })));
-    } catch (err) {
-      console.error('Error marking all as read:', err);
-    }
+      setNotifications(prev => prev.map(n => ({ ...n, isRead: true })));
+    } catch (err) { console.error(err); }
   };
 
   return (
-    <div className='min-h-screen bg-white'>
-      {/* Header */}
-      <div className="bg-white px-1 py-2 border-b border-gray-100">
-        <div className="flex items-center justify-between">
-          {/* Left - Back Button */}
-          <button
-            onClick={() => router.back()}
-            className="p-3 hover:bg-gray-100 rounded-full transition-colors"
-          >
-            <ArrowLeft className="h-6 w-6 text-[#242527]" />
-          </button>
-
-          {/* Center - Title */}
-          <div className="flex-1 px-2">
-            <h1
-              className="text-xl font-semibold text-[#242527]"
-              style={{ fontFamily: 'Manrope, sans-serif', letterSpacing: '-0.14px' }}
+    <div className="bg-[#000201] min-h-full px-10 py-6">
+      <div className="max-w-[920px]">
+        <div className="bg-[#181818] rounded-[24px] px-8 py-8">
+          {/* Header */}
+          <div className="flex items-center justify-between mb-6">
+            <h2
+              className="text-2xl font-normal text-white leading-[120%]"
+              style={{ fontFamily: 'var(--font-bricolage-grotesque)' }}
             >
               Notifications
-            </h1>
+            </h2>
+            <button
+              onClick={markAllRead}
+              className="flex items-center gap-2 text-sm text-[#16A34A] hover:text-green-400 transition-colors"
+            >
+              <CheckCheck className="w-4 h-4" />
+              Mark all as read
+            </button>
           </div>
 
-          {/* Right - Actions */}
-          <div className="flex items-center gap-2">
-            <button
-              onClick={handleMarkAllAsRead}
-              title="Mark all as read"
-              className="p-3 hover:bg-gray-100 rounded-full transition-colors"
-            >
-              <Check className="h-6 w-6 text-[#242527]" />
-            </button>
-            <button className="p-3 hover:bg-gray-100 rounded-full transition-colors">
-              <MoreVertical className="h-6 w-6 text-[#242527]" />
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* Main Content */}
-      <div className="px-9 pt-4">
-        {/* Error Message */}
-        {error && (
-          <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg flex items-start gap-3">
-            <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
-            <div className="flex-1">
-              <p className="text-sm text-red-800">{error}</p>
-            </div>
-            <button
-              onClick={() => setError(null)}
-              className="text-red-600 hover:text-red-700 text-sm font-medium"
-            >
-              Dismiss
-            </button>
-          </div>
-        )}
-
-        {/* Filter Chips */}
-        <div className="flex gap-2 overflow-x-auto pb-4 mb-2 scrollbar-hide">
-          {filters.map((filter) => (
-            <button
-              key={filter}
-              onClick={() => {
-                setActiveFilter(filter);
-                setPage(1);
-              }}
-              className={`px-3 py-1.5 rounded-lg whitespace-nowrap text-sm font-medium transition-colors ${
-                activeFilter === filter
-                  ? 'bg-[#9ba194] text-white'
-                  : 'bg-[#fbfcfa] text-[#242527] border border-[#f4f6f1] hover:bg-gray-100'
-              }`}
-              style={{ fontFamily: 'Work Sans, sans-serif' }}
-            >
-              {filter}
-            </button>
-          ))}
-        </div>
-
-        {/* Loading State */}
-        {loading && (
-          <div className="space-y-0">
-            {[1, 2, 3, 4, 5].map((i) => (
-              <NotificationSkeleton key={i} />
+          {/* Filter tabs */}
+          <div className="flex gap-3 mb-6 overflow-x-auto pb-1" style={{ scrollbarWidth: 'none' }}>
+            {TABS.map(tab => (
+              <button
+                key={tab}
+                onClick={() => setActiveTab(tab)}
+                className={`px-5 py-1.5 rounded-full text-sm whitespace-nowrap transition-colors ${
+                  activeTab === tab
+                    ? 'bg-[#16A34A] text-white'
+                    : 'bg-white/[0.08] text-[#9B9B9B] hover:bg-white/[0.14]'
+                }`}
+              >
+                {tab}
+              </button>
             ))}
           </div>
-        )}
 
-        {/* Empty State */}
-        {!loading && notifications.length === 0 && !error && (
-          <div className="flex flex-col items-center justify-center py-12">
-            <Bell className="h-12 w-12 text-gray-300 mb-3" />
-            <p className="text-gray-500 text-lg">No notifications yet</p>
-            <p className="text-gray-400 text-sm">When you get notifications, they'll show up here</p>
-          </div>
-        )}
-
-        {/* Notifications List */}
-        {!loading && notifications.length > 0 && (
-          <>
-            <div className="space-y-0">
-              {notifications.map((notification) => (
+          {/* List */}
+          <div className="flex flex-col gap-2">
+            {loading ? (
+              [...Array(6)].map((_, i) => (
+                <div key={i} className="h-[88px] bg-[#262626] rounded-xl animate-pulse" />
+              ))
+            ) : notifications.length > 0 ? notifications.map(n => {
+              const id = n._id || n.id;
+              const name = n.senderName || n.title || 'Notification';
+              const initials = name.charAt(0).toUpperCase();
+              return (
                 <div
-                  key={notification.id}
-                  className={`border-b border-gray-100 hover:bg-gray-50 transition-colors ${
-                    !notification.isRead ? 'bg-blue-50' : 'bg-white'
+                  key={id}
+                  onClick={() => !n.isRead && markRead(id)}
+                  className={`min-h-[88px] bg-[#262626] rounded-xl flex items-center px-4 gap-4 cursor-pointer hover:bg-[#2e2e2e] transition-colors ${
+                    !n.isRead ? 'border-l-2 border-[#16A34A]' : ''
                   }`}
                 >
-                  <div className="flex items-center py-3 px-4">
-                    {/* Avatar */}
-                    <div className="shrink-0 mr-4">
-                      <div
-                        className="w-12 h-12 rounded-full flex items-center justify-center overflow-hidden"
-                        style={{ backgroundColor: getTypeColor(notification.type) }}
-                      >
-                        {notification.isRead ? (
-                          <span className="text-xl text-white">✓</span>
-                        ) : (
-                          <span className="text-xl text-white">•</span>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Content */}
-                    <div className="flex-1 pr-4 min-w-0">
-                      <p
-                        className={`text-base font-semibold truncate ${
-                          notification.isRead ? 'text-[#808080]' : 'text-[#242527]'
-                        }`}
-                        style={{ fontFamily: 'Work Sans, sans-serif' }}
-                      >
-                        {notification.title}
-                      </p>
-                      {notification.message && (
-                        <p
-                          className="text-sm text-[#808080] truncate"
-                          style={{ fontFamily: 'Work Sans, sans-serif' }}
-                        >
-                          {notification.message}
-                        </p>
-                      )}
-                    </div>
-
-                    {/* Trailing Actions */}
-                    <div className="flex items-center gap-2 shrink-0">
-                      {!notification.isRead && (
-                        <button
-                          onClick={() => handleMarkAsRead(notification.id)}
-                          className="p-2 hover:bg-blue-100 rounded-full transition-colors"
-                          title="Mark as read"
-                        >
-                          <Check className="h-5 w-5 text-[#0b4fd9]" />
-                        </button>
-                      )}
-                      <button
-                        onClick={() => handleDelete(notification.id)}
-                        className="p-2 hover:bg-red-100 rounded-full transition-colors"
-                        title="Delete"
-                      >
-                        <Trash2 className="h-5 w-5 text-[#bf3709]" />
-                      </button>
-                      <p className="text-xs text-gray-500 min-w-max">
-                        {new Date(notification.createdAt).toLocaleDateString()}
-                      </p>
-                    </div>
+                  <div className="w-12 h-12 shrink-0 bg-[#16A34A] rounded-full flex items-center justify-center text-white font-medium text-base">
+                    {initials}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-white text-base truncate">{n.title || name}</p>
+                    <p className="text-[#9B9B9B] text-xs line-clamp-2 mt-0.5">{n.message || n.body || ''}</p>
+                  </div>
+                  <div className="flex flex-col items-end gap-1 shrink-0">
+                    <span className="text-[#808080] text-xs">{timeAgo(n.createdAt)}</span>
+                    {n.isRead && <CheckCheck className="w-4 h-4 text-[#16A34A]" />}
                   </div>
                 </div>
-              ))}
-            </div>
-
-            {/* Pagination */}
-            {pagination && pagination.totalPages > 1 && (
-              <div className="flex items-center justify-center gap-4 mt-6 pb-4">
-                <button
-                  disabled={!pagination.hasPreviousPage}
-                  onClick={() => setPage(page - 1)}
-                  className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-300 transition-colors"
-                >
-                  Previous
-                </button>
-                <span className="text-sm text-gray-600">
-                  Page {page} of {pagination.totalPages}
-                </span>
-                <button
-                  disabled={!pagination.hasNextPage}
-                  onClick={() => setPage(page + 1)}
-                  className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-300 transition-colors"
-                >
-                  Next
-                </button>
+              );
+            }) : (
+              <div className="py-16 text-center">
+                <Bell className="w-12 h-12 text-white/10 mx-auto mb-3" />
+                <p className="text-white text-base font-medium mb-1">No notifications</p>
+                <p className="text-[#9B9B9B] text-sm">You are all caught up!</p>
               </div>
             )}
-          </>
-        )}
+          </div>
+        </div>
       </div>
     </div>
   );
 }
-
-export default NotificationsPage;

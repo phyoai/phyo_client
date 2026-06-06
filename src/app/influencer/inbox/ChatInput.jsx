@@ -36,7 +36,7 @@ const ChatInput = ({ onSendMessage, onFileSelect }) => {
         <div className="mb-4 bg-white border border-gray-200 rounded-lg shadow-lg p-2 w-48">
           <button
             onClick={() => handleFileClick('document')}
-            className="flex items-center space-x-3 w-full p-2 hover:bg-gray-50 rounded"
+            className="flex items-center space-x-3 w-full p-2 hover:bg-[#000201] rounded"
           >
             <div className="w-8 h-8 bg-gray-100 rounded flex items-center justify-center">
               <svg className="w-4 h-4 text-gray-600" fill="currentColor" viewBox="0 0 20 20">
@@ -48,7 +48,7 @@ const ChatInput = ({ onSendMessage, onFileSelect }) => {
 
           <button
             onClick={() => handleFileClick('video')}
-            className="flex items-center space-x-3 w-full p-2 hover:bg-gray-50 rounded"
+            className="flex items-center space-x-3 w-full p-2 hover:bg-[#000201] rounded"
           >
             <div className="w-8 h-8 bg-gray-100 rounded flex items-center justify-center">
               <svg className="w-4 h-4 text-gray-600" fill="currentColor" viewBox="0 0 20 20">
@@ -60,7 +60,7 @@ const ChatInput = ({ onSendMessage, onFileSelect }) => {
 
           <button
             onClick={() => handleFileClick('photo')}
-            className="flex items-center space-x-3 w-full p-2 hover:bg-gray-50 rounded"
+            className="flex items-center space-x-3 w-full p-2 hover:bg-[#000201] rounded"
           >
             <div className="w-8 h-8 bg-gray-100 rounded flex items-center justify-center">
               <svg className="w-4 h-4 text-gray-600" fill="currentColor" viewBox="0 0 20 20">

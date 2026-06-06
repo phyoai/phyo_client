@@ -1,231 +1,251 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, AlertCircle, Trash2, Plus } from 'lucide-react';
-import { accountApi } from '@/api/account-api';
+import api from '@/utils/api';
+
+const CATEGORIES = ['All', 'Sports', 'Lifestyle', 'Fashion'];
+
+function getInitials(name) {
+  if (!name) return '?';
+  return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+}
 
 export default function MyLists() {
   const router = useRouter();
-  const [lists, setLists] = useState([]);
+  const [activeCategory, setActiveCategory] = useState('All');
+  const [influencers, setInfluencers] = useState([]);
+  const [savedLists, setSavedLists] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [showNewListModal, setShowNewListModal] = useState(false);
-  const [newListName, setNewListName] = useState('');
-  const [newListType, setNewListType] = useState('custom');
-  const [actionLoading, setActionLoading] = useState(false);
 
-  // Fetch lists on mount
+  // Create New List state
+  const [showCreateList, setShowCreateList] = useState(false);
+  const [selected, setSelected] = useState([]);
+  const [selectAll, setSelectAll] = useState(false);
+  const [listName, setListName] = useState('');
+  const [creating, setCreating] = useState(false);
+
   useEffect(() => {
-    const fetch = async () => {
+    const fetchData = async () => {
       try {
-        setLoading(true);
-        setError(null);
-        const response = await accountApi.getLists();
-        setLists(response || []);
+        const [influencersRes, listsRes] = await Promise.all([
+          api.get('/influencers', { params: { page: 1, limit: 30 } }),
+          api.get('/account/lists'),
+        ]);
+
+        const infData = influencersRes.data?.data || influencersRes.data || [];
+        setInfluencers(Array.isArray(infData) ? infData : []);
+
+        const listData = listsRes.data?.data || listsRes.data || [];
+        setSavedLists(Array.isArray(listData) ? listData : []);
       } catch (err) {
-        setError(err?.message || 'Failed to load lists');
-        console.error('Error fetching lists:', err);
+        console.error('Error fetching data:', err);
+        setInfluencers([]);
+        setSavedLists([]);
       } finally {
         setLoading(false);
       }
     };
-    fetch();
+
+    fetchData();
   }, []);
 
-  const handleCreateList = async () => {
-    if (!newListName.trim()) {
-      setError('List name is required');
-      return;
-    }
+  const toggleSelect = (id) => {
+    setSelected(prev => prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]);
+  };
 
+  const handleSelectAll = () => {
+    if (selectAll) {
+      setSelected([]);
+      setSelectAll(false);
+    } else {
+      setSelected(influencers.map(i => i._id || i.id));
+      setSelectAll(true);
+    }
+  };
+
+  const handleCreateNow = async () => {
+    if (!selected.length) return;
+    setCreating(true);
     try {
-      setActionLoading(true);
-      const newList = await accountApi.createList({
-        name: newListName.trim(),
-        type: newListType,
+      await api.post('/lists', {
+        name: listName || 'My List',
+        influencers: selected.map(id => ({ influencerId: id, status: 'new' })),
       });
-      setLists([...lists, newList]);
-      setNewListName('');
-      setNewListType('custom');
-      setShowNewListModal(false);
-      setError(null);
+      setShowCreateList(false);
+      setSelected([]);
+      setListName('');
     } catch (err) {
-      setError(err?.message || 'Failed to create list');
-      console.error('Error creating list:', err);
+      console.error('Create list error:', err);
     } finally {
-      setActionLoading(false);
+      setCreating(false);
     }
   };
 
-  const handleDeleteList = async (listId) => {
-    try {
-      setActionLoading(true);
-      // Note: deleteList method doesn't exist in account-api yet
-      // For now, we'll remove from UI optimistically
-      // TODO: Add deleteList method to account-api
-      setLists(lists.filter(l => l.id !== listId));
-      setError(null);
-    } catch (err) {
-      setError(err?.message || 'Failed to delete list');
-      console.error('Error deleting list:', err);
-    } finally {
-      setActionLoading(false);
-    }
-  };
+  const bg = 'bg-[#000201]';
+  const panelCls = 'bg-[#181818] rounded-[24px] overflow-hidden';
 
-  return (
-    <div className="min-h-screen bg-white">
-      {/* Header */}
-      <div className="px-4 py-3 border-b border-gray-100 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <button
-            onClick={() => router.back()}
-            className="p-2 hover:bg-gray-100 rounded-full"
-          >
-            <ArrowLeft className="w-6 h-6" />
-          </button>
-          <h1 className="text-xl font-semibold">My Lists</h1>
-        </div>
-        <button
-          onClick={() => setShowNewListModal(true)}
-          className="p-2 hover:bg-gray-100 rounded-full"
-        >
-          <Plus className="w-6 h-6" />
-        </button>
-      </div>
-
-      {/* Error Alert */}
-      {error && (
-        <div className="p-4 m-4 bg-red-50 border border-red-200 rounded-lg flex items-start gap-3">
-          <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
-          <div className="flex-1">
-            <p className="text-sm text-red-800">{error}</p>
+  // ── Create New List view ──
+  if (showCreateList) {
+    return (
+      <div className={`min-h-screen ${bg} text-white p-5`}>
+        <div className={`${panelCls} p-5`}>
+          {/* Title + list name input */}
+          <div className="mb-5">
+            <p className="text-[24px] font-normal text-white capitalize text-center leading-[1.2] mb-4" style={{ fontFamily: 'Bricolage Grotesque, sans-serif', fontVariationSettings: '"opsz" 14, "wdth" 100' }}>
+              Create New List
+            </p>
+            <input
+              type="text"
+              value={listName}
+              onChange={e => setListName(e.target.value)}
+              placeholder="List name…"
+              className="w-full bg-[#272626] h-[40px] rounded-[8px] px-[16px] text-[14px] text-white placeholder-[#9b9b9b] outline-none"
+              style={{ fontFamily: 'Inter, sans-serif' }}
+            />
           </div>
-          <button
-            onClick={() => setError(null)}
-            className="text-red-600 hover:text-red-700 text-sm font-medium"
-          >
-            Dismiss
-          </button>
-        </div>
-      )}
 
-      {/* Loading State */}
-      {loading && (
-        <div className="p-4 space-y-4">
-          {[1, 2, 3].map(i => (
-            <div key={i} className="h-20 bg-gray-200 rounded animate-pulse" />
-          ))}
-        </div>
-      )}
-
-      {/* Empty State */}
-      {!loading && lists.length === 0 && (
-        <div className="flex flex-col items-center justify-center py-12 px-4">
-          <p className="text-center text-gray-500 text-lg">No lists created yet</p>
-          <p className="text-center text-gray-400 text-sm mt-2">Create your first list to organize items</p>
-        </div>
-      )}
-
-      {/* Lists Grid */}
-      {!loading && lists.length > 0 && (
-        <div className="p-4 space-y-4">
-          {lists.map(list => (
-            <div
-              key={list.id}
-              className="p-4 border border-gray-200 rounded-lg hover:shadow-md transition-shadow cursor-pointer"
-              onClick={() => router.push(`/influencer/account/my-lists/${list.id}`)}
+          {/* Select All row */}
+          <div className="flex items-end justify-between pb-[10px] border-b border-white/10">
+            <span className="text-[16px] font-normal text-[#9b9b9b] capitalize leading-[1.2]" style={{ fontFamily: 'Inter, sans-serif' }}>
+              Select all
+            </span>
+            <button
+              onClick={handleSelectAll}
+              className="w-[20px] h-[20px] border border-[#9b9b9b] rounded-[4px] flex items-center justify-center flex-shrink-0"
             >
-              <div className="flex items-start justify-between">
-                <div className="flex-1">
-                  <h3 className="font-semibold text-lg">{list.name}</h3>
-                  {list.description && (
-                    <p className="text-sm text-gray-500 mt-1">{list.description}</p>
-                  )}
-                  <p className="text-xs text-gray-400 mt-2">
-                    {list.type} • {list.itemCount} {list.itemCount === 1 ? 'item' : 'items'}
-                  </p>
+              {selectAll && <svg className="w-3 h-3 text-[#16a34a]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7"/></svg>}
+            </button>
+          </div>
+
+          {/* Influencer list with checkboxes */}
+          <div className="flex flex-col gap-[10px] mt-[10px] overflow-y-auto max-h-[60vh]">
+            {loading ? (
+              [...Array(6)].map((_, i) => (
+                <div key={i} className="flex items-center justify-between animate-pulse py-2">
+                  <div className="flex items-center gap-[8px]">
+                    <div className="w-[48px] h-[48px] rounded-full bg-[#272626]" />
+                    <div className="flex flex-col gap-2"><div className="h-3 bg-[#272626] rounded w-24" /><div className="h-2 bg-[#272626] rounded w-36" /></div>
+                  </div>
+                  <div className="w-[20px] h-[20px] border border-[#9b9b9b] rounded-[4px]" />
                 </div>
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleDeleteList(list.id);
-                  }}
-                  disabled={actionLoading}
-                  className="p-2 hover:bg-red-50 rounded-full disabled:opacity-50"
-                >
-                  <Trash2 className="w-5 h-5 text-red-600" />
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
-
-      {/* New List Modal */}
-      {showNewListModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg max-w-md w-full shadow-lg">
-            <div className="px-6 py-4 border-b border-gray-100">
-              <h2 className="text-xl font-semibold">Create New List</h2>
-            </div>
-
-            <div className="px-6 py-6 space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  List Name
-                </label>
-                <input
-                  type="text"
-                  value={newListName}
-                  onChange={(e) => setNewListName(e.target.value)}
-                  onKeyDown={(e) => e.key === 'Enter' && handleCreateList()}
-                  placeholder="Enter list name"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  autoFocus
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Type
-                </label>
-                <select
-                  value={newListType}
-                  onChange={(e) => setNewListType(e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
-                  <option value="custom">Custom</option>
-                  <option value="campaigns">Campaigns</option>
-                  <option value="influencers">Influencers</option>
-                  <option value="brands">Brands</option>
-                </select>
-              </div>
-            </div>
-
-            <div className="px-6 py-4 border-t border-gray-100 flex gap-2 justify-end">
-              <button
-                onClick={() => {
-                  setShowNewListModal(false);
-                  setNewListName('');
-                  setNewListType('custom');
-                }}
-                className="px-4 py-2 text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleCreateList}
-                disabled={actionLoading || !newListName.trim()}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {actionLoading ? 'Creating...' : 'Create'}
-              </button>
-            </div>
+              ))
+            ) : influencers.map((inf, idx) => {
+              const id = inf._id || inf.id;
+              const name = inf.profile?.name || inf.name || 'Influencer';
+              const subtitle = inf.profile?.bio || inf.bio || inf.about || 'Hey, any updates on the campaign?';
+              const avatar = inf.profile?.profileImage || inf.profileImage || inf.profilePicture;
+              const isChecked = selected.includes(id);
+              return (
+                <div key={id || idx}>
+                  <div className="flex items-center justify-between py-[10px]">
+                    <div className="flex items-center gap-[8px]">
+                      <div className="w-[48px] h-[48px] rounded-full bg-[#272626] overflow-hidden flex-shrink-0">
+                        {avatar ? <img src={avatar} alt={name} className="w-full h-full object-cover" /> : <span className="flex items-center justify-center w-full h-full text-white text-sm font-semibold">{getInitials(name)}</span>}
+                      </div>
+                      <div className="flex flex-col gap-[4px]">
+                        <p className="text-[16px] font-normal text-white capitalize leading-[1.2]" style={{ fontFamily: 'Bricolage Grotesque, sans-serif' }}>{name}</p>
+                        <p className="text-[12px] font-normal text-[#9b9b9b] leading-[1.2] truncate max-w-[400px]" style={{ fontFamily: 'Inter, sans-serif' }}>{subtitle}</p>
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => toggleSelect(id)}
+                      className={`w-[20px] h-[20px] border rounded-[4px] flex items-center justify-center flex-shrink-0 ${isChecked ? 'border-[#16a34a] bg-[#16a34a]/20' : 'border-[#9b9b9b]'}`}
+                    >
+                      {isChecked && <svg className="w-3 h-3 text-[#16a34a]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7"/></svg>}
+                    </button>
+                  </div>
+                  <div className="h-px bg-white/10" />
+                </div>
+              );
+            })}
           </div>
         </div>
-      )}
+
+        {/* Action buttons */}
+        <div className="flex justify-end gap-[20px] mt-5">
+          <button onClick={() => setShowCreateList(false)} className="border border-white h-[40px] w-[160px] rounded-full text-[16px] font-normal text-white capitalize hover:bg-white/10 transition-colors" style={{ fontFamily: 'Inter, sans-serif' }}>
+            Cancel
+          </button>
+          <button onClick={handleCreateNow} disabled={creating || !selected.length} className="bg-[#16a34a] hover:bg-[#15803d] h-[40px] w-[160px] rounded-full text-[16px] font-normal text-white capitalize transition-colors disabled:opacity-40" style={{ fontFamily: 'Inter, sans-serif' }}>
+            {creating ? 'Creating…' : 'Create Now'}
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // ── Saved Influencers list view ──
+  return (
+    <div className={`min-h-screen ${bg} text-white p-5`}>
+      <div className={`${panelCls} p-5`}>
+        {/* Header */}
+        <div className="flex items-center justify-between mb-5">
+          <p className="text-[24px] font-normal text-white capitalize leading-[1.2]" style={{ fontFamily: 'Bricolage Grotesque, sans-serif', fontVariationSettings: '"opsz" 14, "wdth" 100' }}>
+            Saved Influencers
+          </p>
+          <button
+            onClick={() => setShowCreateList(true)}
+            className="bg-[#16a34a] hover:bg-[#15803d] h-[40px] w-[200px] rounded-full text-[16px] font-normal text-white capitalize transition-colors"
+            style={{ fontFamily: 'Inter, sans-serif' }}
+          >
+            Create New List
+          </button>
+        </div>
+
+        {/* Category tabs */}
+        <div className="flex gap-[12px] items-center mb-5">
+          {CATEGORIES.map(cat => (
+            <button
+              key={cat}
+              onClick={() => setActiveCategory(cat)}
+              className={`px-[24px] py-[4px] rounded-full text-[14px] capitalize transition-colors ${
+                activeCategory === cat ? 'bg-[#16a34a] text-white' : 'bg-white/12 text-white hover:bg-white/20'
+              }`}
+              style={{ fontFamily: 'Inter, sans-serif' }}
+            >
+              {cat}
+            </button>
+          ))}
+        </div>
+
+        {/* Influencer rows */}
+        {loading ? (
+          <div className="flex flex-col gap-[10px]">
+            {[...Array(8)].map((_, i) => (
+              <div key={i} className="flex items-center gap-[8px] animate-pulse py-[10px]">
+                <div className="w-[48px] h-[48px] rounded-full bg-[#272626] flex-shrink-0" />
+                <div className="flex flex-col gap-2 flex-1"><div className="h-3 bg-[#272626] rounded w-24" /><div className="h-2 bg-[#272626] rounded w-48" /></div>
+              </div>
+            ))}
+          </div>
+        ) : influencers.length === 0 ? (
+          <p className="text-[#9b9b9b] text-sm text-center py-12">No saved influencers yet.</p>
+        ) : (
+          <div className="flex flex-col gap-[10px]">
+            {influencers.map((inf, idx) => {
+              const id = inf._id || inf.id;
+              const name = inf.profile?.name || inf.name || 'Influencer';
+              const subtitle = inf.profile?.bio || inf.bio || inf.about || 'Hey, any updates on the campaign?';
+              const avatar = inf.profile?.profileImage || inf.profileImage || inf.profilePicture;
+              return (
+                <div key={id || idx}>
+                  <div className="flex items-center gap-[8px] py-[10px] cursor-pointer hover:bg-white/5 rounded-lg px-2 transition-colors" onClick={() => router.push(`/influencer/influencers/${id}`)}>
+                    <div className="w-[48px] h-[48px] rounded-full bg-[#272626] overflow-hidden flex-shrink-0">
+                      {avatar ? <img src={avatar} alt={name} className="w-full h-full object-cover" /> : <span className="flex items-center justify-center w-full h-full text-white text-sm font-semibold">{getInitials(name)}</span>}
+                    </div>
+                    <div className="flex flex-col gap-[4px] min-w-0">
+                      <p className="text-[16px] font-normal text-white capitalize leading-[1.2]" style={{ fontFamily: 'Bricolage Grotesque, sans-serif' }}>{name}</p>
+                      <p className="text-[12px] font-normal text-[#9b9b9b] leading-[1.2] truncate" style={{ fontFamily: 'Inter, sans-serif' }}>{subtitle}</p>
+                    </div>
+                  </div>
+                  {idx < influencers.length - 1 && <div className="h-px bg-white/10" />}
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

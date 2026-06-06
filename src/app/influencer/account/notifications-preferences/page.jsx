@@ -28,19 +28,19 @@ export default function NotificationPreferences() {
         className="relative inline-flex items-center"
       >
         <div className={`w-11 h-8 rounded-full transition-colors flex items-center px-1 ${enabled ? 'bg-[#3d4f36]' : 'bg-gray-300'}`}>
-          <div className={`w-6 h-6 bg-white rounded-full transition-transform ${enabled ? 'translate-x-3' : 'translate-x-0'}`}></div>
+          <div className={`w-6 h-6 bg-[#181818] rounded-full transition-transform ${enabled ? 'translate-x-3' : 'translate-x-0'}`}></div>
         </div>
       </button>
     </div>
   );
 
   return (
-    <div className="w-full h-full flex flex-col bg-white">
+    <div className="w-full h-full flex flex-col bg-[#181818]">
       {/* App Bar */}
-      <div className="flex items-center justify-between px-1 py-2 border-b border-gray-100">
+      <div className="flex items-center justify-between px-1 py-2 border-b border-white/5">
         <button
           onClick={() => router.back()}
-          className="flex items-center justify-center w-12 h-12 rounded-full hover:bg-gray-100 transition-colors"
+          className="flex items-center justify-center w-12 h-12 rounded-full hover:bg-[#262626] transition-colors"
         >
           <ArrowLeft className="w-6 h-6 text-[#242527]" />
         </button>
@@ -49,7 +49,7 @@ export default function NotificationPreferences() {
           Notification preferences
         </h1>
         
-        <button className="flex items-center justify-center w-12 h-12 rounded-full hover:bg-gray-100 transition-colors">
+        <button className="flex items-center justify-center w-12 h-12 rounded-full hover:bg-[#262626] transition-colors">
           <MoreVertical className="w-6 h-6 text-[#242527]" />
         </button>
       </div>

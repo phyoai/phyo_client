@@ -1,56 +1,100 @@
-import React from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import BrandCard from '@/components/cards/BrandCard';
+import api from '@/utils/api';
 
-/**
- * Explore Brands Section
- * Displays a grid of brand cards with rounded backgrounds
- */
+const FALLBACK_COLORS = ['#a855f7', '#f59e0b', '#3b82f6', '#f97316', '#ec4899', '#eab308', '#10b981', '#ef4444'];
+
 export default function ExploreBrandsSection() {
   const router = useRouter();
+  const [brands, setBrands] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  // Mock data - will be replaced with API
-  const brands = [
-    { id: 1, name: 'Brand Name', initial: 'BN', color: 'bg-yellow-500' },
-    { id: 2, name: 'Coca-Cola', initial: 'C', color: 'bg-green-600' },
-    { id: 3, name: 'Nike', initial: 'N', color: 'bg-blue-600' },
-    { id: 4, name: 'Nike', initial: 'N', color: 'bg-red-600' },
-    { id: 5, name: 'Apple', initial: 'AE', color: 'bg-red-700' },
-    { id: 6, name: 'Samsung', initial: 'AF', color: 'bg-yellow-500' },
-    { id: 7, name: 'Tesla', initial: 'T', color: 'bg-green-600' },
-    { id: 8, name: 'Tesla', initial: 'T', color: 'bg-blue-600' }
-  ];
+  useEffect(() => {
+    api.get('/brands', { params: { page: 1, limit: 8 } })
+      .then((res) => {
+        const data = res.data?.data || res.data?.brands || res.data || [];
+        setBrands(Array.isArray(data) ? data.slice(0, 8) : []);
+      })
+      .catch(() => setBrands([]))
+      .finally(() => setLoading(false));
+  }, []);
+
+  const getBrandName = (brand) => brand.companyName || brand.name || 'Brand';
 
   return (
-    <div className="mb-8 bg-[#C5D9C0] rounded-3xl p-6">
+    <div className="bg-[#181818] rounded-[24px] p-5 border border-white/5">
       {/* Header */}
-      <div className="flex items-start justify-between mb-6">
-        <div>
-          <p className="text-[10px] text-gray-700 uppercase tracking-wide mb-1 font-medium">
+      <div className="flex items-start justify-between mb-5">
+        <div className="flex flex-col gap-[8px]">
+          <p
+            className="text-[12px] text-white uppercase tracking-widest font-normal leading-[1.2]"
+            style={{ fontFamily: 'Inter, sans-serif' }}
+          >
             TOP BRANDS THIS MONTH
           </p>
-          <h2 className="text-2xl font-bold text-gray-900">Explore Brands</h2>
+          <h2
+            className="text-[24px] font-normal text-white leading-[1.2] capitalize"
+            style={{ fontFamily: 'Bricolage Grotesque, sans-serif', fontVariationSettings: '"opsz" 14, "wdth" 100' }}
+          >
+            Explore Brands
+          </h2>
         </div>
-        <button 
+        <button
           onClick={() => router.push('/brand/explore-brands')}
-          className="px-4 py-1.5 border border-gray-800 text-gray-900 rounded-full font-medium text-sm hover:bg-gray-800 hover:text-white transition-colors"
+          className="px-[24px] py-[12px] border border-white text-white rounded-full text-[16px] font-normal hover:bg-white/10 transition-colors shrink-0"
+          style={{ fontFamily: 'Inter, sans-serif' }}
         >
-          More
+          View More
         </button>
       </div>
 
-      {/* Brands Grid - 4 columns */}
-      <div className="grid grid-cols-4 gap-3">
-        {brands.map((brand) => (
-          <BrandCard
-            key={brand.id}
-            brandName={brand.name}
-            brandInitial={brand.initial}
-            bgColor={brand.color}
-            onClick={() => router.push(`/brand/brand-profile/${brand.id}`)}
-          />
-        ))}
-      </div>
+      {/* Brands row */}
+      {loading ? (
+        <div className="flex gap-[12px] overflow-x-auto pb-1 scrollbar-hide">
+          {[...Array(8)].map((_, i) => (
+            <div key={i} className="flex flex-col items-center gap-[8px] flex-shrink-0 w-[100px] animate-pulse">
+              <div className="w-full aspect-square bg-[#2f2f2f] rounded-full" />
+              <div className="h-3 bg-[#2f2f2f] rounded w-14" />
+            </div>
+          ))}
+        </div>
+      ) : brands.length > 0 ? (
+        <div className="flex gap-[12px] overflow-x-auto pb-1 scrollbar-hide">
+          {brands.map((brand, index) => {
+            const name = getBrandName(brand);
+            const initial = name.charAt(0).toUpperCase();
+            const color = FALLBACK_COLORS[index % FALLBACK_COLORS.length];
+            return (
+              <div
+                key={brand._id || brand.id || index}
+                className="flex flex-col items-center gap-[8px] flex-shrink-0 w-[100px] cursor-pointer"
+                onClick={() => router.push(`/brand/brand-profile/${brand._id || brand.id}`)}
+              >
+                {/* Circle bg-[#2f2f2f], logo centered at size-[60px] */}
+                <div className="w-full aspect-square bg-[#2f2f2f] rounded-full overflow-hidden flex items-center justify-center hover:bg-[#3a3a3a] transition-colors">
+                  {brand.company_logo ? (
+                    <img
+                      src={brand.company_logo}
+                      alt={name}
+                      className="w-[60px] h-[60px] object-contain"
+                    />
+                  ) : (
+                    <span className="text-xl font-bold" style={{ color }}>{initial}</span>
+                  )}
+                </div>
+                <span
+                  className="text-[16px] font-normal text-white capitalize text-center leading-[1.2] w-full truncate"
+                  style={{ fontFamily: 'Inter, sans-serif' }}
+                >
+                  {name}
+                </span>
+              </div>
+            );
+          })}
+        </div>
+      ) : (
+        <p className="text-[#9b9b9b] text-sm py-4 text-center">No brands available</p>
+      )}
     </div>
   );
 }

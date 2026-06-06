@@ -4,141 +4,45 @@ import { ArrowLeft, MoreVertical, MessageSquare, UserPlus, Bookmark, ChevronLeft
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { BookmarkLine, YoutubeFill, InstagramFill, TwitterXLine, UserAddLine, Message3Line, FacebookCircleFill } from '@phyoofficial/phyo-icon-library';
+import { influencerApi } from '@/api/influencer-api';
 
-const influencersData = [
-  {
-    id: 1,
-    name: 'Campaign Chacha',
-    username: '@campaignchacha',
-    followers: '22.4k followers',
-    avatar: '/dummyAvatar.jpg',
-    coverImage: '/world-bg.png',
-    coverColor: 'from-yellow-400 to-yellow-500',
-    bio: 'Content creator specializing in campaign management and brand collaborations. Passionate about helping brands tell their story.',
-    tags: ['Marketing', 'Branding', 'Content Strategy'],
-    stats: {
-      followers: '22.4k',
-      following: '1.2k',
-      posts: '856',
-      engagement: '5.8%'
-    },
-    platforms: {
-      instagram: '22.4k',
-      youtube: '15.3k',
-      twitter: '8.9k'
-    }
-  },
-  {
-    id: 2,
-    name: 'Dadi Cool',
-    username: '@dadi_cool',
-    followers: '22.4k followers',
-    avatar: '/dummyAvatar1.jpg',
-    coverImage: '/world-bg.png',
-    coverColor: 'from-yellow-400 to-yellow-500',
-    bio: 'Lifestyle influencer sharing daily adventures and authentic moments. Love connecting with brands that value creativity.',
-    tags: ['Lifestyle', 'Fashion', 'Travel'],
-    stats: {
-      followers: '22.4k',
-      following: '980',
-      posts: '642',
-      engagement: '6.2%'
-    },
-    platforms: {
-      instagram: '22.4k',
-      youtube: '12.1k',
-      twitter: '7.5k'
-    }
-  },
-  {
-    id: 3,
-    name: 'Tech Guru',
-    username: '@techguru',
-    followers: '35.7k followers',
-    avatar: '/dummyAvatar1 2.jpg',
-    coverImage: '/world-bg.png',
-    coverColor: 'from-blue-400 to-blue-600',
-    bio: 'Technology enthusiast and reviewer. Helping people make informed decisions about tech products.',
-    tags: ['Technology', 'Reviews', 'Gadgets'],
-    stats: {
-      followers: '35.7k',
-      following: '450',
-      posts: '1024',
-      engagement: '7.1%'
-    },
-    platforms: {
-      instagram: '35.7k',
-      youtube: '42.3k',
-      twitter: '18.2k'
-    }
-  },
-  {
-    id: 4,
-    name: 'Fitness Pro',
-    username: '@fitnesspro',
-    followers: '28.9k followers',
-    avatar: '/dummyAvatar.jpg',
-    coverImage: '/world-bg.png',
-    coverColor: 'from-green-400 to-green-600',
-    bio: 'Personal trainer and fitness coach. On a mission to help people achieve their health goals.',
-    tags: ['Fitness', 'Health', 'Wellness'],
-    stats: {
-      followers: '28.9k',
-      following: '720',
-      posts: '892',
-      engagement: '6.9%'
-    },
-    platforms: {
-      instagram: '28.9k',
-      youtube: '31.5k',
-      twitter: '11.8k'
-    }
-  },
-  {
-    id: 5,
-    name: 'Foodie Delight',
-    username: '@foodiedelight',
-    followers: '41.2k followers',
-    avatar: '/dummyAvatar1.jpg',
-    coverImage: '/world-bg.png',
-    coverColor: 'from-orange-400 to-red-500',
-    bio: 'Food blogger exploring culinary adventures around the world. Sharing recipes and restaurant reviews.',
-    tags: ['Food', 'Cooking', 'Travel'],
-    stats: {
-      followers: '41.2k',
-      following: '1.5k',
-      posts: '1247',
-      engagement: '8.3%'
-    },
-    platforms: {
-      instagram: '41.2k',
-      youtube: '25.8k',
-      twitter: '9.4k'
-    }
-  },
-  {
-    id: 6,
-    name: 'Fashion Icon',
-    username: '@fashionicon',
-    followers: '52.6k followers',
-    avatar: '/dummyAvatar1 2.jpg',
-    coverImage: '/world-bg.png',
-    coverColor: 'from-pink-400 to-purple-500',
-    bio: 'Fashion designer and style consultant. Helping people discover their unique style.',
-    tags: ['Fashion', 'Style', 'Design'],
-    stats: {
-      followers: '52.6k',
-      following: '890',
-      posts: '1583',
-      engagement: '9.1%'
-    },
-    platforms: {
-      instagram: '52.6k',
-      youtube: '18.9k',
-      twitter: '14.3k'
-    }
-  }
+const COVER_COLORS = [
+  'from-yellow-400 to-yellow-500', 'from-blue-400 to-blue-600',
+  'from-green-400 to-green-600', 'from-orange-400 to-red-500',
+  'from-pink-400 to-purple-500', 'from-teal-400 to-teal-600',
 ];
+
+const formatCount = (n = 0) => {
+  if (n >= 1000000) return `${(n / 1000000).toFixed(1)}M`;
+  if (n >= 1000) return `${(n / 1000).toFixed(1)}k`;
+  return String(n);
+};
+
+const normalizeInfluencer = (inf, index) => ({
+  id: inf._id || inf.id,
+  name: inf.profile?.name || inf.name || 'Influencer',
+  username: `@${inf.profile?.username || inf.username || 'unknown'}`,
+  followers: `${formatCount(inf.stats?.followers || 0)} followers`,
+  avatar: inf.profile?.profileImage || inf.profileImage || '/dummyAvatar.jpg',
+  coverImage: '/world-bg.png',
+  coverColor: COVER_COLORS[index % COVER_COLORS.length],
+  bio: inf.profile?.bio || inf.about || '',
+  tags: inf.profile?.niche ? [inf.profile.niche] : inf.tags || [],
+  stats: {
+    followers: formatCount(inf.stats?.followers || 0),
+    following: formatCount(inf.stats?.following || 0),
+    posts: String(inf.stats?.totalPosts || inf.stats?.posts || 0),
+    engagement: `${(inf.stats?.avgEngagementRate || 0).toFixed(1)}%`,
+  },
+  platforms: {
+    instagram: formatCount(inf.socialMedia?.instagram?.followers || 0),
+    youtube: formatCount(inf.socialMedia?.youtube?.followers || 0),
+    twitter: formatCount(inf.socialMedia?.twitter?.followers || 0),
+  },
+});
+
+// placeholder so existing references compile until state loads
+const influencersData = [];
 
 const categories = ['All', 'Fitness', 'Comedy', 'Lifestyle', 'Infra', 'Real Estate', 'Travel'];
 
@@ -146,7 +50,17 @@ const TopInfluencersPage = () => {
   const router = useRouter();
   const [selectedInfluencer, setSelectedInfluencer] = useState(null);
   const [activeCategory, setActiveCategory] = useState('All');
+  const [influencers, setInfluencers] = useState([]);
+  const [loadingInfluencers, setLoadingInfluencers] = useState(true);
   const categoriesScrollRef = useRef(null);
+
+  // Fetch influencers from GET /api/influencers
+  useEffect(() => {
+    influencerApi.getAllInfluencers({}, { page: 1, limit: 20 })
+      .then(({ influencers: data }) => setInfluencers(data.map(normalizeInfluencer)))
+      .catch((err) => console.error('Failed to load influencers:', err))
+      .finally(() => setLoadingInfluencers(false));
+  }, []);
 
   const handleBack = () => {
     router.push('/brand/dashboard');
@@ -284,7 +198,20 @@ const TopInfluencersPage = () => {
 
             {/* Influencers List */}
             <div className="px-6 space-y-3">
-              {influencersData
+              {loadingInfluencers ? (
+                [...Array(5)].map((_, i) => (
+                  <div key={i} className="bg-[#f5f5f5] rounded-xl p-4 animate-pulse">
+                    <div className="flex items-center gap-3">
+                      <div className="w-12 h-12 rounded-full bg-gray-300" />
+                      <div className="flex-1 space-y-2">
+                        <div className="h-4 bg-gray-300 rounded w-32" />
+                        <div className="h-3 bg-gray-200 rounded w-48" />
+                      </div>
+                    </div>
+                  </div>
+                ))
+              ) : null}
+              {!loadingInfluencers && influencers
                 .filter(
                   (influencer) =>
                     activeCategory === 'All' ||

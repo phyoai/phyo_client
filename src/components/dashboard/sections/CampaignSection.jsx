@@ -96,7 +96,7 @@ export default function CampaignSection({
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {loading ? (
           <div className="col-span-full flex justify-center py-8">
-            <div className="text-gray-500">Loading campaigns...</div>
+            <div className="text-[#9A9A9A]">Loading campaigns...</div>
           </div>
         ) : campaigns.length > 0 ? (
           campaigns.map((campaign) => (
@@ -115,7 +115,7 @@ export default function CampaignSection({
           ))
         ) : (
           <div className="col-span-full flex justify-center py-8">
-            <div className="text-gray-500">No campaigns available</div>
+            <div className="text-[#9A9A9A]">No campaigns available</div>
           </div>
         )}
       </div>

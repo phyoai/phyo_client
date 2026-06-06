@@ -372,7 +372,7 @@ export default function ChatPage({ params }) {
 
       {/* Pending Attachment Preview */}
       {(pendingVoiceMessage || pendingAttachment) && (
-        <div className="px-4 sm:px-6 py-3 border-t border-gray-200 bg-gray-50 flex items-center justify-between">
+        <div className="px-4 sm:px-6 py-3 border-t border-gray-200 bg-[#000201] flex items-center justify-between">
           <div className="flex-1">
             {pendingVoiceMessage && (
               <div className="flex items-center gap-2">

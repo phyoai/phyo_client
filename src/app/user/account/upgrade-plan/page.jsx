@@ -1,444 +1,371 @@
 'use client';
 
-import React, { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, MoreVertical } from 'lucide-react';
+import api from '@/utils/api';
+import { userAPI } from '@/utils/api';
 
-const RadioButton = ({ selected = false, disabled = false, onChange }) => {
+function CheckIcon({ color = '#9b9b9b' }) {
   return (
-    <button
-      onClick={onChange}
-      disabled={disabled}
-      className="flex items-center justify-center w-12 h-12 shrink-0"
-    >
-      <div className="w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all"
-        style={{
-          borderColor: disabled ? '#808080' : '#43573B',
-          backgroundColor: 'transparent'
-        }}
-      >
-        {selected && (
-          <div className="w-3 h-3 rounded-full"
-            style={{ backgroundColor: disabled ? '#808080' : '#43573B' }}
-          />
-        )}
-      </div>
-    </button>
-  );
-};
-
-export default function UpgradePlan() {
-  const router = useRouter();
-  const [selectedPlan, setSelectedPlan] = useState('free');
-  const [showBillingForm, setShowBillingForm] = useState(false);
-  const [paymentSuccess, setPaymentSuccess] = useState(false);
-  const [billingData, setBillingData] = useState({
-    phone: '',
-    email: '',
-    country: 'India',
-    house: '',
-    street: '',
-    city: '',
-    state: ''
-  });
-
-  const plans = [
-    {
-      id: 'free',
-      name: 'Free',
-      price: '₹0',
-      tagColor: 'bg-[#E6E6E6] border-[#4D4D4D]',
-      textColor: 'text-[#242527]',
-      borderColor: 'border-[#E6E6E6]',
-      isCurrent: true,
-      benefits: [
-        '10 Credits/month',
-        '5 Influencer Searches',
-        'Creator Insights (Basic)',
-        'Access to All Supported Platforms',
-        'Limited AI Report Access (Preview mode)',
-        'Credit Validity: 45 Days'
-      ]
-    },
-    {
-      id: 'basic',
-      name: 'Basic',
-      price: '₹199',
-      tagColor: 'bg-[#08A64A] border-[#067635]',
-      textColor: 'text-[#B2E3C7]',
-      borderColor: 'border-[#067635]',
-      isCurrent: false,
-      benefits: [
-        '50 Credits/month',
-        '10 Advanced Searches',
-        '4 Campaign Reports',
-        'Creator Insights (Advanced)',
-        'AI-Powered Report Analyzer',
-        'Add Up to 2 Team Members',
-        'Historical Data Access (Up to 3 months)',
-        'Access to All Platforms',
-        'Email Support'
-      ]
-    },
-    {
-      id: 'professional',
-      name: 'Professional',
-      price: '₹799',
-      tagColor: 'bg-[#0B4FD9] border-[#0A48C5]',
-      textColor: 'text-[#B3C8F3]',
-      borderColor: 'border-[#08389A]',
-      isCurrent: false,
-      benefits: [
-        '250 Credits/month',
-        '20 Deep Searches',
-        '10 AI-Powered Campaign Reports',
-        'Dedicated Chat Support',
-        'AI optimizes campaigns',
-        'Unlimited Users',
-        'Historical Data (Up to 6 months)',
-        'Exportable Analytics (CSV/ PDF)',
-        'AI Smart Creators, Niche, Region, Top',
-        'Multi-Platform Aggregated Creator Profiles'
-      ]
-    },
-    {
-      id: 'enterprise',
-      name: 'Enterprise',
-      price: '₹1999',
-      tagColor: 'bg-[#FAB70C] border-[#B28209]',
-      textColor: 'text-[#8A6507]',
-      borderColor: 'border-[#B28209]',
-      isCurrent: false,
-      benefits: [
-        'Unlimited Credits/month',
-        '100 Smart Searches',
-        'AI Competitor Analysis (Track 5 competitors)',
-        'Trend Analyzer (5 trends/ month)',
-        'Campaign Auto-Optimization Insights',
-        'Reusable Campaign Templates',
-        'Dedicated Account Workspace',
-        'Priority Access to New Features',
-        'Team Analytics Dashboard',
-        'Global Creator Index Access',
-        '24/7 Priority Support'
-      ]
-    }
-  ];
-
-  // Payment success view
- // Payment success view
-if (paymentSuccess) {
-  return (
-    <div className="bg-white h-screen flex flex-col items-center justify-center px-4">
-      <style>{`
-        @keyframes popScale {
-          0% {
-            transform: scale(0);
-            opacity: 0;
-          }
-          50% {
-            transform: scale(1.1);
-          }
-          100% {
-            transform: scale(1);
-            opacity: 1;
-          }
-        }
-
-        @keyframes checkMark {
-          0% {
-            stroke-dashoffset: 100;
-            opacity: 0;
-          }
-          50% {
-            opacity: 1;
-          }
-          100% {
-            stroke-dashoffset: 0;
-            opacity: 1;
-          }
-        }
-
-        .pop-scale {
-          animation: popScale 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-        }
-
-        .check-animate {
-          stroke-dasharray: 100;
-          stroke-dashoffset: 100;
-          animation: checkMark 0.8s ease-out 0.3s forwards;
-        }
-      `}</style>
-
-      <button
-        onClick={() => router.push('/user/account')}
-        className="absolute top-4 left-4 flex items-center justify-center w-12 h-12 hover:bg-gray-100 rounded-full transition-colors"
-      >
-        <ArrowLeft className="w-6 h-6 text-[#242527]" />
-      </button>
-
-      <div className="flex flex-col items-center gap-6">
-        <div className="pop-scale">
-          <svg width="150" height="150" viewBox="0 0 150 150" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <rect width="150" height="150" fill="#E8F5E9"/>
-            <circle cx="75" cy="75" r="60" fill="#43573B"/>
-            <path d="M55 75L68 88L95 60" stroke="white" strokeWidth="8" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
-          </svg>
-        </div>
-
-        <h1 className="text-3xl font-bold text-[#242527] text-center">
-          Payment successful
-        </h1>
-
-        <p className="text-lg text-gray-600 text-center max-w-md">
-          Your plan has been updated and all features are now unlocked.
-        </p>
-
-        <button
-          onClick={() => router.push('/user/dashboard')}
-          className="bg-[#43573B] hover:bg-[#3d4f36] text-white py-3 px-8 rounded-full font-semibold transition-colors"
-        >
-          Go to home
-        </button>
-      </div>
-    </div>
+    <svg width="21" height="12" viewBox="0 0 21 12" fill="none" className="flex-shrink-0">
+      <path d="M1.5 6L7.5 11L19.5 1" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
   );
 }
 
-  // Billing form view
-  if (showBillingForm) {
+const PLANS = [
+  {
+    id: 'bronze',
+    name: 'Bronze',
+    price: '$0',
+    priceSub: 'free forever',
+    desc: 'Perfect for early-stage creators, startups, and curious users.',
+    cta: 'Start Free',
+    ctaNote: 'Free forever, no credit card required.',
+    highlight: false,
+    popular: false,
+    includes: 'Free plan includes',
+    benefits: [
+      '10 Credits/month',
+      '5 Influencer Searches',
+      'Creator Insights (Basic)',
+      'Access to All Supported Platforms',
+      'Limited AI Report Access (Preview mode)',
+      'Credit Validity: 45 Days',
+    ],
+  },
+  {
+    id: 'silver',
+    name: 'Silver',
+    price: '$194',
+    priceSub: '/Month',
+    desc: 'Best for freelancers, boutique agencies, or small teams.',
+    cta: 'Upgrade Now',
+    ctaNote: 'Billed annually.',
+    highlight: true,
+    popular: true,
+    includes: 'Silver Plan includes',
+    benefits: [
+      '50 Credits/month',
+      '10 Advanced Searches',
+      '4 Campaign Reports',
+      'Creator Insights (Advanced)',
+      'AI-Powered Report Analyzer',
+      'Add Up to 2 Team Members',
+      'Historical Data Access (Up to 3 months)',
+      'Access to All Platforms',
+      'Email Support',
+    ],
+  },
+  {
+    id: 'gold',
+    name: 'Gold',
+    price: '$806',
+    priceSub: '/Month',
+    desc: 'Perfect for growing brands and mid-size teams.',
+    cta: 'Upgrade Now',
+    ctaNote: 'Billed annually.',
+    highlight: false,
+    popular: false,
+    includes: 'Gold Plan includes',
+    benefits: [
+      '250 Credits/month',
+      '20 Deep Searches',
+      '10 AI-Powered Campaign Reports',
+      'Dedicated Chat Support',
+      'AI optimizes campaigns',
+      'Unlimited Users',
+      'Historical Data (Up to 6 months)',
+      'Exportable Analytics (CSV/PDF)',
+      'AI Smart Creators, Niche, Region, Top',
+      'Multi-Platform Aggregated Creator Profiles',
+    ],
+  },
+  {
+    id: 'premium',
+    name: 'Premium',
+    price: '$2030',
+    priceSub: '/Month',
+    desc: 'Perfect for global agencies managing multiple campaigns.',
+    cta: 'Upgrade Now',
+    ctaNote: 'Billed annually.',
+    highlight: false,
+    popular: false,
+    includes: 'Premium Plan includes',
+    benefits: [
+      'Unlimited Credits/month',
+      '100 Smart Searches',
+      'AI Competitor Analysis (Track 5 competitors)',
+      'Trend Analyzer (5 trends/month)',
+      'Campaign Auto-Optimization Insights',
+      'Reusable Campaign Templates',
+      'Dedicated Account Workspace',
+      'Priority Access to New Features',
+      'Team Analytics Dashboard',
+      'Global Creator Index Access',
+      '24/7 Priority Support',
+    ],
+  },
+];
+
+export default function UpgradePlan() {
+  const router = useRouter();
+  const [user, setUser] = useState(null);
+  const [selected, setSelected] = useState('silver');
+  const [submitting, setSubmitting] = useState(false);
+  const [paymentError, setPaymentError] = useState(null);
+  const [paymentSuccess, setPaymentSuccess] = useState(false);
+  const [plansLoading, setPlansLoading] = useState(true);
+  const [displayPlans, setDisplayPlans] = useState(PLANS);
+
+  // Fetch user profile and plans on mount
+  useEffect(() => {
+    const fetchUserAndPlans = async () => {
+      try {
+        setPlansLoading(true);
+
+        // Fetch current user profile
+        const userResponse = await userAPI.getUserProfile();
+        const userData = userResponse.data || userResponse.user || userResponse;
+        setUser(userData);
+
+        // Fetch available plans from Razorpay
+        const res = await api.get('/payment/razorpay/plans', { params: { count: 20, skip: 0 } });
+        const items = res.data?.data?.items || res.data?.items || [];
+
+        if (items.length > 0) {
+          const updatedPlans = PLANS.map(plan => {
+            const apiPlan = items.find(p => {
+              const itemName = (p.item?.name || p.name || '').toLowerCase();
+              return itemName.includes(plan.name.toLowerCase());
+            });
+
+            if (apiPlan && plan.id !== 'bronze') {
+              const priceInRupees = (apiPlan.item?.amount || apiPlan.amount || 0) / 100;
+              return {
+                ...plan,
+                price: `₹${priceInRupees}`,
+                priceSub: '/Month',
+                apiPlanId: apiPlan.id,
+              };
+            }
+            return plan;
+          });
+          setDisplayPlans(updatedPlans);
+        }
+      } catch (err) {
+        console.error('Error fetching user or plans:', err);
+        setPaymentError('Failed to load plans. Please try again.');
+      } finally {
+        setPlansLoading(false);
+      }
+    };
+
+    fetchUserAndPlans();
+  }, []);
+
+  const handleProceed = async () => {
+    const plan = displayPlans.find(p => p.id === selected);
+    if (!plan || plan.id === 'bronze' || !user) return;
+
+    setSubmitting(true);
+    setPaymentError(null);
+
+    try {
+      // Step 1: Create subscription via Razorpay
+      const subscriptionResponse = await api.post('/payment/razorpay/subscriptions', {
+        plan_id: plan.apiPlanId || plan.id,
+        user_id: user._id || user.id,
+        total_count: 12, // Billed annually (12 months)
+      });
+
+      if (subscriptionResponse.data?.success && subscriptionResponse.data?.data) {
+        const subscriptionData = subscriptionResponse.data.data;
+
+        // Step 2: Redirect to Razorpay payment
+        if (subscriptionData.short_url) {
+          // Store subscription ID for verification after payment
+          sessionStorage.setItem('subscription_id', subscriptionData.id);
+          // Redirect to Razorpay payment page
+          // Razorpay will redirect back to payment-success page after payment
+          window.location.href = subscriptionData.short_url;
+        } else if (subscriptionData.id) {
+          // If no short_url but we have subscription ID, redirect to payment success handler
+          router.push(`/user/account/payment-success?subscription_id=${subscriptionData.id}`);
+        } else {
+          setPaymentError('Failed to create payment link. Please try again.');
+        }
+      } else {
+        setPaymentError(subscriptionResponse.data?.message || 'Failed to create subscription. Please try again.');
+      }
+    } catch (err) {
+      console.error('Error creating subscription:', err);
+      setPaymentError(
+        err?.response?.data?.message ||
+        err?.message ||
+        'Payment failed. Please try again.'
+      );
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  if (paymentSuccess) {
     return (
-      <div className="bg-white h-screen flex flex-col">
-        {/* Header */}
-        <div className="flex items-center justify-between px-4 py-4 border-b border-gray-100">
-          <button
-            onClick={() => setShowBillingForm(false)}
-            className="flex items-center justify-center w-12 h-12 hover:bg-gray-100 rounded-full transition-colors"
-          >
-            <ArrowLeft className="w-6 h-6 text-[#242527]" />
-          </button>
-          <h2 className="text-xl font-semibold text-[#242527]" style={{ fontFamily: 'Manrope, sans-serif' }}>
-            Billing
-          </h2>
-          <div className="w-12" />
+      <div className="min-h-screen bg-[#000201] flex flex-col items-center justify-center gap-6 px-4">
+        <div className="w-[120px] h-[120px] rounded-full bg-[#16a34a]/20 flex items-center justify-center">
+          <svg width="60" height="60" viewBox="0 0 60 60" fill="none">
+            <circle cx="30" cy="30" r="28" fill="#16a34a" />
+            <path d="M18 30L25 37L42 20" stroke="white" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
         </div>
+        <h1 className="text-[32px] font-semibold text-white text-center" style={{ fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+          Subscription Created
+        </h1>
+        <p className="text-[16px] text-[#9b9b9b] text-center max-w-md" style={{ fontFamily: 'Inter, sans-serif' }}>
+          Your subscription has been created. You will be redirected to complete payment.
+        </p>
+        <button
+          onClick={() => router.push('/user/account')}
+          className="bg-[#16a34a] hover:bg-[#15803d] text-white px-[32px] h-[44px] rounded-full text-[16px] font-normal capitalize transition-colors"
+          style={{ fontFamily: 'Inter, sans-serif' }}
+        >
+          Go to Account
+        </button>
+      </div>
+    );
+  }
 
-        {/* Form Content */}
-        <div className="flex-1 overflow-y-auto px-6 py-6">
-          <form className="space-y-6">
-            {/* Contact Details Section */}
-            <div>
-              <h3 className="text-lg font-semibold text-[#242527] mb-4">Contact Details</h3>
-
-              {/* Phone Number */}
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-[#242527] mb-2">Phone number</label>
-                <div className="flex gap-2">
-                  <select className="w-20 bg-gray-100 border border-gray-200 rounded px-3 py-2 text-[#242527]">
-                    <option>+91</option>
-                  </select>
-                  <input
-                    type="text"
-                    placeholder="07ABCDE1234F1Z5"
-                    value={billingData.phone}
-                    onChange={(e) => setBillingData({ ...billingData, phone: e.target.value })}
-                    className="flex-1 bg-gray-100 border border-gray-200 rounded px-4 py-2 text-[#242527] placeholder-gray-400"
-                  />
-                </div>
-              </div>
-
-              {/* Email */}
-              <div>
-                <label className="block text-sm font-medium text-[#242527] mb-2">Finance Contact Email</label>
-                <input
-                  type="email"
-                  placeholder="jhondoe@gmail.com"
-                  value={billingData.email}
-                  onChange={(e) => setBillingData({ ...billingData, email: e.target.value })}
-                  className="w-full bg-gray-100 border border-gray-200 rounded px-4 py-2 text-[#242527] placeholder-gray-400"
-                />
-              </div>
-            </div>
-
-            {/* Billing Address Section */}
-            <div>
-              <h3 className="text-lg font-semibold text-[#242527] mb-4">Billing Address</h3>
-
-              {/* Country */}
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-[#242527] mb-2">Country/Region</label>
-                <select
-                  value={billingData.country}
-                  onChange={(e) => setBillingData({ ...billingData, country: e.target.value })}
-                  className="w-full bg-gray-100 border border-gray-200 rounded px-4 py-2 text-[#242527]"
-                >
-                  <option>India</option>
-                  <option>USA</option>
-                  <option>UK</option>
-                </select>
-              </div>
-
-              {/* House/Building No */}
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-[#242527] mb-2">House/Building No.</label>
-                <input
-                  type="text"
-                  placeholder="H-32"
-                  value={billingData.house}
-                  onChange={(e) => setBillingData({ ...billingData, house: e.target.value })}
-                  className="w-full bg-gray-100 border border-gray-200 rounded px-4 py-2 text-[#242527] placeholder-gray-400"
-                />
-              </div>
-
-              {/* Street */}
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-[#242527] mb-2">Street No.</label>
-                <input
-                  type="text"
-                  placeholder="Street No.4"
-                  value={billingData.street}
-                  onChange={(e) => setBillingData({ ...billingData, street: e.target.value })}
-                  className="w-full bg-gray-100 border border-gray-200 rounded px-4 py-2 text-[#242527] placeholder-gray-400"
-                />
-              </div>
-
-              {/* City */}
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-[#242527] mb-2">City</label>
-                <input
-                  type="text"
-                  placeholder="Saket"
-                  value={billingData.city}
-                  onChange={(e) => setBillingData({ ...billingData, city: e.target.value })}
-                  className="w-full bg-gray-100 border border-gray-200 rounded px-4 py-2 text-[#242527] placeholder-gray-400"
-                />
-              </div>
-
-              {/* State */}
-              <div>
-                <label className="block text-sm font-medium text-[#242527] mb-2">State</label>
-                <input
-                  type="text"
-                  placeholder="State"
-                  value={billingData.state}
-                  onChange={(e) => setBillingData({ ...billingData, state: e.target.value })}
-                  className="w-full bg-gray-100 border border-gray-200 rounded px-4 py-2 text-[#242527] placeholder-gray-400"
-                />
-              </div>
-            </div>
-          </form>
-        </div>
-
-        {/* Proceed Button */}
-        <div className="sticky bottom-0 px-6 py-4 border-t border-gray-100 flex justify-center bg-white">
-          <button
-            onClick={() => setPaymentSuccess(true)}
-            className="bg-[#43573B] hover:bg-[#3d4f36] text-white py-3 px-8 rounded-full font-semibold transition-colors"
-          >
-            Proceed to payment
-          </button>
+  if (plansLoading) {
+    return (
+      <div className="min-h-screen bg-[#000201] flex items-center justify-center">
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-12 h-12 border-4 border-[#272626] border-t-[#16a34a] rounded-full animate-spin" />
+          <p className="text-[#9b9b9b]" style={{ fontFamily: 'Inter, sans-serif' }}>Loading plans...</p>
         </div>
       </div>
     );
   }
 
-  // Plans view (default)
   return (
-    <div className="bg-white h-screen flex flex-col">
-      {/* Header/App Bar */}
-      <div className="bg-white flex items-center justify-between px-1 py-2 border-b border-gray-100 shrink-0">
-        <button
-          onClick={() => router.push('/user/account')}
-          className="flex items-center justify-center w-12 h-12 hover:bg-gray-100 rounded-full transition-colors"
-        >
-          <ArrowLeft className="w-6 h-6 text-[#242527]" />
-        </button>
+    <div className="min-h-screen bg-[#000201] text-white">
+      {/* Pricing cards — horizontal scroll on mobile */}
+      <div className="flex gap-[20px] p-5 overflow-x-auto pb-[100px]">
+        {displayPlans.map(plan => (
+          <div
+            key={plan.id}
+            onClick={() => setSelected(plan.id)}
+            className={`relative flex-shrink-0 w-[285px] h-[907px] rounded-[24px] overflow-hidden cursor-pointer transition-all ${
+              plan.highlight
+                ? 'bg-gradient-to-b from-[#16a34a] to-[#073618]'
+                : 'bg-[#272626]'
+            } ${selected === plan.id ? 'ring-2 ring-white/40' : ''}`}
+          >
+            {/* Most Popular badge */}
+            {plan.popular && (
+              <div className="absolute top-0 right-0 w-[103px] h-[28px] bg-[#0f5132] flex items-center justify-center rounded-bl-[8px]">
+                <span className="text-[12px] font-normal text-[#e3e3e3] capitalize leading-[1.2]" style={{ fontFamily: 'Inter, sans-serif' }}>
+                  most popular
+                </span>
+              </div>
+            )}
 
-        <div className="flex-1 px-2">
-          <h2 className="text-xl font-semibold text-[#242527]" style={{ fontFamily: 'Manrope, sans-serif' }}>
-            Plans & Billings
-          </h2>
-        </div>
+            <div className="p-[20px] flex flex-col h-full">
+              {/* Plan name */}
+              <p
+                className="text-[36px] font-semibold text-white capitalize leading-[1.2] mb-[12px]"
+                style={{ fontFamily: 'Bricolage Grotesque, sans-serif', fontVariationSettings: '"opsz" 14, "wdth" 100' }}
+              >
+                {plan.name}
+              </p>
 
-        <button className="flex items-center justify-center w-12 h-12 hover:bg-gray-100 rounded-full transition-colors">
-          <MoreVertical className="w-6 h-6 text-[#242527]" />
-        </button>
-      </div>
-
-      {/* Plans Container */}
-      <div className="flex-1 px-9 py-4">
-        <div className="flex gap-3 h-full min-w-max">
-          {plans.map((plan) => (
-            <div
-              key={plan.id}
-              className={`bg-[#F0F0F0] border-2 ${plan.borderColor} rounded-xl flex-1 min-w-[250px] max-w-[280px] flex flex-col py-3 transition-all hover:shadow-lg cursor-pointer`}
-              onClick={() => !plan.isCurrent && setSelectedPlan(plan.id)}
-            >
-              {/* Current Plan Label (only for free plan) */}
-              {plan.isCurrent && (
-                <div className="px-4 mb-3">
-                  <p className="text-xs text-[#808080] tracking-wide" style={{ fontFamily: 'Inter, sans-serif' }}>
-                    Current Plan
-                  </p>
-                </div>
-              )}
-
-              {/* Tag & Radio Button */}
-              <div className="flex items-center justify-between pl-4 mb-5">
-                <div className={`${plan.tagColor} border rounded px-1.5 py-0.5`}>
-                  <span className={`${plan.textColor} text-xs font-medium tracking-wide`} style={{ fontFamily: 'Work Sans, sans-serif' }}>
-                    {plan.name}
-                  </span>
-                </div>
-                <RadioButton
-                  selected={selectedPlan === plan.id}
-                  disabled={plan.isCurrent}
-                  onChange={() => !plan.isCurrent && setSelectedPlan(plan.id)}
-                />
+              {/* Price + period */}
+              <div className="flex items-baseline gap-[4px] mb-[4px]">
+                <span
+                  className="text-[36px] font-semibold text-white leading-[1.2]"
+                  style={{ fontFamily: 'Bricolage Grotesque, sans-serif', fontVariationSettings: '"opsz" 14, "wdth" 100' }}
+                >
+                  {plan.price}
+                </span>
+                <span
+                  className={`text-[16px] font-normal leading-[1.6] ${plan.highlight ? 'text-[#e3e3e3]' : 'text-[#9b9b9b]'}`}
+                  style={{ fontFamily: 'Inter, sans-serif' }}
+                >
+                  {plan.priceSub}
+                </span>
               </div>
 
-              {/* Pricing */}
-              <div className="flex flex-col gap-0 mb-5">
-                <div className="px-4">
-                  <p className="text-4xl font-bold text-[#242527] leading-tight" style={{ fontFamily: 'Manrope, sans-serif' }}>
-                    {plan.price}
-                  </p>
-                </div>
-                <div className="px-4">
-                  <p className="text-xl font-semibold text-[#242527]" style={{ fontFamily: 'Manrope, sans-serif' }}>
-                    {plan.name}
-                  </p>
-                </div>
+              {/* Description */}
+              <p
+                className={`text-[16px] font-normal leading-[1.6] mb-[32px] ${plan.highlight ? 'text-[#e3e3e3]' : 'text-[#9b9b9b]'}`}
+                style={{ fontFamily: 'Inter, sans-serif' }}
+              >
+                {plan.desc}
+              </p>
+
+              {/* CTA Button */}
+              <div className="flex flex-col gap-[12px] mb-[32px]">
+                <button
+                  className="w-full h-[48px] border border-white rounded-full text-[16px] font-medium text-white capitalize hover:bg-white/10 transition-colors"
+                  style={{ fontFamily: 'Inter, sans-serif' }}
+                  onClick={e => { e.stopPropagation(); setSelected(plan.id); }}
+                >
+                  {plan.cta}
+                </button>
+                <p
+                  className={`text-[12px] font-normal text-center leading-[1.6] ${plan.highlight ? 'text-[#e3e3e3]' : 'text-[#9b9b9b]'}`}
+                  style={{ fontFamily: 'Inter, sans-serif' }}
+                >
+                  {plan.ctaNote}
+                </p>
               </div>
 
-              {/* Benefits */}
-              <div className="flex-1 px-4 overflow-y-auto">
-                <ul className="text-[#333] text-base space-y-1" style={{ fontFamily: 'Work Sans, sans-serif' }}>
-                  {plan.benefits.map((benefit, index) => (
-                    <li key={index} className="flex items-start leading-6">
-                      <span className="mr-2">•</span>
-                      <span>{benefit}</span>
-                    </li>
-                  ))}
-                </ul>
+              {/* Includes heading */}
+              <p
+                className="text-[20px] font-semibold text-white capitalize leading-[1.2] mb-[8px]"
+                style={{ fontFamily: 'Bricolage Grotesque, sans-serif', fontVariationSettings: '"opsz" 14, "wdth" 100' }}
+              >
+                {plan.includes}
+              </p>
+
+              {/* Benefits list */}
+              <div className="flex flex-col gap-[8px] overflow-y-auto flex-1">
+                {plan.benefits.map((benefit, i) => (
+                  <div key={i} className="flex items-start gap-[8px]">
+                    <CheckIcon color={plan.highlight ? '#e3e3e3' : '#9b9b9b'} />
+                    <p
+                      className={`text-[16px] font-normal leading-[1.6] ${plan.highlight ? 'text-[#e3e3e3]' : 'text-[#9b9b9b]'}`}
+                      style={{ fontFamily: 'Inter, sans-serif' }}
+                    >
+                      {benefit}
+                    </p>
+                  </div>
+                ))}
               </div>
             </div>
-          ))}
-        </div>
+          </div>
+        ))}
       </div>
 
-      {/* Proceed to Billing Button */}
-      <div className="sticky bottom-0 px-9 py-4 border-t border-gray-100 flex justify-center bg-white">
+      {/* Sticky bottom action bar */}
+      <div className="fixed bottom-0 right-0 left-0 flex justify-end gap-[20px] px-5 py-4 bg-[#000201]/90 backdrop-blur border-t border-white/5">
+        {paymentError && (
+          <p className="text-red-400 text-sm self-center">{paymentError}</p>
+        )}
         <button
-          onClick={() => setShowBillingForm(true)}
-          disabled={selectedPlan === 'free'}
-          className={`py-3 px-8 rounded-full font-semibold transition-colors min-h-[48px] flex items-center justify-center ${
-            selectedPlan === 'free'
-              ? 'bg-gray-300 text-gray-600 cursor-not-allowed'
-              : 'bg-[#43573B] hover:bg-[#3d4f36] text-white'
-          }`}
+          onClick={() => router.push('/user/account')}
+          className="border border-white h-[40px] w-[160px] rounded-full text-[16px] font-normal text-white capitalize hover:bg-white/10 transition-colors"
+          style={{ fontFamily: 'Inter, sans-serif' }}
         >
-          {selectedPlan === 'free' ? 'Select a plan to proceed' : 'Proceed to billing'}
+          Cancel
+        </button>
+        <button
+          onClick={handleProceed}
+          disabled={submitting || selected === 'bronze'}
+          className="bg-[#16a34a] hover:bg-[#15803d] h-[40px] w-[160px] rounded-full text-[16px] font-normal text-white capitalize transition-colors disabled:opacity-40"
+          style={{ fontFamily: 'Inter, sans-serif' }}
+        >
+          {submitting ? 'Processing…' : 'Proceed to Pay'}
         </button>
       </div>
     </div>

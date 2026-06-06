@@ -39,18 +39,18 @@ export default function ExploreBrandsSection() {
   }, []);
 
   return (
-    <div className="mb-8 bg-[#C5D9C0] rounded-3xl p-6">
+    <div className="mb-8 bg-[#181818] rounded-3xl p-6 border border-white/5">
       {/* Header */}
       <div className="flex items-start justify-between mb-6">
         <div>
-          <p className="text-[10px] text-gray-700 uppercase tracking-wide mb-1 font-medium">
+          <p className="text-[10px] text-[#9A9A9A] uppercase tracking-wide mb-1 font-medium">
             TOP BRANDS THIS MONTH
           </p>
-          <h2 className="text-2xl font-bold text-gray-900">Explore Brands</h2>
+          <h2 className="text-2xl font-normal text-white" style={{ fontFamily: 'var(--font-bricolage-grotesque)' }}>Explore Brands</h2>
         </div>
         <button 
           onClick={() => router.push(`/${role}/brand/explore-brands`)}
-          className="px-4 py-1.5 border border-gray-800 text-gray-900 rounded-full font-medium text-sm hover:bg-gray-800 hover:text-white transition-colors"
+          className="px-4 py-1.5 border border-white/10 text-white rounded-full font-medium text-sm hover:bg-white/5 transition-colors"
         >
           More
         </button>
@@ -62,7 +62,7 @@ export default function ExploreBrandsSection() {
           {Array(8).fill(null).map((_, i) => (
             <div
               key={i}
-              className="aspect-square bg-gray-300 rounded-lg animate-pulse"
+              className="aspect-square bg-[#262626] rounded-3xl animate-pulse"
             />
           ))}
         </div>
@@ -83,7 +83,7 @@ export default function ExploreBrandsSection() {
             ))
           ) : (
             <div className="col-span-4 text-center py-4">
-              <p className="text-gray-500 text-sm">No brands found</p>
+              <p className="text-[#9A9A9A] text-sm">No brands found</p>
             </div>
           )}
         </div>

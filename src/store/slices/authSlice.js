@@ -21,12 +21,14 @@ export const loginUser = createAsyncThunk(
       const response = await api.post('/auth/login', { email, password });
       const data = response.data || response;
 
-      // API returns { token, data: { id, email, type } }
-      const user = data.data || data.user;
+      // API handoff doc: token = payload?.token || payload?.data?.token
+      // user = payload?.user || payload?.data?.user || payload?.data
+      const token = data.token || data.data?.token;
+      const user = data.user || data.data?.user || data.data;
 
       return {
-        token: data.token,
-        user: user,
+        token,
+        user,
       };
     } catch (error) {
       return rejectWithValue(error.message || 'Login failed');
@@ -50,7 +52,8 @@ export const verifyResetCode = createAsyncThunk(
   'auth/verifyResetCode',
   async ({ email, code }, { rejectWithValue }) => {
     try {
-      await api.post('/auth/verify-reset-code', { email, code });
+      // API handoff doc: reset verification endpoint is `/auth/verify-code`.
+      await api.post('/auth/verify-code', { email, code });
       return { success: true, email };
     } catch (error) {
       return rejectWithValue(error.message || 'Invalid or expired code');
@@ -90,7 +93,8 @@ export const resendEmailOtp = createAsyncThunk(
   'auth/resendEmailOtp',
   async ({ email }, { rejectWithValue }) => {
     try {
-      await api.post('/auth/resend-email-otp', { email });
+      // API handoff doc: resend OTP endpoint is /auth/resend-otp
+      await api.post('/auth/resend-otp', { email });
       return { success: true, email };
     } catch (error) {
       return rejectWithValue(error.message || 'Failed to resend OTP');

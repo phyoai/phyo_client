@@ -44,10 +44,10 @@ export default function TrendingInfluencersSection() {
       {loading && (
         <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
           {Array(10).fill(null).map((_, i) => (
-            <div
-              key={i}
-              className="w-16 h-16 bg-gray-200 rounded-full flex-shrink-0 animate-pulse"
-            />
+              <div
+                key={i}
+                className="w-16 h-16 bg-[#262626] rounded-full flex-shrink-0 animate-pulse border border-white/5"
+              />
           ))}
         </div>
       )}
@@ -66,7 +66,7 @@ export default function TrendingInfluencersSection() {
               />
             ))
           ) : (
-            <p className="text-gray-500 text-sm">No trending influencers found</p>
+            <p className="text-[#9A9A9A] text-sm">No trending influencers found</p>
           )}
         </div>
       )}

@@ -17,7 +17,7 @@ const AllCampaignsSection = nextDynamic(() => import('./AllCampaignsSection'), {
           </div>
         </div>
 
-        {/* Section Heading Skeleton */}eee
+        {/* Section Heading Skeleton */}
         <div className="mb-6">
           <div className="flex items-center justify-between mb-4">
             <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-40 animate-pulse"></div>

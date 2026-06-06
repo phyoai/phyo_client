@@ -391,14 +391,14 @@ const AllCampaignsSection = () => {
     <div className="flex items-center">
       <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium
         ${status === 'completed' ? 'bg-green-600 text-white' : 
-          status === 'current' ? 'bg-green-600 text-white' : 'bg-gray-200 text-gray-400'}`}>
+          status === 'current' ? 'bg-green-600 text-white' : 'bg-[#2f2f2f] text-[#808080]'}`}>
         {status === 'completed' ? <Check className="w-4 h-4" /> : stepNumber}
       </div>
       <div className="ml-3">
-        <div className={`text-sm font-medium ${status === 'current' ? 'text-gray-900' : 'text-gray-500'}`}>
+        <div className={`text-sm font-medium ${status === 'current' ? 'text-white' : 'text-[#9A9A9A]'}`}>
           STEP {stepNumber}
         </div>
-        <div className={`text-sm ${status === 'current' ? 'text-gray-900' : 'text-gray-500'}`}>
+        <div className={`text-sm ${status === 'current' ? 'text-white' : 'text-[#9A9A9A]'}`}>
           {title}
         </div>
         {status === 'current' && (
@@ -408,7 +408,7 @@ const AllCampaignsSection = () => {
           <div className="text-xs text-green-600 font-medium">Completed</div>
         )}
         {status === 'pending' && (
-          <div className="text-xs text-gray-400">Pending</div>
+          <div className="text-xs text-[#808080]">Pending</div>
         )}
       </div>
     </div>
@@ -462,16 +462,16 @@ const AllCampaignsSection = () => {
     return (
       <div 
         onClick={() => handleCampaignClick(campaign)}
-        className={`bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden hover:shadow-md transition-shadow relative cursor-pointer ${campaign.isGrayed ? 'opacity-50' : ''}`}
+        className={`bg-[#181818] rounded-lg border border-white/10 shadow-none overflow-hidden hover:shadow-none transition-shadow relative cursor-pointer ${campaign.isGrayed ? 'opacity-50' : ''}`}
       >
         {/* Header with Status and Menu */}
-        <div className="p-4 border-b border-gray-100">
+        <div className="p-4 border-b border-white/5">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-medium text-gray-900">{brandName}</span>
+            <span className="text-sm font-medium text-white">{brandName}</span>
             <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
               <span className={`text-xs px-2 py-1 rounded ${
                 status === 'Active' ? 'text-green-600 bg-green-50' :
-                status === 'Draft' ? 'text-gray-600 bg-gray-50' :
+                status === 'Draft' ? 'text-[#9A9A9A] bg-[#000201]' :
                 status === 'Completed' ? 'text-blue-600 bg-blue-50' :
                 'text-orange-600 bg-orange-50'
               }`}>
@@ -485,19 +485,19 @@ const AllCampaignsSection = () => {
                     e.stopPropagation();
                     setOpenMenuId(openMenuId === campaign._id ? null : campaign._id);
                   }}
-                  className="p-1 hover:bg-gray-100 rounded-full transition-colors"
+                  className="p-1 hover:bg-[#262626] rounded-full transition-colors"
                 >
-                  <MoreVertical className="w-4 h-4 text-gray-600" />
+                  <MoreVertical className="w-4 h-4 text-[#9A9A9A]" />
                 </button>
                 
                 {openMenuId === campaign._id && (
-                  <div className="absolute right-0 mt-2 w-40 bg-white rounded-lg shadow-lg border border-gray-200 z-10">
+                  <div className="absolute right-0 mt-2 w-40 bg-[#181818] rounded-lg shadow-lg border border-white/10 z-10">
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
                         handleDetailClick();
                       }}
-                      className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
+                      className="w-full px-4 py-2 text-left text-sm text-[#9A9A9A] hover:bg-[#000201] flex items-center gap-2"
                     >
                       <Edit className="w-4 h-4" />
                       View/Edit Campaign
@@ -540,7 +540,7 @@ const AllCampaignsSection = () => {
                   <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-blue-50 to-blue-100">
                     <div className="flex flex-col items-center gap-3">
                       <div className="animate-spin rounded-full h-10 w-10 border-3 border-green-600 border-t-transparent"></div>
-                      <p className="text-sm text-gray-600 font-medium">Loading image...</p>
+                      <p className="text-sm text-[#9A9A9A] font-medium">Loading image...</p>
                     </div>
                   </div>
                 )}
@@ -564,7 +564,7 @@ const AllCampaignsSection = () => {
               <div className="w-32 h-40 bg-gray-800 rounded-t-lg relative">
                 <div className="w-full h-full bg-gray-800 rounded-t-lg relative">
                   <div className="absolute top-2 left-1/2 transform -translate-x-1/2 w-4 h-6 bg-blue-500 rounded-t"></div>
-                  <div className="absolute top-8 left-1/2 transform -translate-x-1/2 w-20 h-20 bg-white rounded-lg flex items-center justify-center">
+                  <div className="absolute top-8 left-1/2 transform -translate-x-1/2 w-20 h-20 bg-[#181818] rounded-lg flex items-center justify-center">
                     <div className="text-xs text-gray-800 font-bold text-center">BRAND<br/>LOGO</div>
                   </div>
                 </div>
@@ -574,32 +574,32 @@ const AllCampaignsSection = () => {
 
           {/* Campaign Info */}
           <div className="space-y-2">
-            <h3 className="text-base font-semibold text-gray-900 line-clamp-2">{campaignName}</h3>
+            <h3 className="text-base font-semibold text-white line-clamp-2">{campaignName}</h3>
             
             <div className="flex items-center justify-between">
               <span className="text-sm font-medium text-green-600">Budget: {budget}</span>
-              <span className="text-xs text-gray-500 capitalize">{campaign.campaignType}</span>
+              <span className="text-xs text-[#9A9A9A] capitalize">{campaign.campaignType}</span>
             </div>
 
-            <div className="pt-2 border-t border-gray-100">
+            <div className="pt-2 border-t border-white/5">
               <div className="grid grid-cols-3 gap-2 text-center">
                 <div>
-                  <div className="text-lg font-semibold text-gray-900">{influencerCount}</div>
-                  <div className="text-xs text-gray-500">Target</div>
+                  <div className="text-lg font-semibold text-white">{influencerCount}</div>
+                  <div className="text-xs text-[#9A9A9A]">Target</div>
                 </div>
                 <div>
                   <div className="text-lg font-semibold text-blue-600">{applicantsCount}</div>
-                  <div className="text-xs text-gray-500">Applicants</div>
+                  <div className="text-xs text-[#9A9A9A]">Applicants</div>
                 </div>
                 <div>
                   <div className="text-lg font-semibold text-green-600">{selectedCount}</div>
-                  <div className="text-xs text-gray-500">Selected</div>
+                  <div className="text-xs text-[#9A9A9A]">Selected</div>
                 </div>
               </div>
             </div>
 
             {campaign.createdAt && (
-              <div className="text-xs text-gray-400 pt-2">
+              <div className="text-xs text-[#808080] pt-2">
                 Created: {new Date(campaign.createdAt).toLocaleDateString()}
               </div>
             )}
@@ -610,17 +610,17 @@ const AllCampaignsSection = () => {
   };
 
   const InfluencerCard = ({ influencer }) => (
-    <div className="bg-white rounded-lg border border-gray-200 p-4 hover:shadow-md transition-shadow">
+    <div className="bg-[#181818] rounded-lg border border-white/10 p-4 hover:shadow-none transition-shadow">
       <div className="flex items-start space-x-3">
-        <div className="w-16 h-16 bg-gray-300 rounded-full flex items-center justify-center">
-          <Users className="w-8 h-8 text-gray-600" />
+        <div className="w-16 h-16 bg-[#3a3a3a] rounded-full flex items-center justify-center">
+          <Users className="w-8 h-8 text-[#9A9A9A]" />
         </div>
         <div className="flex-1">
           <div className="flex items-center justify-between mb-1">
-            <h4 className="font-medium text-gray-900">{influencer.name}</h4>
+            <h4 className="font-medium text-white">{influencer.name}</h4>
             <div className="w-4 h-4 bg-green-500 rounded-full"></div>
           </div>
-          <div className="text-xs text-gray-600 mb-2">
+          <div className="text-xs text-[#9A9A9A] mb-2">
             {influencer.followers} followers • {influencer.engagement} engagement
           </div>
           <div className="flex flex-wrap gap-1">
@@ -640,11 +640,11 @@ const AllCampaignsSection = () => {
       case 1:
         return (
           <div className="space-y-6">
-            <h2 className="text-2xl font-bold text-gray-900 text-center">Campaign Details</h2>
+            <h2 className="text-2xl font-bold text-white text-center">Campaign Details</h2>
             
             {/* Product Images Upload */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-[#9A9A9A] mb-2">
                 Add Images of Product for your Campaign
               </label>
               <input
@@ -656,10 +656,10 @@ const AllCampaignsSection = () => {
                 onChange={handleImageChange}
               />
               <div
-                className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer"
+                className="border-2 border-dashed border-white/10 rounded-lg p-8 text-center cursor-pointer"
                 onClick={() => fileInputRef.current && fileInputRef.current.click()}
               >
-                <Upload className="w-8 h-8 text-gray-400 mx-auto mb-2" />
+                <Upload className="w-8 h-8 text-[#808080] mx-auto mb-2" />
                 <p className="text-sm text-blue-600 cursor-pointer hover:text-blue-700">
                   Click here to upload or drop media here
                 </p>
@@ -667,13 +667,13 @@ const AllCampaignsSection = () => {
               <div className="grid grid-cols-3 gap-4 mt-4">
                 {formData.productImages && formData.productImages.length > 0 ? (
                   formData.productImages.map((img, idx) => (
-                    <div key={idx} className="aspect-square bg-gray-200 rounded-lg overflow-hidden flex items-center justify-center">
+                    <div key={idx} className="aspect-square bg-[#2f2f2f] rounded-lg overflow-hidden flex items-center justify-center">
                       <img src={img.url || img} alt={`Product ${idx + 1}`} className="object-cover w-full h-full" />
                     </div>
                   ))
                 ) : (
                   Array.from({ length: 3 }).map((_, idx) => (
-                    <div key={idx} className="aspect-square bg-gray-200 rounded-lg"></div>
+                    <div key={idx} className="aspect-square bg-[#2f2f2f] rounded-lg"></div>
                   ))
                 )}
               </div>
@@ -681,14 +681,14 @@ const AllCampaignsSection = () => {
 
             {/* Budget */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-[#9A9A9A] mb-2">
                 Budget (USD)
               </label>
               <input
                 type="number"
                 value={formData.budget}
                 onChange={e => handleInputChange('budget', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                className="w-full px-3 py-2 border border-white/10 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
                 placeholder="500"
                 min="0"
               />
@@ -696,14 +696,14 @@ const AllCampaignsSection = () => {
 
             {/* Number of Live Posts */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-[#9A9A9A] mb-2">
                 Number of Live Posts
               </label>
               <input
                 type="number"
                 value={formData.numberOfLivePosts}
                 onChange={e => handleInputChange('numberOfLivePosts', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                className="w-full px-3 py-2 border border-white/10 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
                 placeholder="2"
                 min="0"
               />
@@ -711,7 +711,7 @@ const AllCampaignsSection = () => {
 
             {/* Reels URLs */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-[#9A9A9A] mb-2">
                 Reels (Add video URLs)
               </label>
               <div className="flex gap-2 mb-2">
@@ -719,7 +719,7 @@ const AllCampaignsSection = () => {
                   type="url"
                   value={reelInput}
                   onChange={e => setReelInput(e.target.value)}
-                  className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className="flex-1 px-3 py-2 border border-white/10 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
                   placeholder="https://example.com/reel.mp4"
                 />
                 <button
@@ -733,7 +733,7 @@ const AllCampaignsSection = () => {
               <ul className="space-y-1">
                 {formData.reels.map((url, idx) => (
                   <li key={idx} className="flex items-center gap-2">
-                    <span className="truncate flex-1 text-xs text-gray-700">{url}</span>
+                    <span className="truncate flex-1 text-xs text-[#9A9A9A]">{url}</span>
                     <button type="button" onClick={() => handleRemoveReel(idx)} className="text-red-500 text-xs">Remove</button>
                   </li>
                 ))}
@@ -742,63 +742,63 @@ const AllCampaignsSection = () => {
 
             {/* Campaign Name */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-[#9A9A9A] mb-2">
                 Campaign Name
               </label>
               <input
                 type="text"
                 value={formData.campaignName}
                 onChange={(e) => handleInputChange('campaignName', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                className="w-full px-3 py-2 border border-white/10 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
                 placeholder="Name"
               />
             </div>
 
             {/* Campaign Type */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-[#9A9A9A] mb-2">
                 Campaign Type
               </label>
               <input
                 type="text"
                 value={formData.campaignType}
                 onChange={(e) => handleInputChange('campaignType', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                className="w-full px-3 py-2 border border-white/10 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
                 placeholder="Instagram/YouTube"
               />
             </div>
 
             {/* Campaign Brief */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-[#9A9A9A] mb-2">
                 Campaign Brief
               </label>
               <textarea
                 value={formData.campaignBrief}
                 onChange={(e) => handleInputChange('campaignBrief', e.target.value)}
                 rows={8}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                className="w-full px-3 py-2 border border-white/10 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
                 placeholder="Enter campaign brief..."
               />
             </div>
 
             {/* Deliverables */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-[#9A9A9A] mb-2">
                 Deliverables
               </label>
               <textarea
                 value={formData.deliverables}
                 onChange={(e) => handleInputChange('deliverables', e.target.value)}
                 rows={6}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                className="w-full px-3 py-2 border border-white/10 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
                 placeholder="Enter deliverables..."
               />
             </div>
 
             {/* Compensation */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-4">
+              <label className="block text-sm font-medium text-[#9A9A9A] mb-4">
                 Compensation
               </label>
               <div className="space-y-3">
@@ -840,22 +840,22 @@ const AllCampaignsSection = () => {
               {formData.compensation === 'Monetary' && (
                 <div className="grid grid-cols-2 gap-4 mt-3">
                   <div>
-                    <label className="block text-xs text-gray-500 mb-1">Amount</label>
+                    <label className="block text-xs text-[#9A9A9A] mb-1">Amount</label>
                     <input
                       type="number"
                       value={formData.compensationAmount}
                       onChange={(e) => handleInputChange('compensationAmount', e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                      className="w-full px-3 py-2 border border-white/10 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
                       placeholder="500"
                       min="0"
                     />
                   </div>
                   <div>
-                    <label className="block text-xs text-gray-500 mb-1">Currency</label>
+                    <label className="block text-xs text-[#9A9A9A] mb-1">Currency</label>
                     <select
                       value={formData.compensationCurrency}
                       onChange={(e) => handleInputChange('compensationCurrency', e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                      className="w-full px-3 py-2 border border-white/10 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
                     >
                       <option value="USD">USD</option>
                       <option value="EUR">EUR</option>
@@ -870,49 +870,49 @@ const AllCampaignsSection = () => {
                 value={formData.compensationDetails}
                 onChange={(e) => handleInputChange('compensationDetails', e.target.value)}
                 rows={4}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 mt-3"
+                className="w-full px-3 py-2 border border-white/10 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 mt-3"
                 placeholder="Enter compensation details..."
               />
             </div>
 
             {/* Timelines */}
             <div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-4 text-center">Timelines</h3>
+              <h3 className="text-xl font-semibold text-white mb-4 text-center">Timelines</h3>
               
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-[#9A9A9A] mb-2">
                     Application Deadline
                   </label>
                   <input
                     type="date"
                     value={formData.applicationDeadline}
                     onChange={(e) => handleInputChange('applicationDeadline', e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                    className="w-full px-3 py-2 border border-white/10 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-[#9A9A9A] mb-2">
                     Campaign Start & End Date
                   </label>
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-xs text-gray-500 mb-1">Start</label>
+                      <label className="block text-xs text-[#9A9A9A] mb-1">Start</label>
                       <input
                         type="date"
                         value={formData.campaignStartDate}
                         onChange={(e) => handleInputChange('campaignStartDate', e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                        className="w-full px-3 py-2 border border-white/10 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
                       />
                     </div>
                     <div>
-                      <label className="block text-xs text-gray-500 mb-1">End</label>
+                      <label className="block text-xs text-[#9A9A9A] mb-1">End</label>
                       <input
                         type="date"
                         value={formData.campaignEndDate}
                         onChange={(e) => handleInputChange('campaignEndDate', e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                        className="w-full px-3 py-2 border border-white/10 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
                       />
                     </div>
                   </div>
@@ -926,8 +926,8 @@ const AllCampaignsSection = () => {
         return (
           <div className="space-y-6">
             <div className="text-center">
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">Let's set your targeting details</h2>
-              <p className="text-gray-600">
+              <h2 className="text-2xl font-bold text-white mb-2">Let's set your targeting details</h2>
+              <p className="text-[#9A9A9A]">
                 Provide some details on influencers you're looking to target. We'll collect campaign 
                 details like content requirements and product descriptions in the next step.
               </p>
@@ -935,26 +935,26 @@ const AllCampaignsSection = () => {
 
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-[#9A9A9A] mb-2">
                   How many influencers you want to hire
                 </label>
                 <input
                   type="number"
                   value={formData.influencerCount}
                   onChange={(e) => handleInputChange('influencerCount', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className="w-full px-3 py-2 border border-white/10 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
                   placeholder="4"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-[#9A9A9A] mb-2">
                   What Niche you want to Target
                 </label>
                 <select
                   value={formData.niche}
                   onChange={(e) => handleInputChange('niche', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className="w-full px-3 py-2 border border-white/10 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
                 >
                   <option value="">Select a niche</option>
                   <option value="Fashion">Fashion</option>
@@ -975,27 +975,27 @@ const AllCampaignsSection = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-[#9A9A9A] mb-2">
                   Follower Count Range
                 </label>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-xs text-gray-500 mb-1">Min</label>
+                    <label className="block text-xs text-[#9A9A9A] mb-1">Min</label>
                     <input
                       type="number"
                       value={formData.followerCountMin}
                       onChange={(e) => handleInputChange('followerCountMin', e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                      className="w-full px-3 py-2 border border-white/10 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
                       placeholder="1000"
                     />
                   </div>
                   <div>
-                    <label className="block text-xs text-gray-500 mb-1">Max</label>
+                    <label className="block text-xs text-[#9A9A9A] mb-1">Max</label>
                     <input
                       type="number"
                       value={formData.followerCountMax}
                       onChange={(e) => handleInputChange('followerCountMax', e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                      className="w-full px-3 py-2 border border-white/10 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
                       placeholder="100000"
                     />
                   </div>
@@ -1003,26 +1003,26 @@ const AllCampaignsSection = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-[#9A9A9A] mb-2">
                   Countries
                 </label>
                 <input
                   type="text"
                   value={formData.countries}
                   onChange={(e) => handleInputChange('countries', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className="w-full px-3 py-2 border border-white/10 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
                   placeholder="India"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-[#9A9A9A] mb-2">
                   Gender
                 </label>
                 <select
                   value={formData.gender}
                   onChange={(e) => handleInputChange('gender', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className="w-full px-3 py-2 border border-white/10 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
                 >
                   <option value="">Select gender</option>
                   <option value="Male">Male</option>
@@ -1032,29 +1032,29 @@ const AllCampaignsSection = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-[#9A9A9A] mb-2">
                   Age Range
                 </label>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-xs text-gray-500 mb-1">Min</label>
+                    <label className="block text-xs text-[#9A9A9A] mb-1">Min</label>
                     <input
                       type="number"
                       value={formData.ageRangeMin}
                       onChange={(e) => handleInputChange('ageRangeMin', e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                      className="w-full px-3 py-2 border border-white/10 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
                       placeholder="18"
                       min="13"
                       max="100"
                     />
                   </div>
                   <div>
-                    <label className="block text-xs text-gray-500 mb-1">Max</label>
+                    <label className="block text-xs text-[#9A9A9A] mb-1">Max</label>
                     <input
                       type="number"
                       value={formData.ageRangeMax}
                       onChange={(e) => handleInputChange('ageRangeMax', e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                      className="w-full px-3 py-2 border border-white/10 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
                       placeholder="35"
                       min="13"
                       max="100"
@@ -1068,7 +1068,7 @@ const AllCampaignsSection = () => {
                 AI will generate real suggestions when campaign is created */}
             {/* 
             <div className="mt-8">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">
+              <h3 className="text-lg font-semibold text-white mb-4">
                 Influencer Suggestions based on your Requirements
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -1084,19 +1084,19 @@ const AllCampaignsSection = () => {
       case 3:
         return (
           <div className="space-y-6">
-            <h2 className="text-2xl font-bold text-gray-900 text-center mb-4">
+            <h2 className="text-2xl font-bold text-white text-center mb-4">
               This is how your Campaign will look to Influencers
             </h2>
             
-            <div className="bg-gray-50 rounded-lg p-6">
+            <div className="bg-[#000201] rounded-lg p-6">
               <div className="text-center mb-6">
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                <h3 className="text-xl font-semibold text-white mb-2">
                   {formData.campaignName || 'Campaign Title'}
                 </h3>
-                <p className="text-sm text-gray-600">
+                <p className="text-sm text-[#9A9A9A]">
                   Launched {new Date().toLocaleDateString()}
                 </p>
-                <p className="text-sm text-gray-600">
+                <p className="text-sm text-[#9A9A9A]">
                   by {formData.brandName || 'Brand Name'}
                 </p>
               </div>
@@ -1107,33 +1107,33 @@ const AllCampaignsSection = () => {
                   <div className="grid grid-cols-2 gap-2 mb-4">
                     {formData.productImages && formData.productImages.length > 0 ? (
                       formData.productImages.map((img, idx) => (
-                        <div key={idx} className="aspect-square bg-gray-200 rounded-lg overflow-hidden flex items-center justify-center">
+                        <div key={idx} className="aspect-square bg-[#2f2f2f] rounded-lg overflow-hidden flex items-center justify-center">
                           <img src={img.url || img} alt={`Product ${idx + 1}`} className="object-cover w-full h-full" />
                         </div>
                       ))
                     ) : (
                       Array.from({ length: 4 }).map((_, idx) => (
-                        <div key={idx} className="aspect-square bg-gray-200 rounded-lg"></div>
+                        <div key={idx} className="aspect-square bg-[#2f2f2f] rounded-lg"></div>
                       ))
                     )}
                   </div>
                   {/* Reels Preview */}
                   <div className="mt-2">
-                    <h4 className="font-semibold text-gray-900 mb-1">Reels</h4>
+                    <h4 className="font-semibold text-white mb-1">Reels</h4>
                     <ul className="space-y-1">
                       {formData.reels && formData.reels.length > 0 ? (
                         formData.reels.map((url, idx) => (
                           <li key={idx} className="text-xs text-blue-700 truncate">{url}</li>
                         ))
                       ) : (
-                        <li className="text-xs text-gray-400">No reels added</li>
+                        <li className="text-xs text-[#808080]">No reels added</li>
                       )}
                     </ul>
                   </div>
                 </div>
                 <div>
-                  <h4 className="font-semibold text-gray-900 mb-2">Timelines and Qualifications</h4>
-                  <div className="space-y-2 text-sm text-gray-600">
+                  <h4 className="font-semibold text-white mb-2">Timelines and Qualifications</h4>
+                  <div className="space-y-2 text-sm text-[#9A9A9A]">
                     <p>Application Deadline: {formData.applicationDeadline || 'Not set'}</p>
                     <p>Campaign Start: {formData.campaignStartDate || 'Not set'}</p>
                     <p>Campaign End: {formData.campaignEndDate || 'Not set'}</p>
@@ -1144,25 +1144,25 @@ const AllCampaignsSection = () => {
               </div>
 
               <div className="mt-6 p-4 bg-green-50 rounded-lg">
-                <h4 className="font-semibold text-gray-900 mb-2">Compensation</h4>
+                <h4 className="font-semibold text-white mb-2">Compensation</h4>
                 <p className="text-sm text-green-700 capitalize">
                   {formData.compensation} campaign
                 </p>
-                <p className="text-sm text-gray-600 mt-1">
+                <p className="text-sm text-[#9A9A9A] mt-1">
                   {formData.compensationDetails || 'No compensation details provided'}
                 </p>
               </div>
 
-              <div className="mt-6 p-4 bg-gray-100 rounded-lg">
-                <h4 className="font-semibold text-gray-900 mb-2">Campaign Brief</h4>
-                <p className="text-sm text-gray-700">
+              <div className="mt-6 p-4 bg-[#262626] rounded-lg">
+                <h4 className="font-semibold text-white mb-2">Campaign Brief</h4>
+                <p className="text-sm text-[#9A9A9A]">
                   {formData.campaignBrief || 'No campaign brief provided'}
                 </p>
               </div>
 
-              <div className="mt-6 p-4 bg-gray-100 rounded-lg">
-                <h4 className="font-semibold text-gray-900 mb-2">Deliverables</h4>
-                <p className="text-sm text-gray-700">
+              <div className="mt-6 p-4 bg-[#262626] rounded-lg">
+                <h4 className="font-semibold text-white mb-2">Deliverables</h4>
+                <p className="text-sm text-[#9A9A9A]">
                   {formData.deliverables || 'No deliverables specified'}
                 </p>
               </div>
@@ -1259,9 +1259,9 @@ const AllCampaignsSection = () => {
   };
 
   return (
-    <div className="bg-white h-screen overflow-hidden flex flex-col">
+    <div className="bg-[#181818] h-screen overflow-hidden flex flex-col">
       {/* Fixed App Bar - Only header */}
-      <div className="flex-shrink-0 bg-white border-b border-gray-100">
+      <div className="flex-shrink-0 bg-[#181818] border-b border-white/5">
         <div className="px-4 sm:px-6 lg:px-9 py-3 sm:py-4">
           {/* App Bar */}
           <div className="flex items-center justify-between">
@@ -1273,34 +1273,34 @@ const AllCampaignsSection = () => {
                       setShowAllCampaigns(false);
                       setShowAllDrafts(false);
                     }}
-                    className="p-2 hover:bg-gray-100 rounded-full transition-colors -ml-2 mr-1"
+                    className="p-2 hover:bg-[#262626] rounded-full transition-colors -ml-2 mr-1"
                   >
-                    <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6 text-gray-700" />
+                    <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6 text-[#9A9A9A]" />
                   </button>
-                  <h1 className="text-lg sm:text-xl font-semibold text-gray-900 truncate">
+                  <h1 className="text-lg sm:text-xl font-semibold text-white truncate">
                     {showAllCampaigns ? 'Campaigns' : 'Draft Campaigns'}
                   </h1>
                 </div>
                 <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
-                  <button className="p-2 hover:bg-gray-100 rounded-full transition-colors">
-                    <Search className="w-5 h-5 sm:w-6 sm:h-6 text-gray-700" />
+                  <button className="p-2 hover:bg-[#262626] rounded-full transition-colors">
+                    <Search className="w-5 h-5 sm:w-6 sm:h-6 text-[#9A9A9A]" />
                   </button>
-                  <button className="p-2 hover:bg-gray-100 rounded-full transition-colors">
-                    <MoreVertical className="w-5 h-5 sm:w-6 sm:h-6 text-gray-700" />
+                  <button className="p-2 hover:bg-[#262626] rounded-full transition-colors">
+                    <MoreVertical className="w-5 h-5 sm:w-6 sm:h-6 text-[#9A9A9A]" />
                   </button>
                 </div>
               </>
             ) : (
               <>
                 <div className="flex items-center flex-1 min-w-0">
-                  <h1 className="text-lg sm:text-xl font-semibold text-gray-900">Campaigns</h1>
+                  <h1 className="text-lg sm:text-xl font-semibold text-white">Campaigns</h1>
                 </div>
                 <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
-                  <button className="p-2 hover:bg-gray-100 rounded-full transition-colors">
-                    <Search className="w-5 h-5 sm:w-6 sm:h-6 text-gray-700" />
+                  <button className="p-2 hover:bg-[#262626] rounded-full transition-colors">
+                    <Search className="w-5 h-5 sm:w-6 sm:h-6 text-[#9A9A9A]" />
                   </button>
-                  <button className="p-2 hover:bg-gray-100 rounded-full transition-colors">
-                    <MoreVertical className="w-5 h-5 sm:w-6 sm:h-6 text-gray-700" />
+                  <button className="p-2 hover:bg-[#262626] rounded-full transition-colors">
+                    <MoreVertical className="w-5 h-5 sm:w-6 sm:h-6 text-[#9A9A9A]" />
                   </button>
                 </div>
               </>
@@ -1315,7 +1315,7 @@ const AllCampaignsSection = () => {
           // All Campaigns Grid View - Updated to match Figma design
           <div className="mb-8">
             <div className="flex items-center justify-between mb-4">
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-[#9A9A9A]">
                 Showing {campaigns.length} campaigns
               </p>
             </div>
@@ -1325,18 +1325,18 @@ const AllCampaignsSection = () => {
                 // Campaign Cards Skeleton
                 <>
                   {[1, 2, 3].map((i) => (
-                    <div key={i} className="bg-gray-100 border-2 border-white rounded-xl overflow-hidden flex-1 min-w-[300px] max-w-[400px]">
+                    <div key={i} className="bg-[#262626] border-2 border-white rounded-xl overflow-hidden flex-1 min-w-[300px] max-w-[400px]">
                       {/* Card Header Skeleton */}
                       <div className="flex gap-2 items-start p-4">
-                        <div className="w-12 h-12 bg-gray-200 rounded-full animate-pulse"></div>
+                        <div className="w-12 h-12 bg-[#2f2f2f] rounded-full animate-pulse"></div>
                         <div className="flex-1">
-                          <div className="h-5 bg-gray-200 rounded w-3/4 mb-2 animate-pulse"></div>
-                          <div className="h-4 bg-gray-200 rounded w-1/2 animate-pulse"></div>
+                          <div className="h-5 bg-[#2f2f2f] rounded w-3/4 mb-2 animate-pulse"></div>
+                          <div className="h-4 bg-[#2f2f2f] rounded w-1/2 animate-pulse"></div>
                         </div>
-                        <div className="w-12 h-12 bg-gray-200 rounded-full animate-pulse"></div>
+                        <div className="w-12 h-12 bg-[#2f2f2f] rounded-full animate-pulse"></div>
                       </div>
                       {/* Card Image Skeleton */}
-                      <div className="h-[216px] bg-gray-200 animate-pulse"></div>
+                      <div className="h-[216px] bg-[#2f2f2f] animate-pulse"></div>
                     </div>
                   ))}
                 </>
@@ -1344,12 +1344,12 @@ const AllCampaignsSection = () => {
                 campaigns.map((campaign) => (
                   <div 
                     key={campaign._id} 
-                    className="bg-gray-100 border-2 border-white rounded-xl overflow-hidden hover:shadow-lg transition-shadow flex-1 min-w-[300px] max-w-[400px] cursor-pointer"
+                    className="bg-[#262626] border-2 border-white rounded-xl overflow-hidden hover:shadow-lg transition-shadow flex-1 min-w-[300px] max-w-[400px] cursor-pointer"
                     onClick={() => handleCampaignClick(campaign)}
                   >
                     {/* Eyebrow label at top */}
                     <div className="px-4 pt-4">
-                      <span className="text-xs text-gray-500">
+                      <span className="text-xs text-[#9A9A9A]">
                         {campaign.campaignType || 'Campaign'}
                       </span>
                     </div>
@@ -1365,10 +1365,10 @@ const AllCampaignsSection = () => {
 
                       {/* Content Leading */}
                       <div className="flex-1 min-w-0">
-                        <h3 className="text-lg font-semibold text-gray-900 mb-1 truncate">
+                        <h3 className="text-lg font-semibold text-white mb-1 truncate">
                           {campaign.campaignName || 'Lenskart'}
                         </h3>
-                        <p className="text-sm text-gray-600">
+                        <p className="text-sm text-[#9A9A9A]">
                           {campaign.createdAt 
                             ? new Date(campaign.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
                             : '3d ago'
@@ -1383,9 +1383,9 @@ const AllCampaignsSection = () => {
                             e.stopPropagation();
                             // Handle favorite toggle
                           }}
-                          className="p-3 hover:bg-gray-200 rounded-full transition-colors"
+                          className="p-3 hover:bg-[#2f2f2f] rounded-full transition-colors"
                         >
-                          <Heart className="w-6 h-6 text-gray-700" />
+                          <Heart className="w-6 h-6 text-[#9A9A9A]" />
                         </button>
                       </div>
                     </div>
@@ -1411,7 +1411,7 @@ const AllCampaignsSection = () => {
                 ))
               ) : (
                 <div className="w-full text-center py-8">
-                  <p className="text-gray-600">No campaigns found. Create your first campaign!</p>
+                  <p className="text-[#9A9A9A]">No campaigns found. Create your first campaign!</p>
                 </div>
               )}
             </div>
@@ -1420,7 +1420,7 @@ const AllCampaignsSection = () => {
           // All Draft Campaigns Grid View - Updated to match Figma design
           <div className="mb-8">
             <div className="flex items-center justify-between mb-4">
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-[#9A9A9A]">
                 Showing {getDraftCampaigns().length} draft campaigns
               </p>
             </div>
@@ -1430,22 +1430,22 @@ const AllCampaignsSection = () => {
                 // Draft Campaign Cards Skeleton
                 <>
                   {[1, 2, 3].map((i) => (
-                    <div key={i} className="bg-gray-100 border-2 border-white rounded-xl overflow-hidden flex-1 min-w-[300px] max-w-[400px]">
+                    <div key={i} className="bg-[#262626] border-2 border-white rounded-xl overflow-hidden flex-1 min-w-[300px] max-w-[400px]">
                       {/* Card Header Skeleton */}
                       <div className="flex gap-2 items-start p-4">
-                        <div className="w-12 h-12 bg-gray-200 rounded-full animate-pulse"></div>
+                        <div className="w-12 h-12 bg-[#2f2f2f] rounded-full animate-pulse"></div>
                         <div className="flex-1">
-                          <div className="h-5 bg-gray-200 rounded w-3/4 mb-2 animate-pulse"></div>
-                          <div className="h-4 bg-gray-200 rounded w-1/3 animate-pulse"></div>
+                          <div className="h-5 bg-[#2f2f2f] rounded w-3/4 mb-2 animate-pulse"></div>
+                          <div className="h-4 bg-[#2f2f2f] rounded w-1/3 animate-pulse"></div>
                         </div>
-                        <div className="w-12 h-12 bg-gray-200 rounded-full animate-pulse"></div>
+                        <div className="w-12 h-12 bg-[#2f2f2f] rounded-full animate-pulse"></div>
                       </div>
                       {/* Card Image Skeleton */}
-                      <div className="h-[216px] bg-gray-200 animate-pulse"></div>
+                      <div className="h-[216px] bg-[#2f2f2f] animate-pulse"></div>
                       {/* Action Buttons Skeleton */}
                       <div className="p-4 flex gap-2">
-                        <div className="flex-1 h-10 bg-gray-200 rounded-lg animate-pulse"></div>
-                        <div className="flex-1 h-10 bg-gray-200 rounded-lg animate-pulse"></div>
+                        <div className="flex-1 h-10 bg-[#2f2f2f] rounded-lg animate-pulse"></div>
+                        <div className="flex-1 h-10 bg-[#2f2f2f] rounded-lg animate-pulse"></div>
                       </div>
                     </div>
                   ))}
@@ -1454,11 +1454,11 @@ const AllCampaignsSection = () => {
                 getDraftCampaigns().map((draft) => (
                   <div 
                     key={draft._id} 
-                    className="bg-gray-100 border-2 border-white rounded-xl overflow-hidden hover:shadow-lg transition-shadow flex-1 min-w-[300px] max-w-[400px]"
+                    className="bg-[#262626] border-2 border-white rounded-xl overflow-hidden hover:shadow-lg transition-shadow flex-1 min-w-[300px] max-w-[400px]"
                   >
                     {/* Eyebrow label at top */}
                     <div className="px-4 pt-4">
-                      <span className="text-xs text-gray-500">
+                      <span className="text-xs text-[#9A9A9A]">
                         Draft • {draft.campaignType || 'Campaign'}
                       </span>
                     </div>
@@ -1474,10 +1474,10 @@ const AllCampaignsSection = () => {
 
                       {/* Content Leading */}
                       <div className="flex-1 min-w-0">
-                        <h3 className="text-lg font-semibold text-gray-900 mb-1 truncate">
+                        <h3 className="text-lg font-semibold text-white mb-1 truncate">
                           {draft.campaignName || 'Draft Campaign'}
                         </h3>
-                        <p className="text-sm text-gray-600">
+                        <p className="text-sm text-[#9A9A9A]">
                           Draft
                         </p>
                       </div>
@@ -1489,9 +1489,9 @@ const AllCampaignsSection = () => {
                             e.stopPropagation();
                             handleCampaignClick(draft);
                           }}
-                          className="p-3 hover:bg-gray-200 rounded-full transition-colors"
+                          className="p-3 hover:bg-[#2f2f2f] rounded-full transition-colors"
                         >
-                          <Heart className="w-6 h-6 text-gray-700" />
+                          <Heart className="w-6 h-6 text-[#9A9A9A]" />
                         </button>
                       </div>
                     </div>
@@ -1521,7 +1521,7 @@ const AllCampaignsSection = () => {
                           e.stopPropagation();
                           handleCampaignClick(draft);
                         }}
-                        className="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors"
+                        className="flex-1 px-4 py-2 border border-white/10 rounded-lg text-sm font-medium hover:bg-[#000201] transition-colors"
                       >
                         View Details
                       </button>
@@ -1536,7 +1536,7 @@ const AllCampaignsSection = () => {
                 ))
               ) : (
                 <div className="w-full text-center py-8">
-                  <p className="text-gray-600">No draft campaigns found.</p>
+                  <p className="text-[#9A9A9A]">No draft campaigns found.</p>
                 </div>
               )}
             </div>
@@ -1547,7 +1547,7 @@ const AllCampaignsSection = () => {
             <div className="mb-10">
               {/* Section Heading - Figma: pt-4 (16px), 18px font, view all link */}
               <div className="flex items-center justify-between pt-4 mb-[14px]">
-                <h2 className="text-[18px] font-semibold text-gray-900 leading-[26px] tracking-tight">Recent Campaigns</h2>
+                <h2 className="text-[18px] font-semibold text-white leading-[26px] tracking-tight">Recent Campaigns</h2>
                 <button 
                   onClick={() => router.push('/user/campaigns/all-campaigns')}
                   className="flex items-center pr-1"
@@ -1565,22 +1565,22 @@ const AllCampaignsSection = () => {
                   // Recent Campaign Cards Skeleton
                   <>
                     {[1, 2, 3].map((i) => (
-                      <div key={i} className="bg-gray-100 border-2 border-white rounded-xl overflow-hidden flex-1 min-w-[300px] max-w-[365px]">
+                      <div key={i} className="bg-[#262626] border-2 border-white rounded-xl overflow-hidden flex-1 min-w-[300px] max-w-[365px]">
                         {/* Card Header Skeleton */}
                         <div className="flex gap-2 items-start p-4">
-                          <div className="w-12 h-12 bg-gray-200 rounded-full animate-pulse"></div>
+                          <div className="w-12 h-12 bg-[#2f2f2f] rounded-full animate-pulse"></div>
                           <div className="flex-1">
                             <div className="px-4">
-                              <div className="h-5 bg-gray-200 rounded w-3/4 mb-2 animate-pulse"></div>
+                              <div className="h-5 bg-[#2f2f2f] rounded w-3/4 mb-2 animate-pulse"></div>
                             </div>
                             <div className="px-4">
-                              <div className="h-4 bg-gray-200 rounded w-1/2 animate-pulse"></div>
+                              <div className="h-4 bg-[#2f2f2f] rounded w-1/2 animate-pulse"></div>
                             </div>
                           </div>
-                          <div className="w-12 h-12 bg-gray-200 rounded-full animate-pulse"></div>
+                          <div className="w-12 h-12 bg-[#2f2f2f] rounded-full animate-pulse"></div>
                         </div>
                         {/* Card Image Skeleton */}
-                        <div className="h-[216px] bg-gray-200 animate-pulse"></div>
+                        <div className="h-[216px] bg-[#2f2f2f] animate-pulse"></div>
                       </div>
                     ))}
                   </>
@@ -1588,7 +1588,7 @@ const AllCampaignsSection = () => {
                   getActiveCampaigns().slice(0, 3).map((campaign) => (
                     <div 
                       key={campaign._id} 
-                      className="bg-gray-100 border-2 border-white rounded-xl overflow-hidden hover:shadow-lg transition-shadow flex-1 min-w-[300px] max-w-[365px] cursor-pointer"
+                      className="bg-[#262626] border-2 border-white rounded-xl overflow-hidden hover:shadow-lg transition-shadow flex-1 min-w-[300px] max-w-[365px] cursor-pointer"
                       onClick={() => handleCampaignClick(campaign)}
                     >
                       {/* Content Frame - Figma: gap-4 (16px), py-4 (16px) */}
@@ -1603,12 +1603,12 @@ const AllCampaignsSection = () => {
                         {/* Content Leading - Figma: flex-1, gap-2 */}
                         <div className="flex-1 min-w-0 flex flex-col gap-2">
                           <div className="px-4">
-                            <h3 className="text-[20px] font-semibold text-gray-900 leading-7 tracking-tight truncate">
+                            <h3 className="text-[20px] font-semibold text-white leading-7 tracking-tight truncate">
                               {campaign.campaignName || 'Lenskart'}
                             </h3>
                           </div>
                           <div className="px-4">
-                            <p className="text-[16px] text-gray-600 leading-6 tracking-[0px]">
+                            <p className="text-[16px] text-[#9A9A9A] leading-6 tracking-[0px]">
                               {campaign.createdAt 
                                 ? new Date(campaign.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
                                 : '3d ago'
@@ -1624,9 +1624,9 @@ const AllCampaignsSection = () => {
                               e.stopPropagation();
                               // Handle favorite toggle
                             }}
-                            className="p-3 hover:bg-gray-200 rounded-full transition-colors"
+                            className="p-3 hover:bg-[#2f2f2f] rounded-full transition-colors"
                           >
-                            <Heart className="w-6 h-6 text-gray-700" />
+                            <Heart className="w-6 h-6 text-[#9A9A9A]" />
                           </button>
                         </div>
                       </div>
@@ -1652,7 +1652,7 @@ const AllCampaignsSection = () => {
                   ))
                 ) : (
                   <div className="w-full text-center py-8">
-                    <p className="text-gray-600">No active campaigns found. Create your first campaign!</p>
+                    <p className="text-[#9A9A9A]">No active campaigns found. Create your first campaign!</p>
                   </div>
                 )}
               </div>
@@ -1662,7 +1662,7 @@ const AllCampaignsSection = () => {
         <div className="mb-10">
           {/* Section Heading - Figma: pt-4, 18px font */}
           <div className="flex items-center justify-between pt-4 mb-[14px]">
-            <h2 className="text-[18px] font-semibold text-gray-900 leading-[26px] tracking-tight">New Applications</h2>
+            <h2 className="text-[18px] font-semibold text-white leading-[26px] tracking-tight">New Applications</h2>
             <button 
               onClick={() => router.push('/user/campaigns/new-applications')}
               className="flex items-center pr-1 hover:opacity-80 transition-opacity cursor-pointer"
@@ -1675,7 +1675,7 @@ const AllCampaignsSection = () => {
           </div>
 
           {/* List Items - Figma: white background, full width */}
-          <div className="bg-white">
+          <div className="bg-[#181818]">
             {mockInfluencers.slice(0, 5).map((influencer, index) => (
               <div key={influencer.id} className="relative">
                 <div className="flex items-center">
@@ -1686,10 +1686,10 @@ const AllCampaignsSection = () => {
 
                   {/* Content - Figma: flex-1, pr-4, py-3 (12px) */}
                   <div className="flex-1 min-w-0 pr-4 py-3">
-                    <h3 className="text-[16px] font-semibold text-gray-900 leading-6 tracking-[0.24px] mb-0.5">
+                    <h3 className="text-[16px] font-semibold text-white leading-6 tracking-[0.24px] mb-0.5">
                       {influencer.name}
                     </h3>
-                    <p className="text-[14px] text-gray-500 leading-5 tracking-[0px] truncate">
+                    <p className="text-[14px] text-[#9A9A9A] leading-5 tracking-[0px] truncate">
                       {influencer.tags 
                         ? influencer.tags.slice(0, 3).join(' • ') 
                         : 'An innovative web developer skilled in HTML, CSS, and JavaScript. He thrives on solving complex problems and bringing ideas to life through code.'
@@ -1699,7 +1699,7 @@ const AllCampaignsSection = () => {
 
                   {/* Trailing Button - Figma: px-4, py-3.5 (14px) */}
                   <div className="px-4 py-3.5">
-                    <button className="px-4 py-2 border border-green-800 rounded-[24px] text-[14px] font-medium text-green-800 leading-5 tracking-[0.2px] hover:bg-gray-50 transition-colors">
+                    <button className="px-4 py-2 border border-green-800 rounded-[24px] text-[14px] font-medium text-green-800 leading-5 tracking-[0.2px] hover:bg-[#000201] transition-colors">
                       portfolio
                     </button>
                   </div>
@@ -1707,7 +1707,7 @@ const AllCampaignsSection = () => {
                 
                 {/* Divider - Figma: 1px gray line */}
                 {index < mockInfluencers.slice(0, 5).length - 1 && (
-                  <div className="h-px bg-gray-200"></div>
+                  <div className="h-px bg-[#2f2f2f]"></div>
                 )}
               </div>
             ))}
@@ -1727,7 +1727,7 @@ const AllCampaignsSection = () => {
         {/* Draft Campaigns Section */}
         <div className="mb-8">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold text-gray-900">Draft Campaigns</h2>
+            <h2 className="text-lg font-semibold text-white">Draft Campaigns</h2>
             <button 
               onClick={() => router.push('/user/campaigns/all-drafts')}
               className="text-blue-600 text-sm font-medium hover:underline"
@@ -1741,21 +1741,21 @@ const AllCampaignsSection = () => {
               // Draft Campaign Cards Skeleton
               <>
                 {[1, 2, 3].map((i) => (
-                  <div key={i} className="bg-amber-50 rounded-lg overflow-hidden border border-gray-200">
-                    <div className="aspect-video bg-gray-200 animate-pulse"></div>
+                  <div key={i} className="bg-amber-50 rounded-lg overflow-hidden border border-white/10">
+                    <div className="aspect-video bg-[#2f2f2f] animate-pulse"></div>
                     <div className="p-4">
-                      <div className="h-5 bg-gray-200 rounded w-3/4 mb-2 animate-pulse"></div>
-                      <div className="h-4 bg-gray-200 rounded w-full mb-1 animate-pulse"></div>
-                      <div className="h-4 bg-gray-200 rounded w-2/3 mb-4 animate-pulse"></div>
-                      <div className="h-10 bg-gray-200 rounded-lg animate-pulse"></div>
+                      <div className="h-5 bg-[#2f2f2f] rounded w-3/4 mb-2 animate-pulse"></div>
+                      <div className="h-4 bg-[#2f2f2f] rounded w-full mb-1 animate-pulse"></div>
+                      <div className="h-4 bg-[#2f2f2f] rounded w-2/3 mb-4 animate-pulse"></div>
+                      <div className="h-10 bg-[#2f2f2f] rounded-lg animate-pulse"></div>
                     </div>
                   </div>
                 ))}
               </>
             ) : getDraftCampaigns().length > 0 ? (
               getDraftCampaigns().slice(0, 3).map((draft) => (
-                <div key={draft._id} className="bg-amber-50 rounded-lg overflow-hidden border border-gray-200 hover:shadow-md transition-shadow">
-                  <div className="aspect-video bg-gray-200 relative overflow-hidden cursor-pointer" onClick={() => handleCampaignClick(draft)}>
+                <div key={draft._id} className="bg-amber-50 rounded-lg overflow-hidden border border-white/10 hover:shadow-none transition-shadow">
+                  <div className="aspect-video bg-[#2f2f2f] relative overflow-hidden cursor-pointer" onClick={() => handleCampaignClick(draft)}>
                     {draft.productImages && draft.productImages.length > 0 ? (
                       <img src={draft.productImages[0]} alt={draft.campaignName} className="w-full h-full object-cover" />
                     ) : (
@@ -1768,8 +1768,8 @@ const AllCampaignsSection = () => {
                     )}
                   </div>
                   <div className="p-4">
-                    <h3 className="font-semibold text-gray-900 mb-2">{draft.campaignName}</h3>
-                    <p className="text-sm text-gray-600 mb-4 line-clamp-2">
+                    <h3 className="font-semibold text-white mb-2">{draft.campaignName}</h3>
+                    <p className="text-sm text-[#9A9A9A] mb-4 line-clamp-2">
                       {draft.campaignBrief || 'No description available'}
                     </p>
                     <button 
@@ -1783,7 +1783,7 @@ const AllCampaignsSection = () => {
               ))
             ) : (
               <div className="col-span-full text-center py-8">
-                <p className="text-gray-600">No draft campaigns found.</p>
+                <p className="text-[#9A9A9A]">No draft campaigns found.</p>
               </div>
             )}
           </div>
@@ -1795,14 +1795,14 @@ const AllCampaignsSection = () => {
       {/* Modal */}
       {showModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-hidden">
+          <div className="bg-[#181818] rounded-lg max-w-4xl w-full max-h-[90vh] overflow-hidden">
             {/* Modal Header */}
-            <div className="px-6 py-4 border-b border-gray-200">
+            <div className="px-6 py-4 border-b border-white/10">
               <div className="flex items-center justify-between">
-                <h2 className="text-2xl font-bold text-gray-900">Create New Campaign</h2>
+                <h2 className="text-2xl font-bold text-white">Create New Campaign</h2>
                 <button 
                   onClick={handleCloseModal}
-                  className="text-gray-400 hover:text-gray-600"
+                  className="text-[#808080] hover:text-[#9A9A9A]"
                 >
                   <X className="w-6 h-6" />
                 </button>
@@ -1815,13 +1815,13 @@ const AllCampaignsSection = () => {
                   title="Campaign Details" 
                   status={getStepStatus(1)} 
                 />
-                <div className="flex-1 h-px bg-gray-300 mx-4"></div>
+                <div className="flex-1 h-px bg-[#3a3a3a] mx-4"></div>
                 <StepIndicator 
                   stepNumber={2} 
                   title="Target Influencer" 
                   status={getStepStatus(2)} 
                 />
-                <div className="flex-1 h-px bg-gray-300 mx-4"></div>
+                <div className="flex-1 h-px bg-[#3a3a3a] mx-4"></div>
                 <StepIndicator 
                   stepNumber={3} 
                   title="Preview" 
@@ -1836,14 +1836,14 @@ const AllCampaignsSection = () => {
             </div>
 
             {/* Modal Footer */}
-            <div className="px-6 py-4 border-t border-gray-200 flex items-center justify-between">
+            <div className="px-6 py-4 border-t border-white/10 flex items-center justify-between">
               <button
                 onClick={handleCloseModal}
                 disabled={isSubmitting}
                 className={`px-4 py-2 rounded-lg font-medium ${
                   isSubmitting 
-                    ? 'bg-gray-200 text-gray-400 cursor-not-allowed' 
-                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                    ? 'bg-[#2f2f2f] text-[#808080] cursor-not-allowed' 
+                    : 'bg-[#2f2f2f] text-[#9A9A9A] hover:bg-[#3a3a3a]'
                 }`}
               >
                 Cancel
@@ -1856,8 +1856,8 @@ const AllCampaignsSection = () => {
                     disabled={isSubmitting}
                     className={`px-4 py-2 rounded-lg font-medium ${
                       isSubmitting 
-                        ? 'bg-gray-200 text-gray-400 cursor-not-allowed' 
-                        : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                        ? 'bg-[#2f2f2f] text-[#808080] cursor-not-allowed' 
+                        : 'bg-[#2f2f2f] text-[#9A9A9A] hover:bg-[#3a3a3a]'
                     }`}
                   >
                     Previous
@@ -1884,18 +1884,18 @@ const AllCampaignsSection = () => {
       {/* Delete Confirmation Modal */}
       {showDeleteModal && campaignToDelete && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg max-w-md w-full p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">
+          <div className="bg-[#181818] rounded-lg max-w-md w-full p-6">
+            <h3 className="text-lg font-semibold text-white mb-4">
               Confirm Deletion
             </h3>
-            <p className="text-sm text-gray-600 mb-6">
+            <p className="text-sm text-[#9A9A9A] mb-6">
               Are you sure you want to delete the campaign "<span className="font-medium">{campaignToDelete.campaignName}</span>"?
             </p>
 
             <div className="flex justify-end gap-3">
               <button
                 onClick={() => setShowDeleteModal(false)}
-                className="px-4 py-2 bg-gray-200 rounded-lg text-gray-700 hover:bg-gray-300"
+                className="px-4 py-2 bg-[#2f2f2f] rounded-lg text-[#9A9A9A] hover:bg-[#3a3a3a]"
               >
                 Cancel
               </button>
@@ -1918,14 +1918,14 @@ const AllCampaignsSection = () => {
       {/* Campaign Detail/Edit Modal */}
       {showDetailModal && selectedCampaign && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-hidden">
+          <div className="bg-[#181818] rounded-lg max-w-4xl w-full max-h-[90vh] overflow-hidden">
             {/* Modal Header */}
-            <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+            <div className="px-6 py-4 border-b border-white/10 flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <h2 className="text-2xl font-bold text-gray-900">Campaign Detailss</h2>
+                <h2 className="text-2xl font-bold text-white">Campaign Detailss</h2>
                 <span className={`text-xs px-3 py-1 rounded-full ${
                   selectedCampaign.status === 'Active' ? 'text-green-600 bg-green-50' :
-                  selectedCampaign.status === 'Draft' ? 'text-gray-600 bg-gray-50' :
+                  selectedCampaign.status === 'Draft' ? 'text-[#9A9A9A] bg-[#000201]' :
                   selectedCampaign.status === 'Completed' ? 'text-blue-600 bg-blue-50' :
                   'text-orange-600 bg-orange-50'
                 }`}>
@@ -1936,10 +1936,10 @@ const AllCampaignsSection = () => {
                 {!isEditMode && (
                   <button
                     onClick={handleEnableEdit}
-                    className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                    className="p-2 hover:bg-[#262626] rounded-full transition-colors"
                     title="Edit Campaign"
                   >
-                    <Edit className="w-5 h-5 text-gray-600" />
+                    <Edit className="w-5 h-5 text-[#9A9A9A]" />
                   </button>
                 )}
                 <button 
@@ -1948,7 +1948,7 @@ const AllCampaignsSection = () => {
                     setIsEditMode(false);
                     setSelectedCampaign(null);
                   }}
-                  className="text-gray-400 hover:text-gray-600"
+                  className="text-[#808080] hover:text-[#9A9A9A]"
                 >
                   <X className="w-6 h-6" />
                 </button>
@@ -1960,10 +1960,10 @@ const AllCampaignsSection = () => {
               <div className="space-y-6">
                 {/* Product Images */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Product Images</label>
+                  <label className="block text-sm font-medium text-[#9A9A9A] mb-2">Product Images</label>
                   <div className="grid grid-cols-4 gap-4">
                     {selectedCampaign.productImages?.map((img, idx) => (
-                      <div key={idx} className="aspect-square bg-gray-200 rounded-lg overflow-hidden">
+                      <div key={idx} className="aspect-square bg-[#2f2f2f] rounded-lg overflow-hidden">
                         <img src={img} alt={`Product ${idx + 1}`} className="w-full h-full object-cover" />
                       </div>
                     ))}
@@ -1972,7 +1972,7 @@ const AllCampaignsSection = () => {
 
                 {/* Campaign Name - EDITABLE */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-[#9A9A9A] mb-2">
                     Campaign Name {isEditMode && <span className="text-green-600">✎ Editable</span>}
                   </label>
                   {isEditMode ? (
@@ -1980,35 +1980,35 @@ const AllCampaignsSection = () => {
                       type="text"
                       value={selectedCampaign.campaignName}
                       onChange={(e) => handleUpdateField('campaignName', e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                      className="w-full px-3 py-2 border border-white/10 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
                     />
                   ) : (
-                    <p className="text-gray-900">{selectedCampaign.campaignName}</p>
+                    <p className="text-white">{selectedCampaign.campaignName}</p>
                   )}
                 </div>
 
                 {/* Campaign Type - READ ONLY */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Campaign Type</label>
-                  <p className="text-gray-900 capitalize">{selectedCampaign.campaignType}</p>
+                  <label className="block text-sm font-medium text-[#9A9A9A] mb-2">Campaign Type</label>
+                  <p className="text-white capitalize">{selectedCampaign.campaignType}</p>
                 </div>
 
                 {/* Campaign Brief - READ ONLY */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Campaign Brief</label>
-                  <p className="text-gray-900">{selectedCampaign.campaignBrief}</p>
+                  <label className="block text-sm font-medium text-[#9A9A9A] mb-2">Campaign Brief</label>
+                  <p className="text-white">{selectedCampaign.campaignBrief}</p>
                 </div>
 
                 {/* Status - EDITABLE */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-[#9A9A9A] mb-2">
                     Status {isEditMode && <span className="text-green-600">✎ Editable</span>}
                   </label>
                   {isEditMode ? (
                     <select
                       value={selectedCampaign.status}
                       onChange={(e) => handleUpdateField('status', e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                      className="w-full px-3 py-2 border border-white/10 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
                     >
                       <option value="Draft">Draft</option>
                       <option value="Active">Active</option>
@@ -2016,56 +2016,56 @@ const AllCampaignsSection = () => {
                       <option value="Paused">Paused</option>
                     </select>
                   ) : (
-                    <p className="text-gray-900">{selectedCampaign.status}</p>
+                    <p className="text-white">{selectedCampaign.status}</p>
                   )}
                 </div>
 
                 {/* Compensation - EDITABLE */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-[#9A9A9A] mb-2">
                     Compensation {isEditMode && <span className="text-green-600">✎ Editable</span>}
                   </label>
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-xs text-gray-600 mb-1">Type</label>
+                      <label className="block text-xs text-[#9A9A9A] mb-1">Type</label>
                       {isEditMode ? (
                         <select
                           value={selectedCampaign.compensation.type}
                           onChange={(e) => handleUpdateNestedField('compensation', 'type', e.target.value)}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                          className="w-full px-3 py-2 border border-white/10 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
                         >
                           <option value="Monetary">Monetary</option>
                           <option value="Barter/Gifting">Barter/Gifting</option>
                           <option value="Affiliate/Commission">Affiliate/Commission</option>
                         </select>
                       ) : (
-                        <p className="text-gray-900">{selectedCampaign.compensation.type}</p>
+                        <p className="text-white">{selectedCampaign.compensation.type}</p>
                       )}
                     </div>
                     <div>
-                      <label className="block text-xs text-gray-600 mb-1">Amount</label>
+                      <label className="block text-xs text-[#9A9A9A] mb-1">Amount</label>
                       {isEditMode ? (
                         <input
                           type="number"
                           value={selectedCampaign.compensation.amount}
                           onChange={(e) => handleUpdateNestedField('compensation', 'amount', parseInt(e.target.value))}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                          className="w-full px-3 py-2 border border-white/10 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
                         />
                       ) : (
-                        <p className="text-gray-900">{selectedCampaign.compensation.currency} {selectedCampaign.compensation.amount}</p>
+                        <p className="text-white">{selectedCampaign.compensation.currency} {selectedCampaign.compensation.amount}</p>
                       )}
                     </div>
                     <div className="col-span-2">
-                      <label className="block text-xs text-gray-600 mb-1">Description</label>
+                      <label className="block text-xs text-[#9A9A9A] mb-1">Description</label>
                       {isEditMode ? (
                         <textarea
                           value={selectedCampaign.compensation.description}
                           onChange={(e) => handleUpdateNestedField('compensation', 'description', e.target.value)}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                          className="w-full px-3 py-2 border border-white/10 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
                           rows={2}
                         />
                       ) : (
-                        <p className="text-gray-900">{selectedCampaign.compensation.description}</p>
+                        <p className="text-white">{selectedCampaign.compensation.description}</p>
                       )}
                     </div>
                   </div>
@@ -2073,7 +2073,7 @@ const AllCampaignsSection = () => {
 
                 {/* Budget - EDITABLE */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-[#9A9A9A] mb-2">
                     Budget {isEditMode && <span className="text-green-600">✎ Editable</span>}
                   </label>
                   {isEditMode ? (
@@ -2081,28 +2081,28 @@ const AllCampaignsSection = () => {
                       type="number"
                       value={selectedCampaign.budget}
                       onChange={(e) => handleUpdateField('budget', parseInt(e.target.value))}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                      className="w-full px-3 py-2 border border-white/10 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
                     />
                   ) : (
-                    <p className="text-gray-900">{selectedCampaign.compensation?.currency || 'INR'} {selectedCampaign.budget}</p>
+                    <p className="text-white">{selectedCampaign.compensation?.currency || 'INR'} {selectedCampaign.budget}</p>
                   )}
                 </div>
 
                 {/* Deliverables - EDITABLE */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-[#9A9A9A] mb-2">
                     Deliverables {isEditMode && <span className="text-green-600">✎ Editable</span>}
                   </label>
                   {isEditMode ? (
                     <textarea
                       value={Array.isArray(selectedCampaign.deliverables) ? selectedCampaign.deliverables.join(', ') : selectedCampaign.deliverables}
                       onChange={(e) => handleUpdateField('deliverables', e.target.value.split(',').map(d => d.trim()))}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                      className="w-full px-3 py-2 border border-white/10 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
                       rows={3}
                       placeholder="Separate deliverables with commas"
                     />
                   ) : (
-                    <ul className="list-disc list-inside text-gray-900">
+                    <ul className="list-disc list-inside text-white">
                       {Array.isArray(selectedCampaign.deliverables) 
                         ? selectedCampaign.deliverables.map((d, idx) => <li key={idx}>{d}</li>)
                         : <li>{selectedCampaign.deliverables}</li>
@@ -2113,27 +2113,27 @@ const AllCampaignsSection = () => {
 
                 {/* Timelines - READ ONLY */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Timeline</label>
+                  <label className="block text-sm font-medium text-[#9A9A9A] mb-2">Timeline</label>
                   <div className="grid grid-cols-3 gap-4 text-sm">
                     <div>
-                      <p className="text-gray-600">Application Deadline</p>
-                      <p className="text-gray-900">{new Date(selectedCampaign.timelines.applicationDeadline).toLocaleDateString()}</p>
+                      <p className="text-[#9A9A9A]">Application Deadline</p>
+                      <p className="text-white">{new Date(selectedCampaign.timelines.applicationDeadline).toLocaleDateString()}</p>
                     </div>
                     <div>
-                      <p className="text-gray-600">Campaign Start</p>
-                      <p className="text-gray-900">{new Date(selectedCampaign.timelines.campaignStartDate).toLocaleDateString()}</p>
+                      <p className="text-[#9A9A9A]">Campaign Start</p>
+                      <p className="text-white">{new Date(selectedCampaign.timelines.campaignStartDate).toLocaleDateString()}</p>
                     </div>
                     <div>
-                      <p className="text-gray-600">Campaign End</p>
-                      <p className="text-gray-900">{new Date(selectedCampaign.timelines.campaignEndDate).toLocaleDateString()}</p>
+                      <p className="text-[#9A9A9A]">Campaign End</p>
+                      <p className="text-white">{new Date(selectedCampaign.timelines.campaignEndDate).toLocaleDateString()}</p>
                     </div>
                   </div>
                 </div>
 
                 {/* Target Influencer - READ ONLY */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Target Influencer Criteria</label>
-                  <div className="bg-gray-50 p-4 rounded-lg space-y-2 text-sm">
+                  <label className="block text-sm font-medium text-[#9A9A9A] mb-2">Target Influencer Criteria</label>
+                  <div className="bg-[#000201] p-4 rounded-lg space-y-2 text-sm">
                     <p><span className="font-medium">Number of Influencers:</span> {selectedCampaign.targetInfluencer.numberOfInfluencers}</p>
                     <p><span className="font-medium">Niche:</span> {selectedCampaign.targetInfluencer.targetNiche.join(', ')}</p>
                     <p><span className="font-medium">Follower Range:</span> {selectedCampaign.targetInfluencer.followerCount.min.toLocaleString()} - {selectedCampaign.targetInfluencer.followerCount.max.toLocaleString()}</p>
@@ -2145,18 +2145,18 @@ const AllCampaignsSection = () => {
 
                 {/* Number of Live Posts - READ ONLY */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Number of Live Posts</label>
-                  <p className="text-gray-900">{selectedCampaign.numberOfLivePosts}</p>
+                  <label className="block text-sm font-medium text-[#9A9A9A] mb-2">Number of Live Posts</label>
+                  <p className="text-white">{selectedCampaign.numberOfLivePosts}</p>
                 </div>
 
                 {/* Applicants & Selected Influencers */}
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Applicants</label>
+                    <label className="block text-sm font-medium text-[#9A9A9A] mb-2">Applicants</label>
                     <p className="text-2xl font-bold text-blue-600">{selectedCampaign.applicants.length}</p>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Selected Influencers</label>
+                    <label className="block text-sm font-medium text-[#9A9A9A] mb-2">Selected Influencers</label>
                     <p className="text-2xl font-bold text-green-600">{selectedCampaign.selectedInfluencers.length}</p>
                   </div>
                 </div>
@@ -2164,17 +2164,17 @@ const AllCampaignsSection = () => {
                 {/* Suggested Influencers */}
                 {selectedCampaign.suggestedInfluencers && selectedCampaign.suggestedInfluencers.length > 0 && (
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">AI Suggested Influencers</label>
+                    <label className="block text-sm font-medium text-[#9A9A9A] mb-2">AI Suggested Influencers</label>
                     <div className="space-y-2">
                       {selectedCampaign.suggestedInfluencers.map((influencer, idx) => (
                         <div key={idx} className="bg-green-50 p-3 rounded-lg">
                           <div className="flex items-center justify-between mb-1">
-                            <p className="font-medium text-gray-900">@{influencer.username}</p>
+                            <p className="font-medium text-white">@{influencer.username}</p>
                             <span className="text-xs bg-green-600 text-white px-2 py-1 rounded">
                               {influencer.matchScore}% Match
                             </span>
                           </div>
-                          <p className="text-sm text-gray-600">{influencer.reason}</p>
+                          <p className="text-sm text-[#9A9A9A]">{influencer.reason}</p>
                         </div>
                       ))}
                     </div>
@@ -2184,13 +2184,13 @@ const AllCampaignsSection = () => {
             </div>
 
             {/* Modal Footer */}
-            <div className="px-6 py-4 border-t border-gray-200 flex items-center justify-between">
+            <div className="px-6 py-4 border-t border-white/10 flex items-center justify-between">
               {isEditMode ? (
                 <>
                   <button
                     onClick={handleCancelEdit}
                     disabled={isUpdating}
-                    className="px-4 py-2 bg-gray-200 rounded-lg text-gray-700 hover:bg-gray-300"
+                    className="px-4 py-2 bg-[#2f2f2f] rounded-lg text-[#9A9A9A] hover:bg-[#3a3a3a]"
                   >
                     Cancel
                   </button>
@@ -2212,7 +2212,7 @@ const AllCampaignsSection = () => {
                     setShowDetailModal(false);
                     setSelectedCampaign(null);
                   }}
-                  className="ml-auto px-4 py-2 bg-gray-200 rounded-lg text-gray-700 hover:bg-gray-300"
+                  className="ml-auto px-4 py-2 bg-[#2f2f2f] rounded-lg text-[#9A9A9A] hover:bg-[#3a3a3a]"
                 >
                   Close
                 </button>

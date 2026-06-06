@@ -272,7 +272,7 @@ const AllCampaignsSection = () => {
       {/* Active Campaigns Section */}
       <div>
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-2xl font-bold">Active Campaigns</h2>
+          <h2 className="text-2xl font-normal text-white" style={{ fontFamily: 'var(--font-bricolage-grotesque)' }}>Active Campaigns</h2>
           <Button
             onClick={() => setShowModal(true)}
             className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
@@ -339,7 +339,7 @@ const AllCampaignsSection = () => {
 
       {/* Draft Campaigns Section */}
       <div>
-        <h2 className="text-2xl font-bold mb-4">Draft Campaigns</h2>
+        <h2 className="text-2xl font-normal text-white mb-4" style={{ fontFamily: 'var(--font-bricolage-grotesque)' }}>Draft Campaigns</h2>
 
         {draftCampaigns.length > 0 ? (
           <div className="grid grid-cols-1 gap-4">

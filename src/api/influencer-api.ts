@@ -45,32 +45,14 @@ export const influencerApi = {
 
       const trimmedId = influencerId.trim();
 
-      // Try the /api/influencer/:id endpoint
-      try {
-        const response = await api.get<IInfluencerResponse>(
-          `/influencer/${trimmedId}`
-        );
-
-        if (response.data.data) {
-          return response.data.data;
-        }
-      } catch (error: any) {
-        // If 404 or auth error on auth endpoint, try the influencer endpoint
-        if (error.response?.status === 404 || error.response?.status === 403) {
-          const fallbackResponse = await api.get<IInfluencerResponse>(
-            `/influencer/${trimmedId}`
-          );
-
-          if (!fallbackResponse.data.data) {
-            throw new Error('Influencer not found');
-          }
-
-          return fallbackResponse.data.data;
-        }
-        throw error;
+      // API handoff doc: GET /api/influencers/:id — response at response.data.data or response.data
+      const response = await api.get<IInfluencerResponse>(`/influencers/${trimmedId}`);
+      const influencer = response.data?.data || response.data;
+      if (!influencer) {
+        throw new Error('Influencer not found');
       }
 
-      throw new Error('Influencer not found');
+      return influencer;
     } catch (error: any) {
       const errorMessage =
         error.response?.data?.message || error.message || 'Failed to fetch influencer';
