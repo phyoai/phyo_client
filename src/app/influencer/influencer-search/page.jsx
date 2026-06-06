@@ -297,15 +297,15 @@ export default function InfluencerSearch() {
         }
       `}</style>
 
-      <div className="min-h-screen bg-white">
+      <div className="min-h-screen bg-[#000201]">
         {/* Top Bar with centered search */}
-        <div className="bg-white px-6 py-3 flex items-center gap-4 search-fade-in">
+        <div className="bg-[#181818] px-6 py-3 flex items-center gap-4 search-fade-in">
           {/* Back Button - Fixed width */}
           <button 
             onClick={handleBackClick}
-            className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+            className="p-2 hover:bg-[#262626] rounded-full transition-colors"
           >
-            <ArrowLeft className="h-5 w-5 text-gray-700" />
+            <ArrowLeft className="h-5 w-5 text-[#9A9A9A]" />
           </button>
 
           {/* Search Bar - Centered, grows to fill space */}
@@ -318,7 +318,7 @@ export default function InfluencerSearch() {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-                className="w-full pl-6 pr-12 py-3 bg-[#F0F0F0] rounded-full border-none focus:outline-none text-base text-gray-600"
+                className="w-full pl-6 pr-12 py-3 bg-[#F0F0F0] rounded-full border-none focus:outline-none text-base text-[#9A9A9A]"
                 autoFocus
               />
               <button 
@@ -330,9 +330,9 @@ export default function InfluencerSearch() {
             </div>
              <button 
               onClick={handleVoiceSearch}
-              className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+              className="p-2 hover:bg-[#262626] rounded-full transition-colors"
             >
-              <Mic className="h-5 w-5 text-gray-700" />
+              <Mic className="h-5 w-5 text-[#9A9A9A]" />
             </button>
           </div>
 
@@ -341,14 +341,14 @@ export default function InfluencerSearch() {
            <div className="relative" ref={topBarMoreMenuRef}>
             <button 
               onClick={() => setShowTopBarMoreMenu(!showTopBarMoreMenu)}
-              className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+              className="p-2 hover:bg-[#262626] rounded-full transition-colors"
             >
-              <MoreVertical className="h-5 w-5 text-gray-700" />
+              <MoreVertical className="h-5 w-5 text-[#9A9A9A]" />
             </button>
             
             {/* Top Bar Filter Menu */}
             {showTopBarMoreMenu && (
-              <div className="absolute right-0 mt-2 w-96 bg-white rounded-lg shadow-[0_4px_20px_rgba(0,0,0,0.15)] py-4 z-50 filter-dropdown-enter">
+              <div className="absolute right-0 mt-2 w-96 bg-[#181818] rounded-lg shadow-[0_4px_20px_rgba(0,0,0,0.15)] py-4 z-50 filter-dropdown-enter">
                 {/* Region */}
                 <div className="px-4 mb-4">
                   <label className="block text-sm font-medium text-[#242527] mb-2">Region</label>
@@ -402,7 +402,7 @@ export default function InfluencerSearch() {
         {/* Voice Search Modal */}
         {showVoiceModal && (
           <div className="fixed inset-0 bg-black bg-opacity-25 flex items-center justify-center z-50" onClick={closeVoiceModal}>
-            <div className="bg-white rounded-3xl shadow-2xl p-8 w-[500px] max-w-[90vw]" onClick={(e) => e.stopPropagation()}>
+            <div className="bg-[#181818] rounded-3xl shadow-2xl p-8 w-[500px] max-w-[90vw]" onClick={(e) => e.stopPropagation()}>
               {/* Header */}
               <h2 className="text-2xl font-semibold text-[#242527] mb-8">Speak</h2>
               
@@ -690,33 +690,33 @@ function InfluencerProfile({ influencer }) {
         
         {/* Top Action Buttons - Overlaid */}
         <div className="absolute top-4 left-4 right-4 flex justify-between z-10">
-          <button className="w-10 h-10 bg-white rounded-full flex items-center justify-center hover:bg-gray-100 shadow-md">
+          <button className="w-10 h-10 bg-[#181818] rounded-full flex items-center justify-center hover:bg-[#262626] shadow-md">
             <ArrowLeft className="h-5 w-5" />
           </button>
           <div className="flex gap-2">
             <button 
               onClick={() => setShowSaveModal(true)}
-              className="w-10 h-10 bg-white rounded-full flex items-center justify-center hover:bg-gray-100 shadow-md"
+              className="w-10 h-10 bg-[#181818] rounded-full flex items-center justify-center hover:bg-[#262626] shadow-md"
             >
               <BookmarkLine className="h-5 w-5" />
             </button>
             <div className="relative" ref={moreMenuRef}>
               <button 
                 onClick={() => setShowMoreMenu(!showMoreMenu)}
-                className="w-10 h-10 bg-white rounded-full flex items-center justify-center hover:bg-gray-100 shadow-md"
+                className="w-10 h-10 bg-[#181818] rounded-full flex items-center justify-center hover:bg-[#262626] shadow-md"
               >
                 <MoreVertical className="h-5 w-5" />
               </button>
               
               {/* More Menu Dropdown */}
               {showMoreMenu && (
-                <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 z-50">
+                <div className="absolute right-0 mt-2 w-48 bg-[#181818] rounded-lg shadow-lg py-2 z-50">
                   <button 
                     onClick={() => {
                       setShowMoreMenu(false);
                       // Report functionality
                     }}
-                    className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-2"
+                    className="w-full px-4 py-2 text-left text-sm text-[#9A9A9A] hover:bg-[#262626] flex items-center gap-2"
                   >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 21v-4m0 0V5a2 2 0 012-2h6.5l1 1H21l-3 6 3 6h-8.5l-1-1H5a2 2 0 00-2 2zm9-13.5V9" />
@@ -728,7 +728,7 @@ function InfluencerProfile({ influencer }) {
                       setShowMoreMenu(false);
                       // Not interested functionality
                     }}
-                    className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-2"
+                    className="w-full px-4 py-2 text-left text-sm text-[#9A9A9A] hover:bg-[#262626] flex items-center gap-2"
                   >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
@@ -740,7 +740,7 @@ function InfluencerProfile({ influencer }) {
                       setShowMoreMenu(false);
                       // Share functionality
                     }}
-                    className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-2"
+                    className="w-full px-4 py-2 text-left text-sm text-[#9A9A9A] hover:bg-[#262626] flex items-center gap-2"
                   >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
@@ -757,7 +757,7 @@ function InfluencerProfile({ influencer }) {
       {/* Save to List Modal */}
       {showSaveModal && (
         <div className="fixed inset-0 bg-black bg-opacity-25 flex items-center justify-center z-50" onClick={() => setShowSaveModal(false)}>
-          <div className="bg-white rounded-3xl shadow-xl w-[480px]" onClick={(e) => e.stopPropagation()}>
+          <div className="bg-[#181818] rounded-3xl shadow-xl w-[480px]" onClick={(e) => e.stopPropagation()}>
             {/* Header */}
             <div className="px-4 pt-4 pb-3">
               <h3 className="text-lg font-semibold text-[#242527]">Save to...</h3>
@@ -766,7 +766,7 @@ function InfluencerProfile({ influencer }) {
             {/* List Items */}
             <div className="flex flex-col">
               {savedLists.map((list) => (
-                <div key={list.id} className="flex items-center px-4 py-3 hover:bg-gray-50">
+                <div key={list.id} className="flex items-center px-4 py-3 hover:bg-[#000201]">
                   <div 
                     className="w-12 h-12 rounded-full flex items-center justify-center text-white font-semibold mr-4"
                     style={{ backgroundColor: list.color }}
@@ -778,7 +778,7 @@ function InfluencerProfile({ influencer }) {
                   </div>
                   <button 
                     onClick={() => handleSaveToList(list.id)}
-                    className="p-2 hover:bg-gray-100 rounded-full"
+                    className="p-2 hover:bg-[#262626] rounded-full"
                   >
                     <BookmarkLine className="h-5 w-5" />
                   </button>
@@ -825,7 +825,7 @@ function InfluencerProfile({ influencer }) {
                   setShowNewListModal(false);
                   setNewListName('');
                 }}
-                className="px-6 py-2 border border-[#43573b] text-[#43573b] rounded-lg font-medium hover:bg-gray-100 transition-colors"
+                className="px-6 py-2 border border-[#43573b] text-[#43573b] rounded-lg font-medium hover:bg-[#262626] transition-colors"
               >
                 Cancel
               </button>
@@ -841,7 +841,7 @@ function InfluencerProfile({ influencer }) {
       )}
 
       {/* Profile Content - White card that scrolls over yellow background */}
-      <div className="relative bg-white rounded-t-3xl -mt-8 z-10 shadow-lg">
+      <div className="relative bg-[#181818] rounded-t-3xl -mt-8 z-10 shadow-lg">
         <div className="px-4 py-6 pb-28">
           {/* Username and Name */}
           <div className="mb-6">
@@ -905,7 +905,7 @@ function InfluencerProfile({ influencer }) {
             {/* Likes and Views Graphs */}
             <div className="flex gap-3 overflow-x-auto mb-6">
               {/* Likes Graph */}
-              <div className="bg-white border-[0.5px] border-[#e6e6e6] rounded-xl p-2 min-w-[380px] flex-shrink-0">
+              <div className="bg-[#181818] border-[0.5px] border-[#e6e6e6] rounded-xl p-2 min-w-[380px] flex-shrink-0">
                 <div className="mb-2">
                   <p className="text-[#242527] text-base font-semibold leading-6 tracking-[0.24px]">{influencer.likes} Likes</p>
                   <div className="flex items-center gap-1 text-xs">
@@ -946,7 +946,7 @@ function InfluencerProfile({ influencer }) {
               </div>
 
               {/* Views Graph */}
-              <div className="bg-white border-[0.5px] border-[#e6e6e6] rounded-xl p-2 min-w-[380px] flex-shrink-0">
+              <div className="bg-[#181818] border-[0.5px] border-[#e6e6e6] rounded-xl p-2 min-w-[380px] flex-shrink-0">
                 <div className="mb-2">
                   <p className="text-[#242527] text-base font-semibold leading-6 tracking-[0.24px]">{influencer.views} views</p>
                   <div className="flex items-center gap-1 text-xs">
@@ -993,7 +993,7 @@ function InfluencerProfile({ influencer }) {
             <h3 className="text-[#242527] text-xl font-semibold leading-7 tracking-[-0.14px] mb-3">Audience Insights</h3>
             
             {/* Age Group */}
-            <div className="bg-white border-[0.5px] border-[#e6e6e6] rounded-xl p-2 mb-3">
+            <div className="bg-[#181818] border-[0.5px] border-[#e6e6e6] rounded-xl p-2 mb-3">
               <p className="text-[#242527] text-base font-semibold leading-6 tracking-[0.24px] mb-2">Age Group</p>
               <div className="flex gap-2">
                 <div className="flex flex-col justify-between text-[#333] text-xs py-2 text-right" style={{ minWidth: '32px' }}>
@@ -1036,7 +1036,7 @@ function InfluencerProfile({ influencer }) {
             </div>
 
             {/* Gender */}
-            <div className="bg-white border-[0.5px] border-[#e6e6e6] rounded-xl p-2 mb-3">
+            <div className="bg-[#181818] border-[0.5px] border-[#e6e6e6] rounded-xl p-2 mb-3">
               <p className="text-[#242527] text-base font-semibold leading-6 tracking-[0.24px] mb-2">Gender</p>
               <div className="flex items-center justify-center py-4">
                 <svg width="150" height="150" viewBox="0 0 150 150">
@@ -1058,7 +1058,7 @@ function InfluencerProfile({ influencer }) {
             </div>
 
             {/* Top Locations */}
-            <div className="bg-white border-[0.5px] border-[#e6e6e6] rounded-xl p-2">
+            <div className="bg-[#181818] border-[0.5px] border-[#e6e6e6] rounded-xl p-2">
               <p className="text-[#242527] text-base font-semibold leading-6 tracking-[0.24px] mb-2">Top Locations</p>
               <div className="flex gap-2">
                 <div className="flex flex-col justify-between text-[#333] text-xs py-2 text-right" style={{ minWidth: '32px' }}>
@@ -1171,7 +1171,7 @@ function InfluencerProfile({ influencer }) {
       </div>
 
       {/* Bottom Action Buttons - Sticky at bottom */}
-      <div className="sticky bottom-0 bg-white border-t border-gray-200 px-4 py-4 z-20 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)]">
+      <div className="sticky bottom-0 bg-[#181818] border-t border-white/10 px-4 py-4 z-20 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)]">
         <div className="flex gap-3">
           <button className="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-[#dae3d1] rounded-full text-[#43573b] text-base font-semibold hover:bg-[#c9d9ba] transition-colors tracking-[0.24px]">
             <UserPlus className="h-6 w-6" />

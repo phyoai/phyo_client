@@ -20,6 +20,7 @@ import {
   IApplyCampaignRequest,
   ISelectInfluencerRequest,
   ICampaignActionResponse,
+  ICampaignApplication,
   IListQueryParams,
 } from '@/types';
 
@@ -48,11 +49,13 @@ export const campaignApi = {
         `/campaigns/${campaignId.trim()}`
       );
 
-      if (!response.data.data) {
+      // API handoff doc: response may be { data: campaign } or campaign directly
+      const campaign = response.data?.data || response.data;
+      if (!campaign) {
         throw new Error('Campaign not found');
       }
 
-      return response.data.data;
+      return campaign;
     } catch (error: any) {
       const errorMessage =
         error.response?.data?.message || error.message || 'Failed to fetch campaign';
@@ -233,6 +236,7 @@ export const campaignApi = {
         'campaignName',
         'campaignType',
         'campaignBrief',
+        'campaignGoal',
         'budget',
         'numberOfLivePosts',
         'status',
@@ -604,10 +608,12 @@ export const campaignApi = {
         pagination: IPagination;
       }>>(`/campaigns/${campaignId.trim()}/applications`, { params });
 
-      const payload = response.data?.data;
+      // API handoff doc: response.data.data is the applications array
+      const payload = response.data;
+      const applications = payload?.data?.data ?? payload?.data ?? [];
       return {
-        applications: (payload?.data ?? []) as ICampaignApplication[],
-        pagination: payload?.pagination ?? {
+        applications: (Array.isArray(applications) ? applications : []) as ICampaignApplication[],
+        pagination: payload?.data?.pagination ?? payload?.pagination ?? {
           page: 1,
           limit: 10,
           total: 0,
@@ -706,6 +712,214 @@ export const campaignApi = {
       const errorMessage =
         error.response?.data?.message || error.message || 'Failed to reject application';
       console.error('Error in rejectApplication:', errorMessage);
+      throw error.response?.data || { message: errorMessage };
+    }
+  },
+
+  // ---------------------------------------------------------------------------
+  // HISTORY
+  // ---------------------------------------------------------------------------
+
+  /** GET /api/campaigns/history — paginated campaign history for the authenticated user */
+  getCampaignHistory: async (
+    status: 'ALL' | 'DRAFT' | 'PUBLISHED' | 'IN_PROGRESS' | 'COMPLETED' = 'ALL',
+    pagination?: { page?: number; limit?: number }
+  ): Promise<{ campaigns: ICampaign[]; pagination: IPagination }> => {
+    try {
+      const params: Record<string, any> = {
+        status,
+        page: pagination?.page || 1,
+        limit: pagination?.limit || 10,
+      };
+      const response = await api.get<IPaginatedCampaigns>('/campaigns/history', { params });
+      return {
+        campaigns: response.data.data || [],
+        pagination: response.data.pagination || { page: 1, limit: 10, total: 0, totalPages: 0, hasNextPage: false, hasPreviousPage: false },
+      };
+    } catch (error: any) {
+      const errorMessage = error.response?.data?.message || error.message || 'Failed to fetch campaign history';
+      console.error('Error in getCampaignHistory:', errorMessage);
+      throw error.response?.data || { message: errorMessage };
+    }
+  },
+
+  // ---------------------------------------------------------------------------
+  // TRENDING
+  // ---------------------------------------------------------------------------
+
+  /** GET /api/campaigns/trending/for-me — campaigns recommended for the authenticated user */
+  getTrendingCampaigns: async (): Promise<ICampaign[]> => {
+    try {
+      const response = await api.get<IApiResponse<ICampaign[]>>('/campaigns/trending/for-me');
+      return response.data.data || [];
+    } catch (error: any) {
+      const errorMessage = error.response?.data?.message || error.message || 'Failed to fetch trending campaigns';
+      console.error('Error in getTrendingCampaigns:', errorMessage);
+      throw error.response?.data || { message: errorMessage };
+    }
+  },
+
+  // ---------------------------------------------------------------------------
+  // NEARBY
+  // ---------------------------------------------------------------------------
+
+  /** GET /api/campaigns/nearby — nearby campaigns by lat/lng (reverse geocoded, 30-day window) */
+  getNearbyCampaigns: async (
+    latitude: number,
+    longitude: number,
+    pagination?: { page?: number; limit?: number }
+  ): Promise<{ campaigns: any[]; pagination: IPagination }> => {
+    try {
+      const params: Record<string, any> = {
+        latitude,
+        longitude,
+        page: pagination?.page || 1,
+        limit: pagination?.limit || 20,
+      };
+      const response = await api.get<any>('/campaigns/nearby', { params });
+      return {
+        campaigns: response.data.data || [],
+        pagination: response.data.pagination || { page: 1, limit: 20, total: 0, totalPages: 0, hasNextPage: false, hasPreviousPage: false },
+      };
+    } catch (error: any) {
+      const errorMessage = error.response?.data?.message || error.message || 'Failed to fetch nearby campaigns';
+      console.error('Error in getNearbyCampaigns:', errorMessage);
+      throw error.response?.data || { message: errorMessage };
+    }
+  },
+
+  /** POST /api/campaigns/nearby — batch nearby campaign search (supports coords or city/state/country) */
+  getNearbyCampaignsBatch: async (payload: {
+    latitude?: number;
+    longitude?: number;
+    city?: string;
+    state?: string;
+    country?: string;
+    give_all?: boolean;
+    page?: number;
+    limit?: number;
+  }): Promise<{ campaigns: any[]; pagination: IPagination }> => {
+    try {
+      const response = await api.post<any>('/campaigns/nearby', payload);
+      return {
+        campaigns: response.data.data || [],
+        pagination: response.data.pagination || { page: 1, limit: 20, total: 0, totalPages: 0, hasNextPage: false, hasPreviousPage: false },
+      };
+    } catch (error: any) {
+      const errorMessage = error.response?.data?.message || error.message || 'Failed to fetch nearby campaigns';
+      console.error('Error in getNearbyCampaignsBatch:', errorMessage);
+      throw error.response?.data || { message: errorMessage };
+    }
+  },
+
+  // ---------------------------------------------------------------------------
+  // BOOST
+  // ---------------------------------------------------------------------------
+
+  /** POST /api/campaigns/:id/boost — boost a campaign for increased reach */
+  boostCampaign: async (
+    campaignId: string,
+    duration: '3days' | '7days' | '14days' | '30days',
+    amount: number
+  ): Promise<ICampaignActionResponse> => {
+    try {
+      if (!campaignId) throw new Error('Invalid campaign ID');
+      const response = await api.post<ICampaignActionResponse>(
+        `/campaigns/${campaignId.trim()}/boost`,
+        { duration, amount }
+      );
+      return response.data;
+    } catch (error: any) {
+      const errorMessage = error.response?.data?.message || error.message || 'Failed to boost campaign';
+      console.error('Error in boostCampaign:', errorMessage);
+      throw error.response?.data || { message: errorMessage };
+    }
+  },
+
+  /** GET /api/campaigns/:id/boost-recommendations — get boost tier recommendations */
+  getBoostRecommendations: async (campaignId: string): Promise<any> => {
+    try {
+      if (!campaignId) throw new Error('Invalid campaign ID');
+      const response = await api.get<any>(`/campaigns/${campaignId.trim()}/boost-recommendations`);
+      return response.data.data || response.data;
+    } catch (error: any) {
+      const errorMessage = error.response?.data?.message || error.message || 'Failed to fetch boost recommendations';
+      console.error('Error in getBoostRecommendations:', errorMessage);
+      throw error.response?.data || { message: errorMessage };
+    }
+  },
+
+  // ---------------------------------------------------------------------------
+  // DELIVERABLES
+  // ---------------------------------------------------------------------------
+
+  /** GET /api/campaigns/:id/deliverables — list all deliverables for a campaign */
+  getDeliverables: async (campaignId: string): Promise<any[]> => {
+    try {
+      if (!campaignId) throw new Error('Invalid campaign ID');
+      const response = await api.get<IApiResponse<any[]>>(`/campaigns/${campaignId.trim()}/deliverables`);
+      return response.data.data || [];
+    } catch (error: any) {
+      const errorMessage = error.response?.data?.message || error.message || 'Failed to fetch deliverables';
+      console.error('Error in getDeliverables:', errorMessage);
+      throw error.response?.data || { message: errorMessage };
+    }
+  },
+
+  /** POST /api/campaigns/:id/deliverables — add a deliverable to a campaign */
+  addDeliverable: async (campaignId: string, title: string): Promise<any[]> => {
+    try {
+      if (!campaignId) throw new Error('Invalid campaign ID');
+      const response = await api.post<IApiResponse<any[]>>(
+        `/campaigns/${campaignId.trim()}/deliverables`,
+        { title }
+      );
+      return response.data.data || [];
+    } catch (error: any) {
+      const errorMessage = error.response?.data?.message || error.message || 'Failed to add deliverable';
+      console.error('Error in addDeliverable:', errorMessage);
+      throw error.response?.data || { message: errorMessage };
+    }
+  },
+
+  /** POST /api/campaigns/:id/deliverables/:deliverableId/submit — influencer submits a deliverable */
+  submitDeliverable: async (
+    campaignId: string,
+    deliverableId: string,
+    payload: { contentUrl: string; notes?: string }
+  ): Promise<ICampaignActionResponse> => {
+    try {
+      if (!campaignId) throw new Error('Invalid campaign ID');
+      if (!deliverableId) throw new Error('Invalid deliverable ID');
+      const response = await api.post<ICampaignActionResponse>(
+        `/campaigns/${campaignId.trim()}/deliverables/${deliverableId.trim()}/submit`,
+        payload
+      );
+      return response.data;
+    } catch (error: any) {
+      const errorMessage = error.response?.data?.message || error.message || 'Failed to submit deliverable';
+      console.error('Error in submitDeliverable:', errorMessage);
+      throw error.response?.data || { message: errorMessage };
+    }
+  },
+
+  /** PATCH /api/campaigns/:id/deliverables/:deliverableId/brand-review — brand approves/rejects/requests changes */
+  updateDeliverableBrandReview: async (
+    campaignId: string,
+    deliverableId: string,
+    payload: { status: 'approved' | 'rejected' | 'changes_requested'; notes?: string; message_for_change?: string }
+  ): Promise<ICampaignActionResponse> => {
+    try {
+      if (!campaignId) throw new Error('Invalid campaign ID');
+      if (!deliverableId) throw new Error('Invalid deliverable ID');
+      const response = await api.patch<ICampaignActionResponse>(
+        `/campaigns/${campaignId.trim()}/deliverables/${deliverableId.trim()}/brand-review`,
+        payload
+      );
+      return response.data;
+    } catch (error: any) {
+      const errorMessage = error.response?.data?.message || error.message || 'Failed to update deliverable review';
+      console.error('Error in updateDeliverableBrandReview:', errorMessage);
       throw error.response?.data || { message: errorMessage };
     }
   },

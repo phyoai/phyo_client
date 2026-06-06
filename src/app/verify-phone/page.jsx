@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useMemo, useState, Suspense } from 'react';
+import api from '@/utils/api';
 
 const OTP_LENGTH = 6;
 const OTP_ILLUSTRATION = '/landing/login_modal/loginmodal.svg';
@@ -183,22 +184,14 @@ function VerifyPhoneContent() {
     setIsVerifying(true);
 
     try {
-      const apiBase = process.env.NEXT_PUBLIC_API_URL || 'https://api.phyo.ai/api';
-      const response = await fetch(`${apiBase}/brand-requests/verify-otp`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          phone,
-          otp: otpValue,
-        }),
+      const response = await api.post('/brand-requests/verify-otp', {
+        phone,
+        otp: otpValue,
       });
-
-      const result = await response.json().catch(() => ({}));
-
-      if (!response.ok) {
-        throw new Error(result?.message || 'Invalid OTP. Please try again.');
+      // api.post returns axios response; payload is at response.data
+      const result = response.data;
+      if (!result.success) {
+        throw new Error(result.message || 'Invalid OTP. Please try again.');
       }
 
       setStatusMessage('Phone number verified successfully. Redirecting...');
@@ -223,19 +216,10 @@ function VerifyPhoneContent() {
     setIsResending(true);
 
     try {
-      const apiBase = process.env.NEXT_PUBLIC_API_URL || 'https://api.phyo.ai/api';
-      const response = await fetch(`${apiBase}/brand-requests/send-otp`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ phone }),
-      });
-
-      const result = await response.json().catch(() => ({}));
-
-      if (!response.ok) {
-        throw new Error(result?.message || 'Failed to resend OTP.');
+      const response = await api.post('/brand-requests/send-otp', { phone });
+      const result = response.data;
+      if (!result.success) {
+        throw new Error(result.message || 'Failed to resend OTP.');
       }
 
       setOtpDigits(Array(OTP_LENGTH).fill(''));

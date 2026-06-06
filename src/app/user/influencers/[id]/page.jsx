@@ -227,33 +227,33 @@ const TopInfluencersPage = () => {
 
   if (!displayInfluencer) {
     return (
-      <div className="bg-white h-screen flex flex-col overflow-hidden">
-        <div className="bg-white flex items-center justify-between px-4 py-2 border-b border-gray-100 shrink-0">
+      <div className="bg-[#181818] h-screen flex flex-col overflow-hidden">
+        <div className="bg-[#181818] flex items-center justify-between px-4 py-2 border-b border-white/5 shrink-0">
           <button
             onClick={handleBack}
-            className="flex items-center justify-center w-12 h-12 rounded-full hover:bg-gray-100 transition-colors"
+            className="flex items-center justify-center w-12 h-12 rounded-full hover:bg-[#262626] transition-colors"
           >
-            <ArrowLeft className="w-6 h-6 text-gray-700" />
+            <ArrowLeft className="w-6 h-6 text-[#9A9A9A]" />
           </button>
           <h1 className="text-xl font-semibold text-[#242527] flex-1 px-2">Influencer Not Found</h1>
           <div className="w-12"></div>
         </div>
         <div className="flex-1 flex items-center justify-center">
-          <p className="text-gray-500">The influencer you're looking for doesn't exist.</p>
+          <p className="text-[#9A9A9A]">The influencer you're looking for doesn't exist.</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="bg-white h-screen flex flex-col overflow-hidden">
+    <div className="bg-[#181818] h-screen flex flex-col overflow-hidden">
       {/* App Bar */}
-      <div className="bg-white flex items-center justify-between px-4 py-2 border-b border-gray-100 shrink-0">
+      <div className="bg-[#181818] flex items-center justify-between px-4 py-2 border-b border-white/5 shrink-0">
         <button
           onClick={handleBack}
-          className="flex items-center justify-center w-12 h-12 rounded-full hover:bg-gray-100 transition-colors"
+          className="flex items-center justify-center w-12 h-12 rounded-full hover:bg-[#262626] transition-colors"
         >
-          <ArrowLeft className="w-6 h-6 text-gray-700" />
+          <ArrowLeft className="w-6 h-6 text-[#9A9A9A]" />
         </button>
 
         <h1 className="text-xl font-semibold text-[#242527] flex-1 px-2">
@@ -262,16 +262,16 @@ const TopInfluencersPage = () => {
 
         <button
           type="button"
-          className="flex items-center justify-center w-12 h-12 rounded-full hover:bg-gray-100 transition-colors"
+          className="flex items-center justify-center w-12 h-12 rounded-full hover:bg-[#262626] transition-colors"
         >
-          <MoreVertical className="w-6 h-6 text-gray-700" />
+          <MoreVertical className="w-6 h-6 text-[#9A9A9A]" />
         </button>
       </div>
 
       {/* Main Content */}
       <div className="flex-1 overflow-hidden">
         {/* Influencer Profile - Full Width */}
-        <div className="w-full h-full overflow-y-auto bg-white">
+        <div className="w-full h-full overflow-y-auto bg-[#181818]">
           {/* Yellow Background - Sticky at top */}
           <div className="sticky top-0 bg-yellow-400 h-[400px] z-0">
             {/* Profile Image - Centered */}
@@ -286,34 +286,34 @@ const TopInfluencersPage = () => {
             <div className="absolute top-4 left-4 right-4 flex justify-between z-10">
               <button
                 onClick={handleBack}
-                className="w-10 h-10 bg-white rounded-full flex items-center justify-center hover:bg-gray-100 shadow-md"
+                className="w-10 h-10 bg-[#181818] rounded-full flex items-center justify-center hover:bg-[#262626] shadow-md"
               >
                 <ArrowLeft className="h-5 w-5" />
               </button>
               <div className="flex gap-2">
                 <button
                   onClick={() => setShowSaveModal(true)}
-                  className="w-10 h-10 bg-white rounded-full flex items-center justify-center hover:bg-gray-100 shadow-md"
+                  className="w-10 h-10 bg-[#181818] rounded-full flex items-center justify-center hover:bg-[#262626] shadow-md"
                 >
                   <BookmarkLine className="h-5 w-5" />
                 </button>
                 <div className="relative" ref={moreMenuRef}>
                   <button
                     onClick={() => setShowMoreMenu(!showMoreMenu)}
-                    className="w-10 h-10 bg-white rounded-full flex items-center justify-center hover:bg-gray-100 shadow-md"
+                    className="w-10 h-10 bg-[#181818] rounded-full flex items-center justify-center hover:bg-[#262626] shadow-md"
                   >
                     <MoreVertical className="h-5 w-5" />
                   </button>
 
                   {/* More Menu Dropdown */}
                   {showMoreMenu && (
-                    <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 z-50">
+                    <div className="absolute right-0 mt-2 w-48 bg-[#181818] rounded-lg shadow-lg py-2 z-50">
                       <button
                         onClick={() => {
                           setShowMoreMenu(false);
                           // Report functionality
                         }}
-                        className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-2"
+                        className="w-full px-4 py-2 text-left text-sm text-[#9A9A9A] hover:bg-[#262626] flex items-center gap-2"
                       >
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 21v-4m0 0V5a2 2 0 012-2h6.5l1 1H21l-3 6 3 6h-8.5l-1-1H5a2 2 0 00-2 2zm9-13.5V9" />
@@ -325,7 +325,7 @@ const TopInfluencersPage = () => {
                           setShowMoreMenu(false);
                           // Not interested functionality
                         }}
-                        className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-2"
+                        className="w-full px-4 py-2 text-left text-sm text-[#9A9A9A] hover:bg-[#262626] flex items-center gap-2"
                       >
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
@@ -337,7 +337,7 @@ const TopInfluencersPage = () => {
                           setShowMoreMenu(false);
                           // Share functionality
                         }}
-                        className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-2"
+                        className="w-full px-4 py-2 text-left text-sm text-[#9A9A9A] hover:bg-[#262626] flex items-center gap-2"
                       >
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
@@ -354,7 +354,7 @@ const TopInfluencersPage = () => {
           {/* Save to List Modal */}
           {showSaveModal && (
             <div className="fixed inset-0 bg-black bg-opacity-25 flex items-center justify-center z-50" onClick={() => setShowSaveModal(false)}>
-              <div className="bg-white rounded-3xl shadow-xl w-[480px]" onClick={(e) => e.stopPropagation()}>
+              <div className="bg-[#181818] rounded-3xl shadow-xl w-[480px]" onClick={(e) => e.stopPropagation()}>
                 {/* Header */}
                 <div className="px-4 pt-4 pb-3">
                   <h3 className="text-lg font-semibold text-[#242527]">Save to...</h3>
@@ -363,7 +363,7 @@ const TopInfluencersPage = () => {
                 {/* List Items */}
                 <div className="flex flex-col">
                   {savedLists.map((list) => (
-                    <div key={list.id} className="flex items-center px-4 py-3 hover:bg-gray-50">
+                    <div key={list.id} className="flex items-center px-4 py-3 hover:bg-[#000201]">
                       <div
                         className="w-12 h-12 rounded-full flex items-center justify-center text-white font-semibold mr-4"
                         style={{ backgroundColor: list.color }}
@@ -375,7 +375,7 @@ const TopInfluencersPage = () => {
                       </div>
                       <button
                         onClick={() => handleSaveToList(list.id)}
-                        className="p-2 hover:bg-gray-100 rounded-full"
+                        className="p-2 hover:bg-[#262626] rounded-full"
                       >
                         <BookmarkLine className="h-5 w-5" />
                       </button>
@@ -422,7 +422,7 @@ const TopInfluencersPage = () => {
                       setShowNewListModal(false);
                       setNewListName('');
                     }}
-                    className="px-6 py-2 border border-[#43573b] text-[#43573b] rounded-lg font-medium hover:bg-gray-100 transition-colors"
+                    className="px-6 py-2 border border-[#43573b] text-[#43573b] rounded-lg font-medium hover:bg-[#262626] transition-colors"
                   >
                     Cancel
                   </button>
@@ -438,7 +438,7 @@ const TopInfluencersPage = () => {
           )}
 
           {/* Profile Content - Showing after yellow bg */}
-          <div className="relative z-1 bg-white pt-8 pb-32 px-6">
+          <div className="relative z-1 bg-[#181818] pt-8 pb-32 px-6">
             {/* Profile Info */}
             <div className="mb-6">
               <p className="text-[#808080] text-base font-semibold leading-6 tracking-[0.24px] mb-1">{displayInfluencer.username}</p>
@@ -447,15 +447,15 @@ const TopInfluencersPage = () => {
 
             {/* Stats Badges */}
             <div className="flex flex-wrap gap-2 mb-6">
-              <div className="bg-white border border-gray-200 rounded-full px-4 py-2 flex items-center gap-2">
+              <div className="bg-[#181818] border border-white/10 rounded-full px-4 py-2 flex items-center gap-2">
                 <FacebookCircleFill className="w-5 h-5" style={{ color: '#1877f2' }} />
                 <span className="text-[#808080] text-sm sm:text-base font-semibold leading-6 tracking-[0.24px]">{displayInfluencer.followers}</span>
               </div>
-              <div className="bg-white border border-gray-200 rounded-full px-4 py-2 flex items-center gap-2">
+              <div className="bg-[#181818] border border-white/10 rounded-full px-4 py-2 flex items-center gap-2">
                 <InstagramFill className="w-5 h-5" style={{ color: '#e1306c' }} />
                 <span className="text-[#808080] text-sm sm:text-base font-semibold leading-6 tracking-[0.24px]">{displayInfluencer.following}</span>
               </div>
-              <div className="bg-white border border-gray-200 rounded-full px-4 py-2 flex items-center gap-2">
+              <div className="bg-[#181818] border border-white/10 rounded-full px-4 py-2 flex items-center gap-2">
                 <YoutubeFill className="w-5 h-5" style={{ color: '#ff0000' }} />
                 <span className="text-[#808080] text-sm sm:text-base font-semibold leading-6 tracking-[0.24px]">{displayInfluencer.posts}</span>
               </div>
@@ -484,7 +484,7 @@ const TopInfluencersPage = () => {
               <h3 className="text-[#242527] text-xl font-semibold leading-7 tracking-[-0.14px] mb-4">Interactions</h3>
 
               {/* Likes Graph */}
-              <div className="bg-white border-[0.5px] border-[#e6e6e6] rounded-xl p-2 min-w-[380px] flex-shrink-0 mb-3">
+              <div className="bg-[#181818] border-[0.5px] border-[#e6e6e6] rounded-xl p-2 min-w-[380px] flex-shrink-0 mb-3">
                 <div className="mb-2">
                   <p className="text-[#242527] text-base font-semibold leading-6 tracking-[0.24px]">{displayInfluencer.likes} likes</p>
                   <div className="flex items-center gap-1 text-xs">
@@ -525,7 +525,7 @@ const TopInfluencersPage = () => {
               </div>
 
               {/* Views Graph */}
-              <div className="bg-white border-[0.5px] border-[#e6e6e6] rounded-xl p-2 min-w-[380px] flex-shrink-0">
+              <div className="bg-[#181818] border-[0.5px] border-[#e6e6e6] rounded-xl p-2 min-w-[380px] flex-shrink-0">
                 <div className="mb-2">
                   <p className="text-[#242527] text-base font-semibold leading-6 tracking-[0.24px]">{displayInfluencer.views} views</p>
                   <div className="flex items-center gap-1 text-xs">
@@ -571,7 +571,7 @@ const TopInfluencersPage = () => {
               <h3 className="text-[#242527] text-xl font-semibold leading-7 tracking-[-0.14px] mb-3">Audience Insights</h3>
 
               {/* Age Group */}
-              <div className="bg-white border-[0.5px] border-[#e6e6e6] rounded-xl p-2 mb-3">
+              <div className="bg-[#181818] border-[0.5px] border-[#e6e6e6] rounded-xl p-2 mb-3">
                 <p className="text-[#242527] text-base font-semibold leading-6 tracking-[0.24px] mb-2">Age Group</p>
                 <div className="flex gap-2">
                   <div className="flex flex-col justify-between text-[#333] text-xs py-2 text-right" style={{ minWidth: '32px' }}>
@@ -611,7 +611,7 @@ const TopInfluencersPage = () => {
               </div>
 
               {/* Gender Distribution */}
-              <div className="bg-white border-[0.5px] border-[#e6e6e6] rounded-xl p-4 mb-3">
+              <div className="bg-[#181818] border-[0.5px] border-[#e6e6e6] rounded-xl p-4 mb-3">
                 <p className="text-[#242527] text-base font-semibold leading-6 tracking-[0.24px] mb-4">Gender</p>
                 <div className="flex items-center gap-8">
                   <div className="relative w-40 h-40">
@@ -661,7 +661,7 @@ const TopInfluencersPage = () => {
               </div>
 
               {/* Top Locations */}
-              <div className="bg-white border-[0.5px] border-[#e6e6e6] rounded-xl p-4">
+              <div className="bg-[#181818] border-[0.5px] border-[#e6e6e6] rounded-xl p-4">
                 <p className="text-[#242527] text-base font-semibold leading-6 tracking-[0.24px] mb-4">Top Locations</p>
                 <div className="space-y-3">
                   <div>
@@ -718,7 +718,7 @@ const TopInfluencersPage = () => {
               <h3 className="text-[#242527] text-xl font-semibold leading-7 tracking-[-0.14px] mb-4">Similar Influencers</h3>
               <div className="flex gap-3 overflow-x-auto pb-2">
                 {[1, 2, 3, 4, 5].map((item) => (
-                  <div key={item} className="flex-shrink-0 bg-white border border-gray-200 rounded-xl p-4 w-[220px]">
+                  <div key={item} className="flex-shrink-0 bg-[#181818] border border-white/10 rounded-xl p-4 w-[220px]">
                     <div className="w-full h-32 bg-gradient-to-br from-orange-300 to-red-400 rounded-lg mb-3"></div>
                     <p className="text-[#242527] font-semibold text-sm mb-1">Influencer {item}</p>
                     <p className="text-[#808080] text-xs mb-3">@influencer{item}</p>
@@ -732,7 +732,7 @@ const TopInfluencersPage = () => {
           </div>
 
           {/* Sticky Bottom Action Buttons */}
-          <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 py-4 flex gap-3 z-40 px-6">
+          <div className="fixed bottom-0 left-0 right-0 bg-[#181818] border-t border-white/10 py-4 flex gap-3 z-40 px-6">
             <button
               onClick={handleInvite}
               className="flex-1 bg-[#dae3d1] text-[#43573b] py-3 rounded-lg font-semibold hover:bg-[#c9d9ba] transition-colors flex items-center justify-center gap-2"

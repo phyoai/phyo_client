@@ -61,7 +61,7 @@ const TransactionsPage = () => {
   }, {});
 
   return (
-    <div className="flex flex-col w-full min-h-screen bg-white dark:bg-[#121212]">
+    <div className="flex flex-col w-full min-h-screen bg-[#000201] dark:bg-[#121212]">
       <AppBar
         title="Billing history"
         onBack={() => router.push(`/${role}/account`)}
@@ -82,7 +82,7 @@ const TransactionsPage = () => {
             {Object.entries(groupedTransactions).map(([month, monthTransactions]) => (
               <div key={month}>
                 {/* Month Header */}
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 px-2">
+                <h3 className="text-lg font-semibold text-white dark:text-white mb-4 px-2">
                   {month}
                 </h3>
 
@@ -91,7 +91,7 @@ const TransactionsPage = () => {
                   {monthTransactions.map((transaction) => (
                     <div
                       key={transaction._id || transaction.date + transaction.time}
-                      className="flex items-center justify-between p-4 bg-gray-50 dark:bg-[#1e1e1e] border border-gray-200 dark:border-gray-700 rounded-lg hover:shadow-md transition-shadow"
+                      className="flex items-center justify-between p-4 bg-[#000201] dark:bg-[#1e1e1e] border border-white/10 dark:border-gray-700 rounded-lg hover:shadow-md transition-shadow"
                     >
                       {/* Avatar & Details */}
                       <div className="flex items-start gap-4 flex-1">
@@ -102,10 +102,10 @@ const TransactionsPage = () => {
                         </div>
 
                         <div className="flex-1 min-w-0">
-                          <h4 className="font-semibold text-gray-900 dark:text-white text-sm">
+                          <h4 className="font-semibold text-white dark:text-white text-sm">
                             {transaction.type}
                           </h4>
-                          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                          <p className="text-xs text-[#9A9A9A] dark:text-[#808080] mt-1">
                             {transaction.time} {transaction.date}
                           </p>
                         </div>
@@ -121,7 +121,7 @@ const TransactionsPage = () => {
                         <button className="text-xs font-medium text-blue-600 hover:text-blue-700 transition-colors whitespace-nowrap">
                           {transaction.action}
                         </button>
-                        <button className="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
+                        <button className="p-1 text-[#808080] hover:text-[#9A9A9A] dark:hover:text-gray-300 transition-colors">
                           <MoreLine size={18} />
                         </button>
                       </div>
@@ -133,7 +133,7 @@ const TransactionsPage = () => {
           </div>
         ) : (
           <div className="flex flex-col items-center justify-center h-64">
-            <p className="text-gray-500 dark:text-gray-400 text-lg">
+            <p className="text-[#9A9A9A] dark:text-[#808080] text-lg">
               No transactions found
             </p>
           </div>

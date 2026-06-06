@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { ToastContainer, toast } from 'react-toastify';
 import OutlineGlowButton from '@/components/shared/OutlineGlowButton';
+import api from '@/utils/api';
 import 'react-toastify/dist/ReactToastify.css';
 
 const OTP_LENGTH = 6;
@@ -104,18 +105,13 @@ export function ForgotPasswordCard({ isModal = false, onClose, onCompleted }) {
 
     setLoading(true);
     try {
-      const response = await fetch('https://api.phyo.ai/api/user/forgot-password', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: email.trim() }),
-      });
-
-      const result = await response.json();
-      if (response.ok) {
+      const response = await api.post('/auth/forgot-password', { email: email.trim() });
+      const payload = response?.data ?? {};
+      if (payload.success) {
         toast.success('Verification code sent to your email');
         setStep(2);
       } else {
-        toast.error(result.message || 'Failed to send verification code');
+        toast.error(payload.message || 'Failed to send verification code');
       }
     } catch {
       toast.error('Network error. Please try again.');
@@ -132,18 +128,13 @@ export function ForgotPasswordCard({ isModal = false, onClose, onCompleted }) {
 
     setLoading(true);
     try {
-      const response = await fetch('https://api.phyo.ai/api/user/verify-code', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: email.trim(), code: verificationCode }),
-      });
-
-      const result = await response.json();
-      if (response.ok) {
+      const response = await api.post('/auth/verify-code', { email: email.trim(), code: verificationCode });
+      const payload = response?.data ?? {};
+      if (payload.success) {
         toast.success('Code verified successfully');
         setStep(3);
       } else {
-        toast.error(result.message || 'Invalid verification code');
+        toast.error(payload.message || 'Invalid verification code');
       }
     } catch {
       toast.error('Network error. Please try again.');
@@ -170,14 +161,9 @@ export function ForgotPasswordCard({ isModal = false, onClose, onCompleted }) {
 
     setLoading(true);
     try {
-      const response = await fetch('https://api.phyo.ai/api/user/reset-password', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: email.trim(), newPassword }),
-      });
-
-      const result = await response.json();
-      if (response.ok) {
+      const response = await api.post('/auth/reset-password', { email: email.trim(), newPassword });
+      const payload = response?.data ?? {};
+      if (payload.success) {
         toast.success('Password reset successfully. Redirecting to login...');
         setTimeout(() => {
           if (onCompleted) {
@@ -193,7 +179,7 @@ export function ForgotPasswordCard({ isModal = false, onClose, onCompleted }) {
           router.replace('/login');
         }, 1500);
       } else {
-        toast.error(result.message || 'Failed to reset password');
+        toast.error(payload.message || 'Failed to reset password');
       }
     } catch {
       toast.error('Network error. Please try again.');

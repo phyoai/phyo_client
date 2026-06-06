@@ -328,7 +328,6 @@ function LoginForm({ facebookAppId }) {
   const { isAuthenticated } = useAuth();
 
   const verified = searchParams.get("verified");
-  const expired = searchParams.get("expired");
 
   useEffect(() => {
     if (facebookAppId) {
@@ -341,25 +340,10 @@ function LoginForm({ facebookAppId }) {
       return;
     }
 
-    let redirect = searchParams.get("redirect");
+    const redirect = searchParams.get("redirect") ||
+      getDefaultRedirect(secureAuthStorage.getUserData());
 
-    if (!redirect) {
-      const userDataStr = localStorage.getItem("userData");
-
-      if (userDataStr) {
-        try {
-          redirect = getDefaultRedirect(JSON.parse(userDataStr));
-        } catch (error) {
-          redirect = "/";
-        }
-      } else {
-        redirect = "/";
-      }
-    }
-
-    if (redirect) {
-      router.push(redirect);
-    }
+    router.push(redirect);
   }, [isAuthenticated, router, searchParams]);
 
   useEffect(() => {
@@ -371,10 +355,13 @@ function LoginForm({ facebookAppId }) {
   }, [verified]);
 
   useEffect(() => {
-    if (expired) {
-      toast.info("Your session expired. Please sign in again.");
-    }
-  }, [expired]);
+    try {
+      if (sessionStorage.getItem('auth_expired') === '1') {
+        sessionStorage.removeItem('auth_expired');
+        toast.info("Your session expired. Please sign in again.");
+      }
+    } catch (_) {}
+  }, []);
 
   useEffect(() => {
     if (!uiState.forgotModalOpen) {
@@ -413,11 +400,11 @@ function LoginForm({ facebookAppId }) {
       throw new Error('Too many login attempts. Please try again in 1 minute.');
     }
 
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || "https://api.phyo.ai/api";
+    const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || process.env.NEXT_PUBLIC_API_URL || "https://spool-reliance-channel.ngrok-free.dev";
 
-    const response = await fetch(`${apiUrl}/auth/login`, {
+    const response = await fetch(`${apiBaseUrl.replace(/\/$/, '')}/auth/login`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", "ngrok-skip-browser-warning": "true" },
       credentials: "include",
       body: JSON.stringify({ email: emailValidation.value, password }),
     });
@@ -436,11 +423,11 @@ function LoginForm({ facebookAppId }) {
       throw new Error('Invalid Google credentials');
     }
 
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || "https://api.phyo.ai/api";
+    const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || process.env.NEXT_PUBLIC_API_URL || "https://spool-reliance-channel.ngrok-free.dev";
 
-    const response = await fetch(`${apiUrl}/auth/google`, {
+    const response = await fetch(`${apiBaseUrl.replace(/\/$/, '')}/auth/google`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", "ngrok-skip-browser-warning": "true" },
       credentials: "include",
       body: JSON.stringify({ idToken, type: "USER" }),
     });
@@ -455,9 +442,9 @@ function LoginForm({ facebookAppId }) {
   }, []);
 
   const instagramLoginAPI = async (accessToken) => {
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || "https://api.phyo.ai/api";
+    const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || process.env.NEXT_PUBLIC_API_URL || "https://spool-reliance-channel.ngrok-free.dev";
 
-    const response = await fetch(`${apiUrl}/auth/instagram`, {
+    const response = await fetch(`${apiBaseUrl.replace(/\/$/, '')}/auth/instagram`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -874,6 +861,11 @@ function LoginForm({ facebookAppId }) {
                 onSuccess={handleGoogleSuccess}
                 onError={handleGoogleError}
                 useOneTap={false}
+                text="signin_with"
+                shape="rectangular"
+                logo_alignment="left"
+                width="400"
+                locale="en"
               />
             </div>
           </div>

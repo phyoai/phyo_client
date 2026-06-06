@@ -1,8 +1,10 @@
 'use client';
 
 import { useState, useEffect, useRef } from "react";
+import { useParams, useRouter } from "next/navigation";
 import { YoutubeFill, InstagramFill, TwitterXLine } from '@phyoofficial/phyo-icon-library';
 import { ShieldCheck, ExternalLink, Globe, ArrowLeft, MoreVertical } from 'lucide-react';
+import api from '@/utils/api';
 
 const SOCIALS = [
   { platform: "Youtube",   icon: <YoutubeFill size={18} /> },
@@ -12,9 +14,36 @@ const SOCIALS = [
 ];
 
 export default function BrandProfile() {
+  const params = useParams();
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState("info");
   const [scrollY, setScrollY] = useState(0);
+  const [brand, setBrand] = useState(null);
+  const [brandCampaigns, setBrandCampaigns] = useState([]);
+  const [brandStats, setBrandStats] = useState(null);
+  const [loading, setLoading] = useState(true);
   const containerRef = useRef(null);
+
+  const brandId = params?.id;
+
+  // Fetch GET /api/brands/:id, /campaigns, /stats
+  useEffect(() => {
+    if (!brandId) return;
+    setLoading(true);
+    Promise.all([
+      api.get(`/brands/${brandId}`),
+      api.get(`/brands/${brandId}/campaigns`).catch(() => ({ data: { data: [] } })),
+      api.get(`/brands/${brandId}/stats`).catch(() => ({ data: {} })),
+    ])
+      .then(([brandRes, campaignsRes, statsRes]) => {
+        setBrand(brandRes.data?.data || brandRes.data);
+        const camps = campaignsRes.data?.data || campaignsRes.data?.campaigns || campaignsRes.data || [];
+        setBrandCampaigns(Array.isArray(camps) ? camps : []);
+        setBrandStats(statsRes.data?.data || statsRes.data || null);
+      })
+      .catch((err) => console.error('Failed to load brand profile:', err))
+      .finally(() => setLoading(false));
+  }, [brandId]);
 
   useEffect(() => {
     const handleScroll = () => {

@@ -12,7 +12,7 @@ export default function BrandCard({
 }) {
   return (
     <div 
-      className="flex flex-col items-center justify-center p-4 bg-white rounded-xl hover:bg-gray-50 transition-all cursor-pointer"
+      className="flex flex-col items-center justify-center p-4 bg-[#181818] rounded-3xl hover:bg-[#202020] transition-all cursor-pointer border border-white/5"
       onClick={onClick}
     >
       {/* Brand Avatar Circle */}
@@ -21,7 +21,7 @@ export default function BrandCard({
       </div>
       
       {/* Brand Name */}
-      <h3 className="text-xs font-medium text-gray-900 text-center">
+      <h3 className="text-xs font-medium text-white text-center">
         {brandName}
       </h3>
     </div>

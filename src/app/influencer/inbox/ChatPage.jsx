@@ -35,7 +35,7 @@ const ChatPage = () => {
   ];
 
   return (
-    <div className="h-screen bg-gray-50 flex">
+    <div className="h-screen bg-[#000201] flex">
       <MessagesList 
         contacts={contacts} 
         selectedContact={selectedContact}

@@ -10,6 +10,24 @@ let secureTokenStore = {
   lastRefresh: null,
 };
 
+function getStoredUserData() {
+  if (typeof window === 'undefined') return null;
+
+  try {
+    const raw = window.localStorage?.getItem('userData') || window.sessionStorage?.getItem('userData');
+    if (!raw) return null;
+
+    const parsed = JSON.parse(raw);
+    if (parsed && typeof parsed === 'object') {
+      return parsed;
+    }
+  } catch (e) {
+    console.error('Failed to retrieve user data:', e);
+  }
+
+  return null;
+}
+
 /**
  * Get auth token - NEVER expose in client-side JS in production
  * Tokens should only exist in httpOnly cookies set by backend
@@ -24,10 +42,16 @@ export const secureAuthStorage = {
       return false;
     }
 
-    // Only store in memory during development
-    if (process.env.NODE_ENV === 'development') {
-      secureTokenStore.token = token;
-      secureTokenStore.lastRefresh = Date.now();
+    secureTokenStore.token = token;
+    secureTokenStore.lastRefresh = Date.now();
+
+    if (typeof window !== 'undefined') {
+      try {
+        localStorage.setItem('authToken', token);
+        localStorage.setItem('token', token);
+      } catch (e) {
+        console.error('Failed to store auth token:', e);
+      }
     }
 
     // In production, rely only on httpOnly cookies from backend
@@ -41,14 +65,25 @@ export const secureAuthStorage = {
   getToken: () => {
     if (typeof document === 'undefined') return null;
 
-    // In production, DO NOT try to access token from JS
-    // It should only be in httpOnly cookies
+    if (secureTokenStore.token) {
+      return secureTokenStore.token;
+    }
+
     if (process.env.NODE_ENV === 'production') {
       return null;
     }
 
-    // Development only
-    return secureTokenStore.token;
+    try {
+      const token = window.localStorage?.getItem('authToken') || window.localStorage?.getItem('token');
+      if (token) {
+        secureTokenStore.token = token;
+        return token;
+      }
+    } catch (e) {
+      console.error('Failed to retrieve auth token:', e);
+    }
+
+    return null;
   },
 
   /**
@@ -72,10 +107,12 @@ export const secureAuthStorage = {
 
     secureTokenStore.userData = safeUserData;
 
-    // Also store in sessionStorage for page refresh (cleared on browser close)
+    // Persist to both sessionStorage and localStorage so user survives browser restarts
     if (typeof window !== 'undefined') {
       try {
-        sessionStorage.setItem('userData', JSON.stringify(safeUserData));
+        const serialized = JSON.stringify(safeUserData);
+        sessionStorage.setItem('userData', serialized);
+        localStorage.setItem('userData', serialized);
       } catch (e) {
         console.error('Failed to store user data:', e);
       }
@@ -83,23 +120,17 @@ export const secureAuthStorage = {
   },
 
   /**
-   * Get user data from memory or sessionStorage
+   * Get user data from memory, localStorage, or sessionStorage
    */
   getUserData: () => {
     if (secureTokenStore.userData) {
       return secureTokenStore.userData;
     }
 
-    if (typeof window !== 'undefined') {
-      try {
-        const data = sessionStorage.getItem('userData');
-        if (data) {
-          secureTokenStore.userData = JSON.parse(data);
-          return secureTokenStore.userData;
-        }
-      } catch (e) {
-        console.error('Failed to retrieve user data:', e);
-      }
+    const storedUserData = getStoredUserData();
+    if (storedUserData) {
+      secureTokenStore.userData = storedUserData;
+      return secureTokenStore.userData;
     }
 
     return null;
@@ -119,6 +150,7 @@ export const secureAuthStorage = {
       try {
         sessionStorage.removeItem('userData');
         localStorage.removeItem('authToken');
+        localStorage.removeItem('token');
         localStorage.removeItem('userData');
         localStorage.removeItem('userEmail');
         // Clear auth cookie via document.cookie flag
@@ -131,10 +163,23 @@ export const secureAuthStorage = {
 
   /**
    * Check if user is authenticated
+   * Checks in order: in-memory → sessionStorage userData → localStorage token
    */
   isAuthenticated: () => {
+    // 1. Check in-memory or sessionStorage userData (fastest)
     const userData = secureAuthStorage.getUserData();
-    return userData !== null && userData._id !== null;
+    if (userData !== null && userData._id) return true;
+
+    // 2. Fallback: if token exists in localStorage, consider authenticated
+    //    (userData will be re-hydrated on next API call)
+    if (typeof window !== 'undefined') {
+      try {
+        const token = window.localStorage?.getItem('authToken') || window.localStorage?.getItem('token');
+        if (token) return true;
+      } catch (_) {}
+    }
+
+    return false;
   },
 
   /**

@@ -1,30 +1,26 @@
 'use client'
 import React, { useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { ChevronLeft, ChevronRight, X, Upload, Calendar, Check, Users, MoreVertical, Trash2, Edit, Search, Heart, TrendingUp } from 'lucide-react';
-import { campaignAPI } from '../../../utils/api';
+import { ChevronRight, X, Upload, Check, MoreVertical, Trash2, Edit, Search, TrendingUp, UserRound } from 'lucide-react';
+import { campaignApi } from '@/api/campaign-api';
 import { useSidebar } from '../../context/SidebarContext';
-import { AudienceEngagement } from '@/components/AudienceEngagementGraphs';
-import { SpendingBudget } from '@/components/SpendingBudgetGraph';
 
 const AllCampaignsSection = () => {
   const router = useRouter();
   const { setSidebarButtonAction, setSidebarButtonLabel } = useSidebar();
   const [showModal, setShowModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [showDetailModal, setShowDetailModal] = useState(false);
-  const [selectedCampaign, setSelectedCampaign] = useState(null);
-  const [isEditMode, setIsEditMode] = useState(false);
-  const [isUpdating, setIsUpdating] = useState(false);
   const [campaignToDelete, setCampaignToDelete] = useState(null);
   const [isDeletingCampaign, setIsDeletingCampaign] = useState(false);
   const [openMenuId, setOpenMenuId] = useState(null);
   const [currentStep, setCurrentStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [campaigns, setCampaigns] = useState([]);
+  const [draftCampaigns, setDraftCampaigns] = useState([]);
+  const [completedCampaigns, setCompletedCampaigns] = useState([]);
+  const [applications, setApplications] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [showAllCampaigns, setShowAllCampaigns] = useState(false);
-  const [showAllDrafts, setShowAllDrafts] = useState(false);
+  const [activeFilter, setActiveFilter] = useState('All');
   const [pagination, setPagination] = useState({
     currentPage: 1,
     totalPages: 1,
@@ -62,59 +58,6 @@ const AllCampaignsSection = () => {
   });
 
   const fileInputRef = useRef(null);
-
-  // Campaign data will be fetched from API
-
-  const mockInfluencers = [
-    {
-      id: 1,
-      name: 'Andrew Power',
-      followers: '12.5K',
-      engagement: '4.2%',
-      tags: ['Lifestyle', 'Fitness', 'Food', 'Travel'],
-      image: '/api/placeholder/80/80'
-    },
-    {
-      id: 2,
-      name: 'Andrew Power',
-      followers: '8.7K',
-      engagement: '3.8%',
-      tags: ['Beauty', 'Skincare', 'Wellness'],
-      image: '/api/placeholder/80/80'
-    },
-    {
-      id: 3,
-      name: 'Andrew Power',
-      followers: '15.2K',
-      engagement: '5.1%',
-      tags: ['Fashion', 'Lifestyle', 'Travel'],
-      image: '/api/placeholder/80/80'
-    },
-    {
-      id: 4,
-      name: 'Andrew Power',
-      followers: '22.1K',
-      engagement: '6.3%',
-      tags: ['Health', 'Fitness', 'Nutrition'],
-      image: '/api/placeholder/80/80'
-    },
-    {
-      id: 5,
-      name: 'Andrew Power',
-      followers: '9.8K',
-      engagement: '4.7%',
-      tags: ['Tech', 'Gaming', 'Reviews'],
-      image: '/api/placeholder/80/80'
-    },
-    {
-      id: 6,
-      name: 'Andrew Power',
-      followers: '18.3K',
-      engagement: '5.9%',
-      tags: ['Food', 'Cooking', 'Recipes'],
-      image: '/api/placeholder/80/80'
-    }
-  ];
 
   const handleInputChange = (field, value) => {
     setFormData(prev => ({
@@ -154,23 +97,51 @@ const AllCampaignsSection = () => {
     }));
   };
 
-  // Fetch campaigns from API
-  const fetchCampaigns = async (page = 1, limit = 10) => {
+  // Fetch active, draft, and completed campaigns in parallel
+  const fetchCampaigns = async (page = 1, limit = 20) => {
     setLoading(true);
     try {
-      const response = await campaignAPI.getCampaigns({ page, limit });
-      setCampaigns(response.data || []);
-      setPagination(response.pagination || {
-        currentPage: 1,
-        totalPages: 1,
-        totalItems: 0,
-        itemsPerPage: 10,
-        hasNext: false,
-        hasPrev: false
-      });
+      const [activeResult, draftResult, completedResult] = await Promise.allSettled([
+        campaignApi.getBrandCampaigns({}, { page, limit }),
+        campaignApi.getCampaignHistory('DRAFT', { page: 1, limit: 20 }),
+        campaignApi.getCampaignHistory('COMPLETED', { page: 1, limit: 20 }),
+      ]);
+
+      // Active / Published
+      if (activeResult.status === 'fulfilled') {
+        const { campaigns: data, pagination: pag } = activeResult.value;
+        setCampaigns(data);
+        setPagination({
+          currentPage: pag.currentPage ?? pag.page ?? 1,
+          totalPages: pag.totalPages ?? 1,
+          totalItems: pag.totalItems ?? pag.total ?? 0,
+          itemsPerPage: pag.itemsPerPage ?? pag.limit ?? 20,
+          hasNext: pag.hasNext ?? pag.hasNextPage ?? false,
+          hasPrev: pag.hasPrev ?? pag.hasPreviousPage ?? false,
+        });
+        // Applicants embedded in each campaign — deduplicated by user _id
+        const seen = new Set();
+        const embedded = data.flatMap(c =>
+          (c.applicants || []).map(a => ({ ...a, campaignName: c.campaignName, campaignId: c._id }))
+        ).filter(a => {
+          if (seen.has(a._id)) return false;
+          seen.add(a._id);
+          return true;
+        });
+        setApplications(embedded);
+      }
+
+      // Drafts
+      if (draftResult.status === 'fulfilled') {
+        setDraftCampaigns(draftResult.value.campaigns);
+      }
+
+      // Completed
+      if (completedResult.status === 'fulfilled') {
+        setCompletedCampaigns(completedResult.value.campaigns);
+      }
     } catch (error) {
       console.error('Error fetching campaigns:', error);
-      setCampaigns([]);
     } finally {
       setLoading(false);
     }
@@ -183,12 +154,17 @@ const AllCampaignsSection = () => {
 
   // Helper function to get active campaigns
   const getActiveCampaigns = () => {
-    return campaigns.filter(campaign => campaign.status === 'Active');
+    return campaigns.filter(c => ['active', 'published'].includes((c.status || '').toLowerCase()));
   };
 
-  // Helper function to get draft campaigns
-  const getDraftCampaigns = () => {
-    return campaigns.filter(campaign => campaign.status === 'Draft');
+
+  const getFilteredActiveCampaigns = () => {
+    const active = getActiveCampaigns();
+    if (activeFilter === 'All') return active;
+    return active.filter(c =>
+      (c.campaignType || '').toLowerCase() === activeFilter.toLowerCase() ||
+      (c.targetInfluencer?.targetNiche || []).some(n => n.toLowerCase() === activeFilter.toLowerCase())
+    );
   };
 
   // Register sidebar button action for campaigns tab
@@ -206,26 +182,13 @@ const AllCampaignsSection = () => {
     };
   }, [setSidebarButtonAction, setSidebarButtonLabel]);
 
-  // Pagination handlers
-  const handlePrevPage = () => {
-    if (pagination.hasPrev) {
-      fetchCampaigns(pagination.currentPage - 1, pagination.itemsPerPage);
-    }
-  };
-
-  const handleNextPage = () => {
-    if (pagination.hasNext) {
-      fetchCampaigns(pagination.currentPage + 1, pagination.itemsPerPage);
-    }
-  };
-
   // Delete campaign handler
   const handleDeleteCampaign = async () => {
     if (!campaignToDelete) return;
     
     setIsDeletingCampaign(true);
     try {
-      await campaignAPI.deleteCampaign(campaignToDelete._id);
+      await campaignApi.deleteCampaign(campaignToDelete._id || campaignToDelete.id);
       
       // Show success message
       alert('Campaign deleted successfully!');
@@ -248,96 +211,17 @@ const AllCampaignsSection = () => {
   // Activate campaign (change from Draft to Active)
   const handleActivateCampaign = async (campaignId) => {
     try {
-      await campaignAPI.updateCampaign(campaignId, { status: 'Active' });
-      
-      alert('Campaign activated successfully!');
-      
-      // Refresh campaigns list
-      fetchCampaigns(pagination.currentPage, pagination.itemsPerPage);
-      
+      await campaignApi.updateCampaign(campaignId, { status: 'Active' });
+      fetchCampaigns();
     } catch (error) {
       console.error('Error activating campaign:', error);
       alert(`Failed to activate campaign: ${error.message || 'Unknown error'}`);
     }
   };
 
-  // Complete/Activate campaign from draft (with event handler for button click)
-  const handleCompleteCampaign = async (e, campaignId) => {
-    e.stopPropagation(); // Prevent triggering parent click handlers
-    await handleActivateCampaign(campaignId);
-  };
-
-  // Open campaign detail modal
-  const handleCampaignClick = async (campaign) => {
-    // Navigate to campaign detail page instead of showing modal
-    router.push(`/brand/campaigns/${campaign._id}`);
-  };
-
-  // Enable edit mode
-  const handleEnableEdit = () => {
-    setIsEditMode(true);
-  };
-
-  // Cancel edit mode
-  const handleCancelEdit = () => {
-    setIsEditMode(false);
-    // Refresh campaign data to revert changes
-    if (selectedCampaign) {
-      handleCampaignClick({ _id: selectedCampaign._id });
-    }
-  };
-
-  // Update campaign field
-  const handleUpdateField = (field, value) => {
-    setSelectedCampaign(prev => ({
-      ...prev,
-      [field]: value
-    }));
-  };
-
-  // Update nested field (for compensation, timelines, targetInfluencer)
-  const handleUpdateNestedField = (parentField, childField, value) => {
-    setSelectedCampaign(prev => ({
-      ...prev,
-      [parentField]: {
-        ...prev[parentField],
-        [childField]: value
-      }
-    }));
-  };
-
-  // Save campaign updates
-  const handleSaveUpdates = async () => {
-    if (!selectedCampaign) return;
-
-    setIsUpdating(true);
-    try {
-      // Prepare update data (only editable fields)
-      const updateData = {
-        campaignName: selectedCampaign.campaignName,
-        status: selectedCampaign.status,
-        compensation: selectedCampaign.compensation,
-        budget: selectedCampaign.budget,
-        deliverables: selectedCampaign.deliverables,
-      };
-
-      await campaignAPI.updateCampaign(selectedCampaign._id, updateData);
-      
-      alert('Campaign updated successfully!');
-      setIsEditMode(false);
-      
-      // Refresh campaigns list
-      fetchCampaigns(pagination.currentPage, pagination.itemsPerPage);
-      
-      // Refresh detail view
-      handleCampaignClick({ _id: selectedCampaign._id });
-      
-    } catch (error) {
-      console.error('Error updating campaign:', error);
-      alert(`Failed to update campaign: ${error.message || 'Unknown error'}`);
-    } finally {
-      setIsUpdating(false);
-    }
+  // Open campaign detail page
+  const handleCampaignClick = (campaign) => {
+    router.push(`/brand/campaigns/${campaign._id || campaign.id}`);
   };
 
   const handleNextStep = () => {
@@ -415,25 +299,16 @@ const AllCampaignsSection = () => {
     </div>
   );
 
-  const CampaignCard = ({ campaign, isHistory = false }) => {
-    // Handle API data structure
+  const CampaignCard = ({ campaign }) => {
+    const [hovered, setHovered] = useState(false);
     const campaignName = campaign.campaignName || 'Untitled Campaign';
-    const status = campaign.status || 'Draft';
-    const brandName = campaign.brandId?.companyName || 'Unknown Brand';
-    const budget = campaign.budget 
-      ? `${campaign.compensation?.currency || 'INR'} ${campaign.budget}`
-      : 'Not specified';
-    const influencerCount = campaign.targetInfluencer?.numberOfInfluencers || 0;
-    const applicantsCount = campaign.applicants?.length || 0;
-    const selectedCount = campaign.selectedInfluencers?.length || 0;
+    const initials = campaignName.substring(0, 1).toUpperCase();
+    const date = campaign.createdAt
+      ? new Date(campaign.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+      : '3d ago';
     const productImage = campaign.productImages?.[0] || null;
-    
-    const [imageError, setImageError] = React.useState(false);
-    const [imageLoading, setImageLoading] = React.useState(true);
-    
     const menuRef = useRef(null);
 
-    // Close menu when clicking outside
     React.useEffect(() => {
       const handleClickOutside = (event) => {
         if (menuRef.current && !menuRef.current.contains(event.target)) {
@@ -444,197 +319,88 @@ const AllCampaignsSection = () => {
       return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
 
-    const handleDeleteClick = () => {
-      setCampaignToDelete(campaign);
-      setShowDeleteModal(true);
-      setOpenMenuId(null);
-    };
-
-    const handleActivateClick = () => {
-      handleActivateCampaign(campaign._id);
-      setOpenMenuId(null);
-    };
-
-    const handleDetailClick = () => {
-      handleCampaignClick(campaign);
-      setOpenMenuId(null);
-    };
-
     return (
-      <div 
+      <div
         onClick={() => handleCampaignClick(campaign)}
-        className={`bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden hover:shadow-md transition-shadow relative cursor-pointer ${campaign.isGrayed ? 'opacity-50' : ''}`}
+        className="rounded-xl overflow-hidden cursor-pointer shrink-0 w-[300px] sm:w-[360px] transition-colors duration-200"
+        style={{ backgroundColor: hovered ? '#f8fff7' : '#181818' }}
+        onMouseEnter={() => setHovered(true)}
+        onMouseLeave={() => setHovered(false)}
       >
-        {/* Header with Status and Menu */}
-        <div className="p-4 border-b border-gray-100">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-medium text-gray-900">{brandName}</span>
-            <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
-              <span className={`text-xs px-2 py-1 rounded ${
-                status === 'Active' ? 'text-green-600 bg-green-50' :
-                status === 'Draft' ? 'text-gray-600 bg-gray-50' :
-                status === 'Completed' ? 'text-blue-600 bg-blue-50' :
-                'text-orange-600 bg-orange-50'
-              }`}>
-                {status}
-              </span>
-              
-              {/* Three-dot Menu */}
-              <div className="relative" ref={menuRef}>
+        {/* Content — 72px TOP, padding: 12px 4px 12px 16px per Figma */}
+        <div className="h-[72px] flex items-center" style={{ padding: '12px 4px 12px 16px' }}>
+          <div className="flex items-center gap-4 flex-1 min-w-0">
+            <div className="w-10 h-10 bg-[#16A34A] rounded-full flex items-center justify-center text-white text-base font-medium shrink-0">
+              {initials}
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-base font-medium truncate transition-colors duration-200"
+                 style={{ color: hovered ? '#1D1B20' : '#ffffff' }}>
+                {campaignName}
+              </p>
+              <p className="text-sm truncate transition-colors duration-200"
+                 style={{ color: hovered ? '#49454F' : '#9B9B9B' }}>
+                {date}
+              </p>
+            </div>
+          </div>
+          {/* Three-dot menu */}
+          <div className="relative shrink-0" ref={menuRef}>
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                const campaignKey = campaign._id || campaign.id;
+                setOpenMenuId(openMenuId === campaignKey ? null : campaignKey);
+              }}
+              className="w-12 h-12 flex items-center justify-center rounded-full transition-colors"
+              style={{ color: hovered ? '#1D1B20' : '#ffffff' }}
+            >
+              <MoreVertical className="w-5 h-5" />
+            </button>
+            {openMenuId === (campaign._id || campaign.id) && (
+              <div className="absolute right-0 mt-1 w-44 bg-[#262626] rounded-lg shadow-lg border border-white/10 z-10">
                 <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setOpenMenuId(openMenuId === campaign._id ? null : campaign._id);
-                  }}
-                  className="p-1 hover:bg-gray-100 rounded-full transition-colors"
+                  onClick={(e) => { e.stopPropagation(); handleCampaignClick(campaign); setOpenMenuId(null); }}
+                  className="w-full px-4 py-2 text-left text-sm text-white hover:bg-white/10 flex items-center gap-2"
                 >
-                  <MoreVertical className="w-4 h-4 text-gray-600" />
+                  <Edit className="w-4 h-4" /> View/Edit
                 </button>
-                
-                {openMenuId === campaign._id && (
-                  <div className="absolute right-0 mt-2 w-40 bg-white rounded-lg shadow-lg border border-gray-200 z-10">
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleDetailClick();
-                      }}
-                      className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
-                    >
-                      <Edit className="w-4 h-4" />
-                      View/Edit Campaign
-                    </button>
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleDeleteClick();
-                      }}
-                      className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50 flex items-center gap-2"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                      Delete
-                    </button>
-                    {status !== 'Active' && (
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleActivateClick();
-                        }}
-                        className="w-full px-4 py-2 text-left text-sm text-green-600 hover:bg-green-50 flex items-center gap-2"
-                      >
-                        <Check className="w-4 h-4" />
-                        Activate Campaign
-                      </button>
-                    )}
-                  </div>
+                <button
+                  onClick={(e) => { e.stopPropagation(); setCampaignToDelete(campaign); setShowDeleteModal(true); setOpenMenuId(null); }}
+                  className="w-full px-4 py-2 text-left text-sm text-red-400 hover:bg-white/10 flex items-center gap-2"
+                >
+                  <Trash2 className="w-4 h-4" /> Delete
+                </button>
+                {!['active','published'].includes((campaign.status||'').toLowerCase()) && (
+                  <button
+                    onClick={(e) => { e.stopPropagation(); handleActivateCampaign(campaign._id || campaign.id); setOpenMenuId(null); }}
+                    className="w-full px-4 py-2 text-left text-sm text-green-400 hover:bg-white/10 flex items-center gap-2"
+                  >
+                    <Check className="w-4 h-4" /> Activate
+                  </button>
                 )}
               </div>
-            </div>
+            )}
           </div>
         </div>
 
-        {/* Campaign Visual */}
-        <div className="p-4">
-          <div className="aspect-square bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg flex items-center justify-center mb-4 overflow-hidden relative">
-            {productImage && !imageError ? (
-              <>
-                {imageLoading && (
-                  <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-blue-50 to-blue-100">
-                    <div className="flex flex-col items-center gap-3">
-                      <div className="animate-spin rounded-full h-10 w-10 border-3 border-green-600 border-t-transparent"></div>
-                      <p className="text-sm text-gray-600 font-medium">Loading image...</p>
-                    </div>
-                  </div>
-                )}
-                <img 
-                  src={productImage} 
-                  alt={campaignName}
-                  className={`w-full h-full object-cover transition-opacity duration-500 ${
-                    imageLoading ? 'opacity-0' : 'opacity-100'
-                  }`}
-                  onLoad={() => setImageLoading(false)}
-                  onError={(e) => {
-                    console.error('Image failed to load:', productImage);
-                    setImageError(true);
-                    setImageLoading(false);
-                  }}
-                  loading="lazy"
-                  crossOrigin="anonymous"
-                />
-              </>
-            ) : (
-              <div className="w-32 h-40 bg-gray-800 rounded-t-lg relative">
-                <div className="w-full h-full bg-gray-800 rounded-t-lg relative">
-                  <div className="absolute top-2 left-1/2 transform -translate-x-1/2 w-4 h-6 bg-blue-500 rounded-t"></div>
-                  <div className="absolute top-8 left-1/2 transform -translate-x-1/2 w-20 h-20 bg-white rounded-lg flex items-center justify-center">
-                    <div className="text-xs text-gray-800 font-bold text-center">BRAND<br/>LOGO</div>
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* Campaign Info */}
-          <div className="space-y-2">
-            <h3 className="text-base font-semibold text-gray-900 line-clamp-2">{campaignName}</h3>
-            
-            <div className="flex items-center justify-between">
-              <span className="text-sm font-medium text-green-600">Budget: {budget}</span>
-              <span className="text-xs text-gray-500 capitalize">{campaign.campaignType}</span>
+        {/* Media — 188px BOTTOM */}
+        <div
+          className="h-[188px] relative overflow-hidden transition-colors duration-200"
+          style={{ backgroundColor: hovered ? '#e6f0e6' : '#252525' }}
+        >
+          {productImage ? (
+            <img src={productImage} alt={campaignName} className="w-full h-full object-cover" />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center">
+              <TrendingUp className="w-12 h-12" style={{ color: hovered ? '#16A34A' : 'rgba(255,255,255,0.1)' }} />
             </div>
-
-            <div className="pt-2 border-t border-gray-100">
-              <div className="grid grid-cols-3 gap-2 text-center">
-                <div>
-                  <div className="text-lg font-semibold text-gray-900">{influencerCount}</div>
-                  <div className="text-xs text-gray-500">Target</div>
-                </div>
-                <div>
-                  <div className="text-lg font-semibold text-blue-600">{applicantsCount}</div>
-                  <div className="text-xs text-gray-500">Applicants</div>
-                </div>
-                <div>
-                  <div className="text-lg font-semibold text-green-600">{selectedCount}</div>
-                  <div className="text-xs text-gray-500">Selected</div>
-                </div>
-              </div>
-            </div>
-
-            {campaign.createdAt && (
-              <div className="text-xs text-gray-400 pt-2">
-                Created: {new Date(campaign.createdAt).toLocaleDateString()}
-              </div>
-            )}
-          </div>
+          )}
         </div>
       </div>
     );
   };
 
-  const InfluencerCard = ({ influencer }) => (
-    <div className="bg-white rounded-lg border border-gray-200 p-4 hover:shadow-md transition-shadow">
-      <div className="flex items-start space-x-3">
-        <div className="w-16 h-16 bg-gray-300 rounded-full flex items-center justify-center">
-          <Users className="w-8 h-8 text-gray-600" />
-        </div>
-        <div className="flex-1">
-          <div className="flex items-center justify-between mb-1">
-            <h4 className="font-medium text-gray-900">{influencer.name}</h4>
-            <div className="w-4 h-4 bg-green-500 rounded-full"></div>
-          </div>
-          <div className="text-xs text-gray-600 mb-2">
-            {influencer.followers} followers • {influencer.engagement} engagement
-          </div>
-          <div className="flex flex-wrap gap-1">
-            {influencer.tags.map((tag, index) => (
-              <span key={index} className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded">
-                {tag}
-              </span>
-            ))}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
 
   const renderStepContent = () => {
     switch (currentStep) {
@@ -1243,7 +1009,7 @@ const AllCampaignsSection = () => {
         status: 'Draft'
       };
 
-      const response = await campaignAPI.createCampaign(transformedData);
+      await campaignApi.createCampaign(transformedData);
       
       alert('Campaign created successfully!');
       handleCloseModal();
@@ -1259,620 +1025,241 @@ const AllCampaignsSection = () => {
     }
   };
 
+  const cardSkeleton = [1, 2, 3].map(i => (
+    <div key={i} className="bg-[#181818] rounded-xl overflow-hidden shrink-0 w-[300px] sm:w-[360px]">
+      <div className="h-[188px] bg-[#252525] animate-pulse"></div>
+      <div className="h-[72px] flex items-center px-3 gap-3">
+        <div className="w-10 h-10 bg-[#252525] rounded-full animate-pulse shrink-0"></div>
+        <div className="flex-1">
+          <div className="h-4 bg-[#252525] rounded w-3/4 mb-2 animate-pulse"></div>
+          <div className="h-3 bg-[#252525] rounded w-1/2 animate-pulse"></div>
+        </div>
+      </div>
+    </div>
+  ));
+
   return (
-    <div className="bg-white h-screen overflow-hidden flex flex-col">
-      {/* Fixed App Bar - Only header */}
-      <div className="flex-shrink-0 bg-white border-b border-gray-100">
-        <div className="px-4 sm:px-6 lg:px-9 py-3 sm:py-4">
-          {/* App Bar */}
-          <div className="flex items-center justify-between">
-            {showAllCampaigns || showAllDrafts ? (
-              <>
-                <div className="flex items-center flex-1 min-w-0">
-                  <button 
-                    onClick={() => {
-                      setShowAllCampaigns(false);
-                      setShowAllDrafts(false);
-                    }}
-                    className="p-2 hover:bg-gray-100 rounded-full transition-colors -ml-2 mr-1"
-                  >
-                    <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6 text-gray-700" />
-                  </button>
-                  <h1 className="text-lg sm:text-xl font-semibold text-gray-900 truncate">
-                    {showAllCampaigns ? 'Campaigns' : 'Draft Campaigns'}
-                  </h1>
-                </div>
-                <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
-                  <button className="p-2 hover:bg-gray-100 rounded-full transition-colors">
-                    <Search className="w-5 h-5 sm:w-6 sm:h-6 text-gray-700" />
-                  </button>
-                  <button className="p-2 hover:bg-gray-100 rounded-full transition-colors">
-                    <MoreVertical className="w-5 h-5 sm:w-6 sm:h-6 text-gray-700" />
-                  </button>
-                </div>
-              </>
-            ) : (
-              <>
-                <div className="flex items-center flex-1 min-w-0">
-                  <h1 className="text-lg sm:text-xl font-semibold text-gray-900">Campaigns</h1>
-                </div>
-                <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
-                  <button className="p-2 hover:bg-gray-100 rounded-full transition-colors">
-                    <Search className="w-5 h-5 sm:w-6 sm:h-6 text-gray-700" />
-                  </button>
-                  <button className="p-2 hover:bg-gray-100 rounded-full transition-colors">
-                    <MoreVertical className="w-5 h-5 sm:w-6 sm:h-6 text-gray-700" />
-                  </button>
-                </div>
-              </>
-            )}
+    <div className="bg-[#000201] h-screen overflow-hidden flex flex-col">
+
+      {/* Page Header: title + search + new campaign */}
+      <div className="flex-shrink-0 px-4 sm:px-6 py-4 flex items-center justify-between gap-4 bg-[#000201]">
+        <h2
+          className="shrink-0 capitalize"
+          style={{
+            color: '#FFF',
+            fontFamily: 'var(--font-bricolage-grotesque)',
+            fontSize: 24,
+            fontWeight: 400,
+            lineHeight: '120%',
+          }}
+        >
+          Campaigns
+        </h2>
+        <div className="flex items-center gap-3">
+          {/* Search bar — dark bg, green glow border, green circle icon button */}
+          <div className="relative flex items-center">
+            <input
+              type="text"
+              placeholder="Search campaigns..."
+              className="bg-[#0d1f12] text-white placeholder:text-[#9B9B9B] pl-5 pr-12 py-[9px] rounded-full text-sm w-56 focus:outline-none border border-[#16A34A]"
+              style={{ boxShadow: '0 0 12px rgba(22,163,74,0.35)' }}
+            />
+            <div className="absolute right-1 top-1/2 -translate-y-1/2 w-8 h-8 bg-[#16A34A] rounded-full flex items-center justify-center">
+              <Search className="w-4 h-4 text-white" />
+            </div>
           </div>
+          {/* Start New Campaign pill button */}
+          <button
+            onClick={() => router.push('/brand/campaigns/create-campaign')}
+            className="bg-[#16A34A] text-white px-5 py-2 rounded-full text-sm font-medium whitespace-nowrap hover:bg-green-700 transition-colors"
+          >
+            Start New Campaign
+          </button>
         </div>
       </div>
 
-      {/* Scrollable Content Section */}
-      <div className="flex-1 overflow-y-auto px-4 sm:px-6 lg:px-9 py-4 sm:py-6">
-        {showAllCampaigns ? (
-          // All Campaigns Grid View - Updated to match Figma design
-          <div className="mb-8">
-            <div className="flex items-center justify-between mb-4">
-              <p className="text-sm text-gray-600">
-                Showing {campaigns.length} campaigns
-              </p>
-            </div>
+      {/* Scrollable Content */}
+      <div className="flex-1 overflow-y-auto px-4 sm:px-6 pb-8">
 
-            <div className="flex flex-wrap gap-2">
-              {loading ? (
-                // Campaign Cards Skeleton
-                <>
-                  {[1, 2, 3].map((i) => (
-                    <div key={i} className="bg-gray-100 border-2 border-white rounded-xl overflow-hidden flex-1 min-w-[300px] max-w-[400px]">
-                      {/* Card Header Skeleton */}
-                      <div className="flex gap-2 items-start p-4">
-                        <div className="w-12 h-12 bg-gray-200 rounded-full animate-pulse"></div>
-                        <div className="flex-1">
-                          <div className="h-5 bg-gray-200 rounded w-3/4 mb-2 animate-pulse"></div>
-                          <div className="h-4 bg-gray-200 rounded w-1/2 animate-pulse"></div>
-                        </div>
-                        <div className="w-12 h-12 bg-gray-200 rounded-full animate-pulse"></div>
-                      </div>
-                      {/* Card Image Skeleton */}
-                      <div className="h-[216px] bg-gray-200 animate-pulse"></div>
-                    </div>
-                  ))}
-                </>
-              ) : campaigns.length > 0 ? (
-                campaigns.map((campaign) => (
-                  <div 
-                    key={campaign._id} 
-                    className="bg-gray-100 border-2 border-white rounded-xl overflow-hidden hover:shadow-lg transition-shadow flex-1 min-w-[300px] max-w-[400px] cursor-pointer"
-                    onClick={() => handleCampaignClick(campaign)}
-                  >
-                    {/* Eyebrow label at top */}
-                    <div className="px-4 pt-4">
-                      <span className="text-xs text-gray-500">
-                        {campaign.campaignType || 'Campaign'}
-                      </span>
-                    </div>
-
-                    {/* Content Frame with Avatar and Info */}
-                    <div className="flex gap-2 items-start px-4 py-3">
-                      {/* Leading Avatar */}
-                      <div className="flex items-center">
-                        <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center text-white font-semibold shrink-0">
-                          {campaign.campaignName?.substring(0, 2).toUpperCase() || 'AB'}
-                        </div>
-                      </div>
-
-                      {/* Content Leading */}
-                      <div className="flex-1 min-w-0">
-                        <h3 className="text-lg font-semibold text-gray-900 mb-1 truncate">
-                          {campaign.campaignName || 'Lenskart'}
-                        </h3>
-                        <p className="text-sm text-gray-600">
-                          {campaign.createdAt 
-                            ? new Date(campaign.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
-                            : '3d ago'
-                          }
-                        </p>
-                      </div>
-
-                      {/* Trailing Icon Button */}
-                      <div className="flex items-center justify-center px-4">
-                        <button 
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            // Handle favorite toggle
-                          }}
-                          className="p-3 hover:bg-gray-200 rounded-full transition-colors"
-                        >
-                          <Heart className="w-6 h-6 text-gray-700" />
-                        </button>
-                      </div>
-                    </div>
-
-                    {/* Campaign Image */}
-                    <div className="h-[216px] bg-gradient-to-br from-green-700 to-green-900 relative overflow-hidden">
-                      {campaign.productImages && campaign.productImages.length > 0 ? (
-                        <img 
-                          src={campaign.productImages[0]} 
-                          alt={campaign.campaignName} 
-                          className="w-full h-full object-cover" 
-                        />
-                      ) : (
-                        <div className="absolute inset-0 flex items-center justify-center text-white">
-                          <div className="text-center p-6">
-                            <div className="text-2xl font-bold mb-2">WE CREATE</div>
-                            <div className="text-xl">SMILES, NOT ADS</div>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                ))
-              ) : (
-                <div className="w-full text-center py-8">
-                  <p className="text-gray-600">No campaigns found. Create your first campaign!</p>
-                </div>
-              )}
-            </div>
-          </div>
-        ) : showAllDrafts ? (
-          // All Draft Campaigns Grid View - Updated to match Figma design
-          <div className="mb-8">
-            <div className="flex items-center justify-between mb-4">
-              <p className="text-sm text-gray-600">
-                Showing {getDraftCampaigns().length} draft campaigns
-              </p>
-            </div>
-
-            <div className="flex flex-wrap gap-2">
-              {loading ? (
-                // Draft Campaign Cards Skeleton
-                <>
-                  {[1, 2, 3].map((i) => (
-                    <div key={i} className="bg-gray-100 border-2 border-white rounded-xl overflow-hidden flex-1 min-w-[300px] max-w-[400px]">
-                      {/* Card Header Skeleton */}
-                      <div className="flex gap-2 items-start p-4">
-                        <div className="w-12 h-12 bg-gray-200 rounded-full animate-pulse"></div>
-                        <div className="flex-1">
-                          <div className="h-5 bg-gray-200 rounded w-3/4 mb-2 animate-pulse"></div>
-                          <div className="h-4 bg-gray-200 rounded w-1/3 animate-pulse"></div>
-                        </div>
-                        <div className="w-12 h-12 bg-gray-200 rounded-full animate-pulse"></div>
-                      </div>
-                      {/* Card Image Skeleton */}
-                      <div className="h-[216px] bg-gray-200 animate-pulse"></div>
-                      {/* Action Buttons Skeleton */}
-                      <div className="p-4 flex gap-2">
-                        <div className="flex-1 h-10 bg-gray-200 rounded-lg animate-pulse"></div>
-                        <div className="flex-1 h-10 bg-gray-200 rounded-lg animate-pulse"></div>
-                      </div>
-                    </div>
-                  ))}
-                </>
-              ) : getDraftCampaigns().length > 0 ? (
-                getDraftCampaigns().map((draft) => (
-                  <div 
-                    key={draft._id} 
-                    className="bg-gray-100 border-2 border-white rounded-xl overflow-hidden hover:shadow-lg transition-shadow flex-1 min-w-[300px] max-w-[400px]"
-                  >
-                    {/* Eyebrow label at top */}
-                    <div className="px-4 pt-4">
-                      <span className="text-xs text-gray-500">
-                        Draft • {draft.campaignType || 'Campaign'}
-                      </span>
-                    </div>
-
-                    {/* Content Frame with Avatar and Info */}
-                    <div className="flex gap-2 items-start px-4 py-3">
-                      {/* Leading Avatar */}
-                      <div className="flex items-center">
-                        <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center text-white font-semibold shrink-0">
-                          {draft.campaignName?.substring(0, 2).toUpperCase() || 'AB'}
-                        </div>
-                      </div>
-
-                      {/* Content Leading */}
-                      <div className="flex-1 min-w-0">
-                        <h3 className="text-lg font-semibold text-gray-900 mb-1 truncate">
-                          {draft.campaignName || 'Draft Campaign'}
-                        </h3>
-                        <p className="text-sm text-gray-600">
-                          Draft
-                        </p>
-                      </div>
-
-                      {/* Trailing Icon Button */}
-                      <div className="flex items-center justify-center px-4">
-                        <button 
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleCampaignClick(draft);
-                          }}
-                          className="p-3 hover:bg-gray-200 rounded-full transition-colors"
-                        >
-                          <Heart className="w-6 h-6 text-gray-700" />
-                        </button>
-                      </div>
-                    </div>
-
-                    {/* Campaign Image */}
-                    <div className="h-[216px] bg-gradient-to-br from-gray-600 to-gray-800 relative overflow-hidden">
-                      {draft.productImages && draft.productImages.length > 0 ? (
-                        <img 
-                          src={draft.productImages[0]} 
-                          alt={draft.campaignName} 
-                          className="w-full h-full object-cover opacity-80" 
-                        />
-                      ) : (
-                        <div className="absolute inset-0 flex items-center justify-center text-white">
-                          <div className="text-center p-6">
-                            <div className="text-2xl font-bold mb-2">DRAFT</div>
-                            <div className="text-xl">CAMPAIGN</div>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Action Buttons */}
-                    <div className="p-4 flex gap-2">
-                      <button 
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleCampaignClick(draft);
-                        }}
-                        className="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors"
-                      >
-                        View Details
-                      </button>
-                      <button 
-                        onClick={(e) => handleCompleteCampaign(e, draft._id)}
-                        className="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg text-sm font-medium hover:bg-green-700 transition-colors"
-                      >
-                        Complete Campaign
-                      </button>
-                    </div>
-                  </div>
-                ))
-              ) : (
-                <div className="w-full text-center py-8">
-                  <p className="text-gray-600">No draft campaigns found.</p>
-                </div>
-              )}
-            </div>
-          </div>
-        ) : (
-          <>
-            {/* Recent Campaigns Section - Matching Figma x=36, gap=58px from header */}
-            <div className="mb-10">
-              {/* Section Heading - Figma: pt-4 (16px), 18px font, view all link */}
-              <div className="flex items-center justify-between pt-4 mb-[14px]">
-                <h2 className="text-[18px] font-semibold text-gray-900 leading-[26px] tracking-tight">Recent Campaigns</h2>
-                <button 
-                  onClick={() => router.push('/brand/campaigns/all-campaigns')}
-                  className="flex items-center pr-1"
-                >
-                  <span className="text-[16px] font-semibold text-blue-700 leading-6 tracking-[0.24px]">view all</span>
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" className="ml-[-4px]">
-                    <path d="M7.75 7.75L16.25 12L7.75 16.25" stroke="#0a48c5" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
-                </button>
-              </div>
-
-              {/* Campaign Cards Grid - gap between cards as per Figma */}
-              <div className="flex gap-2 overflow-x-auto pb-2">
-                {loading ? (
-                  // Recent Campaign Cards Skeleton
-                  <>
-                    {[1, 2, 3].map((i) => (
-                      <div key={i} className="bg-gray-100 border-2 border-white rounded-xl overflow-hidden flex-1 min-w-[300px] max-w-[365px]">
-                        {/* Card Header Skeleton */}
-                        <div className="flex gap-2 items-start p-4">
-                          <div className="w-12 h-12 bg-gray-200 rounded-full animate-pulse"></div>
-                          <div className="flex-1">
-                            <div className="px-4">
-                              <div className="h-5 bg-gray-200 rounded w-3/4 mb-2 animate-pulse"></div>
-                            </div>
-                            <div className="px-4">
-                              <div className="h-4 bg-gray-200 rounded w-1/2 animate-pulse"></div>
-                            </div>
-                          </div>
-                          <div className="w-12 h-12 bg-gray-200 rounded-full animate-pulse"></div>
-                        </div>
-                        {/* Card Image Skeleton */}
-                        <div className="h-[216px] bg-gray-200 animate-pulse"></div>
-                      </div>
-                    ))}
-                  </>
-                ) : getActiveCampaigns().length > 0 ? (
-                  getActiveCampaigns().slice(0, 3).map((campaign) => (
-                    <div 
-                      key={campaign._id} 
-                      className="bg-gray-100 border-2 border-white rounded-xl overflow-hidden hover:shadow-lg transition-shadow flex-1 min-w-[300px] max-w-[365px] cursor-pointer"
-                      onClick={() => handleCampaignClick(campaign)}
-                    >
-                      {/* Content Frame - Figma: gap-4 (16px), py-4 (16px) */}
-                      <div className="flex gap-2 items-start p-4">
-                        {/* Leading Avatar - Figma: 48x48, pl-4 */}
-                        <div className="flex items-center shrink-0">
-                          <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center text-white text-[20px] font-semibold leading-7">
-                            {campaign.campaignName?.substring(0, 2).toUpperCase() || 'AB'}
-                          </div>
-                        </div>
-
-                        {/* Content Leading - Figma: flex-1, gap-2 */}
-                        <div className="flex-1 min-w-0 flex flex-col gap-2">
-                          <div className="px-4">
-                            <h3 className="text-[20px] font-semibold text-gray-900 leading-7 tracking-tight truncate">
-                              {campaign.campaignName || 'Lenskart'}
-                            </h3>
-                          </div>
-                          <div className="px-4">
-                            <p className="text-[16px] text-gray-600 leading-6 tracking-[0px]">
-                              {campaign.createdAt 
-                                ? new Date(campaign.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
-                                : '3d ago'
-                              }
-                            </p>
-                          </div>
-                        </div>
-
-                        {/* Trailing Icon Button - Figma: 48x48, px-4 */}
-                        <div className="flex flex-col items-center justify-center px-4 h-[67px] w-[88px] shrink-0">
-                          <button 
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              // Handle favorite toggle
-                            }}
-                            className="p-3 hover:bg-gray-200 rounded-full transition-colors"
-                          >
-                            <Heart className="w-6 h-6 text-gray-700" />
-                          </button>
-                        </div>
-                      </div>
-
-                      {/* Campaign Image - Figma: h-216px */}
-                      <div className="h-[216px] bg-gradient-to-br from-green-700 to-green-900 relative overflow-hidden">
-                        {campaign.productImages && campaign.productImages.length > 0 ? (
-                          <img 
-                            src={campaign.productImages[0]} 
-                            alt={campaign.campaignName} 
-                            className="w-full h-full object-cover" 
-                          />
-                        ) : (
-                          <div className="absolute inset-0 flex items-center justify-center text-white">
-                            <div className="text-center p-6">
-                              <div className="text-2xl font-bold mb-2">WE CREATE</div>
-                              <div className="text-xl">SMILES, NOT ADS</div>
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  ))
-                ) : (
-                  <div className="w-full text-center py-8">
-                    <p className="text-gray-600">No active campaigns found. Create your first campaign!</p>
-                  </div>
-                )}
-              </div>
-            </div>
-
-        {/* New Applications Section - Matching Figma List Item design */}
-        <div className="mb-10">
-          {/* Section Heading - Figma: pt-4, 18px font */}
-          <div className="flex items-center justify-between pt-4 mb-[14px]">
-            <h2 className="text-[18px] font-semibold text-gray-900 leading-[26px] tracking-tight">New Applications</h2>
-            <button 
-              onClick={() => router.push('/brand/campaigns/new-applications')}
-              className="flex items-center pr-1 hover:opacity-80 transition-opacity cursor-pointer"
-            >
-              <span className="text-[16px] font-semibold text-blue-700 leading-6 tracking-[0.24px]">view all</span>
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" className="ml-[-4px]">
-                <path d="M7.75 7.75L16.25 12L7.75 16.25" stroke="#0a48c5" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
+        {/* Recent Campaigns */}
+        <div className="mb-8 pt-4">
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="text-2xl font-normal text-white capitalize leading-[120%]" style={{ fontFamily: 'var(--font-bricolage-grotesque)' }}>Recent Campaigns</h3>
+            <button onClick={() => router.push('/brand/campaigns/all-campaigns')} className="flex items-center gap-0.5">
+              <span className="text-[#16A34A] text-sm font-medium">View All</span>
+              <ChevronRight className="w-4 h-4 text-[#16A34A]" />
             </button>
           </div>
 
-          {/* List Items - Figma: white background, full width */}
-          <div className="bg-white">
-            {mockInfluencers.slice(0, 5).map((influencer, index) => (
-              <div key={influencer.id} className="relative">
-                <div className="flex items-center">
-                  {/* Leading Avatar - Figma: px-4, py-1.5 (6px), 48x48 */}
-                  <div className="px-4 py-1.5">
-                    <div className="w-12 h-12 bg-gradient-to-br from-pink-400 to-purple-500 rounded-full"></div>
-                  </div>
-
-                  {/* Content - Figma: flex-1, pr-4, py-3 (12px) */}
-                  <div className="flex-1 min-w-0 pr-4 py-3">
-                    <h3 className="text-[16px] font-semibold text-gray-900 leading-6 tracking-[0.24px] mb-0.5">
-                      {influencer.name}
-                    </h3>
-                    <p className="text-[14px] text-gray-500 leading-5 tracking-[0px] truncate">
-                      {influencer.tags 
-                        ? influencer.tags.slice(0, 3).join(' • ') 
-                        : 'An innovative web developer skilled in HTML, CSS, and JavaScript. He thrives on solving complex problems and bringing ideas to life through code.'
-                      }
-                    </p>
-                  </div>
-
-                  {/* Trailing Button - Figma: px-4, py-3.5 (14px) */}
-                  <div className="px-4 py-3.5">
-                    <button className="px-4 py-2 border border-green-800 rounded-[24px] text-[14px] font-medium text-green-800 leading-5 tracking-[0.2px] hover:bg-gray-50 transition-colors">
-                      portfolio
-                    </button>
-                  </div>
-                </div>
-                
-                {/* Divider - Figma: 1px gray line */}
-                {index < mockInfluencers.slice(0, 5).length - 1 && (
-                  <div className="h-px bg-gray-200"></div>
-                )}
-              </div>
+          {/* Filter tabs — px-6 py-1 gap-3 per Figma, inactive = bg-white/[0.12] */}
+          <div className="flex gap-3 overflow-x-auto pb-2 mb-3" style={{ scrollbarWidth: 'none' }}>
+            {['All', 'Sports', 'Lifestyle', 'Fashion', 'Travelling'].map(filter => (
+              <button
+                key={filter}
+                onClick={() => setActiveFilter(filter)}
+                className={`px-6 py-1 rounded-full text-sm font-normal whitespace-nowrap transition-colors ${
+                  activeFilter === filter
+                    ? 'bg-[#16A34A] text-white'
+                    : 'bg-white/[0.12] text-white hover:bg-white/20'
+                }`}
+              >
+                {filter}
+              </button>
             ))}
           </div>
-        </div>
 
-        {/* Audience Engagement Section - New Component */}
-        <div className="mb-10">
-          <AudienceEngagement />
-        </div>
-
-        {/* Spending Budget Section - New Component */}
-        <div className="mb-10">
-          <SpendingBudget />
-        </div>
-
-        {/* Draft Campaigns Section  new testing*/}
-        <div className="mb-8">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold text-gray-900">Draft Campaigns</h2>
-            <button 
-              onClick={() => router.push('/brand/campaigns/all-drafts')}
-              className="text-blue-600 text-sm font-medium hover:underline"
-            >
-              view all &gt;
-            </button>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {loading ? (
-              // Draft Campaign Cards Skeleton
-              <>
-                {[1, 2, 3].map((i) => (
-                  <div key={i} className="bg-amber-50 rounded-lg overflow-hidden border border-gray-200">
-                    <div className="aspect-video bg-gray-200 animate-pulse"></div>
-                    <div className="p-4">
-                      <div className="h-5 bg-gray-200 rounded w-3/4 mb-2 animate-pulse"></div>
-                      <div className="h-4 bg-gray-200 rounded w-full mb-1 animate-pulse"></div>
-                      <div className="h-4 bg-gray-200 rounded w-2/3 mb-4 animate-pulse"></div>
-                      <div className="h-10 bg-gray-200 rounded-lg animate-pulse"></div>
-                    </div>
-                  </div>
-                ))}
-              </>
-            ) : getDraftCampaigns().length > 0 ? (
-              getDraftCampaigns().slice(0, 3).map((draft) => (
-                <div key={draft._id} className="bg-amber-50 rounded-lg overflow-hidden border border-gray-200 hover:shadow-md transition-shadow">
-                  <div className="aspect-video bg-gray-200 relative overflow-hidden cursor-pointer" onClick={() => handleCampaignClick(draft)}>
-                    {draft.productImages && draft.productImages.length > 0 ? (
-                      <img src={draft.productImages[0]} alt={draft.campaignName} className="w-full h-full object-cover" />
-                    ) : (
-                      <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-green-700 to-green-900 text-white">
-                        <div className="text-center p-6">
-                          <div className="text-2xl font-bold mb-2">WE CREATE</div>
-                          <div className="text-xl">SMILES, NOT ADS</div>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                  <div className="p-4">
-                    <h3 className="font-semibold text-gray-900 mb-2">{draft.campaignName}</h3>
-                    <p className="text-sm text-gray-600 mb-4 line-clamp-2">
-                      {draft.campaignBrief || 'No description available'}
-                    </p>
-                    <button 
-                      onClick={(e) => handleCompleteCampaign(e, draft._id)}
-                      className="px-4 py-2 bg-green-600 text-white rounded-lg text-sm font-medium hover:bg-green-700 w-full"
-                    >
-                      Complete Campaign
-                    </button>
-                  </div>
-                </div>
+          <div className="flex gap-3 overflow-x-auto pb-2" style={{ scrollbarWidth: 'none' }}>
+            {loading ? cardSkeleton : getFilteredActiveCampaigns().length > 0 ? (
+              getFilteredActiveCampaigns().slice(0, 5).map((campaign) => (
+                <CampaignCard key={campaign._id || campaign.id} campaign={campaign} />
               ))
             ) : (
-              <div className="col-span-full text-center py-8">
-                <p className="text-gray-600">No draft campaigns found.</p>
-              </div>
+              <p className="text-[#9B9B9B] text-sm py-4">No active campaigns. Create your first campaign!</p>
             )}
           </div>
         </div>
-        </>
-        )}
+
+        {/* New Applications */}
+        <div className="mb-8">
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="text-2xl font-normal text-white capitalize leading-[120%]" style={{ fontFamily: 'var(--font-bricolage-grotesque)' }}>New Applications</h3>
+            <button onClick={() => router.push('/brand/campaigns/new-applications')} className="flex items-center gap-0.5">
+              <span className="text-[#16A34A] text-sm font-medium">View All</span>
+              <ChevronRight className="w-4 h-4 text-[#16A34A]" />
+            </button>
+          </div>
+          <div className="flex flex-col gap-2">
+            {loading ? (
+              [1,2,3,4].map(i => (
+                <div key={i} className="bg-[#262626] rounded-xl h-[68px] animate-pulse" />
+              ))
+            ) : applications.length > 0 ? (
+              applications.slice(0, 4).map((app, idx) => {
+                // Embedded applicants: { _id, name, username, email, profilePicture?, niche? }
+                const name = app.name || app.username || 'Influencer';
+                const niche = Array.isArray(app.niche)
+                  ? app.niche.slice(0, 3).join(' • ')
+                  : (app.niche || app.campaignName || '');
+                const initials = name.charAt(0).toUpperCase();
+                return (
+                  <div key={`${app._id || app.id}-${idx}`} className="bg-[#262626] rounded-xl h-[68px] flex items-center px-4 justify-between">
+                    {/* Avatar + text — gap-2 per Figma */}
+                    <div className="flex items-center gap-2 min-w-0 flex-1">
+                      {app.profilePicture ? (
+                        <img src={app.profilePicture} alt={name} className="w-12 h-12 rounded-full object-cover shrink-0" />
+                      ) : (
+                        <div className="w-12 h-12 bg-[#16A34A] rounded-full flex items-center justify-center text-white text-base font-medium shrink-0">
+                          {initials}
+                        </div>
+                      )}
+                      <div className="min-w-0">
+                        <p className="text-white text-base font-normal truncate">{name}</p>
+                        <p className="text-[#9B9B9B] text-xs truncate">{niche}</p>
+                      </div>
+                    </div>
+                    {/* View profile button — w-[100px] h-7 rounded-full per Figma */}
+                    <button
+                      onClick={(e) => { e.stopPropagation(); router.push(`/brand/influencers/${app._id || app.id}`); }}
+                      className="bg-[#16A34A] text-white text-xs w-[100px] h-7 rounded-full flex items-center justify-center gap-1 shrink-0 hover:bg-green-700 transition-colors ml-3"
+                    >
+                      <UserRound className="w-3 h-3" />
+                      <span>View profile</span>
+                    </button>
+                  </div>
+                );
+              })
+            ) : (
+              <p className="text-[#9B9B9B] text-sm py-4">No new applications yet.</p>
+            )}
+          </div>
+        </div>
+
+        {/* Previous Campaigns */}
+        <div className="mb-8">
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="text-2xl font-normal text-white capitalize leading-[120%]" style={{ fontFamily: 'var(--font-bricolage-grotesque)' }}>Previous Campaigns</h3>
+            <button className="flex items-center gap-0.5">
+              <span className="text-[#16A34A] text-sm font-medium">View All</span>
+              <ChevronRight className="w-4 h-4 text-[#16A34A]" />
+            </button>
+          </div>
+          <div className="flex gap-3 overflow-x-auto pb-2" style={{ scrollbarWidth: 'none' }}>
+            {loading ? cardSkeleton : completedCampaigns.length > 0 ? (
+              completedCampaigns.slice(0, 5).map((campaign) => (
+                <CampaignCard key={campaign._id || campaign.id} campaign={campaign} />
+              ))
+            ) : (
+              <p className="text-[#9B9B9B] text-sm py-4">No previous campaigns yet.</p>
+            )}
+          </div>
+        </div>
+
+        {/* Draft Campaigns */}
+        <div className="mb-8">
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="text-2xl font-normal text-white capitalize leading-[120%]" style={{ fontFamily: 'var(--font-bricolage-grotesque)' }}>Draft Campaigns</h3>
+            <button onClick={() => router.push('/brand/campaigns/all-drafts')} className="flex items-center gap-0.5">
+              <span className="text-[#16A34A] text-sm font-medium">View All</span>
+              <ChevronRight className="w-4 h-4 text-[#16A34A]" />
+            </button>
+          </div>
+          <div className="flex gap-3 overflow-x-auto pb-2" style={{ scrollbarWidth: 'none' }}>
+            {loading ? cardSkeleton : draftCampaigns.length > 0 ? (
+              draftCampaigns.slice(0, 5).map((campaign) => (
+                <CampaignCard key={campaign._id || campaign.id} campaign={campaign} />
+              ))
+            ) : (
+              <p className="text-[#9B9B9B] text-sm py-4">No draft campaigns found.</p>
+            )}
+          </div>
+        </div>
+
       </div>
 
-      {/* Modal */}
+      {/* Create Campaign Modal */}
       {showModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-hidden">
-            {/* Modal Header */}
             <div className="px-6 py-4 border-b border-gray-200">
               <div className="flex items-center justify-between">
                 <h2 className="text-2xl font-bold text-gray-900">Create New Campaign</h2>
-                <button 
-                  onClick={handleCloseModal}
-                  className="text-gray-400 hover:text-gray-600"
-                >
+                <button onClick={handleCloseModal} className="text-gray-400 hover:text-gray-600">
                   <X className="w-6 h-6" />
                 </button>
               </div>
-              
-              {/* Step Indicator */}
               <div className="mt-6 flex items-center justify-between">
-                <StepIndicator 
-                  stepNumber={1} 
-                  title="Campaign Details" 
-                  status={getStepStatus(1)} 
-                />
+                <StepIndicator stepNumber={1} title="Campaign Details" status={getStepStatus(1)} />
                 <div className="flex-1 h-px bg-gray-300 mx-4"></div>
-                <StepIndicator 
-                  stepNumber={2} 
-                  title="Target Influencer" 
-                  status={getStepStatus(2)} 
-                />
+                <StepIndicator stepNumber={2} title="Target Influencer" status={getStepStatus(2)} />
                 <div className="flex-1 h-px bg-gray-300 mx-4"></div>
-                <StepIndicator 
-                  stepNumber={3} 
-                  title="Preview" 
-                  status={getStepStatus(3)} 
-                />
+                <StepIndicator stepNumber={3} title="Preview" status={getStepStatus(3)} />
               </div>
             </div>
-
-            {/* Modal Content */}
             <div className="px-6 py-6 max-h-[60vh] overflow-y-auto">
               {renderStepContent()}
             </div>
-
-            {/* Modal Footer */}
             <div className="px-6 py-4 border-t border-gray-200 flex items-center justify-between">
               <button
                 onClick={handleCloseModal}
                 disabled={isSubmitting}
-                className={`px-4 py-2 rounded-lg font-medium ${
-                  isSubmitting 
-                    ? 'bg-gray-200 text-gray-400 cursor-not-allowed' 
-                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                }`}
+                className={`px-4 py-2 rounded-lg font-medium ${isSubmitting ? 'bg-gray-200 text-gray-400 cursor-not-allowed' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}
               >
                 Cancel
               </button>
-              
               <div className="flex space-x-3">
                 {currentStep > 1 && (
                   <button
                     onClick={handlePrevStep}
                     disabled={isSubmitting}
-                    className={`px-4 py-2 rounded-lg font-medium ${
-                      isSubmitting 
-                        ? 'bg-gray-200 text-gray-400 cursor-not-allowed' 
-                        : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                    }`}
+                    className={`px-4 py-2 rounded-lg font-medium ${isSubmitting ? 'bg-gray-200 text-gray-400 cursor-not-allowed' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}
                   >
                     Previous
                   </button>
                 )}
-                
                 <button
                   onClick={currentStep === 3 ? handleSubmit : handleNextStep}
                   disabled={isSubmitting}
-                  className={`px-6 py-2 rounded-lg font-medium ${
-                    isSubmitting 
-                      ? 'bg-gray-400 text-white cursor-not-allowed' 
-                      : 'bg-green-600 hover:bg-green-700 text-white'
-                  }`}
+                  className={`px-6 py-2 rounded-lg font-medium ${isSubmitting ? 'bg-gray-400 text-white cursor-not-allowed' : 'bg-green-600 hover:bg-green-700 text-white'}`}
                 >
                   {isSubmitting ? 'Creating...' : currentStep === 3 ? 'Launch Campaign' : 'Next'}
                 </button>
@@ -1885,29 +1272,19 @@ const AllCampaignsSection = () => {
       {/* Delete Confirmation Modal */}
       {showDeleteModal && campaignToDelete && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg max-w-md w-full p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">
-              Confirm Deletion
-            </h3>
-            <p className="text-sm text-gray-600 mb-6">
-              Are you sure you want to delete the campaign "<span className="font-medium">{campaignToDelete.campaignName}</span>"?
+          <div className="bg-[#1E1E1E] rounded-lg max-w-md w-full p-6 border border-white/10">
+            <h3 className="text-lg font-semibold text-white mb-4">Confirm Deletion</h3>
+            <p className="text-sm text-[#9B9B9B] mb-6">
+              Are you sure you want to delete "<span className="font-medium text-white">{campaignToDelete.campaignName}</span>"?
             </p>
-
             <div className="flex justify-end gap-3">
-              <button
-                onClick={() => setShowDeleteModal(false)}
-                className="px-4 py-2 bg-gray-200 rounded-lg text-gray-700 hover:bg-gray-300"
-              >
+              <button onClick={() => setShowDeleteModal(false)} className="px-4 py-2 bg-white/10 rounded-lg text-white hover:bg-white/20 transition-colors">
                 Cancel
               </button>
               <button
                 onClick={handleDeleteCampaign}
                 disabled={isDeletingCampaign}
-                className={`px-4 py-2 rounded-lg font-medium ${
-                  isDeletingCampaign 
-                    ? 'bg-red-400 text-white cursor-not-allowed' 
-                    : 'bg-red-600 hover:bg-red-700 text-white'
-                }`}
+                className={`px-4 py-2 rounded-lg font-medium ${isDeletingCampaign ? 'bg-red-400 text-white cursor-not-allowed' : 'bg-red-600 hover:bg-red-700 text-white'}`}
               >
                 {isDeletingCampaign ? 'Deleting...' : 'Delete Campaign'}
               </button>
@@ -1915,8 +1292,6 @@ const AllCampaignsSection = () => {
           </div>
         </div>
       )}
-
-      {/* Campaign Detail/Edit Modal */}
     </div>
   );
 };

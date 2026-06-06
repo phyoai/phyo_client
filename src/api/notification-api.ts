@@ -64,10 +64,15 @@ export const notificationApi = {
         { params }
       );
 
-      const payload = response.data?.data;
+      // API handoff doc: response.data.notifications[] under data.data or data
+      const payload = response.data;
+      const notifications =
+        payload?.data?.notifications ??
+        payload?.notifications ??
+        (Array.isArray(payload?.data) ? payload.data : []);
       return {
-        notifications: (payload?.data ?? []) as INotification[],
-        pagination: payload?.pagination ?? defaultPagination,
+        notifications: notifications as INotification[],
+        pagination: payload?.data?.pagination ?? payload?.pagination ?? defaultPagination,
       };
     } catch (error: any) {
       const errorMessage =
@@ -87,11 +92,11 @@ export const notificationApi = {
    */
   getUnreadCount: async (): Promise<number> => {
     try {
-      const response = await api.get<IApiResponse<{ count: number }>>(
-        '/notifications/unread-count'
-      );
+      const response = await api.get<any>('/notifications/unread-count');
 
-      return response.data?.data?.count ?? 0;
+      // API handoff doc: may be .data.count, .data.unreadCount, or .unreadCount
+      const d = response.data;
+      return d?.data?.count ?? d?.data?.unreadCount ?? d?.unreadCount ?? d?.count ?? 0;
     } catch (error: any) {
       const errorMessage =
         error.response?.data?.message || error.message || 'Failed to fetch unread count';
@@ -143,8 +148,9 @@ export const notificationApi = {
    */
   markAllAsRead: async (): Promise<number> => {
     try {
+      // API handoff doc: mark-all endpoint is /notifications/read-all
       const response = await api.patch<IApiResponse<{ count: number }>>(
-        '/notifications/mark-all-read',
+        '/notifications/read-all',
         {}
       );
 

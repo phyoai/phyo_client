@@ -2,6 +2,7 @@
 import React, { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import secureAuthStorage from '../../utils/secure-auth';
+import { authUtils, userAPI } from '../../utils/api';
 
 const AuthContext = createContext(null);
 
@@ -21,25 +22,56 @@ export const AuthProvider = ({ children }) => {
 
   // Initialize auth on mount - MEMOIZED
   useEffect(() => {
-    if (typeof window === 'undefined') {
-      setLoading(false);
-      setMounted(true);
-      return;
-    }
+    let cancelled = false;
 
-    try {
-      const userData = secureAuthStorage.getUserData();
-      if (userData) {
-        setUser(userData);
+    const restoreAuth = async () => {
+      if (typeof window === 'undefined') {
+        if (!cancelled) {
+          setLoading(false);
+          setMounted(true);
+        }
+        return;
       }
-    } catch (error) {
-      if (process.env.NODE_ENV === 'development') {
-        console.error('[AUTH] Failed to initialize auth:', error);
+
+      try {
+        const storedUser = secureAuthStorage.getUserData();
+        if (storedUser) {
+          if (!cancelled) {
+            setUser(storedUser);
+          }
+          return;
+        }
+
+        const token = authUtils.getToken?.() || secureAuthStorage.getToken?.();
+        if (!token) {
+          return;
+        }
+
+        const profile = await userAPI.getUserProfile();
+        const userData = profile?.data || profile?.user || profile;
+        if (userData) {
+          secureAuthStorage.setUserData(userData);
+          if (!cancelled) {
+            setUser(userData);
+          }
+        }
+      } catch (error) {
+        if (process.env.NODE_ENV === 'development') {
+          console.error('[AUTH] Failed to initialize auth:', error);
+        }
+      } finally {
+        if (!cancelled) {
+          setLoading(false);
+          setMounted(true);
+        }
       }
-    } finally {
-      setLoading(false);
-      setMounted(true);
-    }
+    };
+
+    restoreAuth();
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   // Memoized login function
@@ -50,8 +82,8 @@ export const AuthProvider = ({ children }) => {
         return { success: false, error: 'Email and password are required' };
       }
 
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://api.phyo.ai/api';
-      const response = await fetch(`${apiUrl}/auth/login`, {
+      const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || process.env.NEXT_PUBLIC_API_URL || 'https://spool-reliance-channel.ngrok-free.dev';
+      const response = await fetch(`${apiBaseUrl.replace(/\/$/, '')}/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include', // Include httpOnly cookies
@@ -64,6 +96,7 @@ export const AuthProvider = ({ children }) => {
         const userData = data.user || data.data || { email };
 
         // Store securely
+        authUtils.setToken(data.token);
         secureAuthStorage.setToken(data.token);
         secureAuthStorage.setUserData(userData);
         setUser(userData);
@@ -107,8 +140,8 @@ export const AuthProvider = ({ children }) => {
         return { success: false, error: 'Email and password are required' };
       }
 
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://api.phyo.ai/api';
-      const response = await fetch(`${apiUrl}/auth/signup`, {
+      const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || process.env.NEXT_PUBLIC_API_URL || 'https://spool-reliance-channel.ngrok-free.dev';
+      const response = await fetch(`${apiBaseUrl.replace(/\/$/, '')}/auth/signup`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -120,6 +153,7 @@ export const AuthProvider = ({ children }) => {
       if (response.ok && data.token) {
         const userData = data.user || data.data || { email: formData.email };
 
+        authUtils.setToken(data.token);
         secureAuthStorage.setToken(data.token);
         secureAuthStorage.setUserData(userData);
         setUser(userData);
@@ -140,6 +174,7 @@ export const AuthProvider = ({ children }) => {
 
   // Memoized logout function
   const logout = useCallback(() => {
+    authUtils.logout();
     secureAuthStorage.clearAuth();
     setUser(null);
 

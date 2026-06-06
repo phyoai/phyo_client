@@ -14,8 +14,8 @@ import { createContext, useContext, useEffect, useState, useCallback, useMemo } 
 const ThemeContext = createContext(null);
 
 export function ThemeProvider({ children }) {
-  const [theme, setThemeState] = useState('light');
-  const [systemTheme, setSystemTheme] = useState('light');
+  const [theme, setThemeState] = useState('dark');
+  const [systemTheme, setSystemTheme] = useState('dark');
   const [mounted, setMounted] = useState(false);
 
   // For backward compatibility
@@ -30,7 +30,7 @@ export function ThemeProvider({ children }) {
 
     // Get stored preference or use system preference
     const stored = localStorage.getItem('theme');
-    const initialTheme = stored || (isDark ? 'dark' : 'light');
+    const initialTheme = stored || 'dark';
 
     setThemeState(initialTheme);
     applyTheme(initialTheme);
@@ -101,8 +101,8 @@ export function ThemeProvider({ children }) {
   // Memoized setTheme function
   const setTheme = useCallback((newTheme) => {
     if (!['light', 'dark'].includes(newTheme)) {
-      console.warn(`Invalid theme: ${newTheme}. Using 'light' as default.`);
-      newTheme = 'light';
+      console.warn(`Invalid theme: ${newTheme}. Using 'dark' as default.`);
+      newTheme = 'dark';
     }
     setThemeState(newTheme);
     applyTheme(newTheme);

@@ -1,161 +1,150 @@
 'use client';
 
-import React, { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { User, ArrowLeft, MoreVertical, Copy, Download } from 'lucide-react';
+import api from '@/utils/api';
+
+function getInitials(name) {
+  if (!name) return '?';
+  return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+}
+
+function formatAmount(amountInPaise, currency = 'INR') {
+  const amountInRupees = amountInPaise / 100;
+  return `₹${amountInRupees.toFixed(2)}`;
+}
+
+function groupByMonth(transactions) {
+  const groups = {};
+  transactions.forEach(txn => {
+    const date = new Date(txn.createdAt || txn.date || Date.now());
+    const label = date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+    if (!groups[label]) groups[label] = [];
+    groups[label].push(txn);
+  });
+  return Object.fromEntries(
+    Object.entries(groups).sort((a, b) => {
+      const dateA = new Date(a[1][0]?.createdAt);
+      const dateB = new Date(b[1][0]?.createdAt);
+      return dateB - dateA;
+    })
+  );
+}
 
 export default function BillingHistory() {
   const router = useRouter();
-  const [openMenuId, setOpenMenuId] = useState(null);
+  const [transactions, setTransactions] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  // Billing History data
-  const billingHistory = [
-    {
-      id: 1,
-      title: 'Cancelled Free Trial',
-      date: '3:45 PM 05-01-2026',
-      amount: '+₹0',
-      action: 'Download Invoice'
-    },
-    {
-      id: 2,
-      title: 'Payment Failed',
-      date: '9:30 AM 07-20-2026',
-      amount: '-₹499',
-      action: 'Retry Payment',
-      isNegative: true
-    },
-    {
-      id: 3,
-      title: 'Cancelled Free Trial',
-      date: '3:45 PM 05-01-2026',
-      amount: '+₹0',
-      action: 'Download Invoice'
-    },
-    {
-      id: 4,
-      title: 'Subscription Upgrade',
-      date: '11:00 AM 08-30-2026',
-      amount: '+₹999',
-      action: 'Download Receipt'
-    },
-    {
-      id: 5,
-      title: 'Renewed Subscription',
-      date: '1:15 PM 06-15-2026',
-      amount: '+₹499',
-      action: 'View Invoice'
-    }
-  ];
+  useEffect(() => {
+    api.get('/account/transactions')
+      .then(res => {
+        const data = res.data?.data || res.data || [];
+        setTransactions(Array.isArray(data) ? data : []);
+      })
+      .catch(() => setTransactions([]))
+      .finally(() => setLoading(false));
+  }, []);
+
+  const grouped = groupByMonth(transactions);
 
   return (
-    <div className="bg-white h-screen flex flex-col">
-      {/* Header/App Bar */}
-      <div className="bg-white flex items-center justify-between px-1 py-2 border-b border-gray-100 shrink-0">
-        <button
-          onClick={() => router.push('/user/account')}
-          className="flex items-center justify-center w-12 h-12 hover:bg-gray-100 rounded-full transition-colors"
+    <div className="min-h-screen bg-[#000201] text-white p-5">
+      <div className="bg-[#181818] rounded-[24px] p-5">
+        <p
+          className="text-[24px] font-normal text-white capitalize leading-[1.2] mb-5"
+          style={{ fontFamily: 'Bricolage Grotesque, sans-serif', fontVariationSettings: '"opsz" 14, "wdth" 100' }}
         >
-          <ArrowLeft className="w-6 h-6 text-[#242527]" />
-        </button>
-        
-        <div className="flex-1 px-2">
-          <h2 className="text-xl font-semibold text-[#242527]" style={{ fontFamily: 'Manrope, sans-serif' }}>
-            Billing history
-          </h2>
-        </div>
-        
-        {/* <button className="flex items-center justify-center w-12 h-12 hover:bg-gray-100 rounded-full transition-colors">
-          <MoreVertical className="w-6 h-6 text-[#242527]" />
-        </button> */}
-      </div>
+          Transactions
+        </p>
 
-      {/* Billing History Container */}
-      <div className="flex-1 overflow-y-auto px-9 py-4">
-        <div className="flex flex-col h-full">
-          {billingHistory.length === 0 ? (
-            /* Empty State */
-            <div className="flex items-center justify-center h-full">
-              <p className="text-xl text-gray-600" style={{ fontFamily: 'Manrope, sans-serif' }}>
-                no transactions created yet
-              </p>
-            </div>
-          ) : (
-            <>
-              {/* Section Heading */}
-              <div className="flex items-center justify-between pb-3 pt-6 px-4">
-                <h3 className="text-lg font-semibold text-[#242527]" style={{ fontFamily: 'Manrope, sans-serif' }}>
-                  December 2025
-                </h3>
+        {loading ? (
+          <div className="flex flex-col gap-[10px]">
+            {[...Array(6)].map((_, i) => (
+              <div key={i} className="flex items-center justify-between animate-pulse py-[10px]">
+                <div className="flex items-center gap-[8px]">
+                  <div className="w-[48px] h-[48px] rounded-full bg-[#272626] flex-shrink-0" />
+                  <div className="flex flex-col gap-2">
+                    <div className="h-3 bg-[#272626] rounded w-24" />
+                    <div className="h-2 bg-[#272626] rounded w-48" />
+                  </div>
+                </div>
+                <div className="flex flex-col items-end gap-2">
+                  <div className="h-3 bg-[#272626] rounded w-12" />
+                  <div className="h-2 bg-[#272626] rounded w-24" />
+                </div>
               </div>
+            ))}
+          </div>
+        ) : transactions.length === 0 ? (
+          <p className="text-[#9b9b9b] text-sm text-center py-12">No transactions yet.</p>
+        ) : (
+          Object.entries(grouped).map(([month, txns]) => (
+            <div key={month} className="mb-6">
+              <p
+                className="text-[16px] font-normal text-[#9b9b9b] capitalize leading-[1.2] mb-[10px]"
+                style={{ fontFamily: 'Inter, sans-serif' }}
+              >
+                {month}
+              </p>
+              <div className="flex flex-col gap-[10px]">
+                {txns.map((txn, idx) => {
+                  const id = txn._id || txn.id;
+                  const planName = txn.metadata?.planName || txn.description || 'Payment';
+                  const displayName = `${planName} Plan`;
+                  const status = txn.status || 'PENDING';
+                  const statusLabel = status === 'COMPLETED' ? 'Completed' : 'Pending';
+                  const amount = txn.amount ?? 0;
+                  const formattedAmount = formatAmount(amount, txn.currency);
+                  const isCompleted = status === 'COMPLETED';
 
-              {/* Transaction List */}
-              <div className="bg-white flex flex-col">
-                {billingHistory.map((transaction, index) => (
-                  <div key={transaction.id}>
-                    <div className="flex items-center w-full relative">
-                      {/* Leading Avatar */}
-                      <div className="flex items-center px-4 py-1.5">
-                        <div className="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center">
-                          <User className="w-6 h-6 text-white" />
+                  return (
+                    <div key={id || idx}>
+                      <div className="flex items-center justify-between py-[10px]">
+                        <div className="flex items-center gap-[8px]">
+                          <div className="w-[48px] h-[48px] rounded-full bg-[#272626] overflow-hidden flex-shrink-0 flex items-center justify-center">
+                            <span className="text-white text-sm font-semibold">{getInitials(planName)}</span>
+                          </div>
+                          <div className="flex flex-col gap-[4px] min-w-0">
+                            <p
+                              className="text-[16px] font-normal text-white capitalize leading-[1.2]"
+                              style={{ fontFamily: 'Bricolage Grotesque, sans-serif', fontVariationSettings: '"opsz" 14, "wdth" 100' }}
+                            >
+                              {displayName}
+                            </p>
+                            <p
+                              className="text-[12px] font-normal text-[#9b9b9b] leading-[1.2]"
+                              style={{ fontFamily: 'Inter, sans-serif' }}
+                            >
+                              {statusLabel}
+                            </p>
+                          </div>
+                        </div>
+
+                        <div className="flex flex-col items-end gap-[4px] flex-shrink-0 w-[140px]">
+                          <p
+                            className="text-[16px] font-normal capitalize leading-[1.2] text-white"
+                            style={{ fontFamily: 'Bricolage Grotesque, sans-serif', fontVariationSettings: '"opsz" 14, "wdth" 100' }}
+                          >
+                            {formattedAmount}
+                          </p>
+                          <button
+                            onClick={() => router.push('/user/account/upgrade-plan')}
+                            className="text-[#16a34a] text-[14px] font-normal capitalize leading-[1.4] hover:underline text-right"
+                            style={{ fontFamily: 'Inter, sans-serif' }}
+                          >
+                            View Subscription
+                          </button>
                         </div>
                       </div>
-
-                      {/* Text Content */}
-                      <div className="flex-1 flex flex-col justify-center pr-4 py-3">
-                        <p className="text-base font-semibold text-[#242527] truncate" style={{ fontFamily: 'Work Sans, sans-serif' }}>
-                          {transaction.title}
-                        </p>
-                        <p className="text-sm text-[#808080]" style={{ fontFamily: 'Work Sans, sans-serif' }}>
-                          {transaction.date}
-                        </p>
-                      </div>
-
-                      {/* Trailing Amount */}
-                      <div className="flex flex-col items-end justify-center pr-4 py-3">
-                        <p className={`text-base font-semibold ${transaction.isNegative ? 'text-red-600' : 'text-[#242527]'}`} style={{ fontFamily: 'Work Sans, sans-serif' }}>
-                          {transaction.amount}
-                        </p>
-                        <p className="text-sm text-[#808080] cursor-pointer hover:underline" style={{ fontFamily: 'Work Sans, sans-serif' }}>
-                          {transaction.action}
-                        </p>
-                      </div>
-
-                      {/* Three Dot Menu */}
-                      <div className="relative">
-                        <button
-                          onClick={() => setOpenMenuId(openMenuId === transaction.id ? null : transaction.id)}
-                          className="flex items-center justify-center w-10 h-10 hover:bg-gray-100 rounded-full transition-colors mr-2"
-                        >
-                          <MoreVertical className="w-5 h-5 text-gray-600" />
-                        </button>
-
-                        {/* Dropdown Menu */}
-                        {openMenuId === transaction.id && (
-                          <div className="absolute right-0 mt-1 w-48 bg-white rounded-lg shadow-lg border border-gray-200 z-10">
-                            <button className="w-full text-left px-4 py-3 hover:bg-gray-50 text-sm text-gray-700 flex items-center gap-2 border-b border-gray-100">
-                              <Download className="w-4 h-4" />
-                              Download Invoice
-                            </button>
-                            <button className="w-full text-left px-4 py-3 hover:bg-gray-50 text-sm text-gray-700 flex items-center gap-2">
-                              <Copy className="w-4 h-4" />
-                              Copy Details
-                            </button>
-                          </div>
-                        )}
-                      </div>
+                      {idx < txns.length - 1 && <div className="h-px bg-white/10" />}
                     </div>
-
-                    {/* Divider */}
-                    {index < billingHistory.length - 1 && (
-                      <div className="h-px bg-gray-200 w-full" />
-                    )}
-                  </div>
-                ))}
+                  );
+                })}
               </div>
-            </>
-          )}
-        </div>
+            </div>
+          ))
+        )}
       </div>
     </div>
   );

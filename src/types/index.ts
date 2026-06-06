@@ -283,6 +283,8 @@ export interface ICampaignCreate {
   campaignType: CampaignType | string;
   /** Campaign description/brief (required) */
   campaignBrief: string;
+  /** Campaign goal / objective (optional) */
+  campaignGoal?: string;
   /** List of deliverables (required) */
   deliverables: string[];
   /** Compensation details (required) */

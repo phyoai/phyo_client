@@ -48,7 +48,7 @@ const pricingPlans = [
     annualPrice: "Rs. 1,425",
     period: "/ Month",
     description: "Best for freelancers, boutique agencies, or small teams.",
-    buttonLabel: "Start Free",
+    buttonLabel: "Start With Silver",
     note: "Billed Annually.",
     featuresTitle: "Silver Plan Includes",
     highlight: true,
@@ -70,7 +70,7 @@ const pricingPlans = [
     annualPrice: "Rs. 5,925",
     period: "/ Month",
     description: "Perfect for growing brands and mid-size teams.",
-    buttonLabel: "Start Free",
+    buttonLabel: "Start With Gold",
     note: "Billed Annually.",
     featuresTitle: "Gold Plan Includes",
     features: [
@@ -92,7 +92,7 @@ const pricingPlans = [
     annualPrice: "Rs. 14,925",
     period: "/ Month",
     description: "Perfect for global agencies managing multiple campaigns.",
-    buttonLabel: "Start Free",
+    buttonLabel: "Start With Premium",
     note: "Billed Annually.",
     featuresTitle: "Premium Plan Includes",
     features: [

@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useAuth } from '../../context/AuthContext';
+import api from '@/utils/api';
 
 const InfluencerLogin = () => {
   const [email, setEmail] = useState('');
@@ -35,7 +36,7 @@ const InfluencerLogin = () => {
   // Show loading or redirect if already authenticated
   if (authLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-gray-50">
+      <div className="flex items-center justify-center min-h-screen bg-[#000201]">
         <div className="text-center max-w-md mx-auto">
           {/* Logo Skeleton */}
           <div className="w-32 h-32 bg-gray-200 rounded-full mx-auto mb-8 animate-pulse"></div>
@@ -65,8 +66,8 @@ const InfluencerLogin = () => {
       const result = await login(email, password);
       
       if (result.success) {
-        // Check if user is an influencer
-        if (result.data.user?.type === 'INFLUENCER' || result.data.data?.type === 'INFLUENCER') {
+        // AuthContext.login() returns { success, redirectPath } — no result.data
+        if (result.redirectPath?.startsWith('/influencer')) {
           router.replace('/influencer/dashboard');
         } else {
           setError('This login is for influencers only. Please use the appropriate login page.');
@@ -92,21 +93,13 @@ const InfluencerLogin = () => {
     setForgotError('');
     
     try {
-      const response = await fetch('https://api.phyo.ai/api/user/forgot-password', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email: forgotEmail }),
-      });
-      
-      const result = await response.json();
-      
-      if (response.ok) {
+      const response = await api.post('/auth/forgot-password', { email: forgotEmail });
+      const payload = response?.data ?? {};
+      if (payload.success) {
         setForgotSuccess('Verification code sent to your email!');
         setForgotStep(2);
       } else {
-        setForgotError(result.message || 'Failed to send verification code');
+        setForgotError(payload.message || 'Failed to send verification code');
       }
     } catch (error) {
       setForgotError('Network error. Please try again.');
@@ -125,24 +118,13 @@ const InfluencerLogin = () => {
     setForgotError('');
     
     try {
-      const response = await fetch('https://api.phyo.ai/api/user/verify-code', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ 
-          email: forgotEmail, 
-          code: verificationCode 
-        }),
-      });
-      
-      const result = await response.json();
-      
-      if (response.ok) {
+      const response = await api.post('/auth/verify-code', { email: forgotEmail, code: verificationCode });
+      const payload = response?.data ?? {};
+      if (payload.success) {
         setForgotSuccess('Code verified successfully!');
         setForgotStep(3);
       } else {
-        setForgotError(result.message || 'Invalid verification code');
+        setForgotError(payload.message || 'Invalid verification code');
       }
     } catch (error) {
       setForgotError('Network error. Please try again.');
@@ -171,27 +153,17 @@ const InfluencerLogin = () => {
     setForgotError('');
     
     try {
-      const response = await fetch('https://api.phyo.ai/api/user/reset-password', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ 
-          email: forgotEmail, 
-          newPassword: newPassword 
-        }),
-      });
-      
-      const result = await response.json();
-      
-      if (response.ok) {
+      const response = await api.post('/auth/reset-password', { email: forgotEmail, newPassword });
+      const payload = response?.data ?? {};
+
+      if (payload.success) {
         setForgotSuccess('Password reset successfully! You can now login with your new password.');
         setTimeout(() => {
           resetForgotPasswordState();
           setShowForgotPassword(false);
         }, 2000);
       } else {
-        setForgotError(result.message || 'Failed to reset password');
+        setForgotError(payload.message || 'Failed to reset password');
       }
     } catch (error) {
       setForgotError('Network error. Please try again.');

@@ -2,10 +2,9 @@
 
 import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { useDispatch, useSelector } from "react-redux";
 import { YoutubeFill, InstagramFill, TwitterXLine } from '@phyoofficial/phyo-icon-library';
 import { ShieldCheckLine, ExternalLinkLine, GlobeLine, ArrowLeftLine, MoreLine } from '@phyoofficial/phyo-icon-library';
-import { getBrandById } from "@/store/slices/brandSlice";
+import api from '@/utils/api';
 
 const SOCIALS = [
   { platform: "Youtube",   icon: <YoutubeFill size={18} /> },
@@ -14,15 +13,6 @@ const SOCIALS = [
   { platform: "Website",   icon: <GlobeLine size={18} /> },
 ];
 
-const LATEST_CAMPAIGNS = [
-  { id: 1, title: "Outdoor Adventure", subtitle: "Hiking Essentials", img: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=600&q=80" },
-  { id: 2, title: "Healthy Living",    subtitle: "Meal Prep Kits",    img: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=600&q=80" },
-];
-
-const PREVIOUS_CAMPAIGNS = [
-  { id: 3, title: "Eco-Friendly Living", subtitle: "Sustainable Products", img: "https://images.unsplash.com/photo-1518611012118-696072aa579a?w=600&q=80" },
-  { id: 4, title: "Urban Style",         subtitle: "City Fashion Week",    img: "https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=600&q=80" },
-];
 
 function CampaignCard({ title, subtitle, img }) {
   return (
@@ -75,27 +65,45 @@ function CampaignCard({ title, subtitle, img }) {
   );
 }
 
-function CampaignsTab() {
+function CampaignsTab({ campaigns = [] }) {
+  const active = campaigns.filter(c => c.status === 'Active');
+  const previous = campaigns.filter(c => c.status !== 'Active');
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
-      {/* Latest */}
       <div>
         <h3 style={{ fontSize: 15, fontWeight: 700, color: "#111", margin: "0 0 10px", paddingLeft: 2 }}>
-          Latest campaigns
+          Active Campaigns
         </h3>
-        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-          {LATEST_CAMPAIGNS.map(c => <CampaignCard key={c.id} {...c} />)}
-        </div>
+        {active.length > 0 ? (
+          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+            {active.map(c => (
+              <CampaignCard
+                key={c._id || c.id}
+                title={c.campaignName || 'Campaign'}
+                subtitle={c.campaignType || ''}
+                img={c.productImages?.[0] || 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=600&q=80'}
+              />
+            ))}
+          </div>
+        ) : <p style={{ fontSize: 13, color: "#9b9b9b" }}>No active campaigns</p>}
       </div>
-      {/* Previous */}
-      <div>
-        <h3 style={{ fontSize: 15, fontWeight: 700, color: "#111", margin: "0 0 10px", paddingLeft: 2 }}>
-          Previous Campaigns
-        </h3>
-        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-          {PREVIOUS_CAMPAIGNS.map(c => <CampaignCard key={c.id} {...c} />)}
+      {previous.length > 0 && (
+        <div>
+          <h3 style={{ fontSize: 15, fontWeight: 700, color: "#111", margin: "0 0 10px", paddingLeft: 2 }}>
+            Previous Campaigns
+          </h3>
+          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+            {previous.map(c => (
+              <CampaignCard
+                key={c._id || c.id}
+                title={c.campaignName || 'Campaign'}
+                subtitle={c.campaignType || ''}
+                img={c.productImages?.[0] || 'https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=600&q=80'}
+              />
+            ))}
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }
@@ -103,19 +111,36 @@ function CampaignsTab() {
 export default function BrandProfile() {
   const params = useParams();
   const router = useRouter();
-  const dispatch = useDispatch();
   const [activeTab, setActiveTab] = useState("info");
+  const [brand, setBrand] = useState(null);
+  const [brandCampaigns, setBrandCampaigns] = useState([]);
+  const [brandStats, setBrandStats] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  // Redux selectors
-  const { selectedBrand: brand, loading, error } = useSelector(state => state.brand);
   const brandId = params?.id;
 
-  // Fetch brand data on mount
+  // Fetch GET /api/brands/:id, /campaigns, /stats
   useEffect(() => {
-    if (brandId) {
-      dispatch(getBrandById(brandId));
-    }
-  }, [brandId, dispatch]);
+    if (!brandId) return;
+    setLoading(true);
+    Promise.all([
+      api.get(`/brands/${brandId}`),
+      api.get(`/brands/${brandId}/campaigns`).catch(() => ({ data: { data: [] } })),
+      api.get(`/brands/${brandId}/stats`).catch(() => ({ data: {} })),
+    ])
+      .then(([brandRes, campaignsRes, statsRes]) => {
+        setBrand(brandRes.data?.data || brandRes.data);
+        const camps = campaignsRes.data?.data || campaignsRes.data?.campaigns || campaignsRes.data || [];
+        setBrandCampaigns(Array.isArray(camps) ? camps : []);
+        setBrandStats(statsRes.data?.data || statsRes.data || null);
+      })
+      .catch((err) => {
+        console.error('Failed to load brand profile:', err);
+        setError(err?.response?.data?.message || 'Failed to load brand');
+      })
+      .finally(() => setLoading(false));
+  }, [brandId]);
 
   // Loading state
   if (loading) {
@@ -376,7 +401,7 @@ export default function BrandProfile() {
           )}
 
           {activeTab === "campaigns" && (
-            <CampaignsTab />
+            <CampaignsTab campaigns={brandCampaigns} />
           )}
         </div>
       </div>

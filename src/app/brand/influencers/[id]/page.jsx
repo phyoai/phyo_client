@@ -4,6 +4,7 @@ import { ArrowLeft, MoreVertical, MessageSquare, UserPlus, Bookmark, ChevronLeft
 import { useRouter, useParams } from 'next/navigation';
 import Image from 'next/image';
 import { BookmarkLine, YoutubeFill, InstagramFill, TwitterXLine, UserAddLine, Message3Line, FacebookCircleFill } from '@phyoofficial/phyo-icon-library';
+import { influencerApi } from '@/api/influencer-api';
 
 const influencersData = [
   {
@@ -158,23 +159,31 @@ const TopInfluencersPage = () => {
     { id: 2, name: 'Campaign 1', initials: 'AB', color: '#0066ff' }
   ]);
 
-  // Get influencer from URL param
-  const influencerId = parseInt(params?.id);
-  const influencer = influencersData.find(inf => inf.id === influencerId);
+  const influencerId = params?.id;
+  const [apiInfluencer, setApiInfluencer] = useState(null);
+  const [loadingInfluencer, setLoadingInfluencer] = useState(true);
 
-  // Transform influencer data to match InfluencerProfile expected format
-  const displayInfluencer = influencer ? {
-    id: influencer.id,
-    name: influencer.name,
-    username: influencer.username,
-    followers: influencer.stats.followers,
-    following: influencer.stats.following,
-    posts: influencer.stats.posts,
-    location: 'Delhi, India',
-    age: '34',
-    about: influencer.bio,
-    likes: '9.2K',
-    views: '9.2K'
+  // Fetch influencer from GET /api/influencers/:id
+  useEffect(() => {
+    if (!influencerId) return;
+    influencerApi.getInfluencerById(influencerId)
+      .then((data) => setApiInfluencer(data))
+      .catch((err) => console.error('Failed to load influencer:', err))
+      .finally(() => setLoadingInfluencer(false));
+  }, [influencerId]);
+
+  const displayInfluencer = apiInfluencer ? {
+    id: apiInfluencer._id || apiInfluencer.id,
+    name: apiInfluencer.profile?.name || apiInfluencer.name || 'Influencer',
+    username: `@${apiInfluencer.profile?.username || apiInfluencer.username || 'unknown'}`,
+    followers: String(apiInfluencer.stats?.followers || 0),
+    following: String(apiInfluencer.stats?.following || 0),
+    posts: String(apiInfluencer.stats?.totalPosts || apiInfluencer.stats?.posts || 0),
+    location: apiInfluencer.profile?.location || 'India',
+    age: apiInfluencer.profile?.age || '—',
+    about: apiInfluencer.profile?.bio || apiInfluencer.about || '',
+    likes: String(apiInfluencer.stats?.likes || '—'),
+    views: String(apiInfluencer.stats?.views || '—'),
   } : null;
 
   const handleBack = () => {

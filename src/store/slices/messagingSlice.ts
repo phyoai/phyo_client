@@ -42,7 +42,8 @@ export const getConversations = createAsyncThunk(
   'messaging/getConversations',
   async (_, { rejectWithValue }) => {
     try {
-      const response = await api.get('/conversation');
+      // API handoff doc: conversation list is `/messages/conversations` (quirk to preserve).
+      const response = await api.get('/messages/conversations');
       return response.data || response;
     } catch (error: any) {
       return rejectWithValue(error.message || 'Failed to fetch conversations');
@@ -54,7 +55,7 @@ export const createConversation = createAsyncThunk(
   'messaging/createConversation',
   async (participantId: string, { rejectWithValue }) => {
     try {
-      const response = await api.post('/conversation', { participantId });
+      const response = await api.post('/messages/conversations', { participantId });
       return response.data || response;
     } catch (error: any) {
       return rejectWithValue(error.message || 'Failed to create conversation');
@@ -121,7 +122,7 @@ export const deleteConversation = createAsyncThunk(
   'messaging/deleteConversation',
   async (conversationId: string, { rejectWithValue }) => {
     try {
-      await api.delete(`/conversation/${conversationId}`);
+      await api.delete(`/messages/conversations/${conversationId}`);
       return { success: true, conversationId };
     } catch (error: any) {
       return rejectWithValue(error.message || 'Failed to delete conversation');

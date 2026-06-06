@@ -18,10 +18,11 @@ export const AUTH_ENDPOINTS = {
   ADMIN_LOGIN: `${API_BASE_URL}/auth/admin/login`,
   GOOGLE_AUTH: `${API_BASE_URL}/auth/google`,
   FORGOT_PASSWORD: `${API_BASE_URL}/auth/forgot-password`,
-  VERIFY_RESET_CODE: `${API_BASE_URL}/auth/verify-reset-code`,
+  // API handoff doc: reset verification endpoint is `/auth/verify-code` (quirk to preserve).
+  VERIFY_RESET_CODE: `${API_BASE_URL}/auth/verify-code`,
   RESET_PASSWORD: `${API_BASE_URL}/auth/reset-password`,
   VERIFY_EMAIL_OTP: `${API_BASE_URL}/auth/verify-email-otp`,
-  RESEND_EMAIL_OTP: `${API_BASE_URL}/auth/resend-email-otp`,
+  RESEND_OTP: `${API_BASE_URL}/auth/resend-otp`,
   CHECK_REGISTRATION_STATUS: `${API_BASE_URL}/auth/check-registration-status`,
 } as const;
 
@@ -204,13 +205,14 @@ export const BRAND_ENDPOINTS = {
   LOGOUT: `${API_BASE_URL}/brand/logout`,
   UPDATE_NOTIFICATION_PREFERENCES: `${API_BASE_URL}/brand/notification-preferences`,
   DEACTIVATE_ACCOUNT: `${API_BASE_URL}/brand/account`,
-  GET_ALL: `${API_BASE_URL}/brand`,
-  GET_BY_ID: (id: string) => `${API_BASE_URL}/brand/${id}`,
-  GET_CAMPAIGNS: (id: string) => `${API_BASE_URL}/brand/${id}/campaigns`,
-  GET_STATS: (id: string) => `${API_BASE_URL}/brand/${id}/stats`,
+  // API handoff doc: brand listing and detail use /brands (plural)
+  GET_ALL: `${API_BASE_URL}/brands`,
+  GET_BY_ID: (id: string) => `${API_BASE_URL}/brands/${id}`,
+  GET_CAMPAIGNS: (id: string) => `${API_BASE_URL}/brands/${id}/campaigns`,
+  GET_STATS: (id: string) => `${API_BASE_URL}/brands/${id}/stats`,
   UPDATE_BY_ID: (id: string) =>
     `${API_BASE_URL}/brand/${id}/profile`,
-  LIST_BRANDS: `${API_BASE_URL}/brand/list`,
+  LIST_BRANDS: `${API_BASE_URL}/brands`,
 } as const;
 
 /**
@@ -512,8 +514,8 @@ export const PORTFOLIO_ENDPOINTS = {
   GET_BY_ID: (id: string) => `${API_BASE_URL}/portfolios/${id}`,
   UPDATE: (id: string) => `${API_BASE_URL}/portfolios/${id}`,
   DELETE: (id: string) => `${API_BASE_URL}/portfolios/${id}`,
-  GET_STATS: (id: string) =>
-    `${API_BASE_URL}/portfolios/stats/${id}`,
+  // API handoff doc: portfolio stats is a single endpoint, no id param
+  GET_STATS: `${API_BASE_URL}/portfolios/stats`,
   ADD_CLIENT: (id: string) =>
     `${API_BASE_URL}/portfolios/${id}/clients`,
   UPDATE_CLIENT: (id: string, clientId: string) =>

@@ -1,187 +1,224 @@
 'use client'
 import React from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { useAuth } from '../app/context/AuthContext';
+import Image from 'next/image';
+import { usePathname, useRouter } from 'next/navigation';
 import { useSidebar } from '../app/context/SidebarContext';
-import {  
-  CalendarEventLine,
-  AccountCircleLine,
-  MenuFill, 
-  MenuUnfold4Line,
-  PencilFill, 
+import {
   Home4Fill,
   InboxLine,
-  Message3Fill
+  CalendarEventLine,
+  AccountCircleLine,
+  Message3Fill,
+  UserLine,
+  ListUnordered,
+  FileList3Line,
+  WalletLine,
+  PassExpiredLine,
+  CloseCircleLine,
+  QuestionLine,
+  FileTextLine,
+  Settings3Line,
+  GlobalLine,
+  LogoutBoxRLine,
 } from '@phyoofficial/phyo-icon-library';
+import { useAuth } from '../app/context/AuthContext';
 
-// Helper function to extract role from pathname
-const getRoleFromPathname = (pathname) => {
-  if (pathname.startsWith('/user/')) return 'user';
-  if (pathname.startsWith('/brand/')) return 'brand';
-  if (pathname.startsWith('/influencer/')) return 'influencer';
-  return 'user'; // Default
-};
+function ChevronDown({ open }) {
+  return (
+    <svg
+      width="11" height="7" viewBox="0 0 11 7" fill="none"
+      className={`transition-transform duration-200 ${open ? 'rotate-180' : ''}`}
+    >
+      <path d="M1 1L5.5 6L10 1" stroke="#9b9b9b" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+    </svg>
+  );
+}
 
 const UserSidebar = () => {
   const pathname = usePathname();
-  const role = getRoleFromPathname(pathname);
-  
-  const { logout } = useAuth();
-  const { isExpanded, setIsExpanded, sidebarButtonAction, sidebarButtonLabel } = useSidebar();
+  const router = useRouter();
+  const { isExpanded, sidebarButtonAction } = useSidebar();
+  useAuth();
   const [mounted, setMounted] = React.useState(false);
-  const [indicatorStyle, setIndicatorStyle] = React.useState({ top: 0, height: 44 });
-  const navRefs = React.useRef([]);
+  const [accountOpen, setAccountOpen] = React.useState(
+    pathname.startsWith('/user/account')
+  );
 
+  React.useEffect(() => { setMounted(true); }, []);
   React.useEffect(() => {
-    setMounted(true);
-  }, []);
+    if (pathname.startsWith('/user/account')) setAccountOpen(true);
+  }, [pathname]);
 
-  // Generate nav items dynamically based on role
-  const navItems = [
-    { name: 'Home', href: `/${role}/dashboard`, icon: Home4Fill },
-    { name: 'Inbox', href: `/${role}/inbox`, icon: InboxLine, badge: 3 },
-    { name: 'Campaigns', href: `/${role}/campaigns`, icon: CalendarEventLine },
-    { name: 'Account', href: `/${role}/account`, icon: AccountCircleLine },
+  const mainNavItems = [
+    { name: 'Home',     href: '/user/dashboard', icon: Home4Fill },
+    { name: 'Inbox',    href: '/user/inbox',     icon: InboxLine, badge: 3 },
+    { name: 'Campaign', href: '/user/campaigns', icon: CalendarEventLine },
   ];
 
-  // Update indicator position when pathname or expansion state changes
-  React.useEffect(() => {
-    const activeIndex = navItems.findIndex(item => item.href === pathname);
-    if (activeIndex !== -1 && navRefs.current[activeIndex] && isExpanded) {
-      const activeElement = navRefs.current[activeIndex];
-      const navContainer = activeElement.parentElement;
-      
-      if (navContainer) {
-        const containerRect = navContainer.getBoundingClientRect();
-        const activeRect = activeElement.getBoundingClientRect();
-        
-        setIndicatorStyle({
-          top: activeRect.top - containerRect.top,
-          height: activeRect.height
-        });
-      }
-    }
-  }, [pathname, isExpanded]);
+  const accountSubItems = [
+    { name: 'Profile',             href: '/user/account',                  icon: UserLine },
+    { name: 'My List',             href: '/user/account/my-lists',          icon: ListUnordered },
+    { name: 'Transactions',        href: '/user/account/billing-history',   icon: FileList3Line },
+    { name: 'Upgrade Plan',        href: '/user/account/upgrade-plan',      icon: WalletLine },
+    { name: 'Pause Subscription',  href: '/user/account/pause',             icon: PassExpiredLine },
+    { name: 'Cancel Subscription', href: '/user/account/cancel',            icon: CloseCircleLine },
+    { name: 'Help & Support',      href: '/user/account/help-support',      icon: QuestionLine },
+    { name: 'Terms & Conditions',  href: '/user/account/terms-conditions',  icon: FileTextLine },
+    { name: 'Privacy Policy',      href: '/user/account/privacy-policy',    icon: FileTextLine },
+    { name: 'Settings',            href: '/user/account/settings',          icon: Settings3Line },
+    { name: 'Language',            href: '/user/account/language',          icon: GlobalLine },
+  ];
 
-  const handleButtonClick = () => {
-    if (sidebarButtonAction) {
-      sidebarButtonAction();
-    }
+  const handleStartNewChat = () => {
+    if (sidebarButtonAction) sidebarButtonAction();
+    else router.push('/user/inbox');
   };
 
-  // Determine which icon to show based on current page
-  const getFabIcon = () => {
-    if (pathname === `/${role}/inbox`) {
-      return Message3Fill;
-    }
-    return PencilFill;
-  };
+  const handleLogout = () => router.push('/user/account/logout');
 
-  const FabIcon = getFabIcon();
-  const isButtonEnabled = sidebarButtonAction || pathname === `/${role}/inbox`;
+  const isAccountActive = pathname.startsWith('/user/account');
 
   if (!mounted) {
-    return (
-      <div className={`h-screen bg-[#F0F0F0] fixed left-0 top-0 flex flex-col transition-[width] duration-300 ease-in-out z-50 w-[96px] pt-[44px] pb-[56px]`}>
-      </div>
-    );
+    return <div className={`h-screen bg-[#181818] fixed left-0 top-0 z-50 ${isExpanded ? 'w-[250px]' : 'w-[72px]'}`} />;
   }
 
   return (
-    <div className={`h-screen bg-[#F0F0F0] fixed left-0 top-0 flex flex-col transition-all duration-300 ease-in-out z-50 ${
-      isExpanded ? 'w-[220px] pt-[44px] pb-[56px] px-[20px]' : 'w-[96px] pt-[44px] pb-[56px]'
-    }`}>
-      <div className={`flex flex-col gap-[4px] mb-[36px] transition-all duration-300 ease-in-out ${isExpanded ? '' : 'items-center'}`}>
-        <button 
-          onClick={() => setIsExpanded(!isExpanded)}
-          className="flex items-center justify-center w-14 h-14 rounded-xl hover:bg-gray-200 transition-all duration-200"
-        >
-          <div className="transition-transform duration-300">
-            {isExpanded ? (
-              <MenuUnfold4Line width={24} height={24} fill="#242527" />
-            ) : (
-              <MenuFill width={24} height={24} fill="#242527" />
-            )}
-          </div>
-        </button>
-
-        <button 
-          onClick={handleButtonClick}
-          disabled={!isButtonEnabled}
-          className={`flex items-center rounded-xl transition-all duration-300 ease-in-out justify-start ${
-            isExpanded 
-              ? 'w-full h-14 px-4 gap-[6px] justify-center' 
-              : 'w-14 h-14 justify-center'
-          } ${
-            isButtonEnabled 
-              ? 'bg-[#43573B] hover:bg-[#3a4a33] cursor-pointer' 
-              : 'bg-[#43573B] opacity-50 cursor-not-allowed'
-          }`}
-        >
-          <FabIcon width={24} height={24} fill="white" color="white" style={{ color: 'white' }} className="flex-shrink-0 transition-all duration-300" />
-          <span className={`text-white text-base font-semibold tracking-[0.24px] leading-6 whitespace-nowrap transition-all duration-300 ${
-            isExpanded ? 'opacity-100 max-w-[200px]' : 'opacity-0 max-w-0 overflow-hidden'
-          }`}>
-            {sidebarButtonLabel || 'Button'}
-          </span>
-        </button>
+    <div
+      className={`h-screen bg-[#181818] fixed left-0 top-0 flex flex-col z-50 transition-[width] duration-300 ease-in-out overflow-hidden ${
+        isExpanded ? 'w-[250px]' : 'w-[72px]'
+      }`}
+    >
+      {/* Logo */}
+      <div className="flex items-center justify-center h-[90px] shrink-0">
+        <Image
+          src="/landing/phyo_logo.svg"
+          alt="Phyo"
+          width={80}
+          height={22}
+          priority
+          className={`object-contain transition-all duration-300 ${isExpanded ? 'w-[80px]' : 'w-[28px]'}`}
+        />
       </div>
 
-      <nav className={`flex flex-col gap-[4px] relative`}>
-        {isExpanded && (
-          <div 
-            className="absolute left-0 w-full bg-[#DAE3D1] rounded-[32px] transition-all duration-[350ms] ease-out pointer-events-none"
-            style={{
-              top: `${indicatorStyle.top}px`,
-              height: `${indicatorStyle.height}px`,
-            }}
-          />
-        )}
-        
-        {navItems.map((item, index) => {
+      {/* Nav */}
+      <nav className="flex flex-col gap-[10px] mt-[28px] flex-1 px-[10px] overflow-y-auto scrollbar-hide">
+
+        {mainNavItems.map((item) => {
           const Icon = item.icon;
           const isActive = pathname === item.href || pathname.startsWith(item.href + '/');
-
-          if (isExpanded) {
-            return (
-              <Link
-                key={item.name}
-                href={item.href}
-                ref={(el) => (navRefs.current[index] = el)}
-                className="relative z-10 flex items-center gap-[12px] px-[16px] py-[12px] rounded-[32px] no-underline transition-colors duration-300"
-              >
-                <Icon width={24} height={24} fill={isActive ? '#43573B' : '#A0A0A0'} color={isActive ? '#43573B' : '#A0A0A0'} />
-                <span className={`text-base font-semibold leading-6 transition-colors duration-300 ${isActive ? 'text-[#43573B]' : 'text-[#A0A0A0]'}`}>
+          return (
+            <Link
+              key={item.name}
+              href={item.href}
+              className={`relative flex items-center h-[40px] rounded-full no-underline hover:bg-white/5 transition-colors ${
+                isExpanded ? 'pl-[20px] pr-[12px]' : 'justify-center'
+              }`}
+            >
+              <span className="flex-shrink-0 flex items-center justify-center w-[16px] h-[16px]">
+                <Icon width={16} height={16} fill={isActive ? '#16a34a' : '#9b9b9b'} color={isActive ? '#16a34a' : '#9b9b9b'} />
+              </span>
+              {isExpanded && (
+                <span className={`ml-[12px] text-[16px] font-normal capitalize leading-[1.2] whitespace-nowrap flex-1 ${isActive ? 'text-[#16a34a]' : 'text-[#9b9b9b]'}`} style={{ fontFamily: 'Inter, sans-serif' }}>
                   {item.name}
                 </span>
-                {item.badge && isActive && (
-                  <span className="ml-auto bg-[#43573B] text-white text-xs font-semibold px-2 py-1 rounded-full">
-                    {item.badge}
-                  </span>
-                )}
-              </Link>
-            );
-          } else {
-            return (
-              <Link
-                key={item.name}
-                href={item.href}
-                ref={(el) => (navRefs.current[index] = el)}
-                className="relative z-10 flex items-center justify-center w-14 h-14 rounded-[32px] no-underline transition-colors duration-300"
-                title={item.name}
-              >
-                <Icon width={24} height={24} fill={isActive ? '#43573B' : '#A0A0A0'} color={isActive ? '#43573B' : '#A0A0A0'} />
-                {item.badge && isActive && (
-                  <span className="absolute top-0 right-0 bg-[#43573B] text-white text-xs font-semibold w-6 h-6 rounded-full flex items-center justify-center">
-                    {item.badge}
-                  </span>
-                )}
-              </Link>
-            );
-          }
+              )}
+              {item.badge && (
+                <span className={`${isExpanded ? 'ml-auto' : 'absolute top-0.5 right-0.5'} bg-[#16a34a] text-white text-[10px] font-semibold min-w-[16px] h-[16px] rounded-full flex items-center justify-center px-1`}>
+                  {item.badge}
+                </span>
+              )}
+            </Link>
+          );
         })}
+
+        {/* Account — expandable */}
+        <button
+          onClick={() => {
+            if (isExpanded) setAccountOpen((o) => !o);
+            else router.push('/user/account');
+          }}
+          className={`relative flex items-center h-[40px] rounded-full hover:bg-white/5 transition-colors w-full ${
+            isExpanded ? 'pl-[20px] pr-[12px]' : 'justify-center'
+          }`}
+        >
+          <span className="flex-shrink-0 flex items-center justify-center w-[16px] h-[16px]">
+            <AccountCircleLine width={16} height={16} fill={isAccountActive ? '#16a34a' : '#9b9b9b'} color={isAccountActive ? '#16a34a' : '#9b9b9b'} />
+          </span>
+          {isExpanded && (
+            <>
+              <span className={`ml-[12px] text-[16px] font-normal capitalize leading-[1.2] whitespace-nowrap flex-1 text-left ${isAccountActive ? 'text-[#16a34a]' : 'text-[#9b9b9b]'}`} style={{ fontFamily: 'Inter, sans-serif' }}>
+                Account
+              </span>
+              <ChevronDown open={accountOpen} />
+            </>
+          )}
+        </button>
+
+        {isExpanded && accountOpen && (
+          <>
+            <div className="h-px bg-white/10 mx-3 my-1" />
+            <div className="bg-[#1e1e1e] rounded-[16px] mx-1 overflow-y-auto scrollbar-hide" style={{ maxHeight: 'calc(100vh - 260px)' }}>
+              {accountSubItems.map((sub, idx) => {
+                const Icon = sub.icon;
+                const isActive = pathname === sub.href;
+                return (
+                  <Link
+                    key={sub.name}
+                    href={sub.href}
+                    className={`flex items-center gap-[8px] px-[12px] py-[10px] transition-colors hover:bg-white/5 ${idx === 0 ? 'border-b border-white/10' : ''}`}
+                  >
+                    <span className="shrink-0 w-[28px] h-[28px] flex items-center justify-center">
+                      <Icon width={16} height={16} fill={isActive ? '#ffffff' : '#9b9b9b'} color={isActive ? '#ffffff' : '#9b9b9b'} />
+                    </span>
+                    <span className={`text-[14px] font-normal capitalize leading-[1.2] whitespace-nowrap ${isActive ? 'text-white' : 'text-[#9b9b9b]'}`} style={{ fontFamily: 'Inter, sans-serif' }}>
+                      {sub.name}
+                    </span>
+                  </Link>
+                );
+              })}
+
+              {(() => {
+                const isLogoutActive = pathname.includes('/account/logout');
+                return (
+                  <button
+                    onClick={handleLogout}
+                    className="w-full flex items-center gap-[8px] px-[12px] py-[10px] hover:bg-white/5 transition-colors"
+                  >
+                    <span className="shrink-0 w-[28px] h-[28px] flex items-center justify-center">
+                      <LogoutBoxRLine width={16} height={16} fill={isLogoutActive ? '#ffffff' : '#9b9b9b'} color={isLogoutActive ? '#ffffff' : '#9b9b9b'} />
+                    </span>
+                    <span className={`text-[14px] font-normal capitalize leading-[1.2] whitespace-nowrap ${isLogoutActive ? 'text-white' : 'text-[#9b9b9b]'}`} style={{ fontFamily: 'Inter, sans-serif' }}>
+                      Log Out
+                    </span>
+                  </button>
+                );
+              })()}
+            </div>
+            <div className="h-px bg-white/10 mx-3 my-1" />
+          </>
+        )}
       </nav>
+
+      {/* Start New Chat */}
+      <div className="pb-[40px] shrink-0 flex justify-center px-[10px]">
+        {isExpanded ? (
+          <button
+            onClick={handleStartNewChat}
+            className="w-full max-w-[200px] h-[40px] bg-[#16a34a] hover:bg-[#15803d] rounded-full text-white text-[16px] font-normal capitalize transition-colors"
+            style={{ fontFamily: 'Inter, sans-serif' }}
+          >
+            Start New Chat
+          </button>
+        ) : (
+          <button
+            onClick={handleStartNewChat}
+            className="w-[40px] h-[40px] bg-[#16a34a] hover:bg-[#15803d] rounded-full flex items-center justify-center transition-colors"
+          >
+            <Message3Fill width={18} height={18} fill="white" color="white" />
+          </button>
+        )}
+      </div>
     </div>
   );
 };

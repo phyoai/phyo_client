@@ -2,6 +2,7 @@
 import React from 'react';
 import { usePathname } from 'next/navigation';
 import BrandSidebar from '../../components/BrandSidebar';
+import BrandTopbar from '../../components/BrandTopbar';
 import { SidebarProvider, useSidebar } from '../context/SidebarContext';
 
 function BrandLayoutContent({ children, pathname }) {
@@ -10,36 +11,27 @@ function BrandLayoutContent({ children, pathname }) {
   const noSidebarRoutes = [
     '/brand/signup',
     '/brand/login',
-    '/brand/campaigns/create-campaign',
-    '/brand/campaigns/new-applications',
-    '/brand/campaigns/all-campaigns',
-    '/brand/campaigns/all-drafts',
     '/brand/influencer-search',
     '/brand/influencers',
-    '/brand/notifications',
   ];
 
-  const isNoSidebarRoute =
-    noSidebarRoutes.some(r => pathname === r) ||
-    pathname.startsWith('/brand/account/') ||
-    (pathname.startsWith('/brand/campaigns/') &&
-      !pathname.includes('/create-campaign') &&
-      !pathname.includes('/new-applications') &&
-      !pathname.includes('/all-campaigns') &&
-      !pathname.includes('/all-drafts'));
+  const isNoSidebarRoute = noSidebarRoutes.some(r => pathname === r);
 
   if (isNoSidebarRoute) {
     return <>{children}</>;
   }
 
   return (
-    <div className="flex min-h-screen bg-[#FFFFFF] dark:bg-[#121212]">
+    <div className="flex h-screen bg-[#000201] overflow-hidden">
       <BrandSidebar />
-      <main className={`flex-1 bg-[#FFFFFF] dark:bg-[#121212] transition-all duration-300 ease-in-out ${
-        isExpanded ? 'ml-[220px]' : 'ml-[96px]'
-      } h-screen overflow-y-auto`}>
-        {children}
-      </main>
+      <div className={`flex flex-col flex-1 transition-all duration-300 ease-in-out overflow-hidden ${
+        isExpanded ? 'ml-[280px]' : 'ml-[72px]'
+      } pl-3`}>
+        <BrandTopbar />
+        <main className="flex-1 overflow-y-auto bg-[#000201]">
+          {children}
+        </main>
+      </div>
     </div>
   );
 }

@@ -1,7 +1,8 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { userAPI } from '@/utils/api';
+import api, { userAPI } from '@/utils/api';
+import { useAuth } from '@/app/context/AuthContext';
 import { useTheme } from '@/app/context/ThemeContext';
 import { useLanguage } from '@/app/context/LanguageContext';
 import {
@@ -34,6 +35,7 @@ import {
 } from '@phyoofficial/phyo-icon-library';
 export default function AccountPage() {
   const router = useRouter();
+  const { logout } = useAuth();
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showLanguageModal, setShowLanguageModal] = useState(false);
@@ -82,20 +84,8 @@ console.log('UserLine profile data:', user);
   };
 
   const confirmLogout = () => {
-    // Clear localStorage
-    localStorage.removeItem('token');
-    localStorage.clear();
-
-    // Clear sessionStorage
-    sessionStorage.clear();
-
-    // Clear cookies
-    document.cookie.split(";").forEach((c) => {
-      document.cookie = c
-        .replace(/^ +/, "")
-        .replace(/=.*/, `=;expires=${new Date().toUTCString()};path=/`);
-    });
-
+    setShowLogoutConfirm(false);
+    logout();
     router.push('/login');
   };
 
@@ -176,19 +166,14 @@ console.log('UserLine profile data:', user);
   const handleSendOTP = async (type) => {
     setIsSaving(true);
     try {
-      const token = localStorage.getItem('authToken');
       const payload = type === 'email'
         ? { email: editFormData.email }
         : { phone: editFormData.mobileNumber };
 
-      await fetch('https://api.phyo.ai/api/brand-requests/send-otp', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-        body: JSON.stringify(payload),
-      });
+      const response = await api.post('/brand-requests/send-otp', payload);
+      if (!response.success) {
+        throw new Error(response.message || 'Failed to send OTP');
+      }
       setOtpType(type);
       setOtpValue('');
       setOtpSentSuccess(true);
@@ -207,19 +192,14 @@ console.log('UserLine profile data:', user);
     if (otpValue.length < 6) return;
     setIsSaving(true);
     try {
-      const token = localStorage.getItem('authToken');
       const payload = otpType === 'email'
         ? { email: editFormData.email, otp: otpValue }
         : { phone: editFormData.mobileNumber, otp: otpValue };
 
-      await fetch('https://api.phyo.ai/api/brand-requests/verify-otp', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-        body: JSON.stringify(payload),
-      });
+      const response = await api.post('/brand-requests/verify-otp', payload);
+      if (!response.success) {
+        throw new Error(response.message || 'Failed to verify OTP');
+      }
       const field = otpType === 'email'
         ? { email: editFormData.email }
         : { mobileNumber: editFormData.mobileNumber };
@@ -1270,36 +1250,26 @@ const RightPanelCategories = () => {
 
       {/* Pause Subscription Modal */}
       {showPauseModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-neutral-base dark:bg-[#1e1e1e] rounded-3xl w-[400px] max-w-[90%] shadow-2xl overflow-hidden">
-            {/* Header */}
-            <div className="px-6 py-6 border-b border-gray-100 dark:border-gray-700">
-              <h2 className="text-xl font-semibold text-[#242527] dark:text-white text-center">
-                Pause Subscription?
-              </h2>
-            </div>
-
-            {/* Content */}
-            <div className="px-6 py-6">
-              <p className="text-base text-[#505152] dark:text-gray-400 text-center mb-6">
-                You can pause your subscription for up to 3 months. Your current plan will be frozen and you won't be charged during this period.
-              </p>
-            </div>
-
-            {/* Actions */}
-            <div className="px-6 py-4 border-t border-gray-100 dark:border-gray-700 flex gap-3 justify-center">
+        <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50">
+          <div className="bg-[#2D5A27] rounded-3xl w-[420px] max-w-[90%] shadow-2xl px-8 py-10 flex flex-col items-center gap-6">
+            <h2 className="text-2xl font-semibold text-white text-center">
+              Pause Subscription
+            </h2>
+            <p className="text-sm text-white/80 text-center leading-relaxed">
+              Join as a creator to collaborate with brands, or as a business to launch campaigns. business to launch influencer campaigns.
+            </p>
+            <div className="flex gap-4 w-full mt-2">
               <button
                 onClick={() => setShowPauseModal(false)}
-                className="flex-1 py-3 px-4 border border-gray-300 dark:border-gray-600 rounded-full font-semibold text-[#242527] dark:text-white hover:bg-gray-50 dark:hover:bg-[#2a2a2a] transition-colors"
+                className="flex-1 py-3 px-4 border border-white/60 rounded-full font-semibold text-white hover:bg-white/10 transition-colors"
               >
                 Cancel
               </button>
               <button
                 onClick={() => {
-                  console.log('Pause subscription confirmed');
                   setShowPauseModal(false);
                 }}
-                className="flex-1 py-3 px-4 bg-[#43573B] hover:bg-[#3d4f36] text-white rounded-full font-semibold transition-colors"
+                className="flex-1 py-3 px-4 bg-white rounded-full font-semibold text-[#2D5A27] hover:bg-white/90 transition-colors"
               >
                 Pause
               </button>

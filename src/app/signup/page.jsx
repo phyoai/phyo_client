@@ -12,6 +12,7 @@ import OtpVerificationCard from "@/components/auth/OtpVerificationCard";
 import OutlineGlowButton from "@/components/shared/OutlineGlowButton";
 import { useAuth } from "../context/AuthContext";
 import { authUtils } from "../../utils/api";
+import api from "../../utils/api";
 import "react-toastify/dist/ReactToastify.css";
 
 const formFields = [
@@ -417,62 +418,41 @@ function SignupForm() {
   }, [isAuthenticated, redirectTarget, router]);
 
   const signupAPI = async (userData) => {
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || "https://api.phyo.ai/api";
-    const response = await fetch(`${apiUrl}/auth/signup`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(userData),
-    });
+    // api.post returns axios response; actual payload is at response.data
+    const response = await api.post('/auth/signup', userData);
+    const data = response.data;
 
-    const data = await response.json();
+    // Backend can return a 201 with only message/email during signup initiation.
+    // Treat that as success so the OTP modal can open.
+    const isSuccess =
+      response.status === 200 ||
+      response.status === 201 ||
+      data?.success === true ||
+      !!data?.email;
 
-    if (!response.ok) {
-      throw new Error(data.message || `HTTP error! status: ${response.status}`);
+    if (!isSuccess) {
+      throw new Error(data.message || 'Signup failed');
     }
 
     return data;
   };
 
   const verifyOTPAPI = async (email, otpCode) => {
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || "https://api.phyo.ai/api";
-    const response = await fetch(`${apiUrl}/user/verify-otp`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ email, otp: otpCode }),
-    });
-
-    const data = await response.json();
-
-    if (!response.ok) {
-      throw new Error(data.message || `HTTP error! status: ${response.status}`);
+    const response = await api.post('/auth/verify-email-otp', { email, otp: otpCode });
+    // handoff doc: token + user at top level or under data
+    const data = response.data;
+    if (!data.success && !data.token) {
+      throw new Error(data.message || 'OTP verification failed');
     }
-
     return data;
   };
 
   const googleSignupAPI = async (idToken) => {
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || "https://api.phyo.ai/api";
-    const response = await fetch(`${apiUrl}/auth/google`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        idToken,
-        type: "USER",
-      }),
-    });
-
-    const data = await response.json();
-
-    if (!response.ok) {
-      throw new Error(data.message || `HTTP error! status: ${response.status}`);
+    const response = await api.post('/auth/google', { idToken, type: 'USER' });
+    const data = response.data;
+    if (!data.token && !data.success) {
+      throw new Error(data.message || 'Google signup failed');
     }
-
     return data;
   };
 
@@ -525,13 +505,14 @@ function SignupForm() {
         type: "USER",
       };
 
-      await signupAPI(userData);
-      setSignupData(userData);
+      const signupResult = await signupAPI(userData);
+      const resolvedEmail = signupResult?.email || userData.email;
+      setSignupData({ ...userData, email: resolvedEmail });
+      localStorage.setItem("pendingEmail", resolvedEmail);
       setShowOTP(true);
       setOtpErrorMessage("");
       setOtpStatusMessage("");
-      localStorage.setItem("pendingEmail", userData.email);
-      toast.success("OTP sent to your email. Please check your inbox.");
+      toast.success(signupResult?.message || "OTP sent to your email. Please check your inbox.");
     } catch (error) {
       toast.error(error.message || "Signup failed.");
     } finally {
@@ -799,6 +780,11 @@ function SignupForm() {
                 onSuccess={handleGoogleSuccess}
                 onError={handleGoogleError}
                 useOneTap={false}
+                text="signup_with"
+                shape="rectangular"
+                logo_alignment="left"
+                width="400"
+                locale="en"
               />
             </div>
           </div>

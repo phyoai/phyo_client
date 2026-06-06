@@ -1,57 +1,167 @@
 import axios from 'axios';
 import secureAuthStorage from './secure-auth';
 
+// ─── Auth Debugger ────────────────────────────────────────────────────────────
+// Only active in development. Set localStorage.debug_auth = '1' in the browser
+// console to enable at runtime: localStorage.setItem('debug_auth','1')
+const isDev = process.env.NODE_ENV === 'development';
+
+const authDebug = {
+  _enabled: () => isDev && (typeof window !== 'undefined') && window.localStorage?.getItem('debug_auth') === '1',
+  log:  (...args) => authDebug._enabled() && console.log  ('%c[AUTH]', 'color:#16a34a;font-weight:bold', ...args),
+  warn: (...args) => authDebug._enabled() && console.warn ('%c[AUTH]', 'color:#f59e0b;font-weight:bold', ...args),
+  error:(...args) => authDebug._enabled() && console.error('%c[AUTH]', 'color:#ef4444;font-weight:bold', ...args),
+  group:(label, fn) => {
+    if (!authDebug._enabled()) return;
+    console.groupCollapsed(`%c[AUTH] ${label}`, 'color:#16a34a;font-weight:bold');
+    fn();
+    console.groupEnd();
+  },
+};
+
+// Expose on window so devs can call window.authDebug.log() from console too
+if (typeof window !== 'undefined' && isDev) window.__authDebug = authDebug;
+// ─────────────────────────────────────────────────────────────────────────────
+
+function getClientToken() {
+  if (typeof window === 'undefined') return null;
+
+  try {
+    const fromLocalStorage = window.localStorage?.getItem('authToken');
+    if (fromLocalStorage) {
+      authDebug.log('Token source: localStorage');
+      return fromLocalStorage;
+    }
+  } catch {
+    // ignore
+  }
+
+  const fromCookie = getCookie('authToken');
+  if (fromCookie) {
+    authDebug.log('Token source: cookie');
+    return fromCookie;
+  }
+
+  const fromMemory = secureAuthStorage.getToken();
+  if (fromMemory) authDebug.log('Token source: in-memory (dev only)');
+  return fromMemory;
+}
+
 // Create axios instance with base configuration
 const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL || 'https://api.phyo.ai/api',
   headers: {
     'Content-Type': 'application/json',
   },
-  withCredentials: true, // Include httpOnly cookies in requests
+  withCredentials: true,
 });
 
-// Request interceptor to add auth token from httpOnly cookies
+// ── Request interceptor ───────────────────────────────────────────────────────
 api.interceptors.request.use(
   (config) => {
-    // Tokens should be in httpOnly cookies (set by backend)
-    // Browser automatically sends them with credentials: true
-    // For development, add Authorization header if available
-    if (process.env.NODE_ENV === 'development') {
-      const token = secureAuthStorage.getToken();
-      if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
-      }
+    const token = getClientToken();
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+      authDebug.log(`→ ${config.method?.toUpperCase()} ${config.url}  [token attached]`);
+    } else {
+      authDebug.warn(`→ ${config.method?.toUpperCase()} ${config.url}  [NO token — request is unauthenticated]`);
     }
     return config;
   },
   (error) => {
+    authDebug.error('Request setup failed:', error.message);
     return Promise.reject(error);
   }
 );
 
-// Response interceptor for error handling
+// ── Logout state guard ────────────────────────────────────────────────────────
+let _isLoggingOut = false;
+
+function handleAuthFailure(reason) {
+  if (_isLoggingOut) {
+    authDebug.warn('handleAuthFailure called but logout already in progress — skipping');
+    return;
+  }
+  if (typeof window === 'undefined') return;
+
+  const publicPaths = ['/login', '/signup', '/brand/login', '/influencer/login', '/forgot-password', '/verify-phone'];
+  if (publicPaths.some(p => window.location.pathname.startsWith(p))) {
+    authDebug.warn(`handleAuthFailure skipped — already on public page: ${window.location.pathname}`);
+    return;
+  }
+
+  authDebug.group(`AUTH FAILURE → logging out (reason: ${reason})`, () => {
+    console.log('Current path :', window.location.pathname);
+    console.log('Token in LS  :', !!localStorage.getItem('authToken'));
+    console.log('Token in mem :', !!secureAuthStorage.getToken());
+    console.log('UserData     :', secureAuthStorage.getUserData());
+  });
+
+  _isLoggingOut = true;
+
+  try {
+    localStorage.removeItem('authToken');
+    localStorage.removeItem('userInfo');
+    localStorage.removeItem('userData');
+    localStorage.removeItem('userEmail');
+    // Only remove auth keys — do NOT sessionStorage.clear() as it wipes userData
+    // needed for isAuthenticated() check on the login page redirect
+    sessionStorage.removeItem('userData');
+    sessionStorage.removeItem('auth_expired');
+    document.cookie = 'authToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+  } catch (_) { /* ignore */ }
+
+  secureAuthStorage.clearAuth();
+
+  const isAdmin = window.location.pathname.startsWith('/admin');
+  // Use sessionStorage instead of query param so the URL stays clean
+  // and a refresh on /login won't re-trigger the "session expired" toast
+  try { sessionStorage.setItem('auth_expired', '1'); } catch (_) {}
+  window.location.href = isAdmin ? '/admin/login' : '/login';
+}
+
+// ── Response interceptor ──────────────────────────────────────────────────────
 api.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    _isLoggingOut = false;
+    authDebug.log(`← ${response.status} ${response.config?.method?.toUpperCase()} ${response.config?.url}`);
+    return response;
+  },
   (error) => {
-    // Handle 401 (Unauthorized) and 403 (Forbidden - Invalid/Expired Token)
-    const status = error.response?.status;
-    const errorMessage = error.response?.data?.message || '';
+    const status    = error.response?.status;
+    const url       = error.config?.url || '(unknown)';
+    const method    = error.config?.method?.toUpperCase() || '?';
+    const errorMsg  = error.response?.data?.message || error.message || '';
 
-    // Check for authentication errors (401) or token expiry/invalid (403)
-    if (status === 401 || (status === 403 && (errorMessage.includes('Invalid or expired token') || errorMessage.includes('token')))) {
-      // Clear all auth data
-      secureAuthStorage.clearAuth();
-
-      if (typeof window !== 'undefined') {
-        // Redirect based on current path
-        if (window.location.pathname.startsWith('/admin')) {
-          window.location.href = '/admin/login';
-        } else if (!window.location.pathname.includes('/login') && !window.location.pathname.includes('/register')) {
-          // Only redirect if not already on login/register page
-          window.location.href = '/login?expired=true';
-        }
-      }
+    if (!status) {
+      // Network error / timeout — server unreachable
+      authDebug.warn(`← NETWORK ERROR  ${method} ${url}  — server unreachable, NOT logging out`);
+      return Promise.reject(error);
     }
+
+    authDebug.warn(`← ${status} ${method} ${url}  message="${errorMsg}"`);
+
+    if (status === 401) {
+      authDebug.error(`401 on ${url} → triggering logout`);
+      handleAuthFailure(`401 from ${url}`);
+      return Promise.reject(error);
+    }
+
+    const isExpiredToken =
+      status === 403 &&
+      (errorMsg === 'Invalid or expired token' ||
+        errorMsg === 'expired token' ||
+        errorMsg === 'invalid token' ||
+        errorMsg === 'jwt expired' ||
+        errorMsg === 'jwt malformed');
+
+    if (isExpiredToken) {
+      authDebug.error(`403 with JWT error on ${url} → triggering logout`);
+      handleAuthFailure(`403 jwt-error from ${url}`);
+    } else if (status === 403) {
+      authDebug.warn(`403 on ${url} — permission denied, NOT logging out (message: "${errorMsg}")`);
+    }
+
     return Promise.reject(error);
   }
 );
@@ -62,7 +172,14 @@ function getCookie(name) {
   
   const value = `; ${document.cookie}`;
   const parts = value.split(`; ${name}=`);
-  if (parts.length === 2) return parts.pop().split(';').shift();
+  if (parts.length === 2) {
+    const raw = parts.pop().split(';').shift();
+    try {
+      return decodeURIComponent(raw);
+    } catch {
+      return raw;
+    }
+  }
   return null;
 }
 
@@ -70,9 +187,15 @@ function getCookie(name) {
 function setCookie(name, value, days = 7) {
   if (typeof document === 'undefined') return;
   
-  const expires = new Date();
-  expires.setTime(expires.getTime() + days * 24 * 60 * 60 * 1000);
-  document.cookie = `${name}=${value};expires=${expires.toUTCString()};path=/;SameSite=Lax`;
+  const maxAge = Math.max(1, Math.floor(days * 24 * 60 * 60));
+  const isHttps = typeof window !== 'undefined' && window.location?.protocol === 'https:';
+
+  // Keep it broadly compatible with middleware (cookie is read on the server).
+  // On http://localhost we cannot set `Secure` or the browser will ignore it.
+  const secureFlag = isHttps ? ';Secure' : '';
+
+  // `Max-Age` tends to be more reliable than `expires` across environments.
+  document.cookie = `${name}=${encodeURIComponent(value)};path=/;Max-Age=${maxAge};SameSite=Lax${secureFlag}`;
 }
 
 // User API functions
@@ -151,7 +274,8 @@ export const campaignAPI = {
   // Get brand campaigns
   getBrandCampaigns: async (params = {}) => {
     try {
-      const response = await api.get('/campaigns/brand/my-campaigns', { params });
+      // API handoff doc: brand-owned campaigns endpoint is /campaigns/mine
+      const response = await api.get('/campaigns/mine', { params });
       return response.data;
     } catch (error) {
       throw error.response?.data || error.message;
@@ -208,7 +332,8 @@ export const authUtils = {
   setToken: (token) => {
     if (typeof window === 'undefined') return;
     localStorage.setItem('authToken', token);
-    setCookie('authToken', token, 7); // Set cookie for 7 days
+    localStorage.setItem('token', token); // also write 'token' key used by api-client.ts
+    setCookie('authToken', token, 7);
   },
   
   // Check if user is authenticated
@@ -227,29 +352,47 @@ export const authUtils = {
   // Validate token by making a lightweight API call
   validateToken: async () => {
     if (typeof window === 'undefined') return false;
-    
+
     const token = localStorage.getItem('authToken') || getCookie('authToken');
-    if (!token) return false;
-    
+    if (!token) {
+      authDebug.warn('validateToken: no token found — skipping validation');
+      return false;
+    }
+
+    authDebug.log('validateToken: checking /auth/check-registration-status …');
     try {
-      // Make a lightweight API call to verify token
       const response = await api.get('/auth/check-registration-status');
+      authDebug.log('validateToken: token is valid ✓');
       return response.status === 200;
     } catch (error) {
-      // Token is invalid or expired
-      authUtils.logout();
-      return false;
+      const status = error.response?.status;
+      if (status === 401) {
+        authDebug.error(`validateToken: 401 → token invalid, logging out`);
+        authUtils.logout();
+        return false;
+      }
+      // Network error, 500, ngrok down — do NOT logout
+      authDebug.warn(`validateToken: status=${status ?? 'NO_RESPONSE'} — server may be down, keeping session alive`);
+      return true;
     }
   },
   
-  // Logout user
+  // Logout user — clears ALL auth stores (localStorage, cookie, in-memory)
   logout: () => {
     if (typeof window === 'undefined') return;
     localStorage.removeItem('authToken');
+    localStorage.removeItem('token'); // also remove api-client.ts key
     localStorage.removeItem('userInfo');
+    localStorage.removeItem('userData');
+    localStorage.removeItem('userEmail');
     localStorage.removeItem('landing_search_results');
     localStorage.removeItem('landing_search_prompt');
+    try {
+      sessionStorage.removeItem('userData');
+      sessionStorage.removeItem('auth_expired');
+    } catch (_) {}
     document.cookie = 'authToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+    secureAuthStorage.clearAuth();
   }
 };
 

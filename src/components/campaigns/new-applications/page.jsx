@@ -551,23 +551,23 @@ const NewApplicationsPages = () => {
                       <div className="space-y-4">
                         <div className="flex justify-between items-center">
                           <span className="text-base text-[#505152]">Brand Collaborations</span>
-                          <span className="text-base font-semibold text-[#242527]">{selectedApplication.stats.brandCollaborations}</span>
+                          <span className="text-base font-semibold text-[#242527]">{selectedApplication.stats?.brandCollaborations}</span>
                         </div>
                         <div className="flex justify-between items-center">
                           <span className="text-base text-[#505152]">InstagramFill Followers</span>
-                          <span className="text-base font-semibold text-[#242527]">{selectedApplication.stats.instagramFollowers}</span>
+                          <span className="text-base font-semibold text-[#242527]">{selectedApplication.stats?.instagramFollowers}</span>
                         </div>
                         <div className="flex justify-between items-center">
                           <span className="text-base text-[#505152]">LinkedIn Followers</span>
-                          <span className="text-base font-semibold text-[#242527]">{selectedApplication.stats.linkedinFollowers}</span>
+                          <span className="text-base font-semibold text-[#242527]">{selectedApplication.stats?.linkedinFollowers}</span>
                         </div>
                         <div className="flex justify-between items-center">
                           <span className="text-base text-[#505152]">CloseLine Followers</span>
-                          <span className="text-base font-semibold text-[#242527]">{selectedApplication.stats.xFollowers}</span>
+                          <span className="text-base font-semibold text-[#242527]">{selectedApplication.stats?.xFollowers}</span>
                         </div>
                         <div className="flex justify-between items-center">
                           <span className="text-base text-[#505152]">YoutubeFill Subscribers</span>
-                          <span className="text-base font-semibold text-[#242527]">{selectedApplication.stats.youtubeSubscribers}</span>
+                          <span className="text-base font-semibold text-[#242527]">{selectedApplication.stats?.youtubeSubscribers}</span>
                         </div>
                       </div>
                     </div>
@@ -587,19 +587,19 @@ const NewApplicationsPages = () => {
                           <div className="border-t border-[rgba(36,37,39,0.12)]">
                             <div className="flex justify-between items-center px-4 py-3 border-b border-[rgba(36,37,39,0.12)]">
                               <span className="text-base font-semibold text-[#242527]">Feed Post</span>
-                              <span className="text-base font-semibold text-[#242527]">{selectedApplication.pricing.instagram.post}</span>
+                              <span className="text-base font-semibold text-[#242527]">{selectedApplication.pricing?.instagram?.post}</span>
                             </div>
                             <div className="flex justify-between items-center px-4 py-3 border-b border-[rgba(36,37,39,0.12)]">
                               <span className="text-base font-semibold text-[#242527]">Reel (30-60s)</span>
-                              <span className="text-base font-semibold text-[#242527]">{selectedApplication.pricing.instagram.reel}</span>
+                              <span className="text-base font-semibold text-[#242527]">{selectedApplication.pricing?.instagram?.reel}</span>
                             </div>
                             <div className="flex justify-between items-center px-4 py-3 border-b border-[rgba(36,37,39,0.12)]">
                               <span className="text-base font-semibold text-[#242527]">Story (3 frames)</span>
-                              <span className="text-base font-semibold text-[#242527]">{selectedApplication.pricing.instagram.story}</span>
+                              <span className="text-base font-semibold text-[#242527]">{selectedApplication.pricing?.instagram?.story}</span>
                             </div>
                             <div className="flex justify-between items-center px-4 py-3">
                               <span className="text-base font-semibold text-[#242527]">Carousel</span>
-                              <span className="text-base font-semibold text-[#242527]">{selectedApplication.pricing.instagram.carousel}</span>
+                              <span className="text-base font-semibold text-[#242527]">{selectedApplication.pricing?.instagram?.carousel}</span>
                             </div>
                           </div>
                         </div>
@@ -615,15 +615,15 @@ const NewApplicationsPages = () => {
                           <div className="border-t border-[rgba(36,37,39,0.12)]">
                             <div className="flex justify-between items-center px-4 py-3 border-b border-[rgba(36,37,39,0.12)]">
                               <span className="text-base font-semibold text-[#242527]">Dedicated Video</span>
-                              <span className="text-base font-semibold text-[#242527]">{selectedApplication.pricing.youtube.video}</span>
+                              <span className="text-base font-semibold text-[#242527]">{selectedApplication.pricing?.youtube?.video}</span>
                             </div>
                             <div className="flex justify-between items-center px-4 py-3 border-b border-[rgba(36,37,39,0.12)]">
                               <span className="text-base font-semibold text-[#242527]">Integrated Mention</span>
-                              <span className="text-base font-semibold text-[#242527]">{selectedApplication.pricing.youtube.integration}</span>
+                              <span className="text-base font-semibold text-[#242527]">{selectedApplication.pricing?.youtube?.integration}</span>
                             </div>
                             <div className="flex justify-between items-center px-4 py-3">
                               <span className="text-base font-semibold text-[#242527]">Short</span>
-                              <span className="text-base font-semibold text-[#242527]">{selectedApplication.pricing.youtube.short}</span>
+                              <span className="text-base font-semibold text-[#242527]">{selectedApplication.pricing?.youtube?.short}</span>
                             </div>
                           </div>
                         </div>
@@ -639,7 +639,7 @@ const NewApplicationsPages = () => {
                           <div className="border-t border-[rgba(36,37,39,0.12)]">
                             <div className="flex justify-between items-center px-4 py-3">
                               <span className="text-base font-semibold text-[#242527]">Single Post</span>
-                              <span className="text-base font-semibold text-[#242527]">{selectedApplication.pricing.x.post}</span>
+                              <span className="text-base font-semibold text-[#242527]">{selectedApplication.pricing?.x?.post}</span>
                             </div>
                           </div>
                         </div>
@@ -655,7 +655,7 @@ const NewApplicationsPages = () => {
                           <div className="border-t border-[rgba(36,37,39,0.12)]">
                             <div className="flex justify-between items-center px-4 py-3">
                               <span className="text-base font-semibold text-[#242527]">Single Post</span>
-                              <span className="text-base font-semibold text-[#242527]">{selectedApplication.pricing.linkedin.post}</span>
+                              <span className="text-base font-semibold text-[#242527]">{selectedApplication.pricing?.linkedin?.post}</span>
                             </div>
                           </div>
                         </div>
@@ -666,7 +666,7 @@ const NewApplicationsPages = () => {
                     <div>
                       <h3 className="text-base font-semibold text-[#505152] mb-3">Socials</h3>
                       <div className="space-y-2">
-                        {Object.entries(selectedApplication.socials).map(([platform, url]) => (
+                        {Object.entries(selectedApplication.socials || {}).map(([platform, url]) => (
                           <a
                             key={platform}
                             href={url}

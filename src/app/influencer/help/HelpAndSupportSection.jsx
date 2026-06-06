@@ -110,7 +110,7 @@ const HelpAndSupportSection = () => {
               <div key={faq.id} className="border-b border-gray-100 last:border-b-0">
                 <button
                   onClick={() => toggleFAQ(faq.id)}
-                  className="flex items-center justify-between w-full py-4 text-left hover:bg-gray-50 transition-colors rounded px-2"
+                  className="flex items-center justify-between w-full py-4 text-left hover:bg-[#000201] transition-colors rounded px-2"
                 >
                   <span className="text-gray-700 text-sm font-normal">{faq.question}</span>
                   {openFAQ === faq.id ? (

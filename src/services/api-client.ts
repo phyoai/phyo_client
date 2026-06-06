@@ -285,7 +285,8 @@ export class APIClient {
    */
   private getToken(): string | null {
     if (typeof window === "undefined") return null;
-    return localStorage.getItem("token");
+    // "authToken" is the key used by authUtils.setToken() — check it first
+    return localStorage.getItem("authToken") || localStorage.getItem("token") || null;
   }
 
   /**

@@ -1,42 +1,84 @@
 'use client'
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { ChevronLeft, Search, MoreVertical, Heart } from 'lucide-react';
-import { campaignAPI } from '../../../../utils/api';
+import { MoreVertical, TrendingUp } from 'lucide-react';
+import { campaignApi } from '@/api/campaign-api';
+
+const CampaignCard = ({ campaign, onClick }) => {
+  const [hovered, setHovered] = useState(false);
+  const name = campaign.campaignName || 'Untitled Campaign';
+  const initials = name.charAt(0).toUpperCase();
+  const date = campaign.createdAt
+    ? new Date(campaign.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+    : '3d ago';
+  const image = campaign.productImages?.[0] || null;
+
+  return (
+    <div
+      className="rounded-xl overflow-hidden cursor-pointer flex flex-col h-[320px] transition-colors duration-200"
+      style={{ backgroundColor: hovered ? '#f8fff7' : '#181818' }}
+      onClick={onClick}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+    >
+      {/* Content — 72px top, padding: 12px 4px 12px 16px per Figma */}
+      <div className="h-[72px] shrink-0 flex items-center" style={{ padding: '12px 4px 12px 16px' }}>
+        <div className="flex items-center gap-4 flex-1 min-w-0">
+          <div className="w-10 h-10 bg-[#16A34A] rounded-full flex items-center justify-center text-white font-medium text-base shrink-0">
+            {initials}
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-base font-medium truncate transition-colors duration-200"
+               style={{ color: hovered ? '#1D1B20' : '#ffffff' }}>
+              {name}
+            </p>
+            <p className="text-sm truncate transition-colors duration-200"
+               style={{ color: hovered ? '#49454F' : '#9B9B9B' }}>
+              {date}
+            </p>
+          </div>
+        </div>
+        <button
+          className="w-12 h-12 flex items-center justify-center rounded-full transition-colors shrink-0"
+          style={{ color: hovered ? '#1D1B20' : '#ffffff' }}
+          onClick={e => e.stopPropagation()}
+        >
+          <MoreVertical className="w-5 h-5" />
+        </button>
+      </div>
+
+      {/* Media — fills rest, bg changes on hover */}
+      <div
+        className="flex-1 relative overflow-hidden transition-colors duration-200"
+        style={{ backgroundColor: hovered ? '#e6f0e6' : '#252525' }}
+      >
+        {image ? (
+          <img src={image} alt={name} className="w-full h-full object-cover" onError={e => { e.currentTarget.style.display = 'none'; }} />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center">
+            <TrendingUp className="w-12 h-12" style={{ color: hovered ? '#16A34A' : 'rgba(255,255,255,0.1)' }} />
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
 
 export default function AllCampaigns() {
   const router = useRouter();
   const [campaigns, setCampaigns] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [pagination, setPagination] = useState({
-    currentPage: 1,
-    totalPages: 1,
-    totalItems: 0,
-    itemsPerPage: 10,
-    hasNext: false,
-    hasPrev: false
-  });
+  const [activeFilter, setActiveFilter] = useState('All');
 
   useEffect(() => {
     fetchCampaigns();
   }, []);
 
-  const fetchCampaigns = async (page = 1, limit = 20) => {
+  const fetchCampaigns = async () => {
     setLoading(true);
     try {
-      const response = await campaignAPI.getCampaigns({ page, limit });
-      const allCampaigns = response.data || [];
-      // Filter only active campaigns (non-draft)
-      const activeCampaigns = allCampaigns.filter(campaign => campaign.status === 'Active');
-      setCampaigns(activeCampaigns);
-      setPagination(response.pagination || {
-        currentPage: 1,
-        totalPages: 1,
-        totalItems: 0,
-        itemsPerPage: 20,
-        hasNext: false,
-        hasPrev: false
-      });
+      const { campaigns: data } = await campaignApi.getBrandCampaigns({}, { page: 1, limit: 50 });
+      setCampaigns(data);
     } catch (error) {
       console.error('Error fetching campaigns:', error);
       setCampaigns([]);
@@ -45,148 +87,63 @@ export default function AllCampaigns() {
     }
   };
 
-  const handleCampaignClick = (campaign) => {
-    // console.log('Campaign clicked:', campaign);
-    router.push(`/user/campaigns/${campaign._id}`);
-    // Navigate to campaign details or handle as needed
+  const getFiltered = () => {
+    const active = campaigns.filter(c => ['active', 'published'].includes((c.status || '').toLowerCase()));
+    if (activeFilter === 'All') return active;
+    return active.filter(c =>
+      (c.campaignType || '').toLowerCase() === activeFilter.toLowerCase() ||
+      (c.targetInfluencer?.targetNiche || []).some(n => n.toLowerCase() === activeFilter.toLowerCase())
+    );
   };
 
+  const filtered = getFiltered();
+
   return (
-    <div className="bg-white min-h-screen flex flex-col">
-      {/* Fixed App Bar */}
-      <div className="flex-shrink-0 bg-white border-b border-gray-100">
-        <div className="px-4 sm:px-6 lg:px-9 py-3 sm:py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center flex-1 min-w-0">
-              <button 
-                onClick={() => router.back()}
-                className="p-2 hover:bg-gray-100 rounded-full transition-colors -ml-2 mr-1"
-              >
-                <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6 text-gray-700" />
-              </button>
-              <h1 className="text-lg sm:text-xl font-semibold text-gray-900 truncate">
-                All Campaigns
-              </h1>
-            </div>
-            <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
-              <button className="p-2 hover:bg-gray-100 rounded-full transition-colors">
-                <Search className="w-5 h-5 sm:w-6 sm:h-6 text-gray-700" />
-              </button>
-              <button className="p-2 hover:bg-gray-100 rounded-full transition-colors">
-                <MoreVertical className="w-5 h-5 sm:w-6 sm:h-6 text-gray-700" />
-              </button>
-            </div>
-          </div>
-        </div>
+    <div className="bg-[#000201] min-h-full px-10 py-6">
+      <div className="mb-4">
+        <h2
+          className="text-2xl font-normal text-white capitalize leading-[120%]"
+          style={{ fontFamily: 'var(--font-bricolage-grotesque)' }}
+        >
+          Recent Campaigns
+        </h2>
       </div>
 
-      {/* Scrollable Content */}
-      <div className="flex-1 overflow-y-auto px-4 sm:px-6 lg:px-9 py-4 sm:py-6">
-        <div className="mb-8">
-          <div className="flex items-center justify-between mb-4">
-            <p className="text-sm text-gray-600">
-              Showing {campaigns.length} campaign{campaigns.length !== 1 ? 's' : ''}
-            </p>
-          </div>
-
-          <div className="flex flex-wrap gap-2">
-            {loading ? (
-              // Campaign Cards Skeleton
-              <>
-                {[1, 2, 3, 4, 5, 6].map((i) => (
-                  <div key={i} className="bg-gray-100 border-2 border-white rounded-xl overflow-hidden flex-1 min-w-[300px] max-w-[400px]">
-                    {/* Card Header Skeleton */}
-                    <div className="flex gap-2 items-start p-4">
-                      <div className="w-12 h-12 bg-gray-200 rounded-full animate-pulse"></div>
-                      <div className="flex-1">
-                        <div className="h-5 bg-gray-200 rounded w-3/4 mb-2 animate-pulse"></div>
-                        <div className="h-4 bg-gray-200 rounded w-1/2 animate-pulse"></div>
-                      </div>
-                      <div className="w-12 h-12 bg-gray-200 rounded-full animate-pulse"></div>
-                    </div>
-                    {/* Card Image Skeleton */}
-                    <div className="h-[216px] bg-gray-200 animate-pulse"></div>
-                  </div>
-                ))}
-              </>
-            ) : campaigns.length > 0 ? (
-              campaigns.map((campaign) => (
-                <div 
-                  key={campaign._id} 
-                  className="bg-gray-100 border-2 border-white rounded-xl overflow-hidden hover:shadow-lg transition-shadow flex-1 min-w-[300px] max-w-[400px] cursor-pointer"
-                  onClick={() => handleCampaignClick(campaign)}
-                >
-                  {/* Eyebrow label at top */}
-                  <div className="px-4 pt-4">
-                    <span className="text-xs text-gray-500">
-                      {campaign.campaignType || 'Campaign'}
-                    </span>
-                  </div>
-
-                  {/* Content Frame with Avatar and Info */}
-                  <div className="flex gap-2 items-start px-4 py-3">
-                    {/* Leading Avatar */}
-                    <div className="flex items-center">
-                      <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center text-white font-semibold shrink-0">
-                        {campaign.campaignName?.substring(0, 2).toUpperCase() || 'AB'}
-                      </div>
-                    </div>
-
-                    {/* Content Leading */}
-                    <div className="flex-1 min-w-0">
-                      <h3 className="text-lg font-semibold text-gray-900 mb-1 truncate">
-                        {campaign.campaignName || 'Campaign'}
-                      </h3>
-                      <p className="text-sm text-gray-600">
-                        {campaign.createdAt 
-                          ? new Date(campaign.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
-                          : 'Recently'
-                        }
-                      </p>
-                    </div>
-
-                    {/* Trailing Icon Button */}
-                    <div className="flex items-center justify-center px-4">
-                      <button 
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          // Handle favorite toggle
-                        }}
-                        className="p-3 hover:bg-gray-200 rounded-full transition-colors"
-                      >
-                        <Heart className="w-6 h-6 text-gray-700" />
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* Campaign Image */}
-                  <div className="h-[216px] bg-gradient-to-br from-blue-600 to-purple-600 relative overflow-hidden">
-                    {campaign.productImages && campaign.productImages.length > 0 ? (
-                      <img 
-                        src={campaign.productImages[0]} 
-                        alt={campaign.campaignName} 
-                        className="w-full h-full object-cover" 
-                      />
-                    ) : (
-                      <div className="absolute inset-0 flex items-center justify-center text-white">
-                        <div className="text-center p-6">
-                          <div className="text-2xl font-bold mb-2">{campaign.campaignName?.substring(0, 2).toUpperCase()}</div>
-                          <div className="text-sm">Campaign</div>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              ))
-            ) : (
-              <div className="w-full text-center py-8">
-                <p className="text-gray-600">No campaigns found.</p>
-              </div>
-            )}
-          </div>
-        </div>
+      {/* Filter tabs */}
+      <div className="flex gap-3 mb-6 overflow-x-auto pb-1" style={{ scrollbarWidth: 'none' }}>
+        {['All', 'Sports', 'Lifestyle', 'Fashion', 'Travelling'].map(f => (
+          <button
+            key={f}
+            onClick={() => setActiveFilter(f)}
+            className={`px-6 py-1 rounded-full text-sm font-normal whitespace-nowrap transition-colors ${
+              activeFilter === f ? 'bg-[#16A34A] text-white' : 'bg-white/[0.12] text-white hover:bg-white/20'
+            }`}
+          >
+            {f}
+          </button>
+        ))}
       </div>
+
+      {/* 2-column grid */}
+      {loading ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          {[...Array(6)].map((_, i) => (
+            <div key={i} className="bg-[#181818] rounded-xl h-[320px] animate-pulse" />
+          ))}
+        </div>
+      ) : filtered.length > 0 ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          {filtered.map(campaign => (
+            <CampaignCard
+              key={campaign._id || campaign.id}
+              campaign={campaign}
+              onClick={() => router.push(`/user/campaigns/${campaign._id || campaign.id}`)}
+            />
+          ))}
+        </div>
+      ) : (
+        <p className="text-[#9B9B9B] text-sm py-8 text-center">No campaigns found.</p>
+      )}
     </div>
   );
 }
-

@@ -394,6 +394,76 @@ export const accountApi = {
     }
   },
 
+  /**
+   * Pause current subscription via Razorpay
+   *
+   * @param subscriptionId - Razorpay subscription ID
+   * @param pauseAt - When to pause: 'now' or 'cycle_end' (default: 'now')
+   * @returns Promise resolving to paused subscription
+   */
+  pauseSubscription: async (subscriptionId: string, pauseAt: 'now' | 'cycle_end' = 'now'): Promise<any> => {
+    try {
+      if (!subscriptionId) {
+        throw new Error('Subscription ID is required');
+      }
+
+      const response = await api.post<IApiResponse<any>>(
+        `/payment/razorpay/subscriptions/${subscriptionId}/pause`,
+        { pause_at: pauseAt }
+      );
+      return response.data?.data || response.data;
+    } catch (error: any) {
+      const errorMessage =
+        error.response?.data?.message || error.message || 'Failed to pause subscription';
+      console.error('Error in pauseSubscription:', errorMessage);
+      throw error.response?.data || { message: errorMessage };
+    }
+  },
+
+  /**
+   * Resume paused subscription via Razorpay
+   *
+   * @param subscriptionId - Razorpay subscription ID
+   * @returns Promise resolving to resumed subscription
+   */
+  resumeSubscription: async (subscriptionId: string): Promise<any> => {
+    try {
+      if (!subscriptionId) {
+        throw new Error('Subscription ID is required');
+      }
+
+      const response = await api.post<IApiResponse<any>>(
+        `/payment/razorpay/subscriptions/${subscriptionId}/resume`
+      );
+      return response.data?.data || response.data;
+    } catch (error: any) {
+      const errorMessage =
+        error.response?.data?.message || error.message || 'Failed to resume subscription';
+      console.error('Error in resumeSubscription:', errorMessage);
+      throw error.response?.data || { message: errorMessage };
+    }
+  },
+
+  /**
+   * Get all subscriptions via Razorpay
+   *
+   * @returns Promise resolving to subscriptions list
+   */
+  getRazorpaySubscriptions: async (): Promise<any[]> => {
+    try {
+      const response = await api.get<IApiResponse<any>>(
+        '/payment/razorpay/subscriptions'
+      );
+      const subscriptions = response.data?.data?.items || response.data?.items || [];
+      return Array.isArray(subscriptions) ? subscriptions : [];
+    } catch (error: any) {
+      const errorMessage =
+        error.response?.data?.message || error.message || 'Failed to fetch subscriptions';
+      console.error('Error in getRazorpaySubscriptions:', errorMessage);
+      throw error.response?.data || { message: errorMessage };
+    }
+  },
+
   // ============ LISTS ============
 
   /**

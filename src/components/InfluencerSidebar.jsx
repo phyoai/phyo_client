@@ -1,178 +1,226 @@
 'use client'
-import React, { useState } from 'react';
+import React from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
+import { useSidebar } from '../app/context/SidebarContext';
 import {
-  LayoutDashboard,
-  Mail,
-  Megaphone,
-  Settings,
-  HelpCircle,
-  LogOut,
-  Handshake,
-  Wallet,
-  UserCircle
-} from 'lucide-react';
+  Home4Fill,
+  InboxLine,
+  CalendarEventLine,
+  AccountCircleLine,
+  Message3Fill,
+  UserLine,
+  ListUnordered,
+  FileList3Line,
+  WalletLine,
+  PassExpiredLine,
+  CloseCircleLine,
+  QuestionLine,
+  FileTextLine,
+  Settings3Line,
+  GlobalLine,
+  LogoutBoxRLine,
+} from '@phyoofficial/phyo-icon-library';
+import { useAuth } from '../app/context/AuthContext';
+
+function ChevronDown({ open }) {
+  return (
+    <svg
+      width="11" height="7" viewBox="0 0 11 7" fill="none"
+      className={`transition-transform duration-200 ${open ? 'rotate-180' : ''}`}
+    >
+      <path d="M1 1L5.5 6L10 1" stroke="#9b9b9b" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+    </svg>
+  );
+}
 
 const InfluencerSidebar = () => {
   const pathname = usePathname();
   const router = useRouter();
-  const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const { isExpanded, sidebarButtonAction } = useSidebar();
+  useAuth();
+  const [mounted, setMounted] = React.useState(false);
+  const [accountOpen, setAccountOpen] = React.useState(
+    pathname.startsWith('/influencer/account')
+  );
 
-  const navItems = [
-    { name: 'Dashboard', href: '/influencer/dashboard', icon: LayoutDashboard },
-    { name: 'Inbox', href: '/influencer/inbox', icon: Mail },
-    { name: 'Campaigns', href: '/influencer/campaigns', icon: Megaphone },
-    { name: 'Deals', href: '/influencer/deals', icon: Handshake },
-    { name: 'Earnings', href: '/influencer/earnings', icon: Wallet },
-    { name: 'Profile Management', href: '/influencer/profile-management', icon: UserCircle },
-    { name: 'Account', href: '/influencer/account', icon: UserCircle },
-    { name: 'Settings', href: '/influencer/settings', icon: Settings },
+  React.useEffect(() => { setMounted(true); }, []);
+  React.useEffect(() => {
+    if (pathname.startsWith('/influencer/account')) setAccountOpen(true);
+  }, [pathname]);
+
+  const mainNavItems = [
+    { name: 'Home',     href: '/influencer/dashboard', icon: Home4Fill },
+    { name: 'Inbox',    href: '/influencer/inbox',     icon: InboxLine, badge: 3 },
+    { name: 'Campaign', href: '/influencer/campaigns', icon: CalendarEventLine },
   ];
 
-  const bottomNavItems = [
-    { name: 'Help', href: '/influencer/help', icon: HelpCircle },
-    { name: 'Logout Account', href: '#', icon: LogOut, isLogout: true },
+  const accountSubItems = [
+    { name: 'Profile',             href: '/influencer/account',                  icon: UserLine },
+    { name: 'My List',             href: '/influencer/account/my-lists',          icon: ListUnordered },
+    { name: 'Transactions',        href: '/influencer/account/billing-history',   icon: FileList3Line },
+    { name: 'Upgrade Plan',        href: '/influencer/account/upgrade-plan',      icon: WalletLine },
+    { name: 'Pause Subscription',  href: '/influencer/account/pause',             icon: PassExpiredLine },
+    { name: 'Cancel Subscription', href: '/influencer/account/cancel',            icon: CloseCircleLine },
+    { name: 'Help & Support',      href: '/influencer/account/help-support',      icon: QuestionLine },
+    { name: 'Terms & Conditions',  href: '/influencer/account/terms-conditions',  icon: FileTextLine },
+    { name: 'Privacy Policy',      href: '/influencer/account/privacy-policy',    icon: FileTextLine },
+    { name: 'Settings',            href: '/influencer/account/settings',          icon: Settings3Line },
+    { name: 'Language',            href: '/influencer/account/language',          icon: GlobalLine },
   ];
 
-  const handleLogout = () => {
-    // Clear authentication tokens
-    localStorage.removeItem('authToken');
-    localStorage.removeItem('userInfo');
-    document.cookie = 'authToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
-    
-    // Close modal and redirect to main login page
-    setShowLogoutModal(false);
-    router.push('/login');
+  const handleStartNewChat = () => {
+    if (sidebarButtonAction) sidebarButtonAction();
+    else router.push('/influencer/inbox');
   };
 
+  const handleLogout = () => router.push('/influencer/account/logout');
+
+  const isAccountActive = pathname.startsWith('/influencer/account');
+
+  if (!mounted) {
+    return <div className={`h-screen bg-[#181818] fixed left-0 top-0 z-50 ${isExpanded ? 'w-[250px]' : 'w-[72px]'}`} />;
+  }
+
   return (
-    <div className="h-screen w-64 bg-white border-r border-gray-200 fixed left-0 top-0 flex flex-col">
-      {/* Logo Section */}
-      <div className="p-6">
-        <img 
-          src="/logo.png" 
-          alt="Ph40" 
-          className="h-8 w-auto"
+    <div
+      className={`h-screen bg-[#181818] fixed left-0 top-0 flex flex-col z-50 transition-[width] duration-300 ease-in-out overflow-hidden ${
+        isExpanded ? 'w-[250px]' : 'w-[72px]'
+      }`}
+    >
+      {/* Logo */}
+      <div className="flex items-center justify-center h-[90px] shrink-0">
+        <Image
+          src="/landing/phyo_logo.svg"
+          alt="Phyo"
+          width={80}
+          height={22}
+          priority
+          className={`object-contain transition-all duration-300 ${isExpanded ? 'w-[80px]' : 'w-[28px]'}`}
         />
       </div>
 
-      {/* Main Navigation */}
-      <nav className="flex-1">
-        <div className="px-3 space-y-1">
-          {navItems.map((item) => {
-            const Icon = item.icon;
-            const isActive = pathname === item.href;
+      {/* Nav */}
+      <nav className="flex flex-col gap-[10px] mt-[28px] flex-1 px-[10px] overflow-y-auto scrollbar-hide">
 
-            return (
-              <Link
-                key={item.name}
-                href={item.href}
-                className={`flex items-center px-3 py-3 text-sm font-medium rounded-lg transition-colors ${
-                  isActive
-                    ? 'bg-green-100 text-green-800'
-                    : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-                }`}
-              >
-                <Icon className="mr-3 h-5 w-5" />
-                {item.name}
-              </Link>
-            );
-          })}
-        </div>
-
-        {/* Bottom Navigation Items */}
-        <div className="px-3 space-y-1 mt-8">
-          {bottomNavItems.map((item) => {
-            const Icon = item.icon;
-            const isActive = pathname === item.href;
-
-            if (item.isLogout) {
-              return (
-                <button
-                  key={item.name}
-                  onClick={() => setShowLogoutModal(true)}
-                  className="flex items-center w-full px-3 py-3 text-sm font-medium text-red-600 hover:bg-red-50 hover:text-red-700 rounded-lg transition-colors"
-                >
-                  <Icon className="mr-3 h-5 w-5" />
+        {mainNavItems.map((item) => {
+          const Icon = item.icon;
+          const isActive = pathname === item.href || pathname.startsWith(item.href + '/');
+          return (
+            <Link
+              key={item.name}
+              href={item.href}
+              className={`relative flex items-center h-[40px] rounded-full no-underline hover:bg-white/5 transition-colors ${
+                isExpanded ? 'pl-[20px] pr-[12px]' : 'justify-center'
+              }`}
+            >
+              <span className="flex-shrink-0 flex items-center justify-center w-[16px] h-[16px]">
+                <Icon width={16} height={16} fill={isActive ? '#16a34a' : '#9b9b9b'} color={isActive ? '#16a34a' : '#9b9b9b'} />
+              </span>
+              {isExpanded && (
+                <span className={`ml-[12px] text-[16px] font-normal capitalize leading-[1.2] whitespace-nowrap flex-1 ${isActive ? 'text-[#16a34a]' : 'text-[#9b9b9b]'}`} style={{ fontFamily: 'Inter, sans-serif' }}>
                   {item.name}
-                </button>
-              );
-            }
+                </span>
+              )}
+              {item.badge && (
+                <span className={`${isExpanded ? 'ml-auto' : 'absolute top-0.5 right-0.5'} bg-[#16a34a] text-white text-[10px] font-semibold min-w-[16px] h-[16px] rounded-full flex items-center justify-center px-1`}>
+                  {item.badge}
+                </span>
+              )}
+            </Link>
+          );
+        })}
 
-            return (
-              <Link
-                key={item.name}
-                href={item.href}
-                className={`flex items-center px-3 py-3 text-sm font-medium rounded-lg transition-colors ${
-                  isActive
-                    ? 'bg-green-100 text-green-800'
-                    : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-                }`}
-              >
-                <Icon className="mr-3 h-5 w-5" />
-                {item.name}
-              </Link>
-            );
-          })}
-        </div>
+        {/* Account — expandable */}
+        <button
+          onClick={() => {
+            if (isExpanded) setAccountOpen((o) => !o);
+            else router.push('/influencer/account');
+          }}
+          className={`relative flex items-center h-[40px] rounded-full hover:bg-white/5 transition-colors w-full ${
+            isExpanded ? 'pl-[20px] pr-[12px]' : 'justify-center'
+          }`}
+        >
+          <span className="flex-shrink-0 flex items-center justify-center w-[16px] h-[16px]">
+            <AccountCircleLine width={16} height={16} fill={isAccountActive ? '#16a34a' : '#9b9b9b'} color={isAccountActive ? '#16a34a' : '#9b9b9b'} />
+          </span>
+          {isExpanded && (
+            <>
+              <span className={`ml-[12px] text-[16px] font-normal capitalize leading-[1.2] whitespace-nowrap flex-1 text-left ${isAccountActive ? 'text-[#16a34a]' : 'text-[#9b9b9b]'}`} style={{ fontFamily: 'Inter, sans-serif' }}>
+                Account
+              </span>
+              <ChevronDown open={accountOpen} />
+            </>
+          )}
+        </button>
+
+        {isExpanded && accountOpen && (
+          <>
+            <div className="h-px bg-white/10 mx-3 my-1" />
+            <div className="bg-[#1e1e1e] rounded-[16px] mx-1 overflow-y-auto scrollbar-hide" style={{ maxHeight: 'calc(100vh - 260px)' }}>
+              {accountSubItems.map((sub, idx) => {
+                const Icon = sub.icon;
+                const isActive = pathname === sub.href;
+                return (
+                  <Link
+                    key={sub.name}
+                    href={sub.href}
+                    className={`flex items-center gap-[8px] px-[12px] py-[10px] transition-colors hover:bg-white/5 ${idx === 0 ? 'border-b border-white/10' : ''}`}
+                  >
+                    <span className="shrink-0 w-[28px] h-[28px] flex items-center justify-center">
+                      <Icon width={16} height={16} fill={isActive ? '#ffffff' : '#9b9b9b'} color={isActive ? '#ffffff' : '#9b9b9b'} />
+                    </span>
+                    <span className={`text-[14px] font-normal capitalize leading-[1.2] whitespace-nowrap ${isActive ? 'text-white' : 'text-[#9b9b9b]'}`} style={{ fontFamily: 'Inter, sans-serif' }}>
+                      {sub.name}
+                    </span>
+                  </Link>
+                );
+              })}
+
+              {(() => {
+                const isLogoutActive = pathname.includes('/account/logout');
+                return (
+                  <button
+                    onClick={handleLogout}
+                    className="w-full flex items-center gap-[8px] px-[12px] py-[10px] hover:bg-white/5 transition-colors"
+                  >
+                    <span className="shrink-0 w-[28px] h-[28px] flex items-center justify-center">
+                      <LogoutBoxRLine width={16} height={16} fill={isLogoutActive ? '#ffffff' : '#9b9b9b'} color={isLogoutActive ? '#ffffff' : '#9b9b9b'} />
+                    </span>
+                    <span className={`text-[14px] font-normal capitalize leading-[1.2] whitespace-nowrap ${isLogoutActive ? 'text-white' : 'text-[#9b9b9b]'}`} style={{ fontFamily: 'Inter, sans-serif' }}>
+                      Log Out
+                    </span>
+                  </button>
+                );
+              })()}
+            </div>
+            <div className="h-px bg-white/10 mx-3 my-1" />
+          </>
+        )}
       </nav>
 
-      {/* Get PRO Section */}
-      <div className="p-4 border-t border-gray-200">
-        <div className="bg-green-50 rounded-lg p-4 text-center">
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">
-            Get PRO!!
-          </h3>
-          <p className="text-sm text-gray-600 mb-4">
-            Upgrade now to unlock premium features
-          </p>
-          <button className="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-lg transition-colors">
-            Upgrade Now
+      {/* Start New Chat */}
+      <div className="pb-[40px] shrink-0 flex justify-center px-[10px]">
+        {isExpanded ? (
+          <button
+            onClick={handleStartNewChat}
+            className="w-full max-w-[200px] h-[40px] bg-[#16a34a] hover:bg-[#15803d] rounded-full text-white text-[16px] font-normal capitalize transition-colors"
+            style={{ fontFamily: 'Inter, sans-serif' }}
+          >
+            Start New Chat
           </button>
-        </div>
+        ) : (
+          <button
+            onClick={handleStartNewChat}
+            className="w-[40px] h-[40px] bg-[#16a34a] hover:bg-[#15803d] rounded-full flex items-center justify-center transition-colors"
+          >
+            <Message3Fill width={18} height={18} fill="white" color="white" />
+          </button>
+        )}
       </div>
-
-      {/* Logout Confirmation Modal */}
-      {showLogoutModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-8 max-w-sm w-full mx-4 shadow-xl">
-            <div className="flex justify-center mb-4">
-              <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center">
-                <LogOut className="w-8 h-8 text-red-600" />
-              </div>
-            </div>
-            
-            <h2 className="text-2xl font-bold text-gray-900 text-center mb-2">
-              Logout
-            </h2>
-            
-            <p className="text-gray-600 text-center mb-6">
-              Are you sure you want to logout?
-            </p>
-            
-            <div className="flex gap-3">
-              <button
-                onClick={() => setShowLogoutModal(false)}
-                className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleLogout}
-                className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium"
-              >
-                Yes, Logout
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 };
 
 export default InfluencerSidebar;
-
-
-

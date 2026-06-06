@@ -40,7 +40,7 @@ const MessagesList = ({ contacts, selectedContact, onSelectContact }) => {
           <div
             key={contact.id}
             onClick={() => onSelectContact(contact)}
-            className={`p-4 border-b border-gray-100 cursor-pointer hover:bg-gray-50 transition-colors ${
+            className={`p-4 border-b border-gray-100 cursor-pointer hover:bg-[#000201] transition-colors ${
               selectedContact?.id === contact.id ? 'bg-green-50 border-l-4 border-green-500' : ''
             }`}
           >

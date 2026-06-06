@@ -1,53 +1,68 @@
-import React from 'react';
-import { Heart } from 'lucide-react';
+import { useState } from 'react';
+import { MoreVertical, TrendingUp } from 'lucide-react';
 
-/**
- * Reusable Campaign Card Component
- * Used across the dashboard for displaying campaign information
- */
-export default function CampaignCard({ 
-  brandName, 
-  brandInitials, 
-  timeAgo, 
-  campaignImage = '/dummyAvatar.jpg',
-  initialsColor = 'bg-blue-500',
-  onLike,
-  onClick
+export default function CampaignCard({
+  brandName,
+  brandInitials,
+  timeAgo,
+  campaignImage,
+  initialsColor = 'bg-[#16A34A]',
+  onMenuClick,
+  onClick,
 }) {
+  const [hovered, setHovered] = useState(false);
+
   return (
-    <div 
-      className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-all cursor-pointer border border-gray-100"
+    <div
+      className="rounded-3xl overflow-hidden cursor-pointer shrink-0 w-full flex flex-col h-[260px] transition-all duration-200 border border-white/5"
+      style={{ backgroundColor: hovered ? '#202020' : '#181818' }}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
       onClick={onClick}
     >
-      {/* Campaign Header */}
-      <div className="p-3 flex items-center justify-between bg-white">
-        <div className="flex items-center gap-3">
-          <div className={`w-9 h-9 ${initialsColor} rounded-full flex items-center justify-center text-white font-semibold text-xs`}>
-            {brandInitials}
+      {/* Content */}
+      <div className="h-[72px] shrink-0 flex items-center" style={{ padding: '12px 4px 12px 16px' }}>
+        <div className="flex items-center gap-4 flex-1 min-w-0">
+          <div className={`shrink-0 w-10 h-10 ${initialsColor} rounded-full flex items-center justify-center text-white font-medium text-base`}>
+            {brandInitials || brandName?.charAt(0)?.toUpperCase()}
           </div>
-          <div>
-            <h3 className="font-semibold text-sm text-gray-900">{brandName}</h3>
-            <p className="text-xs text-gray-500">{timeAgo}</p>
+          <div className="flex flex-col gap-1 min-w-0 flex-1">
+            <p className="text-base font-medium leading-6 truncate transition-colors duration-200"
+               style={{ color: '#ffffff' }}>
+              {brandName}
+            </p>
+            <p className="text-sm font-normal leading-5 truncate transition-colors duration-200"
+               style={{ color: '#9A9A9A' }}>
+              {timeAgo}
+            </p>
           </div>
         </div>
-        <button 
-          className="p-1.5 hover:bg-gray-100 rounded-full transition-colors"
-          onClick={(e) => {
-            e.stopPropagation();
-            onLike?.();
-          }}
+        <button
+          className="shrink-0 w-12 h-12 flex items-center justify-center rounded-full transition-colors"
+          style={{ color: '#ffffff' }}
+          onClick={(e) => { e.stopPropagation(); onMenuClick?.(); }}
         >
-          <Heart className="h-4 w-4 text-gray-400" />
+          <MoreVertical className="w-5 h-5" />
         </button>
       </div>
 
-      {/* Campaign Image */}
-      <div className="relative w-full aspect-[4/3] overflow-hidden">
-        <img 
-          src={campaignImage} 
-          alt={brandName}
-          className="w-full h-full object-cover"
-        />
+      {/* Media — fills rest */}
+      <div
+        className="flex-1 relative overflow-hidden transition-colors duration-200"
+        style={{ backgroundColor: hovered ? '#073D1B' : '#252525' }}
+      >
+        {campaignImage ? (
+          <img
+            src={campaignImage}
+            alt={brandName}
+            className="w-full h-full object-cover"
+            onError={(e) => { e.currentTarget.style.display = 'none'; }}
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center">
+            <TrendingUp className="w-12 h-12" style={{ color: hovered ? '#16A34A' : 'rgba(255,255,255,0.12)' }} />
+          </div>
+        )}
       </div>
     </div>
   );
