@@ -400,7 +400,10 @@ function LoginForm({ facebookAppId }) {
       throw new Error('Too many login attempts. Please try again in 1 minute.');
     }
 
-    const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || process.env.NEXT_PUBLIC_API_URL || "https://spool-reliance-channel.ngrok-free.dev";
+    const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || process.env.NEXT_PUBLIC_API_URL;
+    if (!apiBaseUrl) {
+      throw new Error('API URL is not configured. Set NEXT_PUBLIC_API_URL in .env.local');
+    }
 
     const response = await fetch(`${apiBaseUrl.replace(/\/$/, '')}/auth/login`, {
       method: "POST",
@@ -423,7 +426,10 @@ function LoginForm({ facebookAppId }) {
       throw new Error('Invalid Google credentials');
     }
 
-    const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || process.env.NEXT_PUBLIC_API_URL || "https://spool-reliance-channel.ngrok-free.dev";
+    const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || process.env.NEXT_PUBLIC_API_URL;
+    if (!apiBaseUrl) {
+      throw new Error('API URL is not configured. Set NEXT_PUBLIC_API_URL in .env.local');
+    }
 
     const response = await fetch(`${apiBaseUrl.replace(/\/$/, '')}/auth/google`, {
       method: "POST",
@@ -442,7 +448,10 @@ function LoginForm({ facebookAppId }) {
   }, []);
 
   const instagramLoginAPI = async (accessToken) => {
-    const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || process.env.NEXT_PUBLIC_API_URL || "https://spool-reliance-channel.ngrok-free.dev";
+    const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || process.env.NEXT_PUBLIC_API_URL;
+    if (!apiBaseUrl) {
+      throw new Error('API URL is not configured. Set NEXT_PUBLIC_API_URL in .env.local');
+    }
 
     const response = await fetch(`${apiBaseUrl.replace(/\/$/, '')}/auth/instagram`, {
       method: "POST",
