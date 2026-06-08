@@ -12,6 +12,7 @@ import OutlineGlowButton from "@/components/shared/OutlineGlowButton";
 import { useAuth } from "../context/AuthContext";
 import { ForgotPasswordCard } from "../forgot-password/page";
 import secureAuthStorage from "../../utils/secure-auth";
+import { authUtils } from "../../utils/api";
 import inputValidation from "../../utils/input-validation";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -482,7 +483,9 @@ function LoginForm({ facebookAppId }) {
       if (result.token) {
         const userData = result.user || result.data?.user || result.data;
 
+        // Set token in both secure storage AND cookies (for middleware)
         secureAuthStorage.setToken(result.token);
+        authUtils.setToken(result.token);
         secureAuthStorage.setUserData(userData);
 
         toast.success("Successfully signed in with Google!");
@@ -531,11 +534,14 @@ function LoginForm({ facebookAppId }) {
       const result = await instagramLoginAPI(accessToken);
 
       if (result.token) {
+        // Set token in both secure storage AND cookies (for middleware)
+        secureAuthStorage.setToken(result.token);
         authUtils.setToken(result.token);
 
         const userData = result.user || result.data?.user || result.data;
 
         if (userData) {
+          secureAuthStorage.setUserData(userData);
           localStorage.setItem("userData", JSON.stringify(userData));
 
           if (userData.email) {
@@ -577,7 +583,9 @@ function LoginForm({ facebookAppId }) {
         const userData = result.user || result.data?.user || result.data;
 
         if (token && userData) {
+          // Set token in both secure storage AND cookies (for middleware)
           secureAuthStorage.setToken(token);
+          authUtils.setToken(token);
           secureAuthStorage.setUserData(userData);
 
           toast.success("Login successful! Welcome back!");
