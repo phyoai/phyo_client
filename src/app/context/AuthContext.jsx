@@ -82,7 +82,10 @@ export const AuthProvider = ({ children }) => {
         return { success: false, error: 'Email and password are required' };
       }
 
-      const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || process.env.NEXT_PUBLIC_API_URL || 'https://spool-reliance-channel.ngrok-free.dev';
+      const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || process.env.NEXT_PUBLIC_API_URL;
+      if (!apiBaseUrl) {
+        throw new Error('API URL is not configured. Set NEXT_PUBLIC_API_URL in .env.local');
+      }
       const response = await fetch(`${apiBaseUrl.replace(/\/$/, '')}/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -140,7 +143,10 @@ export const AuthProvider = ({ children }) => {
         return { success: false, error: 'Email and password are required' };
       }
 
-      const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || process.env.NEXT_PUBLIC_API_URL || 'https://spool-reliance-channel.ngrok-free.dev';
+      const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || process.env.NEXT_PUBLIC_API_URL;
+      if (!apiBaseUrl) {
+        throw new Error('API URL is not configured. Set NEXT_PUBLIC_API_URL in .env.local');
+      }
       const response = await fetch(`${apiBaseUrl.replace(/\/$/, '')}/auth/signup`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
