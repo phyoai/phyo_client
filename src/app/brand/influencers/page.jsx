@@ -1,10 +1,10 @@
 'use client'
-import React, { useState, useRef, useEffect } from 'react';
-import { ArrowLeft, MoreVertical, MessageSquare, UserPlus, Bookmark, ChevronLeft } from 'lucide-react';
-import { useRouter } from 'next/navigation';
+import { useState, useRef, useEffect } from 'react';
+import { ArrowLeft, MoreVertical } from 'lucide-react';
 import Image from 'next/image';
-import { BookmarkLine, YoutubeFill, InstagramFill, TwitterXLine, UserAddLine, Message3Line, FacebookCircleFill } from '@phyoofficial/phyo-icon-library';
+import { BookmarkLine, UserAddLine, Message3Line } from '@phyoofficial/phyo-icon-library';
 import { influencerApi } from '@/api/influencer-api';
+
 
 const COVER_COLORS = [
   'from-yellow-400 to-yellow-500', 'from-blue-400 to-blue-600',
@@ -41,13 +41,9 @@ const normalizeInfluencer = (inf, index) => ({
   },
 });
 
-// placeholder so existing references compile until state loads
-const influencersData = [];
-
 const categories = ['All', 'Fitness', 'Comedy', 'Lifestyle', 'Infra', 'Real Estate', 'Travel'];
 
 const TopInfluencersPage = () => {
-  const router = useRouter();
   const [selectedInfluencer, setSelectedInfluencer] = useState(null);
   const [activeCategory, setActiveCategory] = useState('All');
   const [influencers, setInfluencers] = useState([]);
@@ -62,12 +58,7 @@ const TopInfluencersPage = () => {
       .finally(() => setLoadingInfluencers(false));
   }, []);
 
-  const handleBack = () => {
-    router.push('/brand/dashboard');
-  };
-
   const handleInfluencerClick = (influencer) => {
-    // Transform the data to match the profile component's expected format
     const transformedInfluencer = {
       id: influencer.id,
       name: influencer.name,
@@ -82,14 +73,6 @@ const TopInfluencersPage = () => {
       views: '9.2K'
     };
     setSelectedInfluencer(transformedInfluencer);
-  };
-
-  const handleCloseProfile = () => {
-    setSelectedInfluencer(null);
-  };
-
-  const handleSendMessage = () => {
-    console.log('Send message to:', selectedInfluencer?.username);
   };
 
   const handleInvite = () => {
@@ -107,42 +90,33 @@ const TopInfluencersPage = () => {
   };
 
   return (
-    <div className="bg-white h-screen flex flex-col overflow-hidden">
-      {/* App Bar */}
-      <div className="bg-white flex items-center justify-between px-4 py-2 border-b border-gray-100 shrink-0">
-        <button
-          onClick={handleBack}
-          className="flex items-center justify-center w-12 h-12 rounded-full hover:bg-gray-100 transition-colors"
-        >
-          <ArrowLeft className="w-6 h-6 text-gray-700" />
-        </button>
-
-        <h1 className="text-xl font-semibold text-[#242527] flex-1 px-2">
-          Influencers
-        </h1>
-
-        <button
-          type="button"
-          className="flex items-center justify-center w-12 h-12 rounded-full hover:bg-gray-100 transition-colors"
-        >
-          <MoreVertical className="w-6 h-6 text-gray-700" />
-        </button>
-      </div>
-
+    <div className="flex flex-col h-full overflow-hidden" style={{ background: '#000201' }}>
       {/* Main Content */}
-      <div className="flex flex-1 gap-0 overflow-hidden">
-        {/* Influencers List */}
-        <div className={`flex flex-col ${selectedInfluencer ? 'w-[604px]' : 'flex-1'} border-r border-gray-200 transition-all duration-300 shrink-0 overflow-hidden`}>
-          {/* Categories - Sticky */}
-          <div className="px-6 py-4 border-b border-gray-100 bg-white sticky top-0 z-10">
+      <div className="flex-1 overflow-hidden">
+        <div className="fade-up flex h-full pr-5 items-stretch" style={{ gap: 16, paddingTop: 20, paddingBottom: 20, paddingLeft: 0 }}>
+          {/* Left: Influencers List Container */}
+          <div
+            className="flex-shrink-0 overflow-y-auto flex flex-col"
+            style={{
+              width: 450,
+              gap: 12,
+              background: '#181818',
+              border: '1px solid rgba(255,255,255,0.03)',
+              boxShadow: '0 18px 40px rgba(0,0,0,0.25)',
+              borderRadius: 28,
+              padding: '16px',
+            }}
+          >
+          {/* Categories - Sticky Dark Theme */}
+          <div className="px-4 py-3 border-b border-white/10 bg-[#0d0d0d] sticky top-0 z-10">
             <div className="flex items-center gap-2">
               {/* Left Arrow */}
               <button
                 onClick={() => scrollCategories('left')}
-                className="flex-shrink-0 p-2 hover:bg-[#f0f0f0] rounded-lg transition-colors"
+                className="flex-shrink-0 p-1.5 hover:bg-white/10 rounded-lg transition-colors"
                 aria-label="Scroll left"
               >
-                <svg className="w-5 h-5 text-[#242527]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                 </svg>
               </button>
@@ -156,9 +130,9 @@ const TopInfluencersPage = () => {
                   <button
                     key={category}
                     onClick={() => setActiveCategory(category)}
-                    className={`px-4 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-colors flex-shrink-0 ${activeCategory === category
-                        ? 'bg-[#43573b] text-white'
-                        : 'bg-[#f0f0f0] text-[#242527] hover:bg-[#e0e0e0]'
+                    className={`px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap transition-colors flex-shrink-0 ${activeCategory === category
+                        ? 'bg-[#16A34A] text-white'
+                        : 'bg-white/10 text-white/70 hover:bg-white/15'
                       }`}
                   >
                     {category}
@@ -169,10 +143,10 @@ const TopInfluencersPage = () => {
               {/* Right Arrow */}
               <button
                 onClick={() => scrollCategories('right')}
-                className="flex-shrink-0 p-2 hover:bg-[#f0f0f0] rounded-lg transition-colors"
+                className="flex-shrink-0 p-1.5 hover:bg-white/10 rounded-lg transition-colors"
                 aria-label="Scroll right"
               >
-                <svg className="w-5 h-5 text-[#242527]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                 </svg>
               </button>
@@ -181,23 +155,23 @@ const TopInfluencersPage = () => {
 
           {/* Scrollable Content Area */}
           <div className="flex-1 overflow-y-auto">
-            {/* Upgrade Banner */}
-            <div className="mx-6 mt-4 mb-4 px-4 py-3 bg-blue-50 rounded-lg border border-blue-200 flex items-center justify-between">
+            {/* Upgrade Banner - Dark Theme */}
+            <div className="mx-4 mt-3 mb-3 px-4 py-3 bg-[#432004] rounded-lg border border-[#F89617]/30 flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
-                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                <div className="w-6 h-6 bg-[#F89617] rounded-full flex items-center justify-center flex-shrink-0">
+                  <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
                     <path d="M2 8H14" stroke="white" strokeWidth="2" strokeLinecap="round" />
                   </svg>
                 </div>
-                <span className="text-sm text-[#242527]">You have reached your limit. Upgrade plan for more2</span>
+                <span className="text-xs text-white/80">You have reached your limit. Upgrade plan for more.</span>
               </div>
-              <button className="px-4 py-1.5 bg-blue-600 text-white rounded-full text-sm font-medium hover:bg-blue-700 transition-colors">
+              <button className="px-3 py-1.5 bg-[#73400B] text-white rounded-full text-xs font-medium hover:bg-[#8B4B0D] transition-colors flex-shrink-0">
                 Upgrade
               </button>
             </div>
 
             {/* Influencers List */}
-            <div className="px-6 space-y-3">
+            <div className="px-4 space-y-2">
               {loadingInfluencers ? (
                 [...Array(5)].map((_, i) => (
                   <div key={i} className="bg-[#f5f5f5] rounded-xl p-4 animate-pulse">
@@ -221,82 +195,74 @@ const TopInfluencersPage = () => {
                   <div
                     key={influencer.id}
                     onClick={() => handleInfluencerClick(influencer)}
-                    className={`bg-[#f5f5f5] rounded-xl p-4 cursor-pointer hover:bg-[#e8e8e8] transition-colors ${selectedInfluencer?.id === influencer.id ? 'ring-2 ring-[#43573b]' : ''
-                      }`}
+                    className="flex items-center justify-between flex-shrink-0 cursor-pointer transition-all"
+                    style={{
+                      height: 80,
+                      background: '#262626',
+                      borderRadius: 16,
+                      padding: '12px 16px',
+                      border: selectedInfluencer?.id === influencer.id ? '1px solid #16A34A' : '1px solid rgba(255,255,255,0.08)',
+                      gap: 16,
+                    }}
+                    onMouseEnter={(e) => { if (selectedInfluencer?.id !== influencer.id) e.currentTarget.style.borderColor = 'rgba(22,163,74,0.3)'; }}
+                    onMouseLeave={(e) => { if (selectedInfluencer?.id !== influencer.id) e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)'; }}
                   >
-                    <div className="flex items-center gap-3 mb-3">
-                      <div className="w-12 h-12 rounded-full overflow-hidden bg-blue-500">
+                    <div className="flex items-center" style={{ gap: 16, flex: 1, minWidth: 0 }}>
+                      <div className="flex-shrink-0 rounded-full overflow-hidden" style={{ width: 56, height: 56, background: '#555' }}>
                         <Image
                           src={influencer.avatar}
                           alt={influencer.name}
-                          width={48}
-                          height={48}
+                          width={56}
+                          height={56}
                           className="w-full h-full object-cover"
                         />
                       </div>
-                      <div className="flex-1">
-                        <h3 className="text-base font-semibold text-[#242527]">
-                          {influencer.name}
-                        </h3>
-                        <p className="text-sm text-[#808080]">
-                          {influencer.bio.split(' ').slice(0, 2).join(' ')}
-                        </p>
-                        {/* Social Stats */}
-                        <div className="flex gap-3 mb-3 py-2">
-                          <div className="flex items-center gap-1.5">
-                            <div className="w-6 h-6 rounded flex items-center justify-center text-black text-xs font-bold">
-                              <YoutubeFill size={14} />
-                            </div>
-                            <span className="text-xs font-medium text-[#242527]">22.5k</span>
-                          </div>
-                          <div className="flex items-center gap-1.5">
-                            <div className="w-6 h-6 rounded flex items-center justify-center text-black text-xs font-bold">
-                              <InstagramFill size={14} />
-                            </div>
-                            <span className="text-xs font-medium text-[#242527]">22.5k</span>
-                          </div>
-                          <div className="flex items-center gap-1.5">
-                            <div className="w-6 h-6 rounded flex items-center justify-center text-black text-xs font-bold">
-                              <TwitterXLine size={14} />
-                            </div>
-                            <span className="text-xs font-medium text-[#242527]">22.5k</span>
-                          </div>
-                        </div>
+                      <div className="flex flex-col" style={{ gap: 2 }}>
+                        <span style={{ color: '#FFFFFF', fontFamily: 'Bricolage Grotesque, sans-serif', fontSize: 18, fontWeight: 400, lineHeight: '120%' }}>{influencer.name}</span>
+                        <span style={{ color: '#9B9B9B', fontFamily: 'Inter, sans-serif', fontSize: 14, fontWeight: 400, lineHeight: '120%' }}>{influencer.followers} Followers</span>
                       </div>
                     </div>
-
-
-
-                    <div className="flex gap-2 justify-center">
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleSendMessage();
-                        }}
-                        className="px-5 py-2 border border-[#43573b] text-[#43573b] rounded-full text-sm font-medium hover:bg-[#43573b] hover:text-white transition-colors flex items-center justify-center gap-2"
-                      >
-                        <Message3Line className="w-4 h-4" />
-                        message
-                      </button>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleInvite();
-                        }}
-                        className="px-5 py-2 border border-[#43573b] text-[#43573b] rounded-full text-sm font-medium hover:bg-[#43573b] hover:text-white transition-colors flex items-center justify-center gap-2"
-                      >
-                        <UserAddLine className="w-4 h-4" />
-                        invite
-                      </button>
-                    </div>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleInvite();
+                      }}
+                      className="flex-shrink-0 flex items-center justify-center gap-1.5 hover:opacity-90 transition-opacity"
+                      style={{
+                        background: '#16A34A',
+                        borderRadius: 40,
+                        border: 'none',
+                        cursor: 'pointer',
+                        fontFamily: 'Inter, sans-serif',
+                        fontSize: 14,
+                        fontWeight: 500,
+                        color: '#FFFFFF',
+                        padding: '6px 16px',
+                        whiteSpace: 'nowrap',
+                      }}
+                    >
+                      <UserAddLine style={{ width: 18, height: 18 }} />
+                      Invitations
+                    </button>
                   </div>
                 ))}
             </div>
           </div>
-        </div>
+          </div>
 
-        {/* Profile Panel */}
-        <div className="flex-1 overflow-y-auto bg-white m-1 shadow-[0_0_20px_rgba(0,0,0,0.1)] rounded-lg">
+          {/* Right: Profile Panel */}
+          <div
+            className="flex-shrink-0 overflow-y-auto flex flex-col"
+            style={{
+              flex: 1,
+              gap: 12,
+              background: '#181818',
+              border: '1px solid rgba(255,255,255,0.03)',
+              boxShadow: '0 18px 40px rgba(0,0,0,0.25)',
+              borderRadius: 28,
+              padding: '16px',
+            }}
+          >
           {selectedInfluencer ? (
             <InfluencerProfile influencer={selectedInfluencer} />
           ) : (
@@ -315,13 +281,14 @@ const TopInfluencersPage = () => {
               </div>
             </div>
           )}
+          </div>
         </div>
       </div>
     </div>
   );
 };
 
-// Influencer Profile Component (Right Side Panel)
+// InfluencerProfile Component (Right Side Panel) - Matches Figma node 45-15931
 function InfluencerProfile({ influencer }) {
   const [showMoreMenu, setShowMoreMenu] = useState(false);
   const [showSaveModal, setShowSaveModal] = useState(false);
@@ -372,9 +339,9 @@ function InfluencerProfile({ influencer }) {
   };
 
   return (
-    <div className="w-full h-full relative rounded-lg overflow-y-auto">
-      {/* Yellow Background - Sticky at top */}
-      <div className="sticky top-0 bg-yellow-400 h-[400px] z-0">
+    <div className="w-full h-full relative bg-[#000201] overflow-y-auto">
+      {/* PINK/MAGENTA HERO BANNER - Matches Figma */}
+      <div className="sticky top-0 h-[280px] z-0 overflow-hidden rounded-b-3xl" style={{ background: 'linear-gradient(135deg, #D946EF 0%, #EC4899 50%, #D946EF 100%)' }}>
         {/* Profile Image - Centered */}
         <div className="absolute inset-0 flex items-center justify-center pt-8">
           <div className="w-64 h-64 rounded-full overflow-hidden shadow-lg">
@@ -535,35 +502,35 @@ function InfluencerProfile({ influencer }) {
         </div>
       )}
 
-      {/* Profile Content - White card that scrolls over yellow background */}
-      <div className="relative bg-white rounded-t-3xl -mt-8 z-10 shadow-lg">
-        <div className="px-4 py-6 pb-28">
-          {/* Username and Name */}
-          <div className="mb-6">
-            <p className="text-[#808080] text-base font-semibold leading-6 tracking-[0.24px] mb-1">{influencer.username}</p>
-            <h2 className="text-[#242527] text-4xl font-bold leading-[48px] tracking-[-0.32px]">{influencer.name}</h2>
+      {/* Profile Content - Dark cards */}
+      <div className="relative bg-[#000201] -mt-12 z-10 flex flex-col">
+        <div className="px-6 py-5 pb-28 flex-1">
+          {/* Username and Name - Dark Theme */}
+          <div className="mb-4 pt-6">
+            <p className="text-[#9A9A9A] text-sm font-medium mb-1">{influencer.username}</p>
+            <h2 className="text-white text-3xl font-bold" style={{ fontFamily: 'Bricolage Grotesque, sans-serif' }}>{influencer.name}</h2>
           </div>
 
-          {/* Stats Badges */}
-          <div className="flex gap-2 mb-4 sm:mb-6 flex-wrap">
-            <div className="bg-[#0b4fd9] hover:bg-[#0a45bf] px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg flex items-center gap-2 transition-colors">
-              <FacebookCircleFill className="w-5 h-5 text-white" />
-              <span className="text-white text-sm sm:text-base font-semibold leading-6 tracking-[0.24px]">{influencer.followers}</span>
+          {/* Stats Grid - Dark Cards */}
+          <div className="grid grid-cols-3 gap-3 mb-4">
+            <div className="bg-[#181818] rounded-2xl px-3 py-4 text-center border border-[#262626]">
+              <p className="text-white text-xl font-bold" style={{ fontFamily: 'Bricolage Grotesque, sans-serif' }}>{influencer.followers}</p>
+              <p className="text-[#9B9B9B] text-xs mt-1">Followers</p>
             </div>
-            <div className="bg-[#0b4fd9] hover:bg-[#0a45bf] px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg flex items-center gap-2 transition-colors">
-              <InstagramFill className="w-5 h-5 text-white" />
-              <span className="text-white text-sm sm:text-base font-semibold leading-6 tracking-[0.24px]">{influencer.following}</span>
+            <div className="bg-[#181818] rounded-2xl px-3 py-4 text-center border border-[#262626]">
+              <p className="text-white text-xl font-bold" style={{ fontFamily: 'Bricolage Grotesque, sans-serif' }}>{influencer.following}</p>
+              <p className="text-[#9B9B9B] text-xs mt-1">Following</p>
             </div>
-            <div className="bg-[#0b4fd9] hover:bg-[#0a45bf] px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg flex items-center gap-2 transition-colors">
-              <YoutubeFill className="w-5 h-5 text-white" />
-              <span className="text-white text-sm sm:text-base font-semibold leading-6 tracking-[0.24px]">{influencer.posts}</span>
+            <div className="bg-[#181818] rounded-2xl px-3 py-4 text-center border border-[#262626]">
+              <p className="text-white text-xl font-bold" style={{ fontFamily: 'Bricolage Grotesque, sans-serif' }}>{influencer.posts}</p>
+              <p className="text-[#9B9B9B] text-xs mt-1">Posts</p>
             </div>
           </div>
 
           {/* Location and Age */}
-          <div className="flex gap-5 mb-6">
+          <div className="flex gap-4 mb-6">
             <div className="flex-1">
-              <p className="text-[#242527] text-xl font-semibold leading-7 tracking-[-0.14px] mb-1">Location</p>
+              <p className="text-white text-sm font-semibold mb-2">Location</p>
               <div className="flex items-center gap-1">
                 <svg className="w-4 h-4" viewBox="0 0 16 16" fill="none">
                   <path d="M8 8.66667C8.73638 8.66667 9.33333 8.06971 9.33333 7.33333C9.33333 6.59695 8.73638 6 8 6C7.26362 6 6.66667 6.59695 6.66667 7.33333C6.66667 8.06971 7.26362 8.66667 8 8.66667Z" fill="#ff4f4f" />
@@ -573,22 +540,22 @@ function InfluencerProfile({ influencer }) {
               </div>
             </div>
             <div className="flex-1">
-              <p className="text-[#242527] text-xl font-semibold leading-7 tracking-[-0.14px] mb-1">Age</p>
-              <span className="text-[#808080] text-base leading-6">{influencer.age}</span>
+              <p className="text-white text-sm font-semibold mb-2">Age</p>
+              <span className="text-[#9A9A9A] text-sm">{influencer.age}</span>
             </div>
           </div>
 
           {/* About Section */}
-          <div className="mb-6">
-            <h3 className="text-[#242527] text-xl font-semibold leading-7 tracking-[-0.14px] mb-1">About</h3>
-            <p className="text-[#808080] text-base leading-6 text-justify">
+          <div className="mb-6 bg-[#181818] rounded-2xl p-5 border border-[#262626]">
+            <h3 className="text-white text-base font-semibold mb-3" style={{ fontFamily: 'Bricolage Grotesque, sans-serif' }}>Biography</h3>
+            <p className="text-[#9A9A9A] text-sm leading-relaxed">
               {influencer.about}
             </p>
           </div>
 
-          {/* Interactions Section */}
-          <div className="mb-6">
-            <h3 className="text-[#242527] text-xl font-semibold leading-7 tracking-[-0.14px] mb-3">Interactions</h3>
+          {/* Top Campaigns Section */}
+          <div className="mb-6 bg-[#181818] rounded-2xl p-5 border border-[#262626]">
+            <h3 className="text-white text-base font-semibold mb-4" style={{ fontFamily: 'Bricolage Grotesque, sans-serif' }}>Top Campaigns</h3>
 
             {/* Likes and Views Graphs */}
             <div className="flex gap-3 overflow-x-auto mb-6">
@@ -677,11 +644,11 @@ function InfluencerProfile({ influencer }) {
           </div>
 
           {/* Audience Insights */}
-          <div className="mb-6">
-            <h3 className="text-[#242527] text-xl font-semibold leading-7 tracking-[-0.14px] mb-3">Audience Insights</h3>
+          <div className="mb-6 bg-[#181818] rounded-2xl p-5 border border-[#262626]">
+            <h3 className="text-white text-base font-semibold mb-4" style={{ fontFamily: 'Bricolage Grotesque, sans-serif' }}>Audience Insights</h3>
 
             {/* Age Group */}
-            <div className="bg-white border-[0.5px] border-[#e6e6e6] rounded-xl p-2 mb-3">
+            <div className="bg-[#262626] rounded-xl p-3 mb-4">
               <p className="text-[#242527] text-base font-semibold leading-6 tracking-[0.24px] mb-2">Age Group</p>
               <div className="flex gap-2">
                 <div className="flex flex-col justify-between text-[#333] text-xs py-2 text-right" style={{ minWidth: '32px' }}>
@@ -859,17 +826,15 @@ function InfluencerProfile({ influencer }) {
       </div>
 
       {/* Bottom Action Buttons - Sticky at bottom */}
-      <div className="sticky bottom-0 bg-white border-t border-gray-200 px-4 py-4 z-20 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)]">
-        <div className="flex gap-3">
-          <button className="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-[#dae3d1] rounded-full text-[#43573b] text-base font-semibold hover:bg-[#c9d9ba] transition-colors tracking-[0.24px]">
-            <UserPlus className="h-6 w-6" />
-            Invite
-          </button>
-          <button className="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-[#43573b] rounded-full text-white text-base font-semibold hover:bg-[#374829] transition-colors tracking-[0.24px]">
-            <MessageSquare className="h-6 w-6" />
-            Send Message
-          </button>
-        </div>
+      <div className="sticky bottom-0 bg-[#0d0d0d] border-t border-white/10 px-5 py-3 z-20 flex gap-3">
+        <button className="flex-1 flex items-center justify-center gap-2 py-3 bg-[#262626] rounded-full text-white text-sm font-medium hover:bg-[#333] transition-colors">
+          <UserAddLine className="w-4 h-4" />
+          Invite
+        </button>
+        <button className="flex-1 flex items-center justify-center gap-2 py-3 bg-[#16A34A] rounded-full text-white text-sm font-medium hover:opacity-90 transition-opacity">
+          <Message3Line className="w-4 h-4" />
+          Send Message
+        </button>
       </div>
     </div>
   );

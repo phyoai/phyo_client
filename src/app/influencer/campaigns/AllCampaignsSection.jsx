@@ -183,12 +183,16 @@ const AllCampaignsSection = () => {
 
   // Helper function to get active campaigns
   const getActiveCampaigns = () => {
-    return campaigns.filter(campaign => campaign.status === 'Active');
+    return campaigns.filter(campaign =>
+      ['active', 'published'].includes((campaign.status || '').toLowerCase())
+    );
   };
 
   // Helper function to get draft campaigns
   const getDraftCampaigns = () => {
-    return campaigns.filter(campaign => campaign.status === 'Draft');
+    return campaigns.filter(campaign =>
+      (campaign.status || '').toLowerCase() === 'draft'
+    );
   };
 
   // Register sidebar button action for campaigns tab
@@ -1271,7 +1275,7 @@ const AllCampaignsSection = () => {
     <div className="bg-[#181818] h-screen overflow-hidden flex flex-col">
       {/* Fixed App Bar - Only header */}
       <div className="flex-shrink-0 bg-[#181818] border-b border-white/5">
-        <div className="px-4 sm:px-6 lg:px-9 py-3 sm:py-4">
+        <div className="pr-4 sm:pr-6 lg:pr-9 py-3 sm:py-4" style={{ paddingLeft: 0 }}>
           {/* App Bar */}
           <div className="flex items-center justify-between">
             {showAllCampaigns || showAllDrafts ? (

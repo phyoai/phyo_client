@@ -1,7 +1,7 @@
 'use client'
 import React from 'react';
 import { usePathname } from 'next/navigation';
-import InfluencerSidebar from '../../components/InfluencerSidebar';
+import AppSidebar from '../../components/AppSidebar';
 import BrandTopbar from '../../components/BrandTopbar';
 import { SidebarProvider, useSidebar } from '../context/SidebarContext';
 
@@ -11,7 +11,6 @@ function InfluencerLayoutContent({ children, pathname }) {
   const noSidebarRoutes = [
     '/influencer/signup',
     '/influencer/login',
-    '/influencer/influencer-search',
     '/influencer/influencers',
   ];
 
@@ -23,7 +22,7 @@ function InfluencerLayoutContent({ children, pathname }) {
 
   return (
     <div className="flex h-screen bg-[#000201] overflow-hidden">
-      <InfluencerSidebar />
+      <AppSidebar />
       <div className={`flex flex-col flex-1 transition-all duration-300 ease-in-out overflow-hidden ${
         isExpanded ? 'ml-[280px]' : 'ml-[72px]'
       } pl-3`}>
