@@ -1,7 +1,7 @@
 'use client'
 import React from 'react';
 import { usePathname } from 'next/navigation';
-import UserSidebar from '../../components/UserSidebar';
+import AppSidebar from '../../components/AppSidebar';
 import BrandTopbar from '../../components/BrandTopbar';
 import { SidebarProvider, useSidebar } from '../context/SidebarContext';
 
@@ -11,7 +11,6 @@ function UserLayoutContent({ children, pathname }) {
   const noSidebarRoutes = [
     '/user/signup',
     '/user/login',
-    '/user/influencer-search',
     '/user/influencers',
   ];
 
@@ -23,7 +22,7 @@ function UserLayoutContent({ children, pathname }) {
 
   return (
     <div className="flex h-screen bg-[#000201] overflow-hidden">
-      <UserSidebar />
+      <AppSidebar />
       <div className={`flex flex-col flex-1 transition-all duration-300 ease-in-out overflow-hidden ${
         isExpanded ? 'ml-[280px]' : 'ml-[72px]'
       } pl-3`}>

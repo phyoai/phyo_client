@@ -1,20 +1,53 @@
 'use client';
 
 import React from 'react';
-import { colors } from '@/config/colors';
 
 /**
- * Button Component - Part of Ember Design System
+ * Variants:
+ *   primary   — green filled, white text  (most common CTA)
+ *   ghost     — transparent, white border (secondary action)
+ *   dark      — dark surface (#262626), muted text
+ *   chip      — pill filter/tab; use `active` prop for selected state
  *
- * Variants: primary, secondary, tertiary, outlined
- * Sizes: sm, md, lg
- * States: default, hover, active, disabled, loading
+ * Sizes:
+ *   sm  — h-[32px]  text-[13px]
+ *   md  — h-[40px]  text-[16px]  (default)
+ *   lg  — h-[48px]  text-[18px]
+ *
+ * All buttons are rounded-full to match the design system.
  */
+
+const sizeConfig = {
+  sm: { height: 'h-[32px]', text: 'text-[13px]', px: 'px-[16px]', iconSize: 14, gap: 'gap-[6px]' },
+  md: { height: 'h-[40px]', text: 'text-[16px]', px: 'px-[24px]', iconSize: 16, gap: 'gap-[8px]' },
+  lg: { height: 'h-[48px]', text: 'text-[18px]', px: 'px-[32px]', iconSize: 18, gap: 'gap-[10px]' },
+};
+
+const variantConfig = {
+  primary: {
+    base: 'bg-[#16a34a] text-white hover:bg-[#15803d]',
+    disabled: 'bg-[#16a34a]/40 text-white/50 cursor-not-allowed',
+  },
+  ghost: {
+    base: 'border border-white text-white hover:bg-white/10',
+    disabled: 'border border-white/20 text-white/30 cursor-not-allowed',
+  },
+  dark: {
+    base: 'bg-[#262626] text-[#9b9b9b] hover:bg-[#333] hover:text-white',
+    disabled: 'bg-[#262626]/50 text-[#9b9b9b]/40 cursor-not-allowed',
+  },
+  chip: {
+    base: 'bg-[#181818] text-[#9b9b9b] hover:bg-[#262626] hover:text-white',
+    active: 'bg-[#16a34a] text-white',
+    disabled: 'bg-[#181818]/50 text-[#9b9b9b]/40 cursor-not-allowed',
+  },
+};
 
 const Button = React.forwardRef(({
   children,
   variant = 'primary',
   size = 'md',
+  active = false,
   disabled = false,
   loading = false,
   icon: Icon,
@@ -22,104 +55,56 @@ const Button = React.forwardRef(({
   fullWidth = false,
   onClick,
   className = '',
+  type = 'button',
   ...props
 }, ref) => {
-  // Size configuration
-  const sizeConfig = {
-    sm: {
-      padding: 'px-3 py-1.5',
-      text: 'text-xs font-medium',
-      height: 'h-8',
-      iconSize: 16,
-      gap: 'gap-1'
-    },
-    md: {
-      padding: 'px-4 py-2',
-      text: 'text-sm font-semibold',
-      height: 'h-10',
-      iconSize: 18,
-      gap: 'gap-2'
-    },
-    lg: {
-      padding: 'px-6 py-3',
-      text: 'text-base font-semibold',
-      height: 'h-12',
-      iconSize: 20,
-      gap: 'gap-2'
-    }
-  };
+  const sc = sizeConfig[size] ?? sizeConfig.md;
+  const vc = variantConfig[variant] ?? variantConfig.primary;
 
-  // Variant configuration
-  const variantConfig = {
-    primary: {
-      base: `bg-brand-base hover:opacity-90 text-ui-white`,
-      disabled: 'bg-brand-base/50 text-ui-white/50 cursor-not-allowed'
-    },
-    secondary: {
-      base: `bg-neutral-muted hover:opacity-80 text-text-base`,
-      disabled: 'bg-neutral-muted/50 text-text-base/50 cursor-not-allowed'
-    },
-    tertiary: {
-      base: `bg-accent-base hover:bg-accent-subtle text-brand-text`,
-      disabled: 'bg-accent-base/50 text-brand-text/50 cursor-not-allowed'
-    },
-    outlined: {
-      base: `border-2 border-neutral-muted text-text-base hover:bg-neutral-muted/10`,
-      disabled: 'border-neutral-muted/50 text-text-base/50 cursor-not-allowed'
-    }
-  };
+  const stateClass = disabled
+    ? vc.disabled
+    : (variant === 'chip' && active)
+      ? vc.active
+      : vc.base;
 
-  const size_config = sizeConfig[size] || sizeConfig.md;
-  const variant_config = variantConfig[variant] || variantConfig.primary;
-
-  const baseClasses = `
-    inline-flex items-center justify-center
-    rounded-lg
-    transition-all duration-200
-    disabled:opacity-50 disabled:cursor-not-allowed
-    ${size_config.padding}
-    ${size_config.text}
-    ${size_config.gap}
-    ${fullWidth ? 'w-full' : ''}
-    ${disabled ? variant_config.disabled : variant_config.base}
-    ${className}
-  `;
+  const classes = [
+    'inline-flex items-center justify-center',
+    'rounded-full',
+    'font-normal capitalize leading-[1.2]',
+    'transition-colors duration-200',
+    'whitespace-nowrap shrink-0',
+    sc.height,
+    sc.text,
+    sc.px,
+    sc.gap,
+    fullWidth ? 'w-full' : '',
+    stateClass,
+    className,
+  ].filter(Boolean).join(' ');
 
   return (
     <button
       ref={ref}
+      type={type}
       disabled={disabled || loading}
       onClick={onClick}
-      className={baseClasses}
+      className={classes}
+      style={{ fontFamily: 'Inter, sans-serif' }}
       {...props}
     >
       {loading ? (
         <>
-          <svg className="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
-            <circle
-              className="opacity-25"
-              cx="12"
-              cy="12"
-              r="10"
-              stroke="currentColor"
-              strokeWidth="4"
-            />
-            <path
-              className="opacity-75"
-              fill="currentColor"
-              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-            />
-          </svg>
+          <span className="w-[14px] h-[14px] rounded-full border-2 border-white/30 border-t-white animate-spin" />
           {children && <span>{children}</span>}
         </>
       ) : (
         <>
           {Icon && iconPosition === 'left' && (
-            <Icon width={size_config.iconSize} height={size_config.iconSize} />
+            <Icon width={sc.iconSize} height={sc.iconSize} fill="currentColor" color="currentColor" />
           )}
           {children}
           {Icon && iconPosition === 'right' && (
-            <Icon width={size_config.iconSize} height={size_config.iconSize} />
+            <Icon width={sc.iconSize} height={sc.iconSize} fill="currentColor" color="currentColor" />
           )}
         </>
       )}
@@ -128,5 +113,4 @@ const Button = React.forwardRef(({
 });
 
 Button.displayName = 'Button';
-
 export default Button;

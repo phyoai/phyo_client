@@ -67,7 +67,7 @@ function DashboardContent() {
         isFadingOut ? 'fade-out-dashboard' : ''
       }`}>
         {/* Scrollable Content Section */}
-        <div className="px-4 sm:px-6 lg:px-8 pt-6 pb-10">
+        <div className="pr-4 sm:pr-6 lg:pr-8 pt-6 pb-10" style={{ paddingLeft: 0 }}>
 
           {/* Search Bar */}
           <div className="relative mb-[17px] cursor-pointer" onClick={handleSearchClick}>

@@ -1,8 +1,9 @@
 'use client'
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { SendPlane2Fill, MicLine, Link, EmotionLine, Camera4Fill, MultiImageFill, FileTextFill, HeadphoneFill } from '@phyoofficial/phyo-icon-library';
+import { SendPlane2Fill, MicLine, Link, EmotionLine, Camera4Fill, MultiImageFill, FileTextFill, HeadphoneFill, Message3Line, UserAddLine } from '@phyoofficial/phyo-icon-library';
 import messageApi from '@/api/message-api';
 import secureAuthStorage from '@/utils/secure-auth';
+import Button from '@/components/ui/Button';
 
 function SingleTick({ color = '#9b9b9b' }) {
   return (
@@ -220,17 +221,29 @@ const InboxPage = () => {
   }, [messages]);
 
   return (
-    <div className="flex overflow-hidden bg-[#000201] text-white" style={{ height: 'calc(100vh - 72px)' }}>
+    <div className="flex overflow-hidden bg-[#000201] text-white" style={{ height: 'calc(100vh - 80px)' }}>
       <main className="flex min-w-0 flex-1 flex-col overflow-hidden h-full">
-        <div className="flex h-full min-h-0 flex-1 gap-6 p-4 lg:p-6 overflow-hidden">
+        <div className="flex h-full min-h-0 flex-1 gap-6 overflow-hidden" style={{ paddingTop: '16px', paddingRight: '24px', paddingBottom: '24px', paddingLeft: 0 }}>
           <section className="hidden xl:flex h-full w-[360px] min-w-[360px] flex-col overflow-hidden rounded-[24px] bg-[#181818]">
             <div className="flex items-center justify-center gap-5 px-5 pt-5">
-              <button className="h-10 w-[150px] rounded-full bg-[#16a34a] text-[16px] text-white">
+              <Button
+                variant="chip"
+                active={activeTab === 'messages'}
+                className="w-[150px] flex items-center justify-center gap-2"
+                onClick={() => setActiveTab('messages')}
+              >
+                <Message3Line width={18} height={18} />
                 Messages
-              </button>
-              <button className="h-10 w-[150px] rounded-full bg-[#262626] text-[16px] text-[#9b9b9b]">
+              </Button>
+              <Button
+                variant="chip"
+                active={activeTab === 'invitations'}
+                className="w-[150px] flex items-center justify-center gap-2"
+                onClick={() => setActiveTab('invitations')}
+              >
+                <UserAddLine width={18} height={18} />
                 Invitations
-              </button>
+              </Button>
             </div>
 
             <div className="h-0 flex-1 overflow-y-auto px-5 py-4">
@@ -453,13 +466,14 @@ const InboxPage = () => {
                   <MicLine width={22} height={22} />
                 </button>
 
-                <button
+                <Button
                   onClick={handleSendMessage}
                   disabled={sendingMessage || !messageInput.trim() || !selectedConversation}
-                  className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-[#16a34a] text-white transition-colors hover:bg-[#15913d] disabled:cursor-not-allowed disabled:opacity-40"
-                >
-                  <SendPlane2Fill width={18} height={18} />
-                </button>
+                  loading={sendingMessage}
+                  icon={SendPlane2Fill}
+                  className="w-10 px-0 flex-shrink-0"
+                  aria-label="Send message"
+                />
               </div>
             </div>
           </section>

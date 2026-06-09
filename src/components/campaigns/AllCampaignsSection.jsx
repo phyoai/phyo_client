@@ -226,11 +226,15 @@ const AllCampaignsSection = () => {
 
   // Helper functions
   const getActiveCampaigns = () => {
-    return (campaigns || []).filter(campaign => campaign.status === 'Active');
+    return (campaigns || []).filter(campaign =>
+      ['active', 'published'].includes((campaign.status || '').toLowerCase())
+    );
   };
 
   const getDraftCampaigns = () => {
-    return (campaigns || []).filter(campaign => campaign.status === 'Draft');
+    return (campaigns || []).filter(campaign =>
+      (campaign.status || '').toLowerCase() === 'draft'
+    );
   };
 
   const handleFormChange = (field, value) => {
@@ -265,135 +269,63 @@ const AllCampaignsSection = () => {
   }
 
   const activeCampaigns = getActiveCampaigns();
-  const draftCampaigns = getDraftCampaigns();
 
   return (
     <div className="w-full space-y-6">
       {/* Active Campaigns Section */}
       <div>
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-2xl font-normal text-white" style={{ fontFamily: 'var(--font-bricolage-grotesque)' }}>Active Campaigns</h2>
-          <Button
-            onClick={() => setShowModal(true)}
-            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
-          >
-            Create Campaign
-          </Button>
+          <h2 className="text-2xl font-normal text-white" style={{ fontFamily: 'var(--font-bricolage-grotesque)' }}>
+            Active Campaigns
+          </h2>
         </div>
 
         {activeCampaigns.length > 0 ? (
-          <div className="grid grid-cols-1 gap-4">
-            {activeCampaigns.slice(0, showAllCampaigns ? activeCampaigns.length : 5).map((campaign) => (
-              <Card
-                key={campaign.id || campaign._id}
-                className="p-4 hover:shadow-lg transition-shadow cursor-pointer"
-                onClick={() => router.push(`/${role}/campaigns/${campaign._id || campaign.id}`)}
-              >
-                <div className="flex justify-between items-start">
-                  <div className="flex-1">
-                    <h3 className="text-lg font-semibold">{campaign.campaignName}</h3>
-                    <p className="text-gray-600 text-sm">{campaign.campaignBrief}</p>
-                    <div className="flex gap-4 mt-2 text-xs text-gray-500">
-                      <span>Budget: ${campaign.budget}</span>
-                      <span>Status: {campaign.status || 'Draft'}</span>
+          <div className="flex gap-4 overflow-x-auto pb-3" style={{ scrollbarWidth: 'none' }}>
+            {activeCampaigns.map((campaign) => {
+              const id = campaign._id || campaign.id;
+              const name = campaign.campaignName || 'Untitled Campaign';
+              const initial = name.charAt(0).toUpperCase();
+              const productImage = campaign.productImages?.[0] || null;
+              const date = campaign.createdAt
+                ? new Date(campaign.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+                : '';
+              return (
+                <div
+                  key={id}
+                  onClick={() => router.push(`/${role}/campaigns/${id}`)}
+                  className="rounded-xl overflow-hidden cursor-pointer shrink-0 w-[300px] sm:w-[360px] bg-[#181818] hover:bg-[#1f1f1f] transition-colors"
+                >
+                  {/* Card header */}
+                  <div className="h-[72px] flex items-center" style={{ padding: '12px 4px 12px 16px' }}>
+                    <div className="flex items-center gap-4 flex-1 min-w-0">
+                      <div className="w-10 h-10 bg-[#16A34A] rounded-full flex items-center justify-center text-white text-base font-medium shrink-0">
+                        {initial}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-base font-medium text-white truncate">{name}</p>
+                        {date && <p className="text-sm text-[#9B9B9B] truncate">{date}</p>}
+                      </div>
                     </div>
                   </div>
-                  <div className="flex gap-2">
-                    <IconButton
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        openCampaignDetails(campaign);
-                      }}
-                    >
-                      <EditLine size={20} />
-                    </IconButton>
-                    <IconButton
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setSelectedCampaign(campaign);
-                        setShowDeleteModal(true);
-                      }}
-                    >
-                      <DeleteBinLine size={20} />
-                    </IconButton>
+                  {/* Card image */}
+                  <div className="h-[188px] bg-[#252525] overflow-hidden">
+                    {productImage ? (
+                      <img src={productImage} alt={name} className="w-full h-full object-cover" />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center">
+                        <LineChartLine className="w-12 h-12 text-white/10" />
+                      </div>
+                    )}
                   </div>
                 </div>
-              </Card>
-            ))}
+              );
+            })}
           </div>
         ) : (
-          <div className="text-center py-8 text-gray-500">
-            <p>No active campaigns yet.</p>
+          <div className="text-center py-12">
+            <p className="text-[#9B9B9B] text-sm">No active campaigns yet.</p>
           </div>
-        )}
-
-        {activeCampaigns.length > 5 && !showAllCampaigns && (
-          <button
-            onClick={() => setShowAllCampaigns(true)}
-            className="mt-4 text-blue-600 hover:text-blue-700 font-medium"
-          >
-            View All ({activeCampaigns.length})
-          </button>
-        )}
-      </div>
-
-      {/* Draft Campaigns Section */}
-      <div>
-        <h2 className="text-2xl font-normal text-white mb-4" style={{ fontFamily: 'var(--font-bricolage-grotesque)' }}>Draft Campaigns</h2>
-
-        {draftCampaigns.length > 0 ? (
-          <div className="grid grid-cols-1 gap-4">
-            {draftCampaigns.slice(0, showAllDrafts ? draftCampaigns.length : 5).map((campaign) => (
-              <Card
-                key={campaign.id || campaign._id}
-                className="p-4 hover:shadow-lg transition-shadow cursor-pointer opacity-75"
-                onClick={() => openCampaignDetails(campaign)}
-              >
-                <div className="flex justify-between items-start">
-                  <div className="flex-1">
-                    <h3 className="text-lg font-semibold">{campaign.campaignName}</h3>
-                    <p className="text-gray-600 text-sm">{campaign.campaignBrief}</p>
-                    <div className="flex gap-4 mt-2 text-xs text-gray-500">
-                      <span>Budget: ${campaign.budget}</span>
-                      <span>Status: Draft</span>
-                    </div>
-                  </div>
-                  <div className="flex gap-2">
-                    <IconButton
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        openCampaignDetails(campaign);
-                      }}
-                    >
-                      <EditLine size={20} />
-                    </IconButton>
-                    <IconButton
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setSelectedCampaign(campaign);
-                        setShowDeleteModal(true);
-                      }}
-                    >
-                      <DeleteBinLine size={20} />
-                    </IconButton>
-                  </div>
-                </div>
-              </Card>
-            ))}
-          </div>
-        ) : (
-          <div className="text-center py-8 text-gray-500">
-            <p>No draft campaigns.</p>
-          </div>
-        )}
-
-        {draftCampaigns.length > 5 && !showAllDrafts && (
-          <button
-            onClick={() => setShowAllDrafts(true)}
-            className="mt-4 text-blue-600 hover:text-blue-700 font-medium"
-          >
-            View All ({draftCampaigns.length})
-          </button>
         )}
       </div>
 

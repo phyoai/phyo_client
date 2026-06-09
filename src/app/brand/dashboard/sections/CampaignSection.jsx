@@ -62,7 +62,7 @@ export default function CampaignSection({
         title={title}
         eyebrow={eyebrow}
         showViewAll={showViewAll}
-        onViewAll={() => router.push('/brand/campaigns')}
+        onViewAll={() => router.push('/brand/campaigns/all-campaigns')}
       />
 
       {/* Category Filter Tabs */}

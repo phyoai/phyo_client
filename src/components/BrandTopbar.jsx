@@ -7,9 +7,12 @@ import { MenuFill, MenuUnfold4Line } from '@phyoofficial/phyo-icon-library';
 const PAGE_TITLES = {
   // ── Brand ──────────────────────────────────────────────────────────
   '/brand/dashboard':                          { title: 'Welcome!',              subtitle: 'Search & Discover popular creators' },
+  '/brand/influencer-search':                  { title: 'Search Influencers',    subtitle: 'Find the right creators for your campaign' },
   '/brand/inbox':                              { title: 'Inbox',                 subtitle: 'Your messages and invitations' },
   '/brand/campaigns':                          { title: 'Campaigns',             subtitle: 'Manage your campaigns' },
   '/brand/campaigns/all-campaigns':            { title: 'All Campaigns',         subtitle: 'Browse your active campaigns' },
+  '/brand/campaigns/previous-campaigns':       { title: 'Previous Campaigns',    subtitle: 'Completed campaigns' },
+  '/brand/campaigns/influencer-detail-deliverables': { title: 'Deliverables Review', subtitle: 'Review submitted content' },
   '/brand/campaigns/all-drafts':               { title: 'Draft Campaigns',       subtitle: 'Your saved drafts' },
   '/brand/campaigns/new-applications':         { title: 'New Applications',      subtitle: 'Influencers who applied' },
   '/brand/notifications':                      { title: 'Notifications',         subtitle: 'Your latest updates' },
@@ -94,7 +97,7 @@ const BrandTopbar = () => {
   const role = getRole(pathname);
 
   return (
-    <div className="h-[72px] bg-[#181818] flex items-center px-5 gap-4 flex-shrink-0 rounded-b-[24px] border-b border-white/5">
+    <div className="h-[80px] bg-[#181818] flex items-center px-5 gap-4 flex-shrink-0 rounded-b-[24px] border-b border-white/5">
       {/* Hamburger */}
       <button
         onClick={() => setIsExpanded(!isExpanded)}
@@ -109,11 +112,11 @@ const BrandTopbar = () => {
 
       {/* Title */}
       <div className="flex-1 min-w-0">
-        <p className="text-white text-xl font-semibold leading-tight truncate" style={{ fontFamily: 'var(--font-bricolage-grotesque)' }}>
+        <p className="text-white font-normal leading-[120%] truncate" style={{ fontFamily: 'var(--font-bricolage-grotesque)', fontSize: 24 }}>
           {title}
         </p>
         {subtitle && (
-          <p className="text-[#9b9b9b] text-sm leading-tight truncate" style={{ fontFamily: 'Inter, sans-serif' }}>
+          <p className="text-[#9b9b9b] leading-[120%] truncate" style={{ fontFamily: 'Inter, sans-serif', fontSize: 16 }}>
             {subtitle}
           </p>
         )}
@@ -123,9 +126,9 @@ const BrandTopbar = () => {
       <div className="flex items-center gap-3 flex-shrink-0">
         <button
           onClick={() => router.push(`/${role}/notifications`)}
-          className="relative flex items-center justify-center w-9 h-9 rounded-full hover:bg-white/10 transition-colors"
+          className="relative flex items-center justify-center w-10 h-10 rounded-full hover:bg-white/10 transition-colors"
         >
-          <svg className="w-5 h-5 text-[#c9c9c9]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.8}>
+          <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6 6 0 10-12 0v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
           </svg>
           <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full" />
@@ -133,7 +136,7 @@ const BrandTopbar = () => {
 
         <div
           onClick={() => router.push(`/${role}/account`)}
-          className="w-9 h-9 rounded-full bg-[#16a34a] flex items-center justify-center overflow-hidden cursor-pointer ring-2 ring-[#16a34a]/20 flex-shrink-0"
+          className="w-10 h-10 rounded-full bg-[#16a34a] flex items-center justify-center overflow-hidden cursor-pointer ring-2 ring-[#16a34a]/20 flex-shrink-0"
         >
           <span className="text-white text-sm font-semibold">{initials}</span>
         </div>

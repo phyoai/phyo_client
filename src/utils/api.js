@@ -636,4 +636,62 @@ export const adminAPI = {
   },
 };
 
+// Upload API functions
+export const uploadAPI = {
+  // Upload campaign asset image to GCS
+  uploadCampaignImage: async (file, folder = 'campaign-assets') => {
+    try {
+      const formData = new FormData();
+      formData.append('image', file);
+      formData.append('folder', folder);
+
+      const response = await api.post('/upload/gcs-image', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error.message;
+    }
+  },
+
+  // Upload user avatar
+  uploadAvatar: async (file) => {
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const response = await api.post('/users/upload-avatar', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error.message;
+    }
+  },
+
+  // Upload multiple campaign images
+  uploadMultipleCampaignImages: async (files, folder = 'campaign-assets') => {
+    try {
+      const formData = new FormData();
+      files.forEach((file) => {
+        formData.append('images', file);
+      });
+      formData.append('folder', folder);
+
+      const response = await api.post('/upload/gcs-images', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error.message;
+    }
+  },
+};
+
 export default api;

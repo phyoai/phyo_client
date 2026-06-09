@@ -3,6 +3,7 @@ import React, { useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { ChevronRight, X, Upload, Check, MoreVertical, Trash2, Edit, Search, TrendingUp, UserRound } from 'lucide-react';
 import { campaignApi } from '@/api/campaign-api';
+import { uploadAPI } from '@/utils/api';
 import { useSidebar } from '../../context/SidebarContext';
 
 const AllCampaignsSection = () => {
@@ -967,9 +968,23 @@ const AllCampaignsSection = () => {
     setIsSubmitting(true);
 
     try {
-      // Transform formData to match the API structure (keep file objects for FormData)
+      // Upload product images first
+      let uploadedImageUrls = [];
+      if (formData.productImages && formData.productImages.length > 0) {
+        // Filter file objects from the productImages array
+        const imageFiles = formData.productImages.filter(img => img instanceof File);
+        if (imageFiles.length > 0) {
+          const uploadResponse = await uploadAPI.uploadMultipleCampaignImages(imageFiles, 'campaign-assets');
+          uploadedImageUrls = uploadResponse.urls || uploadResponse.imageUrls || [];
+        }
+        // Keep URLs that were already uploaded
+        const existingUrls = formData.productImages.filter(img => typeof img === 'string');
+        uploadedImageUrls = [...uploadedImageUrls, ...existingUrls];
+      }
+
+      // Transform formData to match the API structure
       const transformedData = {
-        productImages: formData.productImages, // Keep file objects
+        productImages: uploadedImageUrls, // Use uploaded URLs
         campaignName: formData.campaignName,
         campaignType: formData.campaignType,
         campaignBrief: formData.campaignBrief,
@@ -1042,7 +1057,7 @@ const AllCampaignsSection = () => {
     <div className="bg-[#000201] h-screen overflow-hidden flex flex-col">
 
       {/* Page Header: title + search + new campaign */}
-      <div className="flex-shrink-0 px-4 sm:px-6 py-4 flex items-center justify-between gap-4 bg-[#000201]">
+      <div className="flex-shrink-0 pr-4 sm:pr-6 py-4 flex items-center justify-between gap-4 bg-[#000201]" style={{ paddingLeft: 0 }}>
         <h2
           className="shrink-0 capitalize"
           style={{
@@ -1079,7 +1094,7 @@ const AllCampaignsSection = () => {
       </div>
 
       {/* Scrollable Content */}
-      <div className="flex-1 overflow-y-auto px-4 sm:px-6 pb-8">
+      <div className="flex-1 overflow-y-auto pr-4 sm:pr-6 pb-8" style={{ paddingLeft: 0 }}>
 
         {/* Recent Campaigns */}
         <div className="mb-8 pt-4">
@@ -1178,7 +1193,7 @@ const AllCampaignsSection = () => {
         <div className="mb-8">
           <div className="flex items-center justify-between mb-3">
             <h3 className="text-2xl font-normal text-white capitalize leading-[120%]" style={{ fontFamily: 'var(--font-bricolage-grotesque)' }}>Previous Campaigns</h3>
-            <button className="flex items-center gap-0.5">
+            <button onClick={() => router.push('/brand/campaigns/previous-campaigns')} className="flex items-center gap-0.5">
               <span className="text-[#16A34A] text-sm font-medium">View All</span>
               <ChevronRight className="w-4 h-4 text-[#16A34A]" />
             </button>

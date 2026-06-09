@@ -1,1187 +1,711 @@
 'use client'
-import React, { useState, useRef, useEffect } from 'react';
-import { Search, ArrowLeft, Mic, MoreVertical, MessageSquare, UserPlus, Info } from 'lucide-react';
+import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { BookmarkLine } from '@phyoofficial/phyo-icon-library';
+import SearchBar from '@/components/SearchBar';
+import {
+  ArrowLeftLine, Message3Line, UserAddLine,
+  BookmarkLine,
+  InstagramFill, YoutubeFill, FacebookCircleFill,
+} from '@phyoofficial/phyo-icon-library';
+
+const C = {
+  bg:        '#000201',
+  panel:     '#181818',
+  card:      '#262626',
+  green:     '#16A34A',
+  white:     '#FFFFFF',
+  gray:      '#9B9B9B',
+  orange:    '#F89617',
+  upgradeBg: '#432004',
+};
+
+const SAMPLE = [
+  { id: 1, name: 'Alcie',   followers: '22.4k', avatarColor: '#8B5CF6' },
+  { id: 2, name: 'Alcie',   followers: '22.4k', avatarColor: '#EC4899' },
+  { id: 3, name: 'Alcie',   followers: '22.4k', avatarColor: '#F97316' },
+  { id: 4, name: 'Alcie',   followers: '22.4k', avatarColor: '#06B6D4' },
+  { id: 5, name: 'Alcie',   followers: '22.4k', avatarColor: '#14B8A6' },
+];
 
 export default function InfluencerSearch() {
   const router = useRouter();
-  const [searchQuery, setSearchQuery] = useState('');
-  const [isSearching, setIsSearching] = useState(false);
-  const [showResults, setShowResults] = useState(false);
-  const [selectedInfluencer, setSelectedInfluencer] = useState(null);
-  const searchInputRef = useRef(null);
-  const topBarMoreMenuRef = useRef(null);
-  
-  // Modal states
-  const [showTopBarMoreMenu, setShowTopBarMoreMenu] = useState(false);
-  const [showVoiceModal, setShowVoiceModal] = useState(false);
-  const [isListening, setIsListening] = useState(false);
-  const [voiceText, setVoiceText] = useState('');
-  const [recognition, setRecognition] = useState(null);
-  const silenceTimerRef = useRef(null);
-  const finalTranscriptRef = useRef('');
+  const [query, setQuery]               = useState('');
+  const [isSearching, setIsSearching]   = useState(false);
+  const [showResults, setShowResults]   = useState(false);
+  const [selected, setSelected]         = useState(null);
+  const [invited, setInvited]           = useState(new Set());
+  const [showMoreMenu, setShowMoreMenu] = useState(false);
+  const [voiceModal, setVoiceModal]     = useState(false);
+  const [isListening, setIsListening]   = useState(false);
+  const [voiceText, setVoiceText]       = useState('');
+  const [recognition, setRecognition]   = useState(null);
+  const [activeFilter, setActiveFilter] = useState('All');
 
-  // Handle search action
-  const handleSearch = () => {
-    setShowResults(false);
-    setIsSearching(true);
-    setSelectedInfluencer(null);
-    setTimeout(() => {
-      setShowResults(true);
-    }, 2000);
-  };
+  const inputRef      = useRef(null);
+  const moreRef       = useRef(null);
+  const silenceRef    = useRef(null);
+  const finalRef      = useRef('');
 
-  // Initialize speech recognition
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-      if (SpeechRecognition) {
-        const recognitionInstance = new SpeechRecognition();
-        recognitionInstance.continuous = true;
-        recognitionInstance.interimResults = true;
-        recognitionInstance.lang = 'en-US';
-
-        recognitionInstance.onresult = (event) => {
-          let interimTranscript = '';
-          let finalTranscript = '';
-
-          for (let i = event.resultIndex; i < event.results.length; i++) {
-            const transcript = event.results[i][0].transcript;
-            if (event.results[i].isFinal) {
-              finalTranscript += transcript + ' ';
-            } else {
-              interimTranscript += transcript;
-            }
-          }
-
-          const fullText = finalTranscript + interimTranscript;
-          setVoiceText(fullText);
-          finalTranscriptRef.current = fullText;
-
-          // Clear existing timer
-          if (silenceTimerRef.current) {
-            clearTimeout(silenceTimerRef.current);
-          }
-
-          // Set new timer - if no speech for 2 seconds, stop recording
-          silenceTimerRef.current = setTimeout(() => {
-            if (finalTranscriptRef.current.trim()) {
-              recognitionInstance.stop();
-            }
-          }, 2000);
-        };
-
-        recognitionInstance.onerror = (event) => {
-          console.error('Speech recognition error:', event.error);
-          setIsListening(false);
-        };
-
-        recognitionInstance.onend = () => {
-          setIsListening(false);
-          
-          // Clear the timer
-          if (silenceTimerRef.current) {
-            clearTimeout(silenceTimerRef.current);
-            silenceTimerRef.current = null;
-          }
-          
-          // Auto-fill search bar when recognition ends
-          const textToFill = finalTranscriptRef.current.trim();
-          if (textToFill) {
-            setSearchQuery(textToFill);
-            setShowVoiceModal(false);
-            setVoiceText('');
-            finalTranscriptRef.current = '';
-            
-            // Trigger search after a brief delay
-            setTimeout(() => {
-              setShowResults(false);
-              setIsSearching(true);
-              setSelectedInfluencer(null);
-              setTimeout(() => {
-                setShowResults(true);
-              }, 2000);
-            }, 300);
-          }
-        };
-
-        setRecognition(recognitionInstance);
-      }
-    }
-  }, []);
-
-  // Start searching animation on mount
-  useEffect(() => {
-    setTimeout(() => {
+    const t1 = setTimeout(() => {
       setIsSearching(true);
-      // Show results after 2 seconds of "searching"
-      setTimeout(() => {
-        setShowResults(true);
-      }, 2000);
+      const t2 = setTimeout(() => { setIsSearching(false); setShowResults(true); }, 2000);
+      return () => clearTimeout(t2);
     }, 300);
+    return () => clearTimeout(t1);
   }, []);
 
-  // Close top bar menu when clicking outside
   useEffect(() => {
-    function handleClickOutside(event) {
-      if (topBarMoreMenuRef.current && !topBarMoreMenuRef.current.contains(event.target)) {
-        setShowTopBarMoreMenu(false);
+    if (!showMoreMenu) return;
+    const h = (e) => { if (moreRef.current && !moreRef.current.contains(e.target)) setShowMoreMenu(false); };
+    document.addEventListener('mousedown', h);
+    return () => document.removeEventListener('mousedown', h);
+  }, [showMoreMenu]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition; // eslint-disable-line
+    if (!SR) return;
+    const rec = new SR();
+    rec.continuous = true; rec.interimResults = true; rec.lang = 'en-US';
+    rec.onresult = (e) => {
+      let fin = '', int = '';
+      for (let i = e.resultIndex; i < e.results.length; i++) {
+        const t = e.results[i][0].transcript;
+        e.results[i].isFinal ? (fin += t + ' ') : (int += t);
       }
-    }
-    if (showTopBarMoreMenu) {
-      document.addEventListener('mousedown', handleClickOutside);
-    }
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
+      const full = fin + int;
+      setVoiceText(full); finalRef.current = full;
+      if (silenceRef.current) clearTimeout(silenceRef.current);
+      silenceRef.current = setTimeout(() => { if (finalRef.current.trim()) rec.stop(); }, 2000);
     };
-  }, [showTopBarMoreMenu]);
+    rec.onerror = () => setIsListening(false);
+    rec.onend = () => {
+      setIsListening(false);
+      if (silenceRef.current) { clearTimeout(silenceRef.current); silenceRef.current = null; }
+      const text = finalRef.current.trim();
+      if (text) { setQuery(text); setVoiceModal(false); setVoiceText(''); finalRef.current = ''; setTimeout(() => doSearch(text), 300); }
+    };
+    setRecognition(rec);
+  }, []);
 
-  // Handle back button
-  const handleBackClick = () => {
-    setIsSearching(false);
-    setShowResults(false);
-    setSelectedInfluencer(null);
-    setTimeout(() => {
-      router.push('/influencer/dashboard');
-    }, 300);
+  const doSearch = (q = query) => {
+    if (!q.trim()) return;
+    setShowResults(false); setIsSearching(true); setSelected(null);
+    setTimeout(() => { setIsSearching(false); setShowResults(true); }, 2000);
   };
 
-  // Handle influencer card click
-  const handleInfluencerClick = (influencer) => {
-    setSelectedInfluencer(influencer);
+  const startVoice = () => {
+    setVoiceModal(true); setVoiceText(''); finalRef.current = '';
+    if (recognition) { setIsListening(true); try { recognition.start(); } catch {} }
   };
 
-  // Handle voice search
-  const handleVoiceSearch = () => {
-    setShowVoiceModal(true);
-    setVoiceText('');
-    finalTranscriptRef.current = '';
-    
-    if (recognition) {
-      setIsListening(true);
-      try {
-        recognition.start();
-      } catch (error) {
-        console.error('Error starting recognition:', error);
-      }
-    } else {
-      alert('Speech recognition is not supported in your browser. Please use Chrome or Edge.');
-    }
-  };
-
-  // Toggle listening (start/stop)
   const toggleListening = () => {
     if (!recognition) return;
-
     if (isListening) {
-      // Stop listening and fill search bar
-      recognition.stop();
-      setIsListening(false);
-      
-      // Clear any pending timer
-      if (silenceTimerRef.current) {
-        clearTimeout(silenceTimerRef.current);
-        silenceTimerRef.current = null;
-      }
-      
-      // Fill search bar and close modal after a brief delay
+      recognition.stop(); setIsListening(false);
+      if (silenceRef.current) { clearTimeout(silenceRef.current); silenceRef.current = null; }
       setTimeout(() => {
-        const textToFill = finalTranscriptRef.current.trim() || voiceText.trim();
-        if (textToFill) {
-          setSearchQuery(textToFill);
-          setShowVoiceModal(false);
-          setVoiceText('');
-          finalTranscriptRef.current = '';
-          
-          // Trigger search
-          setTimeout(() => {
-            handleSearch();
-          }, 300);
-        } else {
-          setShowVoiceModal(false);
-          setVoiceText('');
-          finalTranscriptRef.current = '';
-        }
+        const text = finalRef.current.trim() || voiceText.trim();
+        if (text) { setQuery(text); setVoiceModal(false); setVoiceText(''); finalRef.current = ''; setTimeout(() => doSearch(text), 300); }
+        else { setVoiceModal(false); setVoiceText(''); finalRef.current = ''; }
       }, 200);
     } else {
-      // Start listening
-      setVoiceText('');
-      finalTranscriptRef.current = '';
-      setIsListening(true);
-      try {
-        recognition.start();
-      } catch (error) {
-        console.error('Error starting recognition:', error);
-      }
+      setVoiceText(''); finalRef.current = ''; setIsListening(true);
+      try { recognition.start(); } catch {}
     }
-  };
-
-  // Close voice modal
-  const closeVoiceModal = () => {
-    if (recognition && isListening) {
-      recognition.stop();
-    }
-    
-    // Clear timer
-    if (silenceTimerRef.current) {
-      clearTimeout(silenceTimerRef.current);
-      silenceTimerRef.current = null;
-    }
-    
-    setShowVoiceModal(false);
-    setIsListening(false);
-    setVoiceText('');
-    finalTranscriptRef.current = '';
   };
 
   return (
     <>
-      {/* Custom CSS for smooth animations */}
       <style jsx global>{`
-        @keyframes searchFadeIn {
-          from {
-            transform: translateY(20px);
-            opacity: 0;
-          }
-          to {
-            transform: translateY(0);
-            opacity: 1;
-          }
+        * { scrollbar-width: none; -ms-overflow-style: none; }
+        *::-webkit-scrollbar { display: none; }
+        @keyframes fadeUp {
+          from { opacity: 0; transform: translateY(12px); }
+          to   { opacity: 1; transform: translateY(0); }
         }
-        
-        @keyframes filterDropdownIn {
-          from {
-            transform: translateY(-10px) scale(0.95);
-            opacity: 0;
-          }
-          to {
-            transform: translateY(0) scale(1);
-            opacity: 1;
-          }
-        }
-        
-        @keyframes filterDropdownOut {
-          from {
-            transform: translateY(0) scale(1);
-            opacity: 1;
-          }
-          to {
-            transform: translateY(-10px) scale(0.95);
-            opacity: 0;
-          }
-        }
-        
-        .search-fade-in {
-          animation: searchFadeIn 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-        }
-        
-        .filter-dropdown-enter {
-          animation: filterDropdownIn 0.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-          transform-origin: top right;
-        }
-        
-        .filter-dropdown-exit {
-          animation: filterDropdownOut 0.15s cubic-bezier(0.4, 0, 1, 1) forwards;
-          transform-origin: top right;
-        }
-        
-        /* Hide scrollbar for all elements */
-        * {
-          scrollbar-width: none; /* Firefox */
-          -ms-overflow-style: none; /* IE and Edge */
-        }
-        
-        *::-webkit-scrollbar {
-          display: none; /* Chrome, Safari, and Opera */
-        }
+        .fade-up { animation: fadeUp 0.4s cubic-bezier(0.4,0,0.2,1) both; }
+        ::placeholder { color: #9B9B9B !important; opacity: 1; }
       `}</style>
 
-      <div className="min-h-screen bg-[#000201]">
-        {/* Top Bar with centered search */}
-        <div className="bg-[#181818] px-6 py-3 flex items-center gap-4 search-fade-in">
-          {/* Back Button - Fixed width */}
-          <button 
-            onClick={handleBackClick}
-            className="p-2 hover:bg-[#262626] rounded-full transition-colors"
+      <div className="flex flex-col h-full overflow-hidden" style={{ background: C.bg }}>
+
+        {/* Search bar */}
+        <SearchBar
+          value={query}
+          onChange={setQuery}
+          onSearch={doSearch}
+          onMic={startVoice}
+          onMore={() => setShowMoreMenu(!showMoreMenu)}
+          isSearching={isSearching}
+          inputRef={inputRef}
+        />
+
+        {/* Filter dropdown */}
+        {showMoreMenu && (
+          <div
+            ref={moreRef}
+            className="absolute z-50 rounded-2xl shadow-2xl py-4"
+            style={{ background: C.panel, width: 360, border: '1px solid rgba(255,255,255,0.08)', top: '200px', right: '20px' }}
           >
-            <ArrowLeft className="h-5 w-5 text-[#9A9A9A]" />
-          </button>
-
-          {/* Search Bar - Centered, grows to fill space */}
-          <div className="flex-1 flex justify-center gap-4">
-            <div className="relative w-full max-w-[720px]">
-              <input
-                ref={searchInputRef}
-                type="text"
-                placeholder="Find a lifestyle influencers for my business..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-                className="w-full pl-6 pr-12 py-3 bg-[#F0F0F0] rounded-full border-none focus:outline-none text-base text-[#9A9A9A]"
-                autoFocus
-              />
-              <button 
-                onClick={handleSearch}
-                className="absolute right-4 top-1/2 transform -translate-y-1/2"
-              >
-                <Search className="h-5 w-5 text-[#808080]" />
-              </button>
-            </div>
-             <button 
-              onClick={handleVoiceSearch}
-              className="p-2 hover:bg-[#262626] rounded-full transition-colors"
-            >
-              <Mic className="h-5 w-5 text-[#9A9A9A]" />
-            </button>
-          </div>
-
-          {/* Right Actions - Fixed width */}
-          <div className="flex items-center gap-1">
-           <div className="relative" ref={topBarMoreMenuRef}>
-            <button 
-              onClick={() => setShowTopBarMoreMenu(!showTopBarMoreMenu)}
-              className="p-2 hover:bg-[#262626] rounded-full transition-colors"
-            >
-              <MoreVertical className="h-5 w-5 text-[#9A9A9A]" />
-            </button>
-            
-            {/* Top Bar Filter Menu */}
-            {showTopBarMoreMenu && (
-              <div className="absolute right-0 mt-2 w-96 bg-[#181818] rounded-lg shadow-[0_4px_20px_rgba(0,0,0,0.15)] py-4 z-50 filter-dropdown-enter">
-                {/* Region */}
-                <div className="px-4 mb-4">
-                  <label className="block text-sm font-medium text-[#242527] mb-2">Region</label>
-                  <div className="bg-[#f0f0f0] border-2 border-[#e6e6e6] rounded-lg px-4 py-2 flex items-center justify-between">
-                    <span className="text-sm text-[#808080]">india</span>
-                    <svg className="w-5 h-5" viewBox="0 0 20 20" fill="currentColor">
-                      <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
-                    </svg>
-                  </div>
-                </div>
-                
-                {/* Category */}
-                <div className="px-4 mb-4">
-                  <label className="block text-sm font-medium text-[#242527] mb-2">Category</label>
-                  <div className="bg-[#f0f0f0] border-2 border-[#e6e6e6] rounded-lg px-4 py-2 flex items-center justify-between">
-                    <span className="text-sm text-[#808080]">Comedy, Life</span>
-                    <svg className="w-5 h-5" viewBox="0 0 20 20" fill="currentColor">
-                      <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
-                    </svg>
-                  </div>
-                </div>
-                
-                {/* Platform */}
-                <div className="px-4 mb-4">
-                  <label className="block text-sm font-medium text-[#242527] mb-2">Platform</label>
-                  <div className="flex gap-2 overflow-x-auto py-2">
-                    {['Label', 'Label', 'Label', 'Label', 'Label'].map((label, idx) => (
-                      <button key={idx} className="px-3 py-1 bg-[#fbfcfa] border border-[#f4f6f1] rounded-lg text-sm text-[#242527] whitespace-nowrap">
-                        {label}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-                
-                {/* Audience */}
-                <div className="px-4">
-                  <label className="block text-sm font-medium text-[#242527] mb-2">Audience</label>
-                  <div className="bg-[#f0f0f0] border-2 border-[#e6e6e6] rounded-lg px-4 py-2 flex items-center justify-between">
-                    <span className="text-sm text-[#808080]">18-24, 25-35</span>
-                    <svg className="w-5 h-5" viewBox="0 0 20 20" fill="currentColor">
-                      <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
-                    </svg>
-                  </div>
+            {[
+              { label: 'Region',   placeholder: 'india' },
+              { label: 'Category', placeholder: 'Comedy, Life' },
+              { label: 'Audience', placeholder: '18-24, 25-35' },
+            ].map(({ label, placeholder }) => (
+              <div key={label} className="px-4 mb-4">
+                <p className="text-sm font-medium mb-2" style={{ color: C.white }}>{label}</p>
+                <div className="rounded-xl px-4 py-2.5 flex items-center justify-between" style={{ background: C.card, border: '1px solid rgba(255,255,255,0.08)' }}>
+                  <span className="text-sm" style={{ color: C.gray }}>{placeholder}</span>
+                  <svg className="w-4 h-4" style={{ color: C.gray }} viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+                  </svg>
                 </div>
               </div>
-            )}
-           </div>
+            ))}
+            <div className="px-4">
+              <p className="text-sm font-medium mb-2" style={{ color: C.white }}>Platform</p>
+              <div className="flex gap-2 flex-wrap">
+                {['Instagram', 'YouTube', 'Twitter', 'Facebook'].map((p) => (
+                  <button key={p} className="px-3 py-1.5 rounded-lg text-sm" style={{ background: C.card, border: '1px solid rgba(255,255,255,0.1)', color: C.white }}>{p}</button>
+                ))}
+              </div>
+            </div>
           </div>
-        </div>
+        )}
 
-        {/* Voice Search Modal */}
-        {showVoiceModal && (
-          <div className="fixed inset-0 bg-black bg-opacity-25 flex items-center justify-center z-50" onClick={closeVoiceModal}>
-            <div className="bg-[#181818] rounded-3xl shadow-2xl p-8 w-[500px] max-w-[90vw]" onClick={(e) => e.stopPropagation()}>
-              {/* Header */}
-              <h2 className="text-2xl font-semibold text-[#242527] mb-8">Speak</h2>
-              
-              {/* Mic Button with Animation */}
+        {/* Voice modal */}
+        {voiceModal && (
+          <div
+            className="fixed inset-0 flex items-center justify-center z-50"
+            style={{ background: 'rgba(0,0,0,0.7)' }}
+            onClick={() => { if (recognition && isListening) recognition.stop(); setVoiceModal(false); setIsListening(false); }}
+          >
+            <div
+              className="rounded-3xl p-8 w-[480px] max-w-[90vw]"
+              style={{ background: C.panel }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <h2 className="text-2xl font-semibold mb-8" style={{ color: C.white }}>Speak</h2>
               <div className="flex justify-center mb-8">
                 <button
                   onClick={toggleListening}
-                  className={`w-20 h-20 rounded-full flex items-center justify-center transition-all duration-300 ${
-                    isListening 
-                      ? 'bg-[#43573b] animate-pulse shadow-lg' 
-                      : 'bg-[#43573b] hover:bg-[#374829] shadow-lg'
-                  }`}
+                  className={`w-20 h-20 rounded-full flex items-center justify-center transition-all ${isListening ? 'animate-pulse' : ''}`}
+                  style={{ background: C.green }}
                 >
-                  <Mic className="h-8 w-8 text-white" />
+                  <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 24 24"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm0-12c1.1 0 2 .9 2 2v6c0 1.1-.9 2-2 2s-2-.9-2-2V4c0-1.1.9-2 2-2zm4 10c0 2.97-2.16 5.43-5 5.91V21h-2v-3.09C7.16 17.43 5 14.97 5 12h2c0 2.21 1.79 4 4 4s4-1.79 4-4h2z"/></svg>
                 </button>
               </div>
-              
-              {/* Transcript Text */}
-              <p className="text-base text-[#333] text-center min-h-[60px]">
-                {voiceText || (isListening ? 'Listening...' : '')}
+              <p className="text-center min-h-[48px]" style={{ color: C.gray, fontSize: 16 }}>
+                {voiceText || (isListening ? 'Listening...' : 'Tap the mic to start')}
               </p>
-              
-              {/* Browser Support Warning */}
-              {!recognition && (
-                <p className="text-xs text-red-500 text-center mt-4">
-                  Speech recognition is not supported in your browser. Please use Chrome or Edge.
-                </p>
-              )}
             </div>
           </div>
         )}
 
-        {/* Search Results Container or Loading State */}
-        {!showResults ? (
-          <div className="flex-1 flex items-center justify-center h-[calc(100vh-80px)]">
-            <div 
-              className={`flex flex-col items-center justify-center transition-all duration-700 ${
-                isSearching ? 'opacity-100 scale-100' : 'opacity-0 scale-95'
-              }`}
-            >
-              {/* Mascot Image */}
-              <div className="mb-6">
-                <img 
-                  src="http://localhost:3845/assets/82b9f2b6ee13b45763ef3c3a3ffc5b2b30b247c4.png" 
-                  alt="Searching"
-                  className="w-[187px] h-[279px] object-contain"
-                  onError={(e) => {
-                    e.target.style.display = 'none';
-                    e.target.nextElementSibling.style.display = 'flex';
-                  }}
+        {/* Content area */}
+        <div className="flex-1 overflow-hidden">
+
+          {/* Searching state */}
+          {!showResults && (
+            <div className="flex flex-col items-center justify-center h-full">
+              <div
+                className="flex flex-col items-center transition-all duration-700"
+                style={{ opacity: isSearching ? 1 : 0, transform: isSearching ? 'scale(1)' : 'scale(0.95)' }}
+              >
+                <img
+                  src="/assets/searching_look.svg"
+                  alt=""
+                  style={{ width: 187, height: 279, objectFit: 'contain' }}
+                  onError={(e) => { e.currentTarget.style.display = 'none'; }}
                 />
-                {/* Fallback mascot */}
-                <div className="w-[187px] h-[279px] hidden items-center justify-center">
-                  <Search className="w-24 h-24 text-teal-600 animate-pulse" />
-                </div>
+                <p
+                  className="mt-4 text-center"
+                  style={{
+                    color: '#808080',
+                    fontFamily: 'Inter, sans-serif',
+                    fontSize: 16,
+                    fontWeight: 500,
+                    lineHeight: '120%',
+                    letterSpacing: '0.2px',
+                  }}
+                >
+                  finding results...
+                </p>
               </div>
-              
-              {/* Finding Results Text */}
-              <p className="text-[#808080] text-sm font-medium">
-                finding results...
-              </p>
             </div>
-          </div>
-        ) : (
-          /* Search Results Container */
-          <div className="flex gap-4 px-9 h-[calc(100vh-96px)]">
-            {/* Left Column - Results List */}
-            <div className="flex flex-col gap-2 overflow-y-auto w-[604px] shrink-0 pr-2">
-              {/* Influencer Card 1 */}
-              <InfluencerCard 
-                name="Campaign Chacha"
-                followers="22.4k followers"
-                avatarColor="#016fff"
-                onClick={() => handleInfluencerClick({
-                  id: 1,
-                  name: "Dadi Cool",
-                  username: "@dadi_cool",
-                  followers: "22.4k",
-                  following: "2.1k",
-                  posts: "145",
-                  location: "Delhi, India",
-                  age: "34",
-                  about: "A calm, composed elder figure with soft curls and a thoughtful demeanor. Protocol represents wisdom and acts as a grounding presence. Ideal for adding a mature balance to the set.",
-                  likes: "9.2K",
-                  views: "9.2K"
-                })}
-              />
-              
-              {/* Influencer Card 2 */}
-              <InfluencerCard 
-                name="Campaign Chacha"
-                followers="22.4k followers"
-                avatarColor="#016fff"
-                onClick={() => handleInfluencerClick({
-                  id: 2,
-                  name: "Dadi Cool",
-                  username: "@dadi_cool",
-                  followers: "22.4k",
-                  following: "2.1k",
-                  posts: "145",
-                  location: "Delhi, India",
-                  age: "34",
-                  about: "A calm, composed elder figure with soft curls and a thoughtful demeanor. Protocol represents wisdom and acts as a grounding presence. Ideal for adding a mature balance to the set.",
-                  likes: "9.2K",
-                  views: "9.2K"
-                })}
-              />
-              
-              {/* Influencer Card 3 */}
-              <InfluencerCard 
-                name="Campaign Chacha"
-                followers="22.4k followers"
-                avatarColor="#016fff"
-                onClick={() => handleInfluencerClick({
-                  id: 3,
-                  name: "Dadi Cool",
-                  username: "@dadi_cool",
-                  followers: "22.4k",
-                  following: "2.1k",
-                  posts: "145",
-                  location: "Delhi, India",
-                  age: "34",
-                  about: "A calm, composed elder figure with soft curls and a thoughtful demeanor. Protocol represents wisdom and acts as a grounding presence. Ideal for adding a mature balance to the set.",
-                  likes: "9.2K",
-                  views: "9.2K"
-                })}
-              />
-              
-              {/* Upgrade Banner */}
-              <div className="flex items-center bg-[#e7edfb] rounded-xl px-3 py-2 gap-3">
-                <Info className="h-6 w-6 text-[#0b4fd9] shrink-0" />
-                <div className="flex items-center flex-1 gap-3">
-                  <p className="text-sm text-[#242527] flex-1">
-                    You have reached your limit. Upgrade plan for more.
+          )}
+
+          {/* Results state */}
+          {showResults && (
+            <div className="fade-up flex h-full pr-5 items-stretch" style={{ gap: 16, paddingTop: 20, paddingBottom: 20, paddingLeft: 0 }}>
+
+              {/* Left: cards */}
+              <div
+                className="flex-shrink-0 overflow-y-auto flex flex-col rounded-[28px] px-4 py-4"
+                style={{
+                  width: 450,
+                  gap: 12,
+                  background: '#181818',
+                  border: '1px solid rgba(255,255,255,0.03)',
+                  boxShadow: '0 18px 40px rgba(0,0,0,0.25)',
+                }}
+              >
+                <div className="px-1 pb-3">
+                  <p style={{ color: C.white, fontFamily: 'Inter, sans-serif', fontSize: 22, fontWeight: 400, lineHeight: '1.2' }}>
+                    Top Influencers
                   </p>
-                  <button className="bg-[#0b4fd9] text-white px-3 py-2 rounded-full text-sm font-medium hover:bg-[#0a45c2] transition-colors">
+                </div>
+
+                {/* Filter pills */}
+                <div className="flex gap-2 pb-3 overflow-x-auto flex-shrink-0" style={{ scrollBehavior: 'smooth', minWidth: 0 }}>
+                  {['All', 'Fitness', 'Comedy', 'Travel', 'Tech', 'Lifestyle'].map((filter) => (
+                    <button
+                      key={filter}
+                      onClick={() => setActiveFilter(filter)}
+                      className="flex-shrink-0 rounded-full px-4 py-1.5 font-medium transition-all"
+                      style={{
+                        background: activeFilter === filter ? C.green : 'rgba(255,255,255,0.1)',
+                        color: activeFilter === filter ? '#000' : C.white,
+                        border: 'none',
+                        fontFamily: 'Inter, sans-serif',
+                        fontSize: 13,
+                        fontWeight: 500,
+                        whiteSpace: 'nowrap',
+                        cursor: 'pointer',
+                      }}
+                    >
+                      {filter}
+                    </button>
+                  ))}
+                </div>
+
+                {/* Upgrade banner */}
+                <div
+                  style={{
+                    background: C.upgradeBg,
+                    borderRadius: 8,
+                    height: 70,
+                    borderLeft: `4px solid ${C.orange}`,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    padding: '0 10px 0 16px',
+                    flexShrink: 0,
+                  }}
+                >
+                  <div className="flex items-center gap-2" style={{ flex: 1, minWidth: 0 }}>
+                    <svg viewBox="0 0 24 24" fill="currentColor" style={{ width: 20, height: 20, color: C.white, flexShrink: 0 }}>
+                      <path d="M12 2a10 10 0 110 20A10 10 0 0112 2zm0 14a1 1 0 100 2 1 1 0 000-2zm0-9a1 1 0 00-1 1v5a1 1 0 002 0V8a1 1 0 00-1-1z"/>
+                    </svg>
+                    <p style={{ color: C.white, fontFamily: 'Inter, sans-serif', fontSize: 12, fontWeight: 400, lineHeight: '140%' }}>
+                      You have reached your limit. Upgrade plan for more.
+                    </p>
+                  </div>
+                  <button
+                    className="flex-shrink-0 hover:opacity-90 transition-opacity"
+                    style={{
+                      background: '#73400B',
+                      color: C.white,
+                      borderRadius: 40,
+                      width: 80,
+                      height: 28,
+                      border: 'none',
+                      cursor: 'pointer',
+                      fontFamily: 'Inter, sans-serif',
+                      fontSize: 12,
+                      fontWeight: 400,
+                      marginLeft: 8,
+                    }}
+                  >
                     Upgrade
                   </button>
                 </div>
+
+                {SAMPLE.map((inf) => (
+                  <InfluencerCard
+                    key={inf.id}
+                    inf={inf}
+                    isInvited={invited.has(inf.id)}
+                    isSelected={selected?.id === inf.id}
+                    onInvite={() => setInvited(new Set([...invited, inf.id]))}
+                    onClick={() => setSelected(selected?.id === inf.id ? null : inf)}
+                  />
+                ))}
+              </div>
+
+              {/* Right: profile */}
+              <div
+                className="flex-1 rounded-[28px] overflow-hidden"
+                style={{
+                  minWidth: 0,
+                  background: '#181818',
+                  border: '1px solid rgba(255,255,255,0.03)',
+                  boxShadow: '0 18px 40px rgba(0,0,0,0.25)',
+                }}
+              >
+                {selected ? (
+                  <InfluencerProfile
+                    inf={selected}
+                    isInvited={invited.has(selected.id)}
+                    onInvite={() => setInvited(new Set([...invited, selected.id]))}
+                    onBack={() => setSelected(null)}
+                  />
+                ) : (
+                  <div className="w-full h-full flex flex-col items-center justify-center gap-4">
+                    <img
+                      src="/assets/phyo_logo_new.svg"
+                      alt="Phyo"
+                      style={{ width: 240, height: 60, objectFit: 'contain', opacity: 0.6 }}
+                      onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                    />
+                    <p style={{ color: '#666666', fontFamily: 'Manrope, sans-serif', fontSize: 16, fontWeight: 500, lineHeight: '24px', letterSpacing: '0' }}>
+                      A PyroMedia Product
+                    </p>
+                  </div>
+                )}
               </div>
             </div>
-
-            {/* Right Column - Influencer Profile or Empty State */}
-            <div className="flex-1 m-1 shadow-[0_0_20px_rgba(0,0,0,0.1)] rounded-lg">
-              {selectedInfluencer ? (
-                <InfluencerProfile influencer={selectedInfluencer} />
-              ) : (
-                <div className="w-full h-full bg-[#F0F0F0] rounded-lg flex flex-col items-center justify-center p-8">
-                  <div className="w-[286px] h-[74px] mb-1">
-                    <img 
-                      src="/assets/phyo_logo_new.svg"
-                      alt="Phyo Logo"
-                      className="w-full h-full object-contain"
-                    />
-                  </div>
-                  <p className="text-[#808080] text-lg font-semibold">
-                    A PyroMedia Product
-                  </p>
-                </div>
-              )}
-            </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </>
   );
 }
 
-// Influencer Card Component
-function InfluencerCard({ name, followers, avatarColor, onClick }) {
+function InfluencerCard({ inf, isInvited, isSelected, onInvite, onClick }) {
+  const [toast, setToast] = useState(false);
+  const handleInvite = (e) => { e.stopPropagation(); onInvite(); setToast(true); setTimeout(() => setToast(false), 2500); };
+
   return (
-    <div 
-      onClick={onClick}
-      className="bg-[#F0F0F0] border-2 border-white rounded-xl py-4 m-1 flex flex-col gap-2 max-w[50%] cursor-pointer  hover:scale-[1.01] transition-transform duration-200"
-    >
-      {/* Profile Section */}
-      <div className="flex items-start px-4 gap-4">
-        {/* Avatar */}
-        <div 
-          className="w-16 h-16 rounded-full shrink-0"
-          style={{ backgroundColor: avatarColor }}
-        >
-          {/* Avatar placeholder - you can add actual avatar images here */}
+    <>
+      {toast && (
+        <div className="fixed top-5 left-1/2 -translate-x-1/2 z-[9999] px-6 py-3 rounded-xl text-sm shadow-xl" style={{ background: '#333', color: C.white }}>
+          Invite sent
         </div>
-        
-        {/* Name and Followers */}
-        <div className="flex-1 flex flex-col gap-2 pb-2">
-          <h3 className="text-xl font-semibold text-[#242527] leading-7">
-            {name}
-          </h3>
-          <p className="text-base text-[#333]">
-            {followers}
-          </p>
+      )}
+      <div
+        onClick={onClick}
+        className="flex items-center justify-between flex-shrink-0 cursor-pointer transition-all"
+        style={{
+          height: 80,
+          background: C.card,
+          borderRadius: 16,
+          padding: '12px 16px',
+          border: isSelected ? `1px solid ${C.green}` : '1px solid rgba(255,255,255,0.08)',
+          gap: 16,
+        }}
+        onMouseEnter={(e) => { if (!isSelected) e.currentTarget.style.borderColor = 'rgba(22,163,74,0.3)'; }}
+        onMouseLeave={(e) => { if (!isSelected) e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)'; }}
+      >
+        <div className="flex items-center" style={{ gap: 16, flex: 1, minWidth: 0 }}>
+          <div className="flex-shrink-0 rounded-full overflow-hidden" style={{ width: 56, height: 56, background: inf.avatarColor || '#555' }} />
+          <div className="flex flex-col" style={{ gap: 2 }}>
+            <span style={{ color: C.white, fontFamily: 'Bricolage Grotesque, sans-serif', fontSize: 18, fontWeight: 400, lineHeight: '120%' }}>{inf.name}</span>
+            <span style={{ color: C.gray, fontFamily: 'Inter, sans-serif', fontSize: 14, fontWeight: 400, lineHeight: '120%' }}>{inf.followers} Followers</span>
+          </div>
         </div>
-      </div>
-      
-      {/* Action Buttons */}
-      <div className="flex gap-2 px-4 justify-center">
-        <button 
-          onClick={(e) => {
-            e.stopPropagation();
-            // Handle send message
+        <button
+          onClick={handleInvite}
+          className="flex-shrink-0 flex items-center justify-center gap-1.5 hover:opacity-90 transition-opacity"
+          style={{
+            background: isInvited ? 'rgba(22,163,74,0.3)' : C.green,
+            borderRadius: 40,
+            border: isInvited ? `1px solid ${C.green}` : 'none',
+            cursor: 'pointer',
+            fontFamily: 'Inter, sans-serif',
+            fontSize: 14,
+            fontWeight: 500,
+            color: C.white,
+            padding: '6px 16px',
+            whiteSpace: 'nowrap',
           }}
-          className="flex items-center gap-1 px-4 py-2 border border-[#43573b] rounded-full text-[#43573b] text-sm font-medium hover:bg-[#f5f8f1] transition-colors"
         >
-          <MessageSquare className="h-5 w-5" />
-          send message
-        </button>
-        <button 
-          onClick={(e) => {
-            e.stopPropagation();
-            // Handle invite
-          }}
-          className="flex items-center gap-1 px-4 py-2 border border-[#43573b] rounded-full text-[#43573b] text-sm font-medium hover:bg-[#f5f8f1] transition-colors"
-        >
-          <UserPlus className="h-5 w-5" />
-          invite
+          <UserAddLine style={{ width: 18, height: 18 }} />
+          {isInvited ? 'Invited' : 'Invitations'}
         </button>
       </div>
-    </div>
+    </>
   );
 }
 
-// Influencer Profile Component (Right Side Panel)
-function InfluencerProfile({ influencer }) {
-  const [showMoreMenu, setShowMoreMenu] = useState(false);
-  const [showSaveModal, setShowSaveModal] = useState(false);
-  const [showNewListModal, setShowNewListModal] = useState(false);
-  const [newListName, setNewListName] = useState('');
-  const moreMenuRef = useRef(null);
-  
-  // Sample lists data
-  const [savedLists, setSavedLists] = useState([
-    { id: 1, name: 'Favorties', initials: 'AB', color: '#0066ff' },
-    { id: 2, name: 'Campaign 1', initials: 'AB', color: '#0066ff' }
-  ]);
-
-  // Close menu when clicking outside
-  useEffect(() => {
-    function handleClickOutside(event) {
-      if (moreMenuRef.current && !moreMenuRef.current.contains(event.target)) {
-        setShowMoreMenu(false);
-      }
-    }
-    if (showMoreMenu) {
-      document.addEventListener('mousedown', handleClickOutside);
-    }
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [showMoreMenu]);
-
-  const handleSaveToList = (listId) => {
-    // Handle saving to list
-    console.log('Saving to list:', listId);
-    setShowSaveModal(false);
-  };
-
-  const handleCreateNewList = () => {
-    if (newListName.trim()) {
-      const newList = {
-        id: savedLists.length + 1,
-        name: newListName,
-        initials: 'AB',
-        color: '#0066ff'
-      };
-      setSavedLists([...savedLists, newList]);
-      setNewListName('');
-      setShowNewListModal(false);
-      setShowSaveModal(true);
-    }
+function InfluencerProfile({ inf, isInvited, onInvite, onBack }) {
+  const router = useRouter();
+  const [toast, setToast] = useState(false);
+  const handleInvite = () => { onInvite(); setToast(true); setTimeout(() => setToast(false), 2500); };
+  const profile = {
+    name: 'Dadi Cool', username: '@dadi_cool', location: 'Mumbai, India',
+    followers: '2.4M', engagement: '6.8%', campaigns: '48',
+    about: 'Fitness-first creator blending tech reviews with wellness content. Known for high-trust, community-driven storytelling. Works best with purpose-led brands focused on real outcomes.',
+    categories: ['Fitness', 'Comedy', 'Travel', 'Infra', 'Label', 'Comedy'],
+    gender: { female: 60, male: 40 },
+    ageGroups: [
+      { range: '12-18', val: 75 },
+      { range: '19-24', val: 45 },
+      { range: '24-34', val: 55 },
+      { range: '35-45', val: 30 },
+      { range: '46-55', val: 40 },
+      { range: '56-65', val: 25 },
+      { range: '65+', val: 35 }
+    ],
+    locations: [
+      { country: 'IN', val: 70 },
+      { country: 'DL', val: 60 },
+      { country: 'USA', val: 50 },
+      { country: 'NY', val: 45 },
+      { country: 'UK', val: 40 },
+      { country: 'LON', val: 35 },
+      { country: 'UAE', val: 30 },
+      { country: 'DUB', val: 25 }
+    ],
+    topCampaigns: [
+      { name: 'Nike Campaign', engagement: '71%', followers: '1.4M' },
+      { name: 'Apple Campaign', engagement: '65%', followers: '1.2M' },
+      { name: 'Samsung Campaign', engagement: '58%', followers: '1.1M' }
+    ],
+    reviews: [
+      { brand: 'Nike India', role: 'Marketing Lead', rating: 5, text: 'Aarya delivered beyond brief. Authenticity was off the charts DMs flooded with leads.' },
+      { brand: 'Nike India', role: 'Marketing Lead', rating: 5, text: 'Aarya delivered beyond brief. Authenticity was off the charts DMs flooded with leads.' }
+    ]
   };
 
   return (
-    <div className="w-full h-full relative rounded-lg overflow-y-auto">
-      {/* Yellow Background - Sticky at top */}
-      <div className="sticky top-0 bg-yellow-400 h-[400px] z-0">
-        {/* Profile Image - Centered */}
-        <div className="absolute inset-0 flex items-center justify-center pt-8">
-          <div className="w-64 h-64 rounded-full overflow-hidden shadow-lg">
-            {/* Placeholder for profile image */}
-            <div className="w-full h-full bg-gradient-to-br from-orange-300 to-red-400"></div>
-          </div>
-        </div>
-        
-        {/* Top Action Buttons - Overlaid */}
-        <div className="absolute top-4 left-4 right-4 flex justify-between z-10">
-          <button className="w-10 h-10 bg-[#181818] rounded-full flex items-center justify-center hover:bg-[#262626] shadow-md">
-            <ArrowLeft className="h-5 w-5" />
-          </button>
-          <div className="flex gap-2">
-            <button 
-              onClick={() => setShowSaveModal(true)}
-              className="w-10 h-10 bg-[#181818] rounded-full flex items-center justify-center hover:bg-[#262626] shadow-md"
-            >
-              <BookmarkLine className="h-5 w-5" />
-            </button>
-            <div className="relative" ref={moreMenuRef}>
-              <button 
-                onClick={() => setShowMoreMenu(!showMoreMenu)}
-                className="w-10 h-10 bg-[#181818] rounded-full flex items-center justify-center hover:bg-[#262626] shadow-md"
-              >
-                <MoreVertical className="h-5 w-5" />
-              </button>
-              
-              {/* More Menu Dropdown */}
-              {showMoreMenu && (
-                <div className="absolute right-0 mt-2 w-48 bg-[#181818] rounded-lg shadow-lg py-2 z-50">
-                  <button 
-                    onClick={() => {
-                      setShowMoreMenu(false);
-                      // Report functionality
-                    }}
-                    className="w-full px-4 py-2 text-left text-sm text-[#9A9A9A] hover:bg-[#262626] flex items-center gap-2"
-                  >
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 21v-4m0 0V5a2 2 0 012-2h6.5l1 1H21l-3 6 3 6h-8.5l-1-1H5a2 2 0 00-2 2zm9-13.5V9" />
-                    </svg>
-                    Report
-                  </button>
-                  <button 
-                    onClick={() => {
-                      setShowMoreMenu(false);
-                      // Not interested functionality
-                    }}
-                    className="w-full px-4 py-2 text-left text-sm text-[#9A9A9A] hover:bg-[#262626] flex items-center gap-2"
-                  >
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
-                    </svg>
-                    Not interested
-                  </button>
-                  <button 
-                    onClick={() => {
-                      setShowMoreMenu(false);
-                      // Share functionality
-                    }}
-                    className="w-full px-4 py-2 text-left text-sm text-[#9A9A9A] hover:bg-[#262626] flex items-center gap-2"
-                  >
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
-                    </svg>
-                    Share
-                  </button>
+    <div
+      className="relative w-full h-full flex flex-col overflow-hidden"
+      style={{
+        background: '#181818',
+      }}
+    >
+      {toast && <div className="fixed top-5 left-1/2 -translate-x-1/2 z-[9999] px-6 py-3 rounded-xl text-sm shadow-xl" style={{ background: '#333', color: C.white }}>Invite sent</div>}
+
+      <div className="flex-1 overflow-y-auto">
+        {/* Profile Card */}
+        <div className="px-5 pt-5 pb-4" style={{ position: 'relative', zIndex: 10 }}>
+          {/* Avatar + Name + Bookmark */}
+          <div className="relative mb-4" style={{ minHeight: 124 }}>
+            <div className="absolute inset-0 opacity-45" style={{ background: 'radial-gradient(circle at 20% 10%, rgba(255,255,255,0.35), transparent 38%), radial-gradient(circle at 80% 30%, rgba(255,255,255,0.18), transparent 32%)' }} />
+            <div className="absolute inset-x-0 bottom-0 h-20" style={{ background: 'linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.12) 100%)' }} />
+            <div className="relative flex gap-3 items-start">
+              <div className="w-[100px] h-[100px] rounded-full flex-shrink-0 border-2 overflow-hidden shadow-[0_0_74px_rgba(0,0,0,0.55)]" style={{ background: inf.avatarColor || '#555', borderColor: C.white }} />
+              <div className="flex-1 pt-2">
+                <div className="flex items-center gap-2 mb-1">
+                  <h2 className="text-[24px] leading-[1.2] font-semibold" style={{ color: C.white, fontFamily: 'Bricolage Grotesque, sans-serif' }}>{profile.name}</h2>
+                  <span style={{ color: '#8FC2A5', fontSize: '18px' }}>✓</span>
                 </div>
-              )}
-            </div>
-          </div>
-        </div>
-      </div>
-      
-      {/* Save to List Modal */}
-      {showSaveModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-25 flex items-center justify-center z-50" onClick={() => setShowSaveModal(false)}>
-          <div className="bg-[#181818] rounded-3xl shadow-xl w-[480px]" onClick={(e) => e.stopPropagation()}>
-            {/* Header */}
-            <div className="px-4 pt-4 pb-3">
-              <h3 className="text-lg font-semibold text-[#242527]">Save to...</h3>
-            </div>
-            
-            {/* List Items */}
-            <div className="flex flex-col">
-              {savedLists.map((list) => (
-                <div key={list.id} className="flex items-center px-4 py-3 hover:bg-[#000201]">
-                  <div 
-                    className="w-12 h-12 rounded-full flex items-center justify-center text-white font-semibold mr-4"
-                    style={{ backgroundColor: list.color }}
-                  >
-                    {list.initials}
-                  </div>
-                  <div className="flex-1">
-                    <p className="text-base font-semibold text-[#242527]">{list.name}</p>
-                  </div>
-                  <button 
-                    onClick={() => handleSaveToList(list.id)}
-                    className="p-2 hover:bg-[#262626] rounded-full"
-                  >
-                    <BookmarkLine className="h-5 w-5" />
-                  </button>
-                </div>
-              ))}
-            </div>
-            
-            {/* New List Button */}
-            <div className="px-4 pb-4">
-              <button 
-                onClick={() => {
-                  setShowSaveModal(false);
-                  setShowNewListModal(true);
-                }}
-                className="w-full bg-[#dae3d1] text-[#43573b] py-3 rounded-full font-semibold hover:bg-[#c9d9ba] transition-colors flex items-center justify-center gap-2"
-              >
-                <span className="text-xl">+</span>
-                New List
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-      
-      {/* New List Modal */}
-      {showNewListModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-25 flex items-center justify-center z-50" onClick={() => setShowNewListModal(false)}>
-          <div className="bg-[#f0f0f0] rounded-lg p-6 w-[400px]" onClick={(e) => e.stopPropagation()}>
-            <h3 className="text-lg font-semibold text-[#242527] mb-4">New List</h3>
-            
-            <input
-              type="text"
-              placeholder="Placeholder"
-              value={newListName}
-              onChange={(e) => setNewListName(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && handleCreateNewList()}
-              className="w-full bg-[#f0f0f0] border-2 border-[#e6e6e6] rounded-lg px-4 py-3 mb-4 text-sm focus:outline-none focus:border-[#43573b]"
-              autoFocus
-            />
-            
-            <div className="flex gap-2 justify-end">
-              <button
-                onClick={() => {
-                  setShowNewListModal(false);
-                  setNewListName('');
-                }}
-                className="px-6 py-2 border border-[#43573b] text-[#43573b] rounded-lg font-medium hover:bg-[#262626] transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleCreateNewList}
-                className="px-6 py-2 bg-[#43573b] text-white rounded-lg font-medium hover:bg-[#374829] transition-colors"
-              >
-                Create
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Profile Content - White card that scrolls over yellow background */}
-      <div className="relative bg-[#181818] rounded-t-3xl -mt-8 z-10 shadow-lg">
-        <div className="px-4 py-6 pb-28">
-          {/* Username and Name */}
-          <div className="mb-6">
-            <p className="text-[#808080] text-base font-semibold leading-6 tracking-[0.24px] mb-1">{influencer.username}</p>
-            <h2 className="text-[#242527] text-4xl font-bold leading-[48px] tracking-[-0.32px]">{influencer.name}</h2>
-          </div>
-
-          {/* Stats Badges */}
-          <div className="flex gap-2 mb-6">
-            <div className="bg-[#0b4fd9] border border-[#0a48c5] px-1.5 py-1 rounded flex items-center gap-1">
-              <svg className="w-5 h-5" viewBox="0 0 20 20" fill="none">
-                <path d="M10 2.5C10 2.5 3.75 5 3.75 10V15C3.75 15.663 4.01339 16.2989 4.48223 16.7678C4.95107 17.2366 5.58696 17.5 6.25 17.5H10M10 2.5V17.5M10 2.5C10 2.5 16.25 5 16.25 10V15C16.25 15.663 15.9866 16.2989 15.5178 16.7678C15.0489 17.2366 14.413 17.5 13.75 17.5H10M10 17.5V2.5" stroke="#b3c8f3" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
-              <span className="text-[#b3c8f3] text-base font-semibold leading-6 tracking-[0.24px]">{influencer.followers}</span>
-            </div>
-            <div className="bg-[#0b4fd9] border border-[#0a48c5] px-1.5 py-1 rounded flex items-center gap-1">
-              <svg className="w-5 h-5" viewBox="0 0 20 20" fill="none">
-                <path d="M10 10C11.3807 10 12.5 8.88071 12.5 7.5C12.5 6.11929 11.3807 5 10 5C8.61929 5 7.5 6.11929 7.5 7.5C7.5 8.88071 8.61929 10 10 10ZM10 10C7.5 10 5 11.25 5 13.75V15H15V13.75C15 11.25 12.5 10 10 10Z" stroke="#b3c8f3" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
-              <span className="text-[#b3c8f3] text-base font-semibold leading-6 tracking-[0.24px]">{influencer.following}</span>
-            </div>
-            <div className="bg-[#0b4fd9] border border-[#0a48c5] px-1.5 py-1 rounded flex items-center gap-1">
-              <svg className="w-5 h-5" viewBox="0 0 20 20" fill="none">
-                <rect x="3.75" y="5" width="12.5" height="10" rx="1" stroke="#b3c8f3" strokeWidth="1.5"/>
-                <path d="M3.75 8.75H16.25" stroke="#b3c8f3" strokeWidth="1.5"/>
-              </svg>
-              <span className="text-[#b3c8f3] text-base font-semibold leading-6 tracking-[0.24px]">{influencer.posts}</span>
-            </div>
-          </div>
-
-          {/* Location and Age */}
-          <div className="flex gap-5 mb-6">
-            <div className="flex-1">
-              <p className="text-[#242527] text-xl font-semibold leading-7 tracking-[-0.14px] mb-1">Location</p>
-              <div className="flex items-center gap-1">
-                <svg className="w-4 h-4" viewBox="0 0 16 16" fill="none">
-                  <path d="M8 8.66667C8.73638 8.66667 9.33333 8.06971 9.33333 7.33333C9.33333 6.59695 8.73638 6 8 6C7.26362 6 6.66667 6.59695 6.66667 7.33333C6.66667 8.06971 7.26362 8.66667 8 8.66667Z" fill="#ff4f4f"/>
-                  <path d="M8 1.33333C6.23189 1.33333 4.66667 2.89856 4.66667 4.66667C4.66667 7.33333 8 12 8 12C8 12 11.3333 7.33333 11.3333 4.66667C11.3333 2.89856 9.76811 1.33333 8 1.33333Z" stroke="#ff4f4f" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                <p className="text-sm" style={{ color: 'rgba(255,255,255,0.72)', fontFamily: 'Inter, sans-serif' }}>{profile.username} | {profile.location}</p>
+              </div>
+              <button className="w-[40px] h-[40px] flex items-center justify-center hover:bg-white/10 rounded-full relative z-10">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: C.white }}>
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h6a2 2 0 012 2v12a2 2 0 01-2 2H7a2 2 0 01-2-2V5z" />
                 </svg>
-                <span className="text-[#808080] text-base leading-6">{influencer.location}</span>
-              </div>
-            </div>
-            <div className="flex-1">
-              <p className="text-[#242527] text-xl font-semibold leading-7 tracking-[-0.14px] mb-1">Age</p>
-              <span className="text-[#808080] text-base leading-6">{influencer.age}</span>
+              </button>
             </div>
           </div>
 
-          {/* About Section */}
-          <div className="mb-6">
-            <h3 className="text-[#242527] text-xl font-semibold leading-7 tracking-[-0.14px] mb-1">About</h3>
-            <p className="text-[#808080] text-base leading-6 text-justify">
-              {influencer.about}
-            </p>
+          {/* Categories */}
+          <div className="flex flex-wrap gap-2 mb-4 max-w-[353px]">
+            {profile.categories.map((cat, i) => (
+              <span key={i} className="px-4 py-1 rounded-full text-xs font-medium" style={{ background: 'rgba(255,255,255,0.12)', color: C.white, fontFamily: 'Inter, sans-serif' }}>
+                {cat}
+              </span>
+            ))}
           </div>
 
-          {/* Interactions Section */}
-          <div className="mb-6">
-            <h3 className="text-[#242527] text-xl font-semibold leading-7 tracking-[-0.14px] mb-3">Interactions</h3>
-            
-            {/* Likes and Views Graphs */}
-            <div className="flex gap-3 overflow-x-auto mb-6">
-              {/* Likes Graph */}
-              <div className="bg-[#181818] border-[0.5px] border-[#e6e6e6] rounded-xl p-2 min-w-[380px] flex-shrink-0">
-                <div className="mb-2">
-                  <p className="text-[#242527] text-base font-semibold leading-6 tracking-[0.24px]">{influencer.likes} Likes</p>
-                  <div className="flex items-center gap-1 text-xs">
-                    <svg className="w-4 h-4" viewBox="0 0 16 16" fill="none">
-                      <path d="M11 8L8 5L5 8" stroke="#067635" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                      <path d="M11 11L8 8L5 11" stroke="#067635" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                    </svg>
-                    <span className="text-[#067635] font-medium">24%</span>
-                    <span className="text-[#808080]">vs</span>
-                    <span className="text-[#808080]">last month</span>
+          {/* Stats Grid */}
+          <div className="grid grid-cols-3 gap-3">
+            {[
+              { label: 'Followers', val: profile.followers },
+              { label: 'Engagement', val: profile.engagement },
+              { label: 'Campaigns', val: profile.campaigns }
+            ].map(({ label, val }) => (
+              <div key={label} className="text-center rounded-[12px] py-5" style={{ background: C.card }}>
+                <p className="text-[24px] leading-[1.2] font-normal" style={{ color: C.white, fontFamily: 'Bricolage Grotesque, sans-serif' }}>{val}</p>
+                <p className="text-[16px]" style={{ color: C.gray, fontFamily: 'Inter, sans-serif' }}>{label}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Biography */}
+        <div className="px-5 pt-4 pb-5">
+          <p className="mb-2" style={{ color: C.white, fontFamily: 'Bricolage Grotesque, sans-serif', fontSize: 24, fontWeight: 400, lineHeight: '1.2', textTransform: 'capitalize' }}>Biography</p>
+          <p className="text-sm leading-6" style={{ color: C.gray, fontFamily: 'Inter, sans-serif' }}>{profile.about}</p>
+        </div>
+
+        {/* Top Campaigns */}
+        <div className="px-5 mb-5 pb-5">
+          <div className="flex justify-between items-center mb-3">
+            <p style={{ color: C.white, fontFamily: 'Bricolage Grotesque, sans-serif', fontSize: 24, fontWeight: 400, lineHeight: '1.2', textTransform: 'capitalize' }}>Top Campaigns</p>
+            <a href="#" className="text-xs" style={{ color: C.green, fontFamily: 'Inter, sans-serif' }}>View All ›</a>
+          </div>
+          <div className="space-y-2">
+            {profile.topCampaigns.map((camp, i) => (
+              <div key={i} className="flex items-center justify-between text-sm p-2 rounded-[8px] hover:bg-white/5 transition-colors" style={{ background: C.card }}>
+                <div className="flex items-center gap-2">
+                  <div className="w-11 h-11 rounded-[4px]" style={{ background: inf.avatarColor || '#555' }} />
+                  <div>
+                    <span className="block" style={{ color: C.white, fontFamily: 'Bricolage Grotesque, sans-serif', fontSize: 16 }}>{camp.name}</span>
+                    <span className="block text-xs" style={{ color: C.gray, fontFamily: 'Inter, sans-serif' }}>{profile.username}</span>
                   </div>
                 </div>
-                
-                <div className="flex gap-2">
-                  <div className="flex flex-col justify-between text-[#333] text-xs py-2">
-                    <span>10K</span>
-                    <span>8K</span>
-                    <span>4K</span>
-                    <span>2K</span>
-                    <span>0</span>
-                  </div>
-                  <div className="flex-1 relative h-[217px]">
-                    <svg className="absolute inset-0 w-full h-full" viewBox="0 0 352 217" preserveAspectRatio="none">
-                      <path d="M0 126.089L58.9259 95.5895L117.852 47.5895L176.778 79.5895L235.704 71.5895L294.63 103.589L353.556 2.58955" stroke="#43573b" strokeWidth="2" fill="none"/>
-                      <path d="M0 126.089L58.9259 95.5895L117.852 47.5895L176.778 79.5895L235.704 71.5895L294.63 103.589L353.556 2.58955V217H0V126.089Z" fill="#43573b" fillOpacity="0.2"/>
-                    </svg>
-                  </div>
-                </div>
-                
-                <div className="flex justify-between text-[#333] text-xs text-center mt-2 pl-6">
-                  <span className="w-[60px]">July</span>
-                  <span className="w-[60px]">Aug</span>
-                  <span className="w-[60px]">Sep</span>
-                  <span className="w-[60px]">Oct</span>
-                  <span className="w-[60px]">Nov</span>
-                  <span className="w-[60px]">Dec</span>
+                <div className="text-right">
+                  <span className="block text-[16px]" style={{ color: C.green, fontFamily: 'Inter, sans-serif' }}>{camp.engagement} eng.</span>
+                  <span className="block text-[13px]" style={{ color: C.gray, fontFamily: 'Inter, sans-serif' }}>{camp.followers} followers</span>
                 </div>
               </div>
+            ))}
+          </div>
+        </div>
 
-              {/* Views Graph */}
-              <div className="bg-[#181818] border-[0.5px] border-[#e6e6e6] rounded-xl p-2 min-w-[380px] flex-shrink-0">
-                <div className="mb-2">
-                  <p className="text-[#242527] text-base font-semibold leading-6 tracking-[0.24px]">{influencer.views} views</p>
-                  <div className="flex items-center gap-1 text-xs">
-                    <svg className="w-4 h-4" viewBox="0 0 16 16" fill="none">
-                      <path d="M11 8L8 5L5 8" stroke="#067635" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                      <path d="M11 11L8 8L5 11" stroke="#067635" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                    </svg>
-                    <span className="text-[#067635] font-medium">24%</span>
-                    <span className="text-[#808080]">vs</span>
-                    <span className="text-[#808080]">last month</span>
-                  </div>
-                </div>
-                
-                <div className="flex gap-2">
-                  <div className="flex flex-col justify-between text-[#333] text-xs py-2">
-                    <span>10K</span>
-                    <span>8K</span>
-                    <span>4K</span>
-                    <span>2K</span>
-                    <span>0</span>
-                  </div>
-                  <div className="flex-1 relative h-[217px]">
-                    <svg className="absolute inset-0 w-full h-full" viewBox="0 0 352 217" preserveAspectRatio="none">
-                      <path d="M0 134L58.9259 103.5L117.852 55.5L176.778 87.5L235.704 79.5L294.63 111.5L353.802 8" stroke="#43573b" strokeWidth="2" fill="none"/>
-                      <path d="M0 134L58.9259 103.5L117.852 55.5L176.778 87.5L235.704 79.5L294.63 111.5L353.802 8V217H0V134Z" fill="#43573b" fillOpacity="0.2"/>
-                    </svg>
-                  </div>
-                </div>
-                
-                <div className="flex justify-between text-[#333] text-xs text-center mt-2 pl-6">
-                  <span className="w-[60px]">July</span>
-                  <span className="w-[60px]">Aug</span>
-                  <span className="w-[60px]">Sep</span>
-                  <span className="w-[60px]">Oct</span>
-                  <span className="w-[60px]">Nov</span>
-                  <span className="w-[60px]">Dec</span>
-                </div>
+        {/* Audience Insights */}
+        <div className="px-5 mb-5 pb-5">
+          <p className="mb-4" style={{ color: C.white, fontFamily: 'Bricolage Grotesque, sans-serif', fontSize: 24, fontWeight: 400, lineHeight: '1.2', textTransform: 'capitalize' }}>Audience Insights</p>
+
+          {/* Gender Chart */}
+          <div className="mb-6 rounded-[24px] p-5 relative overflow-hidden" style={{ background: C.card, minHeight: 220 }}>
+            <p className="text-[16px] font-semibold mb-2" style={{ color: C.white, fontFamily: 'Bricolage Grotesque, sans-serif' }}>Gender</p>
+            <div className="absolute right-5 top-5 flex gap-4 text-[12px]" style={{ color: C.white, fontFamily: 'Inter, sans-serif' }}>
+              <span><span className="inline-block w-2 h-2 rounded-full mr-1" style={{ background: '#8FC2A5' }} />Female</span>
+              <span><span className="inline-block w-2 h-2 rounded-full mr-1" style={{ background: C.green }} />Male</span>
+            </div>
+            <div className="flex items-center justify-center pt-2">
+              <div className="relative w-[171px] h-[171px] rounded-full border-[18px]" style={{ borderColor: 'rgba(67, 160, 71, 0.18)' }}>
+                <div className="absolute inset-0 rounded-full border-[18px] border-transparent border-r-[#8FC2A5] border-b-[#8FC2A5] border-l-transparent border-t-transparent rotate-45" />
+                <div className="absolute left-[118px] top-[33px] bg-[#8FC2A5] text-black text-[12px] rounded-[4px] px-2 py-1 font-semibold">36%</div>
+                <div className="absolute left-[20px] bottom-[25px] bg-[#067635] text-white text-[12px] rounded-[4px] px-2 py-1 font-semibold">62%</div>
               </div>
             </div>
           </div>
 
-          {/* Audience Insights */}
-          <div className="mb-6">
-            <h3 className="text-[#242527] text-xl font-semibold leading-7 tracking-[-0.14px] mb-3">Audience Insights</h3>
-            
-            {/* Age Group */}
-            <div className="bg-[#181818] border-[0.5px] border-[#e6e6e6] rounded-xl p-2 mb-3">
-              <p className="text-[#242527] text-base font-semibold leading-6 tracking-[0.24px] mb-2">Age Group</p>
-              <div className="flex gap-2">
-                <div className="flex flex-col justify-between text-[#333] text-xs py-2 text-right" style={{ minWidth: '32px' }}>
-                  <span>100%</span>
-                  <span>80%</span>
-                  <span>60%</span>
-                  <span>40%</span>
-                  <span>20%</span>
-                  <span>0%</span>
-                </div>
-                <div className="flex-1 flex items-end justify-around gap-[6px] pb-1" style={{ height: '150px' }}>
-                  <div className="flex-1 flex flex-col items-center justify-end min-w-[24px] max-w-[32px]">
-                    <div className="w-full bg-[#43573b] rounded-t-lg" style={{ height: '99px' }}></div>
-                  </div>
-                  <div className="flex-1 flex flex-col items-center justify-end min-w-[24px] max-w-[32px]">
-                    <div className="w-full bg-[#43573b] rounded-t-lg" style={{ height: '75px' }}></div>
-                  </div>
-                  <div className="flex-1 flex flex-col items-center justify-end min-w-[24px] max-w-[32px]">
-                    <div className="w-full bg-[#43573b] rounded-t-lg" style={{ height: '84px' }}></div>
-                  </div>
-                  <div className="flex-1 flex flex-col items-center justify-end min-w-[24px] max-w-[32px]">
-                    <div className="w-full bg-[#43573b] rounded-t-lg" style={{ height: '45px' }}></div>
-                  </div>
-                  <div className="flex-1 flex flex-col items-center justify-end min-w-[24px] max-w-[32px]">
-                    <div className="w-full bg-[#43573b] rounded-t-lg" style={{ height: '72px' }}></div>
-                  </div>
-                  <div className="flex-1 flex flex-col items-center justify-end min-w-[24px] max-w-[32px]">
-                    <div className="w-full bg-[#43573b] rounded-t-lg" style={{ height: '60px' }}></div>
-                  </div>
-                </div>
+          {/* Age Groups Chart */}
+          <div className="mb-6 rounded-[24px] p-5" style={{ background: C.card }}>
+            <p className="text-[16px] font-semibold mb-3" style={{ color: C.white, fontFamily: 'Bricolage Grotesque, sans-serif' }}>Age groups</p>
+            <div className="flex gap-3">
+              <div className="flex flex-col justify-between h-[226px] text-[12px]" style={{ color: C.white, fontFamily: 'Inter, sans-serif' }}>
+                <span>100%</span><span>80%</span><span>60%</span><span>40%</span><span>20%</span><span>0%</span>
               </div>
-              <div className="flex justify-around text-[#333] text-xs text-center mt-2 pl-8 gap-[6px]">
-                <span className="flex-1 min-w-[24px] max-w-[32px]">12-18</span>
-                <span className="flex-1 min-w-[24px] max-w-[32px]">19-24</span>
-                <span className="flex-1 min-w-[24px] max-w-[32px]">24-34</span>
-                <span className="flex-1 min-w-[24px] max-w-[32px]">35-50</span>
-                <span className="flex-1 min-w-[24px] max-w-[32px]">50-65</span>
-                <span className="flex-1 min-w-[24px] max-w-[32px]">65+</span>
-              </div>
-            </div>
-
-            {/* Gender */}
-            <div className="bg-[#181818] border-[0.5px] border-[#e6e6e6] rounded-xl p-2 mb-3">
-              <p className="text-[#242527] text-base font-semibold leading-6 tracking-[0.24px] mb-2">Gender</p>
-              <div className="flex items-center justify-center py-4">
-                <svg width="150" height="150" viewBox="0 0 150 150">
-                  <circle cx="75" cy="75" r="65" fill="none" stroke="#9ba194" strokeWidth="20"/>
-                  <circle cx="75" cy="75" r="65" fill="none" stroke="#43573b" strokeWidth="20" 
-                    strokeDasharray="245 408" strokeDashoffset="0" transform="rotate(-90 75 75)"/>
-                </svg>
-              </div>
-              <div className="flex items-center justify-center gap-4">
-                <div className="flex items-center gap-1">
-                  <div className="w-3 h-3 rounded-full bg-[#43573b]"></div>
-                  <span className="text-[#333] text-xs">Male</span>
-                </div>
-                <div className="flex items-center gap-1">
-                  <div className="w-3 h-3 rounded-full bg-[#9ba194]"></div>
-                  <span className="text-[#333] text-xs">Female</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Top Locations */}
-            <div className="bg-[#181818] border-[0.5px] border-[#e6e6e6] rounded-xl p-2">
-              <p className="text-[#242527] text-base font-semibold leading-6 tracking-[0.24px] mb-2">Top Locations</p>
-              <div className="flex gap-2">
-                <div className="flex flex-col justify-between text-[#333] text-xs py-2 text-right" style={{ minWidth: '32px' }}>
-                  <span>100%</span>
-                  <span>80%</span>
-                  <span>60%</span>
-                  <span>40%</span>
-                  <span>20%</span>
-                  <span>0%</span>
-                </div>
-                <div className="flex-1 flex items-end justify-around gap-[6px] pb-1" style={{ height: '150px' }}>
-                  {/* In */}
-                  <div className="flex items-end justify-center" style={{ minWidth: '24px' }}>
-                    <div className="w-8 bg-[#43573b] rounded-t-lg" style={{ height: '105px' }}></div>
+              <div className="flex-1 flex items-end gap-1 h-[226px]">
+                {profile.ageGroups.map((group, i) => (
+                  <div key={i} className="flex-1 flex flex-col items-center h-full justify-end">
+                    <div className="w-full rounded-t-[8px]" style={{ background: C.green, height: `${Math.max(group.val * 1.8, 8)}px` }} />
+                    <p className="text-[12px] mt-2" style={{ color: C.white, fontFamily: 'Inter, sans-serif' }}>{group.range}</p>
                   </div>
-                  {/* DL */}
-                  <div className="flex items-end justify-center" style={{ minWidth: '24px' }}>
-                    <div className="w-8 bg-[#9ba194] rounded-t-lg" style={{ height: '95px' }}></div>
-                  </div>
-                  {/* USA */}
-                  <div className="flex items-end justify-center" style={{ minWidth: '24px' }}>
-                    <div className="w-8 bg-[#43573b] rounded-t-lg" style={{ height: '78px' }}></div>
-                  </div>
-                  {/* NY */}
-                  <div className="flex items-end justify-center" style={{ minWidth: '24px' }}>
-                    <div className="w-8 bg-[#9ba194] rounded-t-lg" style={{ height: '95px' }}></div>
-                  </div>
-                  {/* UK */}
-                  <div className="flex items-end justify-center" style={{ minWidth: '24px' }}>
-                    <div className="w-8 bg-[#43573b] rounded-t-lg" style={{ height: '72px' }}></div>
-                  </div>
-                  {/* Lon */}
-                  <div className="flex items-end justify-center" style={{ minWidth: '24px' }}>
-                    <div className="w-8 bg-[#9ba194] rounded-t-lg" style={{ height: '53px' }}></div>
-                  </div>
-                  {/* UAE */}
-                  <div className="flex items-end justify-center" style={{ minWidth: '24px' }}>
-                    <div className="w-8 bg-[#43573b] rounded-t-lg" style={{ height: '68px' }}></div>
-                  </div>
-                  {/* Dub */}
-                  <div className="flex items-end justify-center" style={{ minWidth: '24px' }}>
-                    <div className="w-8 bg-[#9ba194] rounded-t-lg" style={{ height: '78px' }}></div>
-                  </div>
-                </div>
-              </div>
-              <div className="flex justify-around text-[#333] text-xs text-center mt-2 pl-8 gap-[6px]">
-                <span style={{ minWidth: '24px' }}>In</span>
-                <span style={{ minWidth: '24px' }}>DL</span>
-                <span style={{ minWidth: '24px' }}>USA</span>
-                <span style={{ minWidth: '24px' }}>NY</span>
-                <span style={{ minWidth: '24px' }}>UK</span>
-                <span style={{ minWidth: '24px' }}>Lon</span>
-                <span style={{ minWidth: '24px' }}>UAE</span>
-                <span style={{ minWidth: '24px' }}>Dub</span>
-              </div>
-              <div className="flex items-center justify-center gap-3 mt-3">
-                <div className="flex items-center gap-1">
-                  <div className="w-3 h-3 rounded bg-[#43573b]"></div>
-                  <span className="text-[#333] text-xs">Top Countries</span>
-                </div>
-                <div className="flex items-center gap-1">
-                  <div className="w-3 h-3 rounded bg-[#9ba194]"></div>
-                  <span className="text-[#333] text-xs">Top Cities</span>
-                </div>
+                ))}
               </div>
             </div>
           </div>
 
-          {/* Similar Influencers */}
-          <div className="mb-6">
-            <h3 className="text-[#242527] text-xl font-semibold leading-7 tracking-[-0.14px] mb-3">Similar Influencers</h3>
-            
-            <div className="flex gap-3 overflow-x-auto pb-2">
-              {/* Similar Influencer Card 1 */}
-              <div className="bg-[#f0f0f0] border-2 border-white rounded-xl overflow-hidden min-w-[375px] flex-shrink-0">
-                <p className="text-[#808080] text-xs px-4 pt-2">Health & Lifestyle</p>
-                <div className="aspect-[375/216] bg-gradient-to-br from-orange-200 to-pink-200"></div>
-                <div className="px-4 pb-4 pt-2 flex items-center gap-2">
-                  <div className="w-12 h-12 bg-[#008490] rounded-full flex-shrink-0"></div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-[#242527] text-xl font-semibold leading-7 tracking-[-0.14px] truncate">Emily Johnson</p>
-                    <p className="text-[#333] text-base">22.4K follower</p>
-                  </div>
-                </div>
+          {/* Top Locations Chart */}
+          <div className="rounded-[24px] p-5" style={{ background: C.card }}>
+            <p className="text-[16px] font-semibold mb-3" style={{ color: C.white, fontFamily: 'Bricolage Grotesque, sans-serif' }}>Top locations</p>
+            <div className="flex gap-3">
+              <div className="flex flex-col justify-between h-[226px] text-[12px]" style={{ color: C.white, fontFamily: 'Inter, sans-serif' }}>
+                <span>100%</span><span>80%</span><span>60%</span><span>40%</span><span>20%</span><span>0%</span>
               </div>
-              
-              {/* Similar Influencer Card 2 */}
-              <div className="bg-[#f0f0f0] border-2 border-white rounded-xl overflow-hidden min-w-[375px] flex-shrink-0">
-                <p className="text-[#808080] text-xs px-4 pt-2">Health & Lifestyle</p>
-                <div className="aspect-[375/216] bg-gradient-to-br from-blue-200 to-purple-200"></div>
-                <div className="px-4 pb-4 pt-2 flex items-center gap-2">
-                  <div className="w-12 h-12 bg-[#008490] rounded-full flex-shrink-0"></div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-[#242527] text-xl font-semibold leading-7 tracking-[-0.14px] truncate">Emily Johnson</p>
-                    <p className="text-[#333] text-base">22.4K follower</p>
+              <div className="flex-1 flex items-end gap-1 h-[226px]">
+                {profile.locations.map((loc, i) => (
+                  <div key={i} className="flex-1 flex flex-col items-center h-full justify-end">
+                    <div className="w-full rounded-t-[8px]" style={{ background: i % 2 === 0 ? C.green : '#8FC2A5', height: `${Math.max(loc.val * 1.8, 8)}px` }} />
+                    <p className="text-[12px] mt-2" style={{ color: C.white, fontFamily: 'Inter, sans-serif' }}>{loc.country}</p>
                   </div>
-                </div>
+                ))}
               </div>
             </div>
+          </div>
+        </div>
 
-            {/* Page indicators */}
-            <div className="flex items-center justify-center gap-2 mt-3">
-              <div className="w-2 h-2 rounded-full bg-[#242527]"></div>
-              <div className="w-2 h-2 rounded-full bg-[#e6e6e6]"></div>
-              <div className="w-2 h-2 rounded-full bg-[#e6e6e6]"></div>
-              <div className="w-2 h-2 rounded-full bg-[#e6e6e6]"></div>
+        {/* Content Highlights */}
+        <div className="px-5 mb-5 pb-5">
+          <div className="flex items-center justify-between mb-3">
+            <p style={{ color: C.white, fontFamily: 'Bricolage Grotesque, sans-serif', fontSize: 24, fontWeight: 400, lineHeight: '1.2', textTransform: 'capitalize' }}>Content highlights</p>
+            <div className="bg-[#262626] px-3 py-1 rounded-full text-[14px]" style={{ color: C.white, fontFamily: 'Inter, sans-serif' }}>Reels</div>
+          </div>
+          <div className="grid grid-cols-3 gap-2">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="aspect-[0.62] rounded-[16px] relative overflow-hidden" style={{ background: 'linear-gradient(135deg, #EC4899, #D946EF)' }}>
+                <div className="absolute inset-0 bg-black/55" />
+                <div className="absolute inset-0 flex items-end p-3">
+                  <div className="flex gap-1 text-[12px]" style={{ color: C.white, fontFamily: 'Work Sans, sans-serif' }}>
+                    <span>❤️ 62K</span>
+                    <span>💬 10K</span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Campaign Reviews */}
+        <div className="px-5 mb-32">
+          <div className="flex items-center justify-between mb-3">
+            <div className="text-[64px] leading-none font-bold" style={{ color: C.white, fontFamily: 'Bricolage Grotesque, sans-serif' }}>4.9</div>
+            <div className="text-right">
+              <div className="text-yellow-400 text-[18px]">★★★★★</div>
+              <p className="text-[14px]" style={{ color: C.gray, fontFamily: 'Inter, sans-serif' }}>31 brand reviews</p>
             </div>
+          </div>
+          <p className="mb-3" style={{ color: C.white, fontFamily: 'Bricolage Grotesque, sans-serif', fontSize: 24, fontWeight: 400, lineHeight: '1.2', textTransform: 'capitalize' }}>Campaign Reviews</p>
+          <div className="space-y-3">
+            {profile.reviews.map((review, i) => (
+              <div key={i} className="bg-[#262626] rounded-[16px] p-4 border border-white/5">
+                <div className="flex justify-between items-start mb-2">
+                  <div>
+                    <p className="text-[20px] font-bold" style={{ color: C.white, fontFamily: 'Bricolage Grotesque, sans-serif' }}>{review.brand}</p>
+                    <p className="text-[14px]" style={{ color: C.gray, fontFamily: 'Inter, sans-serif' }}>{review.role}</p>
+                  </div>
+                  <div className="flex gap-0.5">
+                    {[...Array(review.rating)].map((_, j) => (
+                      <span key={j} style={{ color: '#FCD34D', fontSize: '14px' }}>★</span>
+                    ))}
+                  </div>
+                </div>
+                <p className="text-[14px] leading-6" style={{ color: C.gray, fontFamily: 'Inter, sans-serif' }}>"{review.text}"</p>
+              </div>
+            ))}
           </div>
         </div>
       </div>
 
-      {/* Bottom Action Buttons - Sticky at bottom */}
-      <div className="sticky bottom-0 bg-[#181818] border-t border-white/10 px-4 py-4 z-20 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)]">
-        <div className="flex gap-3">
-          <button className="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-[#dae3d1] rounded-full text-[#43573b] text-base font-semibold hover:bg-[#c9d9ba] transition-colors tracking-[0.24px]">
-            <UserPlus className="h-6 w-6" />
-            Invite
-          </button>
-          <button className="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-[#43573b] rounded-full text-white text-base font-semibold hover:bg-[#374829] transition-colors tracking-[0.24px]">
-            <MessageSquare className="h-6 w-6" />
-            Send Message
-          </button>
-        </div>
+      {/* Action Buttons */}
+      <div className="flex-shrink-0 px-5 py-4 border-t border-white/10 bg-[#0d0d0d] flex gap-3">
+        <button
+          onClick={handleInvite}
+          className="flex-1 flex items-center justify-center hover:opacity-90 transition-opacity"
+          style={{
+            background: '#262626',
+            color: C.white,
+            borderRadius: 40,
+            padding: '10px 40px 11px 41px',
+            border: 'none',
+            fontFamily: 'Inter, sans-serif',
+            fontSize: 14,
+            fontWeight: 500,
+            lineHeight: '1.2',
+          }}
+        >
+          {isInvited ? '✓ Invited' : '+ Invite'}
+        </button>
+        <button
+          onClick={() => router.push(`/influencer/inbox/${inf.id}?name=${encodeURIComponent(profile.name)}`)}
+          className="flex-1 py-2.5 rounded-lg font-semibold text-sm hover:opacity-90 transition-opacity"
+          style={{
+            background: '#16A34A',
+            color: C.white,
+            borderRadius: 40,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '10px 40px 11px 41px',
+            border: 'none',
+            fontFamily: 'Inter, sans-serif',
+            fontSize: 14,
+            fontWeight: 500,
+            lineHeight: '1.2',
+          }}
+        >
+          Message
+        </button>
       </div>
     </div>
   );

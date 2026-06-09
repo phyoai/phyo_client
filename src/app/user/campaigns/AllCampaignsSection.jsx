@@ -1262,7 +1262,7 @@ const AllCampaignsSection = () => {
     <div className="bg-[#181818] h-screen overflow-hidden flex flex-col">
       {/* Fixed App Bar - Only header */}
       <div className="flex-shrink-0 bg-[#181818] border-b border-white/5">
-        <div className="px-4 sm:px-6 lg:px-9 py-3 sm:py-4">
+        <div className="pr-4 sm:pr-6 lg:pr-9 py-3 sm:py-4" style={{ paddingLeft: 0 }}>
           {/* App Bar */}
           <div className="flex items-center justify-between">
             {showAllCampaigns || showAllDrafts ? (
@@ -1310,7 +1310,7 @@ const AllCampaignsSection = () => {
       </div>
 
       {/* Scrollable Content Section */}
-      <div className="flex-1 overflow-y-auto px-4 sm:px-6 lg:px-9 py-4 sm:py-6">
+      <div className="flex-1 overflow-y-auto pr-4 sm:pr-6 lg:pr-9 py-4 sm:py-6" style={{ paddingLeft: 0 }}>
         {showAllCampaigns ? (
           // All Campaigns Grid View - Updated to match Figma design
           <div className="mb-8">

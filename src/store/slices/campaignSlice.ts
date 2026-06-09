@@ -44,10 +44,15 @@ export const getCampaigns = createAsyncThunk(
   async (params: any = {}, { rejectWithValue }) => {
     try {
       const response = await apiClient.get('/campaigns', { params });
-      return response.data;
+      const body = response.data;
+      // Normalise: API may return { data: [...] } or { campaigns: [...] }
+      const list = body?.data || body?.campaigns || [];
+      return {
+        data: Array.isArray(list) ? list : [],
+        pagination: body?.pagination || { page: 1, totalPages: 1, totalItems: 0 },
+      };
     } catch (error: any) {
       console.error('Error fetching campaigns:', error.response?.status, error.message);
-      // Return empty data instead of rejecting to prevent crash
       return { data: [], pagination: { page: 1, totalPages: 1, totalItems: 0 } };
     }
   }
