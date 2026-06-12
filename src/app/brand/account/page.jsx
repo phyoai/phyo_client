@@ -8,6 +8,7 @@ import api from '@/utils/api';
 import secureAuthStorage from '@/utils/secure-auth';
 import { useAuth } from '@/app/context/AuthContext';
 import { useLanguage } from '@/app/context/LanguageContext';
+import { useSidebar } from '@/app/context/SidebarContext';
 import { accountApi } from '@/api/account-api';
 import {
   ArrowLeftLine, LockLine, PhoneLine, InformationLine,
@@ -43,6 +44,7 @@ function BrandAccountContent() {
   const router = useRouter();
   const { logout } = useAuth();
   const { t } = useLanguage();
+  const { isExpanded } = useSidebar();
 
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -234,7 +236,7 @@ function BrandAccountContent() {
     ],
   ];
 
-  const subscriptionStatus = user?.subscriptionStatus || 'inactive';
+  const subscriptionStatus = (user?.subscriptionStatus || 'inactive').toLowerCase();
   const currentPlan = user?.currentPlan || 'free';
 
   const CATEGORY_OPTIONS = ['Comedy','Lifestyle','Fashion','Beauty','Tech','Travel','Food','Fitness','Education','Finance','Gaming','Sports','Music'];
@@ -249,6 +251,7 @@ function BrandAccountContent() {
 
   const inputCls = "w-full px-4 py-3 bg-[#262626] border border-[#333] rounded-xl text-sm text-white placeholder-[#666] focus:outline-none focus:ring-2 focus:ring-[#16a34a]";
   const saveBtnCls = "mt-4 w-full h-[44px] bg-[#16a34a] hover:bg-[#15803d] text-white rounded-full text-[15px] font-medium transition-colors disabled:opacity-40";
+  const baseStyle = { fontFamily: 'Inter, sans-serif' };
   const labelCls = "block text-xs font-semibold text-[#9b9b9b] mb-1";
 
   const RightPanelEmail = () => (
@@ -379,15 +382,27 @@ function BrandAccountContent() {
 
       {/* ── Profile Editor — Figma 136:7139 layout ── */}
       {editingSection === 'profile-editor' && (
-        <div className="fixed inset-0 z-50 bg-[#000201] overflow-y-auto">
-          <div className="flex gap-[20px] p-5 min-h-screen">
+        <div className={`fixed top-0 right-0 bottom-0 z-50 bg-[#000201] flex flex-col transition-all duration-300 ${isExpanded ? 'left-[280px]' : 'left-[72px]'}`}>
+          {/* Top Bar */}
+          <div className="h-[80px] bg-[#181818] border-b border-[#2F2F2F] flex items-center px-5 flex-shrink-0 rounded-b-[24px]">
+            <div className="flex items-center justify-between w-full">
+              <h2 className="text-[24px] font-normal text-white" style={{ fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                Edit Profile
+              </h2>
+              <button onClick={closeEditSection} className="text-[#9B9B9B] hover:text-white transition-colors">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <line x1="18" y1="6" x2="6" y2="18"></line>
+                  <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          {/* Main content area */}
+          <div className="flex gap-[20px] p-5 flex-1 overflow-hidden">
 
             {/* Center panel — 2-col form */}
-            <div className="flex-1 bg-[#181818] rounded-[24px] p-[20px] flex flex-col gap-[20px]">
-              <p className="text-[24px] font-normal text-white capitalize text-center leading-[1.2]" style={{ fontFamily: 'Bricolage Grotesque, sans-serif' }}>
-                Edit Profile
-              </p>
-
+            <div className="flex-1 bg-[#181818] rounded-[24px] p-[20px] flex flex-col gap-[20px] overflow-y-auto">
               {/* Form grid — 2 cols, gap-[20px] rows, gap-[20px] between cols */}
               {[
                 [
@@ -495,7 +510,7 @@ function BrandAccountContent() {
           </div>
 
           {/* Bottom action bar */}
-          <div className="sticky bottom-0 flex justify-end gap-[20px] px-5 py-4 bg-[#000201]/80 backdrop-blur">
+          <div className="flex justify-end gap-[20px] px-5 py-4 bg-[#181818] border-t border-[#2F2F2F] flex-shrink-0">
             <button
               onClick={closeEditSection}
               className="border border-white h-[40px] px-[32px] rounded-full text-[16px] font-normal text-white capitalize hover:bg-white/10 transition-colors"
@@ -644,10 +659,11 @@ function BrandAccountContent() {
               </button>
               <button
                 onClick={() => router.push('/brand/account/upgrade-plan')}
-                className="w-full h-[40px] bg-[#16a34a] hover:bg-[#15803d] text-white rounded-full text-[14px] font-medium transition-colors"
+                className={`w-full h-[40px] bg-[#16a34a] hover:bg-[#15803d] text-white rounded-full text-[14px] font-medium transition-colors ${subscriptionStatus === 'active' ? 'opacity-50 cursor-not-allowed' : ''}`}
+                disabled={subscriptionStatus === 'active'}
                 style={{ fontFamily: 'Inter, sans-serif' }}
               >
-                Upgrade Plan
+                {subscriptionStatus === 'active' ? 'Plan Active' : 'Upgrade Plan'}
               </button>
             </div>
 

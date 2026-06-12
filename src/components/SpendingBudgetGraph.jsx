@@ -37,7 +37,7 @@ function GrowthPercentage({ percentage = "24%", comparisonText = "last month" })
 
 function LeftValues() {
   return (
-    <div className="content-stretch flex flex-col font-['Inter:Regular',sans-serif] font-normal h-[226px] items-end justify-between leading-[16px] not-italic relative shrink-0 text-[#333] text-[12px] tracking-[0.16px] w-[22px]">
+    <div className="content-stretch flex flex-col font-['Inter',sans-serif] font-normal h-[226px] items-end justify-between leading-[16px] not-italic relative shrink-0 text-[#9B9B9B] text-[12px] tracking-[0.16px] w-[22px]">
       <p className="relative shrink-0">10K</p>
       <p className="relative shrink-0">8K</p>
       <p className="relative shrink-0">4K</p>
@@ -51,7 +51,7 @@ function BottomValues({ months = ["July", "Aug", "Sep", "Oct", "Nov", "Dec"] }) 
   return (
     <div className="relative shrink-0 w-full">
       <div className="flex flex-row items-center size-full">
-        <div className="content-stretch flex font-['Inter:Regular',sans-serif] font-normal items-center justify-between leading-[16px] not-italic pl-[130px] pr-[100px] relative text-[#333] text-[12px] text-center tracking-[0.16px] w-full">
+        <div className="content-stretch flex font-['Inter',sans-serif] font-normal items-center justify-between leading-[16px] not-italic pl-[130px] pr-[100px] relative text-[#9B9B9B] text-[12px] text-center tracking-[0.16px] w-full">
           {months.map((month, index) => (
             <p key={index} className="relative shrink-0 w-[60px]">{month}</p>
           ))}
@@ -62,33 +62,33 @@ function BottomValues({ months = ["July", "Aug", "Sep", "Oct", "Nov", "Dec"] }) 
 }
 
 // Spending Budget Bar Chart Component
-export function SpendingBudgetGraph({ 
-  title = "₹124,657.80", 
+export function SpendingBudgetGraph({
+  title = "₹124,657.80",
   percentage = "24%",
   barData = [
-    { height: 150, color: "#43573b" },
-    { height: 140, color: "#3ca67e" },
-    { height: 120, color: "#43573b" },
-    { height: 140, color: "#3ca67e" },
-    { height: 110, color: "#43573b" },
-    { height: 85, color: "#3ca67e" },
-    { height: 110, color: "#43573b" },
-    { height: 115, color: "#3ca67e" }
+    { height: 150, color: "linear-gradient(180deg, rgba(22, 163, 74, 0.2) 0%, rgba(8, 61, 28, 0.4) 100%)" },
+    { height: 140, color: "linear-gradient(180deg, rgba(22, 163, 74, 0.2) 0%, rgba(8, 61, 28, 0.4) 100%)" },
+    { height: 120, color: "linear-gradient(180deg, rgba(22, 163, 74, 0.2) 0%, rgba(8, 61, 28, 0.4) 100%)" },
+    { height: 140, color: "linear-gradient(180deg, rgba(22, 163, 74, 0.2) 0%, rgba(8, 61, 28, 0.4) 100%)" },
+    { height: 110, color: "linear-gradient(180deg, rgba(22, 163, 74, 0.2) 0%, rgba(8, 61, 28, 0.4) 100%)" },
+    { height: 85, color: "linear-gradient(180deg, rgba(22, 163, 74, 0.2) 0%, rgba(8, 61, 28, 0.4) 100%)" },
+    { height: 110, color: "linear-gradient(180deg, rgba(22, 163, 74, 0.2) 0%, rgba(8, 61, 28, 0.4) 100%)" },
+    { height: 115, color: "linear-gradient(180deg, rgba(22, 163, 74, 0.2) 0%, rgba(8, 61, 28, 0.4) 100%)" }
   ],
   months = ["July", "Aug", "Sep", "Oct", "Nov", "Dec"]
 }) {
-  // Positions for 8 bars
-  const positions = ["2.5%", "15%", "27.5%", "40%", "52.5%", "65%", "77.5%", "90%"];
-  const rightPositions = ["90%", "77.5%", "65%", "52.5%", "40%", "27.5%", "15%", "2.5%"];
+  // Positions for 8 bars - stretched layout with 11% bar width and 1% gaps
+  const positions = ["1%", "13%", "25%", "37%", "49%", "61%", "73%", "85%"];
+  const rightPositions = ["88%", "76%", "64%", "52%", "40%", "28%", "16%", "4%"];
 
   return (
-    <div className="bg-[#f0f0f0] relative rounded-[12px] shrink-0 w-full">
-      <div aria-hidden="true" className="absolute border-[#e6e6e6] border-[0.5px] border-solid inset-[-0.25px] pointer-events-none rounded-[12.25px]" />
+    <div className="bg-[#181818] relative rounded-[12px] shrink-0 w-full">
+      <div aria-hidden="true" className="absolute border-[#949494]/20 border-[0.5px] border-solid inset-[-0.25px] pointer-events-none rounded-[12.25px]" />
       <div className="content-stretch flex flex-col gap-[8px] items-start p-[8px] relative w-full">
         {/* Header */}
         <div className="content-stretch flex gap-[2px] items-end relative shrink-0 w-full">
           <div className="content-stretch flex flex-[1_0_0] flex-col gap-[2px] items-start min-h-px min-w-px relative">
-            <p className="font-['Work_Sans:Semibold',sans-serif] leading-[24px] not-italic relative shrink-0 text-[#242527] text-[16px] tracking-[0.24px] w-full">{title}</p>
+            <p className="font-['Inter'] font-semibold leading-[24px] not-italic relative shrink-0 text-[#ffffff] text-[16px] tracking-[0.24px] w-full" style={{ fontWeight: 600 }}>{title}</p>
             <GrowthPercentage percentage={percentage} />
           </div>
         </div>
@@ -105,11 +105,11 @@ export function SpendingBudgetGraph({
             {/* Bar Graph */}
             <div className="absolute bottom-0 h-[150px] left-0 overflow-clip right-0">
               {barData.map((bar, index) => (
-                <div 
+                <div
                   key={index}
                   className="absolute bottom-0 rounded-tl-[8px] rounded-tr-[8px]"
                   style={{
-                    backgroundColor: bar.color,
+                    background: bar.color,
                     height: `${bar.height}px`,
                     left: positions[index],
                     right: rightPositions[index]

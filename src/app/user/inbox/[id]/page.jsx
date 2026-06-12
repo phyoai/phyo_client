@@ -219,7 +219,7 @@ export default function ChatPage({ params }) {
           <div className="flex items-center gap-2 sm:gap-3">
             <div className="w-10 sm:w-12 h-10 sm:h-12 rounded-full bg-gradient-to-br from-orange-300 to-red-400 flex-shrink-0"></div>
             <div className="min-w-0">
-              <h3 className="text-base sm:text-lg font-semibold text-[#242527] truncate">{influencerName}</h3>
+              <h3 className="text-base sm:text-lg font-semibold text-[#242527] truncate" style={{ fontFamily: 'Inter, sans-serif' }}>{influencerName}</h3>
               <p className="text-xs sm:text-sm text-[#808080]">Online</p>
             </div>
           </div>

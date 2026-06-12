@@ -537,7 +537,12 @@ function InfluencerProfile({ inf, isInvited, onInvite, onBack }) {
         <div className="px-5 mb-5 pb-5">
           <div className="flex justify-between items-center mb-3">
             <p style={{ color: C.white, fontFamily: 'Bricolage Grotesque, sans-serif', fontSize: 24, fontWeight: 400, lineHeight: '1.2', textTransform: 'capitalize' }}>Top Campaigns</p>
-            <a href="#" className="text-xs" style={{ color: C.green, fontFamily: 'Inter, sans-serif' }}>View All ›</a>
+            <button className="flex items-center gap-1.5 text-xs" style={{ color: C.green, fontFamily: 'Inter, sans-serif', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>
+              View All
+              <svg width="6" height="10" viewBox="0 0 6 10" fill="none" style={{ flexShrink: 0 }}>
+                <path d="M0 0.81727L0.892353 0L5.75277 4.45412C5.83112 4.5255 5.8933 4.61037 5.93573 4.70385C5.97816 4.79734 6 4.89759 6 4.99884C6 5.1001 5.97816 5.20035 5.93573 5.29384C5.8933 5.38732 5.83112 5.47219 5.75277 5.54356L0.892353 10L0.000840664 9.18273L4.56269 5L0 0.81727Z" fill="#16A34A"/>
+              </svg>
+            </button>
           </div>
           <div className="space-y-2">
             {profile.topCampaigns.map((camp, i) => (

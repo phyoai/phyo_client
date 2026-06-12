@@ -1,256 +1,152 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { UserLine, FileCopyLine, DownloadLine, MoreLine } from '@phyoofficial/phyo-icon-library';
-import AppBar from '@/components/ui/AppBar';
-import Button from '@/components/ui/Button';
-import IconButton from '@/components/ui/IconButton';
-import { colors } from '@/config/colors';
-import apiClient from '@/utils/api';
 import { useRoleContext } from '@/app/context/RoleContext';
+import api from '@/utils/api';
 
-export default function BillingHistoryAll() {
+function getInitials(name) {
+  if (!name) return '?';
+  return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+}
+
+function formatAmount(amountInPaise, currency = 'INR') {
+  const amountInRupees = amountInPaise / 100;
+  return `₹${amountInRupees.toFixed(2)}`;
+}
+
+function groupByMonth(transactions) {
+  const groups = {};
+  transactions.forEach(txn => {
+    const date = new Date(txn.createdAt || txn.date || Date.now());
+    const label = date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+    if (!groups[label]) groups[label] = [];
+    groups[label].push(txn);
+  });
+  return Object.fromEntries(
+    Object.entries(groups).sort((a, b) => {
+      const dateA = new Date(a[1][0]?.createdAt);
+      const dateB = new Date(b[1][0]?.createdAt);
+      return dateB - dateA;
+    })
+  );
+}
+
+export default function BillingHistory() {
   const router = useRouter();
   const { role } = useRoleContext();
-  const [paymentHistory, setPaymentHistory] = useState([]);
+  const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [pagination, setPagination] = useState({});
-  const [openMenuId, setOpenMenuId] = useState(null);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [filters, setFilters] = useState({
-    status: null,
-    dateFrom: null,
-    dateTo: null,
-    amountMin: null,
-    amountMax: null
-  });
-  const [showFilters, setShowFilters] = useState(false);
 
-  // Fetch payment history from API
-  const fetchPaymentHistory = async (page = 1) => {
-    try {
-      setLoading(true);
-      setError(null);
-      const response = await apiClient.get(`/account/payments/history?page=${page}&limit=10`);
-      setPaymentHistory(response.data.data || []);
-      setPagination(response.data.pagination || {});
-    } catch (err) {
-      console.error('Error fetching payment history:', err);
-      setError('Failed to load payment history');
-      setPaymentHistory([]);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Fetch payment history on mount and when page changes
   useEffect(() => {
-    fetchPaymentHistory(currentPage);
-  }, [currentPage]);
+    api.get('/account/transactions')
+      .then(res => {
+        const data = res.data?.data || res.data || [];
+        setTransactions(Array.isArray(data) ? data : []);
+      })
+      .catch(() => setTransactions([]))
+      .finally(() => setLoading(false));
+  }, []);
 
-  // Format payment history for display
-  const transactions = paymentHistory.map(payment => ({
-    _id: payment._id,
-    title: payment.description || payment.type,
-    date: new Date(payment.createdAt).toLocaleString(),
-    amount: payment.amount ? `${payment.type === 'credit' ? '+' : '-'}₹${payment.amount}` : '₹0',
-    action: payment.status === 'failed' ? 'Retry Payment' : 'Download Invoice',
-    status: payment.status,
-    isNegative: payment.type !== 'credit'
-  }));
-
-  // Handle retry payment for failed transactions
-  const handleRetryPayment = async (transactionId) => {
-    try {
-      // This would typically call verifyNewPayment with the transaction details
-      console.log('Retrying payment for transaction:', transactionId);
-      await verifyNewPayment('', '', '', '');
-    } catch (err) {
-      console.error('Retry payment failed:', err);
-    }
-  };
-
-  // Loading state
-  if (loading) {
-    return (
-      <div className="h-screen flex flex-col" style={{ backgroundColor: colors.neutral.base }}>
-        <AppBar
-          title="Billing history"
-          onBack={() => router.push('/brand/account')}
-        />
-        <div className="flex-1 flex items-center justify-center">
-          <div className="flex flex-col items-center gap-4">
-            <svg className="animate-spin h-8 w-8" style={{ color: colors.brand.base }} fill="none" viewBox="0 0 24 24">
-              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-            </svg>
-            <p style={{ color: colors.text.neutral.muted }}>Loading transactions...</p>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // Error state
-  if (error && !loading) {
-    return (
-      <div className="h-screen flex flex-col" style={{ backgroundColor: colors.neutral.base }}>
-        <AppBar
-          title="Billing history"
-          onBack={() => router.push('/brand/account')}
-        />
-        <div className="flex-1 flex flex-col items-center justify-center px-4">
-          <p className="text-lg font-semibold mb-4" style={{ color: colors.semantic.error.bold }}>
-            Error loading transactions
-          </p>
-          <p className="text-sm text-center mb-6" style={{ color: colors.text.neutral.muted }}>
-            {error}
-          </p>
-          <Button
-            variant="primary"
-            size="lg"
-            onClick={() => fetchPaymentHistory(currentPage, 10)}
-          >
-            Retry
-          </Button>
-        </div>
-      </div>
-    );
-  }
+  const grouped = groupByMonth(transactions);
 
   return (
-    <div className="h-screen flex flex-col" style={{ backgroundColor: colors.neutral.base }}>
-      <AppBar
-        title="Billing history"
-        onBack={() => router.push('/brand/account')}
-      />
+    <div className="min-h-screen bg-[#000201] text-white p-5">
+      <div className="bg-[#181818] rounded-[24px] p-5">
+        <p
+          className="text-[24px] font-normal text-white capitalize leading-[1.2] mb-5"
+          style={{ fontFamily: 'Bricolage Grotesque, sans-serif', fontVariationSettings: '"opsz" 14, "wdth" 100' }}
+        >
+          Transactions
+        </p>
 
-      {/* Billing History Container */}
-      <div className="flex-1 overflow-y-auto px-3 sm:px-4 md:px-6 lg:px-9 py-3 sm:py-4">
-        <div className="flex flex-col h-full">
-          {transactions.length === 0 ? (
-            /* Empty State */
-            <div className="flex items-center justify-center h-full">
-              <p className="text-xl" style={{ color: colors.text.neutral.muted, fontFamily: 'Manrope, sans-serif' }}>
-                no transactions created yet
-              </p>
-            </div>
-          ) : (
-            <>
-              {/* Section Heading */}
-              <div className="flex items-center justify-between pb-3 pt-6 px-4">
-                <h3 className="text-lg font-semibold" style={{ color: colors.text.neutral.base, fontFamily: 'Manrope, sans-serif' }}>
-                  December 2025
-                </h3>
+        {loading ? (
+          <div className="flex flex-col gap-[10px]">
+            {[...Array(6)].map((_, i) => (
+              <div key={i} className="flex items-center justify-between animate-pulse py-[10px]">
+                <div className="flex items-center gap-[8px]">
+                  <div className="w-[48px] h-[48px] rounded-full bg-[#272626] flex-shrink-0" />
+                  <div className="flex flex-col gap-2">
+                    <div className="h-3 bg-[#272626] rounded w-24" />
+                    <div className="h-2 bg-[#272626] rounded w-48" />
+                  </div>
+                </div>
+                <div className="flex flex-col items-end gap-2">
+                  <div className="h-3 bg-[#272626] rounded w-12" />
+                  <div className="h-2 bg-[#272626] rounded w-24" />
+                </div>
               </div>
+            ))}
+          </div>
+        ) : transactions.length === 0 ? (
+          <p className="text-[#9b9b9b] text-sm text-center py-12">No transactions yet.</p>
+        ) : (
+          Object.entries(grouped).map(([month, txns]) => (
+            <div key={month} className="mb-6">
+              <p
+                className="text-[16px] font-normal text-[#9b9b9b] capitalize leading-[1.2] mb-[10px]"
+                style={{ fontFamily: 'Inter, sans-serif' }}
+              >
+                {month}
+              </p>
+              <div className="flex flex-col gap-[10px]">
+                {txns.map((txn, idx) => {
+                  const id = txn._id || txn.id;
+                  const planName = txn.metadata?.planName || txn.description || 'Payment';
+                  const displayName = `${planName} Plan`;
+                  const status = txn.status || 'PENDING';
+                  const statusLabel = status === 'COMPLETED' ? 'Completed' : 'Pending';
+                  const amount = txn.amount ?? 0;
+                  const formattedAmount = formatAmount(amount, txn.currency);
 
-              {/* Transaction List */}
-              <div className="flex flex-col" style={{ backgroundColor: colors.neutral.base }}>
-                {transactions.map((transaction, index) => (
-                  <div key={transaction.id}>
-                    <div className="flex items-center w-full relative">
-                      {/* Leading Avatar */}
-                      <div className="flex items-center px-4 py-1.5">
-                        <div className="w-12 h-12 rounded-full flex items-center justify-center" style={{ backgroundColor: colors.brand.base }}>
-                          <UserLine className="w-6 h-6 text-white" />
+                  return (
+                    <div key={id || idx}>
+                      <div className="flex items-center justify-between py-[10px]">
+                        <div className="flex items-center gap-[8px]">
+                          <div className="w-[48px] h-[48px] rounded-full bg-[#272626] overflow-hidden flex-shrink-0 flex items-center justify-center">
+                            <span className="text-white text-sm font-semibold">{getInitials(planName)}</span>
+                          </div>
+                          <div className="flex flex-col gap-[4px] min-w-0">
+                            <p
+                              className="text-[16px] font-normal text-white capitalize leading-[1.2]"
+                              style={{ fontFamily: 'Bricolage Grotesque, sans-serif', fontVariationSettings: '"opsz" 14, "wdth" 100' }}
+                            >
+                              {displayName}
+                            </p>
+                            <p
+                              className="text-[12px] font-normal text-[#9b9b9b] leading-[1.2]"
+                              style={{ fontFamily: 'Inter, sans-serif' }}
+                            >
+                              {statusLabel}
+                            </p>
+                          </div>
+                        </div>
+
+                        <div className="flex flex-col items-end gap-[4px] flex-shrink-0 w-[140px]">
+                          <p
+                            className="text-[16px] font-normal capitalize leading-[1.2] text-white"
+                            style={{ fontFamily: 'Bricolage Grotesque, sans-serif', fontVariationSettings: '"opsz" 14, "wdth" 100' }}
+                          >
+                            {formattedAmount}
+                          </p>
+                          <button
+                            onClick={() => router.push(`/${role}/account/upgrade-plan`)}
+                            className="text-[#16a34a] text-[14px] font-normal capitalize leading-[1.4] hover:underline text-right"
+                            style={{ fontFamily: 'Inter, sans-serif' }}
+                          >
+                            View Subscription
+                          </button>
                         </div>
                       </div>
-
-                      {/* Text Content */}
-                      <div className="flex-1 flex flex-col justify-center pr-4 py-3">
-                        <p className="text-base font-semibold truncate" style={{ color: colors.text.neutral.base, fontFamily: 'Work Sans, sans-serif' }}>
-                          {transaction.title}
-                        </p>
-                        <p className="text-sm" style={{ color: colors.text.neutral.muted, fontFamily: 'Work Sans, sans-serif' }}>
-                          {transaction.date}
-                        </p>
-                      </div>
-
-                      {/* Trailing Amount */}
-                      <div className="flex flex-col items-end justify-center pr-4 py-3">
-                        <p className="text-base font-semibold" style={{ color: transaction.isNegative ? colors.semantic.error.bold : colors.text.neutral.base, fontFamily: 'Work Sans, sans-serif' }}>
-                          {transaction.amount}
-                        </p>
-                        <p className="text-sm cursor-pointer hover:underline" style={{ color: colors.text.neutral.muted, fontFamily: 'Work Sans, sans-serif' }}>
-                          {transaction.action}
-                        </p>
-                      </div>
-
-                      {/* Three Dot Menu */}
-                      <div className="relative">
-                        <IconButton
-                          icon={MoreLine}
-                          size="md"
-                          variant="default"
-                          onClick={() => setOpenMenuId(openMenuId === transaction.id ? null : transaction.id)}
-                          className="mr-2"
-                        />
-
-                        {/* Dropdown Menu */}
-                        {openMenuId === transaction.id && (
-                          <div className="absolute right-0 mt-1 w-48 rounded-lg shadow-lg z-10" style={{ backgroundColor: colors.neutral.base, borderColor: colors.neutral.muted, borderWidth: '1px' }}>
-                            <button className="w-full text-left px-4 py-3 text-sm flex items-center gap-2 transition-colors hover:opacity-80" style={{ color: colors.text.neutral.base, borderBottomColor: colors.neutral.muted, borderBottomWidth: '1px' }}>
-                              <DownloadLine className="w-4 h-4" />
-                              Download Invoice
-                            </button>
-                            <button className="w-full text-left px-4 py-3 text-sm flex items-center gap-2 transition-colors hover:opacity-80" style={{ color: colors.text.neutral.base }}>
-                              <FileCopyLine className="w-4 h-4" />
-                              Copy Details
-                            </button>
-                            {transaction.status === 'failed' && (
-                              <button
-                                onClick={() => handleRetryPayment(transaction.id)}
-                                className="w-full text-left px-4 py-3 text-sm flex items-center gap-2 transition-colors hover:opacity-80 border-t"
-                                style={{ color: colors.brand.base, borderTopColor: colors.neutral.muted, borderTopWidth: '1px' }}
-                              >
-                                Retry Payment
-                              </button>
-                            )}
-                          </div>
-                        )}
-                      </div>
+                      {idx < txns.length - 1 && <div className="h-px bg-white/10" />}
                     </div>
-
-                    {/* Divider */}
-                    {index < transactions.length - 1 && (
-                      <div className="h-px w-full" style={{ backgroundColor: colors.neutral.muted }} />
-                    )}
-                  </div>
-                ))}
+                  );
+                })}
               </div>
-            </>
-          )}
-        </div>
+            </div>
+          ))
+        )}
       </div>
-
-      {/* Pagination Controls */}
-      {transactions.length > 0 && pagination && (
-        <div className="sticky bottom-0 px-3 sm:px-4 md:px-6 lg:px-9 py-3 sm:py-4 border-t flex items-center justify-between" style={{ backgroundColor: colors.neutral.base, borderColor: colors.neutral.muted }}>
-          <div className="flex items-center gap-2">
-            <Button
-              variant="secondary"
-              size="sm"
-              disabled={currentPage === 1}
-              onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
-            >
-              Previous
-            </Button>
-            <span style={{ color: colors.text.neutral.base }} className="px-2">
-              Page {currentPage} of {pagination.totalPages || 1}
-            </span>
-            <Button
-              variant="secondary"
-              size="sm"
-              disabled={currentPage >= (pagination.totalPages || 1)}
-              onClick={() => setCurrentPage(currentPage + 1)}
-            >
-              Next
-            </Button>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

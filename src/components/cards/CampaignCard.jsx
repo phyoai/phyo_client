@@ -15,7 +15,7 @@ export default function CampaignCard({
   return (
     <div
       className="rounded-3xl overflow-hidden cursor-pointer shrink-0 w-full flex flex-col h-[260px] transition-all duration-200 border border-white/5"
-      style={{ backgroundColor: hovered ? '#202020' : '#181818' }}
+      style={{ backgroundColor: hovered ? '#F8FFF7' : '#181818' }}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       onClick={onClick}
@@ -28,18 +28,18 @@ export default function CampaignCard({
           </div>
           <div className="flex flex-col gap-1 min-w-0 flex-1">
             <p className="text-base font-medium leading-6 truncate transition-colors duration-200"
-               style={{ color: '#ffffff' }}>
+               style={{ color: hovered ? '#1D1B20' : '#ffffff' }}>
               {brandName}
             </p>
             <p className="text-sm font-normal leading-5 truncate transition-colors duration-200"
-               style={{ color: '#9A9A9A' }}>
+               style={{ color: hovered ? '#49454F' : '#9A9A9A' }}>
               {timeAgo}
             </p>
           </div>
         </div>
         <button
           className="shrink-0 w-12 h-12 flex items-center justify-center rounded-full transition-colors"
-          style={{ color: '#ffffff' }}
+          style={{ color: hovered ? '#1D1B20' : '#ffffff' }}
           onClick={(e) => { e.stopPropagation(); onMenuClick?.(); }}
         >
           <MoreVertical className="w-5 h-5" />
@@ -49,7 +49,7 @@ export default function CampaignCard({
       {/* Media — fills rest */}
       <div
         className="flex-1 relative overflow-hidden transition-colors duration-200"
-        style={{ backgroundColor: hovered ? '#073D1B' : '#252525' }}
+        style={{ backgroundColor: hovered ? '#E6F0E6' : '#252525' }}
       >
         {campaignImage ? (
           <img
@@ -60,7 +60,7 @@ export default function CampaignCard({
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center">
-            <TrendingUp className="w-12 h-12" style={{ color: hovered ? '#16A34A' : 'rgba(255,255,255,0.12)' }} />
+            <TrendingUp className="w-12 h-12" style={{ color: hovered ? '#16A34A' : '#404040' }} />
           </div>
         )}
       </div>

@@ -133,10 +133,10 @@ function DeliverableCard({ deliverable, onApprove, onReject, onRequestChanges, a
             )}
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-white text-[16px] leading-snug" style={{ fontFamily: 'var(--font-bricolage-grotesque)' }}>
+            <p className="text-white text-[15px] font-semibold leading-snug" style={{ fontFamily: 'Inter, sans-serif' }}>
               {deliverable.title || deliverable.type || 'Deliverable'}
             </p>
-            <p className="text-[#9b9b9b] text-[14px] mt-0.5" style={{ fontFamily: 'Inter, sans-serif' }}>
+            <p className="text-[#9b9b9b] text-[12px] mt-1" style={{ fontFamily: 'Inter, sans-serif' }}>
               {deliverable.submittedAt ? `Submitted ${fmt(deliverable.submittedAt)}` : 'Not yet submitted'}
             </p>
           </div>
@@ -151,8 +151,8 @@ function DeliverableCard({ deliverable, onApprove, onReject, onRequestChanges, a
         {/* Caption */}
         {caption && (
           <div className="mb-4">
-            <p className="text-white text-[16px] mb-1" style={{ fontFamily: 'var(--font-bricolage-grotesque)' }}>Caption</p>
-            <p className="text-[#9b9b9b] text-[14px] leading-relaxed" style={{ fontFamily: 'Inter, sans-serif' }}>
+            <p className="text-white text-[14px] font-semibold mb-2" style={{ fontFamily: 'Inter, sans-serif' }}>Caption</p>
+            <p className="text-[#9b9b9b] text-[13px] leading-relaxed" style={{ fontFamily: 'Inter, sans-serif' }}>
               {caption}
             </p>
           </div>
@@ -340,33 +340,33 @@ export default function InfluencersDetailsWithDeliverable({ campaignId: propCamp
   const approvedCount = deliverables.filter(d => (d.brandReview || d.status) === 'accepted').length;
 
   return (
-    <div className="bg-[#000201] min-h-full px-6 py-6 w-full">
+    <div className="bg-[#000201] min-h-full px-8 py-8 w-full">
 
       {/* ── Back button row ── */}
       <button
         onClick={() => router.back()}
-        className="flex items-center gap-1.5 text-[#9b9b9b] hover:text-white transition-colors mb-6 group"
+        className="flex items-center gap-2 text-[#9b9b9b] hover:text-white transition-colors mb-8 group"
       >
-        <ChevronLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
-        <span className="text-[13px]" style={{ fontFamily: 'Inter, sans-serif' }}>Back to Campaign</span>
+        <ChevronLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
+        <span className="text-[14px] font-medium" style={{ fontFamily: 'Inter, sans-serif' }}>Back to Campaign</span>
       </button>
 
       {/* ── Influencer profile card ── */}
-      <div className="bg-[#181818] rounded-[20px] border border-white/5 p-5 mb-6">
+      <div className="bg-[#181818] rounded-[20px] border border-white/5 p-6 mb-8">
         {/* Top row: avatar + name + badge */}
-        <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-4">
-            <div className="w-[60px] h-[60px] rounded-full bg-[#763d06] flex items-center justify-center text-white text-[24px] font-medium shrink-0" style={{ fontFamily: 'Roboto, sans-serif' }}>
+            <div className="w-[64px] h-[64px] rounded-full bg-[#763d06] flex items-center justify-center text-white text-[28px] font-medium shrink-0" style={{ fontFamily: 'Roboto, sans-serif' }}>
               {influencer?.profileImage
                 ? <img src={influencer.profileImage} alt="" className="w-full h-full rounded-full object-cover" />
                 : getInitials(influencerName)
               }
             </div>
             <div>
-              <p className="text-white text-[16px]" style={{ fontFamily: 'var(--font-bricolage-grotesque)' }}>
+              <p className="text-white text-[18px] font-semibold leading-snug" style={{ fontFamily: 'Inter, sans-serif' }}>
                 {influencerName} submitted deliverables
               </p>
-              <p className="text-[#9b9b9b] text-[14px] mt-0.5" style={{ fontFamily: 'Inter, sans-serif' }}>
+              <p className="text-[#9b9b9b] text-[13px] mt-1" style={{ fontFamily: 'Inter, sans-serif' }}>
                 {influencer?.platform || 'Content'} ready for review
               </p>
             </div>
@@ -375,29 +375,27 @@ export default function InfluencersDetailsWithDeliverable({ campaignId: propCamp
         </div>
 
         {/* Divider */}
-        <div className="border-t border-[#767676]/40 mb-4" style={{ borderTopWidth: '0.5px' }} />
+        <div className="border-t border-[#767676]/40 mb-6" style={{ borderTopWidth: '0.5px' }} />
 
-        {/* Stats row */}
-        <div className="flex gap-6">
-          <div>
-            <p className="text-[#9b9b9b] text-[36px] leading-none" style={{ fontFamily: 'var(--font-bricolage-grotesque)' }}>{deliverables.length}</p>
-            <p className="text-[#9b9b9b] text-[16px] mt-1" style={{ fontFamily: 'Inter, sans-serif' }}>Total Deliverables</p>
+        {/* Stats row - Three equal columns */}
+        <div className="grid grid-cols-3 gap-0">
+          <div className="text-center py-4 border-r border-white/10">
+            <p className="text-[#16A34A] text-[44px] font-bold leading-none" style={{ fontFamily: 'Inter, sans-serif' }}>{deliverables.length}</p>
+            <p className="text-[#9b9b9b] text-[13px] mt-3" style={{ fontFamily: 'Inter, sans-serif', fontWeight: 500 }}>Total Deliverables</p>
           </div>
-          <div className="w-px bg-white/5" />
-          <div>
-            <p className="text-[#9b9b9b] text-[36px] leading-none" style={{ fontFamily: 'var(--font-bricolage-grotesque)' }}>{pendingCount}</p>
-            <p className="text-[#9b9b9b] text-[16px] mt-1" style={{ fontFamily: 'Inter, sans-serif' }}>Pending Review</p>
+          <div className="text-center py-4 border-r border-white/10">
+            <p className="text-[#16A34A] text-[44px] font-bold leading-none" style={{ fontFamily: 'Inter, sans-serif' }}>{pendingCount}</p>
+            <p className="text-[#9b9b9b] text-[13px] mt-3" style={{ fontFamily: 'Inter, sans-serif', fontWeight: 500 }}>Pending Review</p>
           </div>
-          <div className="w-px bg-white/5" />
-          <div>
-            <p className="text-[#9b9b9b] text-[36px] leading-none" style={{ fontFamily: 'var(--font-bricolage-grotesque)' }}>{approvedCount}</p>
-            <p className="text-[#9b9b9b] text-[16px] mt-1" style={{ fontFamily: 'Inter, sans-serif' }}>Approved</p>
+          <div className="text-center py-4">
+            <p className="text-[#16A34A] text-[44px] font-bold leading-none" style={{ fontFamily: 'Inter, sans-serif' }}>{approvedCount}</p>
+            <p className="text-[#9b9b9b] text-[13px] mt-3" style={{ fontFamily: 'Inter, sans-serif', fontWeight: 500 }}>Approved</p>
           </div>
         </div>
       </div>
 
       {/* ── Section label ── */}
-      <p className="text-white text-[24px] mb-4" style={{ fontFamily: 'var(--font-bricolage-grotesque)' }}>
+      <p className="text-white text-[20px] font-semibold mb-6" style={{ fontFamily: 'Inter, sans-serif' }}>
         Submitted Deliverables
       </p>
 
@@ -433,8 +431,8 @@ export default function InfluencersDetailsWithDeliverable({ campaignId: propCamp
 
       {/* ── Timeline section ── */}
       {deliverables.length > 0 && (
-        <div className="bg-[#181818] rounded-[20px] border border-white/5 p-5 mt-4">
-          <p className="text-white text-[24px] mb-4" style={{ fontFamily: 'var(--font-bricolage-grotesque)' }}>Timeline</p>
+        <div className="bg-[#181818] rounded-[20px] border border-white/5 p-6 mt-8">
+          <p className="text-white text-[20px] font-semibold mb-6" style={{ fontFamily: 'Inter, sans-serif' }}>Timeline</p>
           <div className="border-t border-[#767676]/40 mb-5" style={{ borderTopWidth: '0.5px' }} />
           <div className="relative flex gap-0">
             {/* Timeline items */}
@@ -449,9 +447,9 @@ export default function InfluencersDetailsWithDeliverable({ campaignId: propCamp
                   <div className="absolute top-[5px] left-1/2 w-full h-px bg-white/10" />
                 )}
                 {/* Dot */}
-                <div className={`w-3 h-3 rounded-full mx-auto mb-3 relative z-10 ${i === 0 ? 'bg-[#16a34a]' : 'bg-white'}`} />
-                <p className="text-white text-[20px] text-center" style={{ fontFamily: 'var(--font-bricolage-grotesque)' }}>{item.label}</p>
-                <p className="text-[#9b9b9b] text-[16px] text-center mt-0.5" style={{ fontFamily: 'Inter, sans-serif' }}>{item.sub}</p>
+                <div className={`w-3 h-3 rounded-full mx-auto mb-4 relative z-10 ${i === 0 ? 'bg-[#16a34a]' : 'bg-white'}`} />
+                <p className="text-white text-[14px] font-semibold text-center" style={{ fontFamily: 'Inter, sans-serif' }}>{item.label}</p>
+                <p className="text-[#9b9b9b] text-[13px] text-center mt-1" style={{ fontFamily: 'Inter, sans-serif' }}>{item.sub}</p>
               </div>
             ))}
           </div>

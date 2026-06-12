@@ -11,7 +11,6 @@ function InfluencerLayoutContent({ children, pathname }) {
   const noSidebarRoutes = [
     '/influencer/signup',
     '/influencer/login',
-    '/influencer/influencers',
   ];
 
   const isNoSidebarRoute = noSidebarRoutes.some(r => pathname === r || pathname.startsWith(r + '/'));

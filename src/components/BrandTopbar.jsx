@@ -9,6 +9,7 @@ const PAGE_TITLES = {
   '/brand/dashboard':                          { title: 'Welcome!',              subtitle: 'Search & Discover popular creators' },
   '/brand/influencer-search':                  { title: 'Search Influencers',    subtitle: 'Find the right creators for your campaign' },
   '/brand/inbox':                              { title: 'Inbox',                 subtitle: 'Your messages and invitations' },
+  '/brand/start-new-chat':                     { title: 'Start New Chat',        subtitle: 'Connect with creators' },
   '/brand/campaigns':                          { title: 'Campaigns',             subtitle: 'Manage your campaigns' },
   '/brand/campaigns/all-campaigns':            { title: 'All Campaigns',         subtitle: 'Browse your active campaigns' },
   '/brand/campaigns/previous-campaigns':       { title: 'Previous Campaigns',    subtitle: 'Completed campaigns' },
@@ -32,6 +33,7 @@ const PAGE_TITLES = {
   // ── User ───────────────────────────────────────────────────────────
   '/user/dashboard':                           { title: 'Welcome!',              subtitle: 'Search & Discover popular creators' },
   '/user/inbox':                               { title: 'Inbox',                 subtitle: 'Your messages and invitations' },
+  '/user/start-new-chat':                      { title: 'Start New Chat',        subtitle: 'Connect with creators' },
   '/user/campaigns':                           { title: 'Campaigns',             subtitle: 'Manage your campaigns' },
   '/user/campaigns/all-campaigns':             { title: 'All Campaigns',         subtitle: 'Browse your active campaigns' },
   '/user/campaigns/all-drafts':                { title: 'Draft Campaigns',       subtitle: 'Your saved drafts' },
@@ -53,6 +55,7 @@ const PAGE_TITLES = {
   // ── Influencer ─────────────────────────────────────────────────────
   '/influencer/dashboard':                     { title: 'Welcome!',              subtitle: 'Search & Discover popular creators' },
   '/influencer/inbox':                         { title: 'Inbox',                 subtitle: 'Your messages and invitations' },
+  '/influencer/start-new-chat':                { title: 'Start New Chat',        subtitle: 'Connect with creators' },
   '/influencer/campaigns':                     { title: 'Campaigns',             subtitle: 'Manage your campaigns' },
   '/influencer/campaigns/all-campaigns':       { title: 'All Campaigns',         subtitle: 'Browse your active campaigns' },
   '/influencer/campaigns/all-drafts':          { title: 'Draft Campaigns',       subtitle: 'Your saved drafts' },

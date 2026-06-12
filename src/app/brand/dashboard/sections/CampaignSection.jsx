@@ -1,10 +1,16 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import SectionHeading from '@/components/SectionHeading';
 import CampaignCard from '@/components/cards/CampaignCard';
 import { campaignApi } from '@/api/campaign-api';
 
 const CATEGORIES = ['All', 'Sports', 'Lifestyle', 'Fashion', 'Travelling'];
+
+const DUMMY_CAMPAIGNS = [
+  { id: 'dc1', name: 'Glow Beyond Filters', timeAgo: '2d ago', color: 'bg-purple-600' },
+  { id: 'dc2', name: 'Fuel Your Finish', timeAgo: '5d ago', color: 'bg-blue-600' },
+  { id: 'dc3', name: 'Pack Light, Go Far', timeAgo: '1w ago', color: 'bg-teal-600' },
+];
 
 export default function CampaignSection({
   title,
@@ -72,11 +78,21 @@ export default function CampaignSection({
             <button
               key={cat}
               onClick={() => setActiveCategory(cat)}
-              className={`px-6 py-1 rounded-full text-sm capitalize transition-colors ${
-                activeCategory === cat
-                  ? 'bg-[#16a34a] text-white'
-                  : 'bg-white/12 text-white hover:bg-white/20'
-              }`}
+              style={{
+                padding: '4px 24px',
+                borderRadius: 40,
+                border: 'none',
+                cursor: 'pointer',
+                fontFamily: 'Inter, sans-serif',
+                fontSize: 14,
+                fontWeight: 400,
+                lineHeight: '120%',
+                color: '#FFFFFF',
+                background: activeCategory === cat ? '#16A34A' : 'rgba(255,255,255,0.12)',
+                transition: 'background 0.15s ease',
+              }}
+              onMouseEnter={(e) => { if (activeCategory !== cat) e.currentTarget.style.background = 'rgba(255,255,255,0.20)'; }}
+              onMouseLeave={(e) => { if (activeCategory !== cat) e.currentTarget.style.background = 'rgba(255,255,255,0.12)'; }}
             >
               {cat}
             </button>
@@ -90,27 +106,21 @@ export default function CampaignSection({
           [...Array(campaignsCount)].map((_, i) => (
             <div key={i} className="bg-[#181818] rounded-2xl h-52 animate-pulse" />
           ))
-        ) : campaigns.length > 0 ? (
-          campaigns.map((campaign, index) => {
+        ) : (campaigns.length > 0 ? campaigns : DUMMY_CAMPAIGNS).map((campaign, index) => {
             const id = campaign.campaignId || campaign._id || campaign.id;
-            const name = campaign.campaignName || campaign.brandId?.companyName || 'Campaign';
+            const name = campaign.campaignName || campaign.brandId?.companyName || campaign.name || 'Campaign';
             return (
               <CampaignCard
                 key={id || index}
                 brandName={name}
                 brandInitials={getInitials(name)}
-                timeAgo={getTimeAgo(campaign.createdAt)}
+                timeAgo={campaign.timeAgo || getTimeAgo(campaign.createdAt)}
                 campaignImage={campaign.productImages?.[0] || null}
-                initialsColor={getInitialsColor(id || String(index))}
-                onClick={() => router.push(`/brand/campaigns/${id}`)}
+                initialsColor={campaign.color || getInitialsColor(id || String(index))}
+                onClick={() => id && !id.startsWith('dc') ? router.push(`/brand/campaigns/${id}`) : null}
               />
             );
-          })
-        ) : (
-          <div className="col-span-full py-8 text-center text-[#9b9b9b] text-sm">
-            No campaigns available
-          </div>
-        )}
+          })}
       </div>
     </div>
   );
