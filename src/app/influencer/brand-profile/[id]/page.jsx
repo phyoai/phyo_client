@@ -1,410 +1,401 @@
-'use client';
-
-import { useState, useEffect } from "react";
-import { useParams, useRouter } from "next/navigation";
-import { YoutubeFill, InstagramFill, TwitterXLine } from '@phyoofficial/phyo-icon-library';
-import { ShieldCheckLine, ExternalLinkLine, GlobeLine, ArrowLeftLine, MoreLine } from '@phyoofficial/phyo-icon-library';
-import api from '@/utils/api';
-
-const SOCIALS = [
-  { platform: "Youtube",   icon: <YoutubeFill size={18} /> },
-  { platform: "Instagram", icon: <InstagramFill size={18} /> },
-  { platform: "Twitter X", icon: <TwitterXLine size={18} /> },
-  { platform: "Website",   icon: <GlobeLine size={18} /> },
-];
-
-
-function CampaignCard({ title, subtitle, img }) {
-  return (
-    <div style={{
-      display: "flex",
-      height: 210,
-      padding: "16px 0",
-      flexDirection: "column",
-      alignItems: "flex-start",
-      gap: 0,
-      alignSelf: "stretch",
-      position: "relative",
-      borderRadius: 14,
-      overflow: "hidden",
-      background: "#1a1a1a",
-      cursor: "pointer",
-      boxSizing: "border-box",
-    }}>
-      {/* Background image */}
-      <img src={img} alt={title} style={{
-        position: "absolute", inset: 0,
-        width: "100%", height: "100%",
-        objectFit: "cover",
-        opacity: 0.65,
-      }} />
-      {/* Text overlay */}
-      <div style={{
-        position: "absolute", inset: 0,
-        padding: "16px",
-        display: "flex", alignItems: "flex-start", gap: 12,
-        background: "linear-gradient(to right, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.1) 60%, transparent 100%)",
-      }}>
-        {/* Avatar */}
-        <div style={{
-          width: 38, height: 38, borderRadius: "50%",
-          background: "#4a6cf7",
-          display: "flex", alignItems: "center", justifyContent: "center",
-          flexShrink: 0,
-          fontSize: 13, fontWeight: 700, color: "#fff",
-          border: "2px solid rgba(255,255,255,0.3)",
-        }}>
-          AC
-        </div>
-        <div>
-          <div style={{ fontSize: 15, fontWeight: 700, color: "#fff", lineHeight: 1.3 }}>{title}</div>
-          <div style={{ fontSize: 12, color: "rgba(255,255,255,0.75)", marginTop: 3 }}>{subtitle}</div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function CampaignsTab({ campaigns = [] }) {
-  const active = campaigns.filter(c => c.status === 'Active');
-  const previous = campaigns.filter(c => c.status !== 'Active');
-  return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
-      <div>
-        <h3 style={{ fontSize: 15, fontWeight: 700, color: "#111", margin: "0 0 10px", paddingLeft: 2 }}>
-          Active Campaigns
-        </h3>
-        {active.length > 0 ? (
-          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-            {active.map(c => (
-              <CampaignCard
-                key={c._id || c.id}
-                title={c.campaignName || 'Campaign'}
-                subtitle={c.campaignType || ''}
-                img={c.productImages?.[0] || 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=600&q=80'}
-              />
-            ))}
-          </div>
-        ) : <p style={{ fontSize: 13, color: "#9b9b9b" }}>No active campaigns</p>}
-      </div>
-      {previous.length > 0 && (
-        <div>
-          <h3 style={{ fontSize: 15, fontWeight: 700, color: "#111", margin: "0 0 10px", paddingLeft: 2 }}>
-            Previous Campaigns
-          </h3>
-          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-            {previous.map(c => (
-              <CampaignCard
-                key={c._id || c.id}
-                title={c.campaignName || 'Campaign'}
-                subtitle={c.campaignType || ''}
-                img={c.productImages?.[0] || 'https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=600&q=80'}
-              />
-            ))}
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
+'use client'
+import React, { useState, useEffect } from 'react';
+import { useParams } from 'next/navigation';
+import { BookmarkLine, ShareLine } from '@phyoofficial/phyo-icon-library';
+import { Clock, Users } from 'lucide-react';
 
 export default function BrandProfile() {
   const params = useParams();
-  const router = useRouter();
-  const [activeTab, setActiveTab] = useState("info");
   const [brand, setBrand] = useState(null);
-  const [brandCampaigns, setBrandCampaigns] = useState([]);
-  const [brandStats, setBrandStats] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [saved, setSaved] = useState(false);
 
-  const brandId = params?.id;
-
-  // Fetch GET /api/brands/:id, /campaigns, /stats
   useEffect(() => {
-    if (!brandId) return;
-    setLoading(true);
-    Promise.all([
-      api.get(`/brands/${brandId}`),
-      api.get(`/brands/${brandId}/campaigns`).catch(() => ({ data: { data: [] } })),
-      api.get(`/brands/${brandId}/stats`).catch(() => ({ data: {} })),
-    ])
-      .then(([brandRes, campaignsRes, statsRes]) => {
-        setBrand(brandRes.data?.data || brandRes.data);
-        const camps = campaignsRes.data?.data || campaignsRes.data?.campaigns || campaignsRes.data || [];
-        setBrandCampaigns(Array.isArray(camps) ? camps : []);
-        setBrandStats(statsRes.data?.data || statsRes.data || null);
-      })
-      .catch((err) => {
-        console.error('Failed to load brand profile:', err);
-        setError(err?.response?.data?.message || 'Failed to load brand');
-      })
-      .finally(() => setLoading(false));
-  }, [brandId]);
+    const fetchBrandProfile = async () => {
+      try {
+        const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'https://phyo-node-server-586564333800.us-central1.run.app/api';
+        const response = await fetch(
+          `${apiBaseUrl}/brands/${params.id}`,
+          {
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          }
+        );
 
-  // Loading state
-  if (loading) {
-    return (
-      <div style={{
-        minHeight: "100vh",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        background: "linear-gradient(180deg, #c8d9be 0%, #d4e2ca 35%, #ddebd4 65%, #eaf2e5 100%)",
-      }}>
-        <div style={{ textAlign: "center" }}>
-          <div style={{ fontSize: 18, fontWeight: 600, color: "#111", marginBottom: 10 }}>Loading brand...</div>
-        </div>
-      </div>
-    );
-  }
+        if (response.ok) {
+          const responseData = await response.json();
+          const apiBrand = responseData.data || responseData;
 
-  // Error state
-  if (error) {
-    return (
-      <div style={{
-        minHeight: "100vh",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        background: "linear-gradient(180deg, #c8d9be 0%, #d4e2ca 35%, #ddebd4 65%, #eaf2e5 100%)",
-      }}>
-        <div style={{ textAlign: "center" }}>
-          <div style={{ fontSize: 18, fontWeight: 600, color: "#d32f2f", marginBottom: 10 }}>Brand not found</div>
-          <button onClick={() => router.back()} style={{
-            padding: "8px 16px",
-            background: "#4a6cf7",
-            color: "white",
-            border: "none",
-            borderRadius: 6,
-            cursor: "pointer",
-          }}>
-            Go Back
-          </button>
-        </div>
-      </div>
-    );
-  }
+          // Merge API data with mock data for missing fields
+          const brandData = {
+            id: apiBrand._id || params.id,
+            name: apiBrand.name || 'Brand',
+            logo: apiBrand.name ? apiBrand.name.charAt(0).toUpperCase() : 'B',
+            banner: apiBrand.banner || null,
+            description: apiBrand.description || 'A brand on our platform',
+            location: apiBrand.location || 'India',
+            followers: apiBrand.followers || '0',
+            engagement: apiBrand.engagement || '0%',
+            about: apiBrand.about || 'Brand profile',
+            verified: apiBrand.verified || false,
+            activeCampaigns: apiBrand.activeCampaigns || [
+              {
+                id: 1,
+                name: 'Campaign 1',
+                hashtag: '#campaign1',
+                closesDate: '20 Apr',
+                enrolled: '30+ Enrolled',
+                contentTypes: { reels: 3, stories: 5, posts: 1 },
+                budget: '₹80K-1.5L',
+                daysLeft: 6,
+                spotsOpen: 12,
+                status: 'On Going'
+              }
+            ],
+            performance: apiBrand.performance || {
+              campaignsRun: 0,
+              avgEngagement: '0%',
+              avgReach: '0',
+              creatorSatisfaction: '0%',
+              ageGroups: [
+                { range: '12-18', value: 0 },
+                { range: '19-24', value: 0 },
+                { range: '24-34', value: 0 },
+                { range: '35-45', value: 0 },
+                { range: '46-55', value: 0 },
+                { range: '65+', value: 0 },
+              ]
+            },
+            connectedPlatforms: apiBrand.connectedPlatforms || [],
+            reviews: apiBrand.reviews || {
+              rating: 0,
+              count: 0,
+              items: []
+            }
+          };
 
-  // Get brand initials
-  const initials = brand?.name?.split(' ').map(w => w[0]).join('').toUpperCase() || 'AB';
+          setBrand(brandData);
+        } else {
+          setMockBrand();
+        }
+      } catch (error) {
+        console.error('Error fetching brand profile:', error);
+        setMockBrand();
+      }
+    };
+
+    const setMockBrand = () => {
+      const mockBrand = {
+        id: params.id,
+        name: 'Lenskart',
+        logo: 'L',
+        banner: null,
+        description: 'Fitness tracker branding tech reviews with wellness content. Known for high-trust, community-driven storytelling.',
+        location: 'India',
+        followers: '2.4M',
+        engagement: '4.2%',
+        about: 'Leading eyewear brand delivering premium spectacles, contact lenses, and eye care solutions.',
+        verified: true,
+        activeCampaigns: [
+          {
+            id: 1,
+            name: 'Summer Launch',
+            hashtag: '#MoveWithIPLT20',
+            closesDate: '20 Apr',
+            enrolled: '30+ User Enrolled',
+            contentTypes: { reels: 3, stories: 5, posts: 1 },
+            budget: '₹80K-1.5L',
+            daysLeft: 6,
+            spotsOpen: 12,
+            status: 'On Going'
+          },
+          {
+            id: 2,
+            name: 'Summer Launch',
+            hashtag: '#MoveWithIPLT20',
+            closesDate: '20 Apr',
+            enrolled: '30+ User Enrolled',
+            contentTypes: { reels: 3, stories: 5, posts: 1 },
+            budget: '₹80K-1.5L',
+            daysLeft: 6,
+            spotsOpen: 12,
+            status: 'On Going'
+          },
+          {
+            id: 3,
+            name: 'Summer Launch',
+            hashtag: '#MoveWithIPLT20',
+            closesDate: '20 Apr',
+            enrolled: '30+ User Enrolled',
+            contentTypes: { reels: 3, stories: 5, posts: 1 },
+            budget: '₹80K-1.5L',
+            daysLeft: 6,
+            spotsOpen: 12,
+            status: 'On Going'
+          },
+        ],
+        performance: {
+          campaignsRun: 48,
+          avgEngagement: '7.2%',
+          avgReach: '1.8M',
+          creatorSatisfaction: '94%',
+          ageGroups: [
+            { range: '12-18', value: 65 },
+            { range: '19-24', value: 50 },
+            { range: '24-34', value: 55 },
+            { range: '35-45', value: 30 },
+            { range: '46-55', value: 50 },
+            { range: '65+', value: 40 },
+          ]
+        },
+        connectedPlatforms: [
+          { id: 1, name: 'Dadi Cool', handle: '@dadi_cool', engagement: '7.1%', followers: '1.4M' },
+          { id: 2, name: 'Dadi Cool', handle: '@dadi_cool', engagement: '7.1%', followers: '1.4M' },
+        ],
+        reviews: {
+          rating: 4.9,
+          count: 31,
+          items: [
+            { brand: 'Nike India', role: 'Marketing Lead', rating: 5, review: 'Aanya delivered beyond brief. Authenticity was off the charts DMs flooded with leads.' },
+            { brand: 'Nike India', role: 'Marketing Lead', rating: 5, review: 'Aanya delivered beyond brief. Authenticity was off the charts DMs flooded with leads.' },
+          ]
+        }
+      };
+      setBrand(mockBrand);
+    };
+
+    if (params.id) {
+      fetchBrandProfile();
+    }
+  }, [params.id]);
+
+  if (!brand) return <div className="min-h-screen bg-[#000201] flex items-center justify-center text-white">Loading...</div>;
+
+  const initial = brand.name.charAt(0).toUpperCase();
+  const maxHeight = Math.max(...brand.performance.ageGroups.map(g => g.value));
 
   return (
-    <>
-      {/* ── TOP NAV ── */}
-      <div style={{
-        position: "fixed",
-        top: 0,
-        left: "50%",
-        transform: "translateX(-50%)",
-        display: "flex",
-        padding: "8px 4px",
-        justifyContent: "space-between",
-        alignItems: "center",
-        zIndex: 50,
-        width: "100%",
-        maxWidth: 830,
-        boxSizing: "border-box",
-      }}>
-        <button onClick={() => router.back()} style={{ background: "none", border: "none", cursor: "pointer", padding: 4 }}>
-          <ArrowLeftLine size={22} className="text-gray-950" />
-        </button>
-        <button style={{ background: "none", border: "none", cursor: "pointer", padding: 4 }}>
-          <MoreLine size={22} className="text-gray-950" />
-        </button>
-      </div>
+    <div className="min-h-screen bg-[#000201] pr-5 py-6 pb-24">
+      <div className="w-full flex flex-col gap-6">
 
-      {/* ── PAGE WRAPPER ── */}
-      <div style={{
-        fontFamily: "'Inter', -apple-system, sans-serif",
-        background: "linear-gradient(180deg, #c8d9be 0%, #d4e2ca 35%, #ddebd4 65%, #eaf2e5 100%)",
-        minHeight: "100vh",
-        maxWidth: 830,
-        margin: "0 auto",
-        overflowX: "hidden",
-        position: "relative",
-        paddingTop: 48,
-      }}>
-
-        {/* ── HERO SECTION ── */}
-        <div style={{
-          position: "relative",
-          paddingBottom: 28,
-          paddingTop: 14,
-        }}>
-
-          {/* Large initials — fixed, fades out toward bottom */}
-          <div style={{
-            position: "fixed",
-            top: "8%",
-            left: "50%",
-            transform: "translateX(-45%)",
-            fontSize: 200,
-            fontWeight: 900,
-            color: "#3a5033",
-            letterSpacing: -8,
-            WebkitMaskImage: "linear-gradient(to bottom, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.4) 30%, rgba(0,0,0,0.12) 65%, transparent 100%)",
-            maskImage: "linear-gradient(to bottom, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.4) 30%, rgba(0,0,0,0.12) 65%, transparent 100%)",
-            userSelect: "none",
-            pointerEvents: "none",
-            lineHeight: 0.9,
-            zIndex: 0,
-          }}>
-            {initials}
+        {/* ── HERO BANNER + AVATAR ── */}
+        <div className="relative">
+          <div className="w-full h-[260px] rounded-3xl overflow-hidden" style={{ background: 'linear-gradient(135deg, #0d2818 0%, #073d1b 40%, #16A34A22 100%)' }}>
+            <div className="w-full h-full flex items-end p-8">
+              <p className="text-white/10 font-black leading-none select-none" style={{ fontFamily: 'var(--font-bricolage-grotesque)', fontSize: 'clamp(48px, 8vw, 96px)' }}>
+                {brand.name.toUpperCase()}
+              </p>
+            </div>
           </div>
 
-          {/* Spacer so brand name sits below AB */}
-          <div style={{ height: 160 }} />
+          <div className="absolute left-8 bottom-0 translate-y-1/2 w-[148px] h-[148px] rounded-full border-4 border-[#000201] overflow-hidden flex items-center justify-center z-10"
+            style={{ background: 'linear-gradient(135deg,#16A34A,#0a4620)', boxShadow: '0px 0px 74px rgba(0,0,0,0.55)' }}>
+            <span className="text-white font-black select-none" style={{ fontFamily: 'var(--font-bricolage-grotesque)', fontSize: 56 }}>{initial}</span>
+          </div>
 
-          {/* Fade gradient — green to white, behind brand info */}
-          <div style={{
-            position: "absolute",
-            bottom: 0, left: 0, right: 0,
-            height: 170,
-            background: "linear-gradient(to top, #ffffff 0%, rgba(255,255,255,0.9) 40%, rgba(255,255,255,0.3) 75%, transparent 100%)",
-            zIndex: 1,
-            pointerEvents: "none",
-          }} />
+          <div className="absolute top-4 right-4 flex gap-2 z-10">
+            <button onClick={() => setSaved(s => !s)} className="w-10 h-10 rounded-full flex items-center justify-center hover:bg-white/10 transition" style={{ background: 'rgba(0,0,0,0.45)', backdropFilter: 'blur(6px)', border: 'none', cursor: 'pointer' }}>
+              <BookmarkLine className="w-5 h-5" style={{ color: saved ? '#16A34A' : '#fff' }} />
+            </button>
+            <button className="w-10 h-10 rounded-full flex items-center justify-center hover:bg-white/10 transition" style={{ background: 'rgba(0,0,0,0.45)', backdropFilter: 'blur(6px)', border: 'none', cursor: 'pointer' }}>
+              <ShareLine className="w-5 h-5 text-white" />
+            </button>
+          </div>
+        </div>
 
-          {/* Brand name · tagline · pills */}
-          <div style={{ padding: "0 20px", position: "relative", zIndex: 2 }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
-              <h1 style={{
-                fontSize: 28, fontWeight: 900, color: "#111",
-                margin: 0, letterSpacing: "-0.03em",
-              }}>
-                {brand?.name || 'Brand'}
-              </h1>
-              <span style={{ width: 22, height: 22, flexShrink: 0, display: "inline-flex", alignItems: "center", justifyContent: "center", color: "#43573b" }}>
-                <ShieldCheckLine size={22} />
+        {/* ── NAME + INFO ── */}
+        <div className="flex flex-col gap-3" style={{ paddingTop: 12, paddingLeft: 196 }}>
+          <div className="flex items-center gap-3 flex-wrap">
+            <h1 className="text-[32px] font-bold text-white leading-tight" style={{ fontFamily: 'var(--font-bricolage-grotesque)', letterSpacing: '-0.01em' }}>
+              {brand.name}
+            </h1>
+            {brand.verified && (
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[12px] font-semibold bg-[#0a4620] text-[#16A34A]">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#16A34A] inline-block" />
+                verified
               </span>
+            )}
+          </div>
+          <p className="text-[15px] text-[#9A9A9A]" style={{ fontFamily: 'Inter,sans-serif' }}>{brand.location} · {brand.followers} followers</p>
+          <p className="text-[15px] leading-relaxed text-[#9A9A9A]" style={{ fontFamily: 'Inter, sans-serif' }}>{brand.description}</p>
+        </div>
+
+        {/* ── BIOGRAPHY ── */}
+        <div className="bg-[#1a1a1a] rounded-2xl p-6">
+          <h3 className="text-white text-[22px] font-semibold mb-3" style={{ fontFamily: 'var(--font-bricolage-grotesque)' }}>Biography</h3>
+          <p className="text-[#9A9A9A] text-[15px] leading-relaxed" style={{ fontFamily: 'Inter,sans-serif' }}>{brand.about}</p>
+        </div>
+
+        {/* ── GRID: Active Campaigns + Campaign Performance + Connected Platforms ── */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* ACTIVE CAMPAIGNS */}
+          <div className="bg-[#1a1a1a] rounded-2xl p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-white text-[22px] font-semibold" style={{ fontFamily: 'var(--font-bricolage-grotesque)' }}>Active Campaigns</h3>
+              <button className="flex items-center gap-1.5 text-[#16A34A] text-[14px]" style={{ fontFamily: 'Inter,sans-serif', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>
+                View All
+                <svg width="6" height="10" viewBox="0 0 6 10" fill="none" style={{ flexShrink: 0 }}>
+                  <path d="M0 0.81727L0.892353 0L5.75277 4.45412C5.83112 4.5255 5.8933 4.61037 5.93573 4.70385C5.97816 4.79734 6 4.89759 6 4.99884C6 5.1001 5.97816 5.20035 5.93573 5.29384C5.8933 5.38732 5.83112 5.47219 5.75277 5.54356L0.892353 10L0.000840664 9.18273L4.56269 5L0 0.81727Z" fill="#16A34A"/>
+                </svg>
+              </button>
             </div>
-            <p style={{ fontSize: 15, color: "#4b5563", margin: "0 0 14px", lineHeight: 1.5 }}>
-              {brand?.website ? `Visit ${brand.name} at ${brand.website}` : 'Premium brand'}
-            </p>
-            <div style={{ display: "flex", gap: 8 }}>
-              {(brand?.categories || ["Lifestyle", "Premium"]).map((cat, i) => (
-                <span key={i} style={{
-                  padding: "5px 16px",
-                  background: "rgba(255,255,255,0.55)",
-                  border: "1px solid rgba(67,87,59,0.3)",
-                  borderRadius: 20,
-                  fontSize: 13, color: "#374151", fontWeight: 500,
-                }}>{cat}</span>
+            <div className="space-y-4">
+              {brand.activeCampaigns.map((campaign) => (
+                <div key={campaign.id} className="bg-[#262625] rounded-3xl p-5 min-h-[280px] flex flex-col">
+                  <div className="flex items-start justify-between mb-3">
+                    <div>
+                      <h4 className="text-white text-[16px] font-semibold" style={{ fontFamily: 'Inter,sans-serif' }}>{campaign.name}</h4>
+                      <p className="text-[#9B9B9B] text-[13px]" style={{ fontFamily: 'Inter,sans-serif' }}>{campaign.hashtag}</p>
+                    </div>
+                    <span className="px-3 py-1 rounded-full text-[12px] font-semibold bg-[#0a4620] text-[#16A34A]" style={{ fontFamily: 'Inter,sans-serif' }}>
+                      {campaign.status}
+                    </span>
+                  </div>
+
+                  <div className="space-y-2 mb-3">
+                    <div className="flex items-center gap-2 text-[13px] text-[#9B9B9B]" style={{ fontFamily: 'Inter,sans-serif' }}>
+                      <Clock size={14} /> Closes {campaign.closesDate}
+                      <span className="mx-1">·</span>
+                      <Users size={14} /> {campaign.enrolled}
+                    </div>
+                  </div>
+
+                  <div className="flex gap-2 mb-3">
+                    {[{ label: `${campaign.contentTypes.reels} Reels` }, { label: `${campaign.contentTypes.stories} Stories` }, { label: `${campaign.contentTypes.posts} Post` }].map((ct, i) => (
+                      <span key={i} className="border border-[#9B9B9B] text-[#9B9B9B] px-3 py-1 rounded-full text-[11px]" style={{ fontFamily: 'Inter,sans-serif' }}>
+                        {ct.label}
+                      </span>
+                    ))}
+                  </div>
+
+                  <div className="flex items-center justify-between mt-auto">
+                    <div>
+                      <p className="text-white text-[16px] font-semibold" style={{ fontFamily: 'Inter,sans-serif' }}>{campaign.budget}</p>
+                      <div className="flex items-center gap-2 text-[12px] mt-1">
+                        <span className="text-[#ff4444]" style={{ fontFamily: 'Inter,sans-serif' }}>{campaign.daysLeft} days left</span>
+                        <span className="text-[#9B9B9B]" style={{ fontFamily: 'Inter,sans-serif' }}>| {campaign.spotsOpen} spots open</span>
+                      </div>
+                    </div>
+                    <button className="bg-[#16A34A] hover:bg-[#15803d] text-white px-6 py-2 rounded-full font-semibold transition" style={{ fontFamily: 'Inter,sans-serif' }}>
+                      Apply Now
+                    </button>
+                  </div>
+                </div>
               ))}
             </div>
           </div>
-        </div>
 
-        {/* ── TABS ── */}
-        <div style={{
-          display: "flex",
-          background: "#fff",
-          borderBottom: "1px solid rgba(0,0,0,0.08)",
-        }}>
-          {["info", "campaigns"].map(tab => (
-            <button key={tab} onClick={() => setActiveTab(tab)} style={{
-              flex: 1, padding: "16px 0",
-              background: "transparent", border: "none",
-              borderBottom: activeTab === tab ? "2px solid #111" : "2px solid transparent",
-              fontSize: 15,
-              fontWeight: activeTab === tab ? 700 : 500,
-              color: activeTab === tab ? "#111" : "#6b7280",
-              cursor: "pointer", transition: "all 0.15s",
-              marginBottom: -1,
-            }}>
-              {tab.charAt(0).toUpperCase() + tab.slice(1)}
-            </button>
-          ))}
-        </div>
+          {/* RIGHT COLUMN: Campaign Performance + Connected Platforms */}
+          <div className="flex flex-col gap-6">
+            {/* CAMPAIGN PERFORMANCE */}
+            <div className="bg-[#1a1a1a] rounded-2xl p-6">
+              <h3 className="text-white text-[22px] font-semibold mb-4" style={{ fontFamily: 'var(--font-bricolage-grotesque)' }}>Campaign Performance</h3>
 
-        {/* ── CONTENT ── */}
-        <div style={{
-          background: "#fff",
-          minHeight: "60vh",
-          padding: "14px 12px 40px",
-          display: "flex",
-          flexDirection: "column",
-          gap: 14,
-        }}>
-
-          {activeTab === "info" && (
-            <>
-              {/* About card */}
-              <div style={{
-                background: "#fff",
-                borderRadius: 14,
-                border: "1px solid #e5e7eb",
-                padding: "18px 18px 20px",
-              }}>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
-                  <h3 style={{ fontSize: 17, fontWeight: 700, color: "#111", margin: 0 }}>About</h3>
-                  <span style={{ width: 20, height: 20, flexShrink: 0, display: "inline-flex", alignItems: "center", justifyContent: "center", color: "#6b7280" }}>
-                    <ExternalLinkLine size={20} />
-                  </span>
+              <div className="space-y-4 mb-6">
+                <div className="bg-[#262625] rounded-lg p-3">
+                  <p className="text-[24px] font-bold text-white" style={{ fontFamily: 'var(--font-bricolage-grotesque)' }}>{brand.performance.campaignsRun}</p>
+                  <p className="text-[#9B9B9B] text-[12px]" style={{ fontFamily: 'Inter,sans-serif' }}>Campaigns Run</p>
                 </div>
-                <p style={{ fontSize: 14, color: "#6b7280", lineHeight: 1.8, margin: 0 }}>
-                  Um, I'm happy you're home. You're an idiot, Steve Harrington. You're beautiful, Nancy Wheeler. You're right. You are a freak.... Who would you rather be friends with: Bowie or Kenny Rogers? Why's he gotta kick the door? Why do we even need weapons anyway? We have her. Friends don't lie. It's about the shadow monster, isn't it? You're an idiot, Steve Harrington. You're beautiful, Nancy Wheeler. Nobody normal ever accomplished anything meaningful...
-                </p>
+                <div className="bg-[#262625] rounded-lg p-3">
+                  <p className="text-[24px] font-bold text-white" style={{ fontFamily: 'var(--font-bricolage-grotesque)' }}>{brand.performance.avgEngagement}</p>
+                  <p className="text-[#9B9B9B] text-[12px]" style={{ fontFamily: 'Inter,sans-serif' }}>Avg Engagement</p>
+                </div>
+                <div className="bg-[#262625] rounded-lg p-3">
+                  <p className="text-[24px] font-bold text-white" style={{ fontFamily: 'var(--font-bricolage-grotesque)' }}>{brand.performance.avgReach}</p>
+                  <p className="text-[#9B9B9B] text-[12px]" style={{ fontFamily: 'Inter,sans-serif' }}>Avg Reach</p>
+                </div>
+                <div className="bg-[#262625] rounded-lg p-3">
+                  <p className="text-[24px] font-bold text-white" style={{ fontFamily: 'var(--font-bricolage-grotesque)' }}>{brand.performance.creatorSatisfaction}</p>
+                  <p className="text-[#9B9B9B] text-[12px]" style={{ fontFamily: 'Inter,sans-serif' }}>Creator Satisfaction</p>
+                </div>
               </div>
 
-              {/* Socials label */}
-              <h3 style={{ fontSize: 15, fontWeight: 700, color: "#111", margin: "2px 0 0", paddingLeft: 2 }}>
-                Socials
-              </h3>
+              <h4 className="text-white text-[16px] font-semibold mb-3" style={{ fontFamily: 'Inter,sans-serif' }}>Age groups</h4>
+              <div className="flex items-end justify-around gap-1 h-[150px]">
+                {brand.performance.ageGroups.map((group, i) => (
+                  <div key={i} className="flex flex-col items-center gap-2">
+                    <div className="w-7 bg-[#16A34A] rounded-sm" style={{ height: `${(group.value / maxHeight) * 100}px` }}></div>
+                    <p className="text-[#9B9B9B] text-[10px]" style={{ fontFamily: 'Inter,sans-serif' }}>{group.range}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+            {/* End Campaign Performance */}
 
-              {/* Socials list */}
-              <div style={{
-                display: "flex", flexDirection: "column",
-                border: "1px solid #e5e7eb",
-                borderRadius: 14,
-                overflow: "hidden",
-                background: "#fff",
-              }}>
-                {SOCIALS.map((s, i) => (
-                  <div key={i} style={{
-                    display: "flex", alignItems: "center", justifyContent: "space-between",
-                    padding: "14px 16px",
-                    borderBottom: i < SOCIALS.length - 1 ? "1px solid #f0f0f0" : "none",
-                    cursor: "pointer",
-                  }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
-                      <div style={{
-                        width: 38, height: 38,
-                        background: "#111",
-                        borderRadius: 10,
-                        display: "flex", alignItems: "center", justifyContent: "center",
-                        flexShrink: 0,
-                        color: "white",
-                      }}>
-                        {s.icon}
+            {/* ── CONNECTED PLATFORMS ── */}
+            <div className="bg-[#1a1a1a] rounded-2xl p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-white text-[22px] font-semibold" style={{ fontFamily: 'var(--font-bricolage-grotesque)' }}>Connected Platforms</h3>
+                <button className="flex items-center gap-1.5 text-[#16A34A] text-[14px]" style={{ fontFamily: 'Inter,sans-serif', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>
+                View All
+                <svg width="6" height="10" viewBox="0 0 6 10" fill="none" style={{ flexShrink: 0 }}>
+                  <path d="M0 0.81727L0.892353 0L5.75277 4.45412C5.83112 4.5255 5.8933 4.61037 5.93573 4.70385C5.97816 4.79734 6 4.89759 6 4.99884C6 5.1001 5.97816 5.20035 5.93573 5.29384C5.8933 5.38732 5.83112 5.47219 5.75277 5.54356L0.892353 10L0.000840664 9.18273L4.56269 5L0 0.81727Z" fill="#16A34A"/>
+                </svg>
+              </button>
+              </div>
+              <div className="space-y-3">
+                {brand.connectedPlatforms.map((platform) => (
+                  <div key={platform.id} className="bg-[#262625] rounded-2xl p-4 flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="w-12 h-12 rounded-full bg-gradient-to-br from-orange-300 to-red-400 flex-shrink-0"></div>
+                      <div>
+                        <p className="text-white text-[14px] font-medium" style={{ fontFamily: 'Inter,sans-serif' }}>{platform.name}</p>
+                        <p className="text-[#9B9B9B] text-[12px]" style={{ fontFamily: 'Inter,sans-serif' }}>{platform.handle}</p>
                       </div>
-                      <span style={{ fontSize: 15, fontWeight: 600, color: "#111" }}>{s.platform}</span>
                     </div>
-                    <div style={{
-                      width: 34, height: 34,
-                      border: "1px solid #e0e0e0",
-                      borderRadius: 8,
-                      display: "flex", alignItems: "center", justifyContent: "center",
-                      background: "#fafafa",
-                      flexShrink: 0,
-                      overflow: "hidden",
-                    }}>
-                      <span style={{ width: 15, height: 15, display: "inline-flex", alignItems: "center", justifyContent: "center", color: "#6b7280" }}>
-                        <ExternalLinkLine size={15} />
-                      </span>
+                    <div className="text-right">
+                      <p className="text-[#16A34A] text-[13px] font-semibold" style={{ fontFamily: 'Inter,sans-serif' }}>{platform.engagement} eng.</p>
+                      <p className="text-[#9B9B9B] text-[12px]" style={{ fontFamily: 'Inter,sans-serif' }}>{platform.followers} followers</p>
                     </div>
                   </div>
                 ))}
               </div>
-            </>
-          )}
-
-          {activeTab === "campaigns" && (
-            <CampaignsTab campaigns={brandCampaigns} />
-          )}
+            </div>
+            {/* End Connected Platforms */}
+          </div>
+          {/* End Right Column */}
         </div>
+        {/* End Grid */}
+
+        {/* ── TOP CAMPAIGNS / REVIEWS ── */}
+        <div className="bg-[#1a1a1a] rounded-2xl p-6">
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <div className="flex items-center gap-3 mb-2">
+                <h3 className="text-[40px] font-bold text-white" style={{ fontFamily: 'var(--font-bricolage-grotesque)' }}>{brand.reviews.rating}</h3>
+                <div className="flex gap-1">
+                  {[...Array(5)].map((_, i) => <span key={i} className="text-[20px]">⭐</span>)}
+                </div>
+              </div>
+              <p className="text-[#9B9B9B] text-[13px]" style={{ fontFamily: 'Inter,sans-serif' }}>{brand.reviews.count} Brand Reviews</p>
+            </div>
+            <button className="flex items-center gap-1.5 text-[#16A34A] text-[14px]" style={{ fontFamily: 'Inter,sans-serif', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>
+              View All
+              <svg width="6" height="10" viewBox="0 0 6 10" fill="none" style={{ flexShrink: 0 }}>
+                <path d="M0 0.81727L0.892353 0L5.75277 4.45412C5.83112 4.5255 5.8933 4.61037 5.93573 4.70385C5.97816 4.79734 6 4.89759 6 4.99884C6 5.1001 5.97816 5.20035 5.93573 5.29384C5.8933 5.38732 5.83112 5.47219 5.75277 5.54356L0.892353 10L0.000840664 9.18273L4.56269 5L0 0.81727Z" fill="#16A34A"/>
+              </svg>
+            </button>
+          </div>
+
+          <div className="space-y-4">
+            {brand.reviews.items.map((review, i) => (
+              <div key={i} className="bg-[#262625] rounded-2xl p-4">
+                <div className="flex items-start justify-between mb-2">
+                  <div>
+                    <p className="text-white text-[15px] font-semibold" style={{ fontFamily: 'Inter,sans-serif' }}>{review.brand}</p>
+                    <p className="text-[#9B9B9B] text-[12px]" style={{ fontFamily: 'Inter,sans-serif' }}>{review.role}</p>
+                  </div>
+                  <div className="flex gap-1">
+                    {[...Array(review.rating)].map((_, i) => <span key={i} className="text-[16px]">⭐</span>)}
+                  </div>
+                </div>
+                <p className="text-[#9B9B9B] text-[13px] leading-relaxed" style={{ fontFamily: 'Inter,sans-serif' }}>"{review.review}"</p>
+              </div>
+            ))}
+          </div>
+        </div>
+
       </div>
-    </>
+    </div>
   );
 }

@@ -63,7 +63,7 @@ const HelpAndSupportSection = () => {
       <div className="max-w-5xl mx-auto px-6">
         {/* Page Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-6">Help & Support</h1>
+          <h1 className="text-3xl font-bold text-gray-900 mb-6" style={{ fontFamily: 'Inter, sans-serif' }}>Help & Support</h1>
           
           {/* Search Bar */}
           <div className="relative">
@@ -82,7 +82,7 @@ const HelpAndSupportSection = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
           {/* Getting Started Card */}
           <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">Getting Started</h3>
+            <h3 className="text-lg font-semibold text-gray-900 mb-2" style={{ fontFamily: 'Inter, sans-serif' }}>Getting Started</h3>
             <p className="text-gray-500 text-sm mb-4">Learn the basic of creating and managing campaigns</p>
             <button className="flex items-center space-x-1 text-blue-600 hover:text-blue-700 text-sm font-medium transition-colors">
               <span>Learn More</span>
@@ -92,7 +92,7 @@ const HelpAndSupportSection = () => {
 
           {/* Campaign Management Card */}
           <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">Campaign Management</h3>
+            <h3 className="text-lg font-semibold text-gray-900 mb-2" style={{ fontFamily: 'Inter, sans-serif' }}>Campaign Management</h3>
             <p className="text-gray-500 text-sm mb-4">Tips for running successful influencer campaigns</p>
             <button className="flex items-center space-x-1 text-blue-600 hover:text-blue-700 text-sm font-medium transition-colors">
               <span>Learn More</span>
@@ -103,7 +103,7 @@ const HelpAndSupportSection = () => {
 
         {/* FAQ Section */}
         <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm mb-8">
-          <h2 className="text-xl font-semibold text-gray-900 mb-6">Frequently Asked Questions</h2>
+          <h2 className="text-xl font-semibold text-gray-900 mb-6" style={{ fontFamily: 'Inter, sans-serif' }}>Frequently Asked Questions</h2>
           
           <div className="space-y-0">
             {faqs.map((faq) => (
@@ -135,7 +135,7 @@ const HelpAndSupportSection = () => {
 
         {/* Contact Support Form */}
         <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
-          <h2 className="text-xl font-semibold text-gray-900 mb-6">Contact Support</h2>
+          <h2 className="text-xl font-semibold text-gray-900 mb-6" style={{ fontFamily: 'Inter, sans-serif' }}>Contact Support</h2>
           
           <form onSubmit={handleSubmit} className="space-y-5">
             {/* Subject Field */}

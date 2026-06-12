@@ -1,8 +1,1 @@
-'use client';
-import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-export default function Redirect() {
-  const router = useRouter();
-  useEffect(() => { router.replace('/term-and-conditions'); }, []);
-  return null;
-}
+export { default } from '@/components/Account/TermsConditionsRedirect';

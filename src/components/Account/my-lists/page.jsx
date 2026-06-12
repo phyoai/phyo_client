@@ -1,435 +1,233 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { ArrowLeftLine, MoreLine, DeleteBinLine, DownloadLine, AddLine } from '@phyoofficial/phyo-icon-library';
-import { useGoBack } from '@/hooks/useGoBack';
-import Button from '@/components/ui/Button';
-import IconButton from '@/components/ui/IconButton';
-import Card from '@/components/ui/Card';
-import apiClient from '@/utils/api';
+import { useRoleContext } from '@/app/context/RoleContext';
+import api from '@/utils/api';
 
-export default function MyListsAll() {
+const CATEGORIES = ['All', 'Sports', 'Lifestyle', 'Fashion'];
+
+function getInitials(name) {
+  if (!name) return '?';
+  return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+}
+
+export default function MyLists() {
   const router = useRouter();
-  const goBack = useGoBack();
+  const { role } = useRoleContext();
+  const [activeCategory, setActiveCategory] = useState('All');
+  const [influencers, setInfluencers] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [apiLoading, setApiLoading] = useState(false);
-  const [selectionMode, setSelectionMode] = useState(false);
-  const [selectedItems, setSelectedItems] = useState([]);
-  const [activeChip, setActiveChip] = useState('All');
-  const [showNewListModal, setShowNewListModal] = useState(false);
-  const [newListName, setNewListName] = useState('');
-  const [error, setError] = useState(null);
-  const [successMessage, setSuccessMessage] = useState('');
 
-  // Fetch lists from API
-  const [lists, setLists] = useState([]);
+  const [showCreateList, setShowCreateList] = useState(false);
+  const [selected, setSelected] = useState([]);
+  const [selectAll, setSelectAll] = useState(false);
+  const [listName, setListName] = useState('');
+  const [creating, setCreating] = useState(false);
 
   useEffect(() => {
-    fetchLists();
+    const fetchData = async () => {
+      try {
+        const influencersRes = await api.get('/influencers', { params: { page: 1, limit: 30 } });
+        const infData = influencersRes.data?.data || influencersRes.data || [];
+        setInfluencers(Array.isArray(infData) ? infData : []);
+      } catch (err) {
+        console.error('Error fetching data:', err);
+        setInfluencers([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
   }, []);
 
-  const fetchLists = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const response = await apiClient.get('/lists');
-      setLists(response.data.data || []);
-    } catch (err) {
-      console.error('Error fetching lists:', err);
-      setError('Failed to load your lists. Please try again.');
-      setLists([]);
-    } finally {
-      setLoading(false);
-    }
+  const toggleSelect = (id) => {
+    setSelected(prev => prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]);
   };
-
-  const chips = ['All', 'Favorites', 'Campaign 1', 'Campaign 2', 'Label', 'Label', 'Label', 'Label', 'Label', 'Label'];
 
   const handleSelectAll = () => {
-    if (selectedItems.length === lists.length) {
-      setSelectedItems([]);
+    if (selectAll) {
+      setSelected([]);
+      setSelectAll(false);
     } else {
-      setSelectedItems(lists.map(item => item.id));
+      setSelected(influencers.map(i => i._id || i.id));
+      setSelectAll(true);
     }
   };
 
-  const handleSelectItem = (id) => {
-    if (selectedItems.includes(id)) {
-      setSelectedItems(selectedItems.filter(item => item !== id));
-    } else {
-      setSelectedItems([...selectedItems, id]);
-    }
-  };
-
-  const getInitials = (name) => {
-    if (!name) return 'U';
-    return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
-  };
-
-  const handleBack = () => {
-    if (selectionMode) {
-      setSelectionMode(false);
-      setSelectedItems([]);
-    } else {
-      router.back();
-    }
-  };
-
-  const handleDelete = async () => {
+  const handleCreateNow = async () => {
+    if (!selected.length) return;
+    setCreating(true);
     try {
-      setApiLoading(true);
-      setError(null);
-
-      // Delete selected lists via API
-      for (const itemId of selectedItems) {
-        await apiClient.delete(`/lists/${itemId}`);
-      }
-
-      // Update local state
-      setLists(lists.filter(item => !selectedItems.includes(item.id)));
-      setSelectedItems([]);
-      setSelectionMode(false);
-      setSuccessMessage(`${selectedItems.length} list(s) deleted successfully`);
-      setTimeout(() => setSuccessMessage(''), 3000);
+      await api.post('/lists', {
+        name: listName || 'My List',
+        influencers: selected.map(id => ({ influencerId: id, status: 'new' })),
+      });
+      setShowCreateList(false);
+      setSelected([]);
+      setListName('');
     } catch (err) {
-      console.error('Error deleting lists:', err);
-      setError('Failed to delete lists. Please try again.');
+      console.error('Create list error:', err);
     } finally {
-      setApiLoading(false);
+      setCreating(false);
     }
   };
 
-  const handleExport = () => {
-    console.log('Exporting selected items:', selectedItems);
-    // Add export logic here
-  };
+  const bg = 'bg-[#000201]';
+  const panelCls = 'bg-[#181818] rounded-[24px] overflow-hidden';
 
-  const handleCreateNewList = () => {
-    setShowNewListModal(true);
-  };
-
-  const handleCreateList = async () => {
-    if (newListName.trim()) {
-      try {
-        setApiLoading(true);
-        setError(null);
-
-        // Create new list via API
-        const response = await apiClient.post('/lists', {
-          name: newListName,
-          description: '',
-          isPublic: false
-        });
-
-        // Add to local state
-        setLists([...lists, response.data.data]);
-        setSuccessMessage('List created successfully');
-        setTimeout(() => setSuccessMessage(''), 3000);
-
-        // Reset and close modal
-        setNewListName('');
-        setShowNewListModal(false);
-        setSelectionMode(false);
-        setSelectedItems([]);
-      } catch (err) {
-        console.error('Error creating list:', err);
-        setError('Failed to create list. Please try again.');
-      } finally {
-        setApiLoading(false);
-      }
-    }
-  };
-
-  // Loading state
-  if (loading) {
+  if (showCreateList) {
     return (
-      <div className="flex flex-col h-screen bg-neutral-base items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-blue-600"></div>
-        <p className="mt-4 text-gray-600">Loading your lists...</p>
-      </div>
-    );
-  }
-
-  // Empty state
-  if (lists.length === 0 && !loading) {
-    return (
-      <div className="flex flex-col h-screen bg-neutral-base">
-        {/* App Bar */}
-        <div className="flex items-center justify-between px-1 py-2 bg-neutral-base shrink-0">
-          <IconButton
-            icon={ArrowLeftLine}
-            size="lg"
-            variant="default"
-            onClick={handleBack}
-          />
-          <div className="flex-1 px-2">
-            <h1 className="text-xl font-semibold text-[#242527] leading-7 tracking-[-0.14px]">My Lists</h1>
-          </div>
-          <div className="flex items-center gap-2">
-            <IconButton
-              icon={MoreLine}
-              size="lg"
-              variant="default"
+      <div className={`min-h-screen ${bg} text-white p-5`}>
+        <div className={`${panelCls} p-5`}>
+          <div className="mb-5">
+            <p className="text-[24px] font-normal text-white capitalize text-center leading-[1.2] mb-4" style={{ fontFamily: 'Bricolage Grotesque, sans-serif', fontVariationSettings: '"opsz" 14, "wdth" 100' }}>
+              Create New List
+            </p>
+            <input
+              type="text"
+              value={listName}
+              onChange={e => setListName(e.target.value)}
+              placeholder="List name…"
+              className="w-full bg-[#272626] h-[40px] rounded-[8px] px-[16px] text-[14px] text-white placeholder-[#9b9b9b] outline-none"
+              style={{ fontFamily: 'Inter, sans-serif' }}
             />
+          </div>
+
+          <div className="flex items-end justify-between pb-[10px] border-b border-white/10">
+            <span className="text-[16px] font-normal text-[#9b9b9b] capitalize leading-[1.2]" style={{ fontFamily: 'Inter, sans-serif' }}>
+              Select all
+            </span>
+            <button
+              onClick={handleSelectAll}
+              className="w-[20px] h-[20px] border border-[#9b9b9b] rounded-[4px] flex items-center justify-center flex-shrink-0"
+            >
+              {selectAll && <svg className="w-3 h-3 text-[#16a34a]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7"/></svg>}
+            </button>
+          </div>
+
+          <div className="flex flex-col gap-[10px] mt-[10px] overflow-y-auto max-h-[60vh]">
+            {loading ? (
+              [...Array(6)].map((_, i) => (
+                <div key={i} className="flex items-center justify-between animate-pulse py-2">
+                  <div className="flex items-center gap-[8px]">
+                    <div className="w-[48px] h-[48px] rounded-full bg-[#272626]" />
+                    <div className="flex flex-col gap-2"><div className="h-3 bg-[#272626] rounded w-24" /><div className="h-2 bg-[#272626] rounded w-36" /></div>
+                  </div>
+                  <div className="w-[20px] h-[20px] border border-[#9b9b9b] rounded-[4px]" />
+                </div>
+              ))
+            ) : influencers.map((inf, idx) => {
+              const id = inf._id || inf.id;
+              const name = inf.profile?.name || inf.name || 'Influencer';
+              const subtitle = inf.profile?.bio || inf.bio || inf.about || 'Hey, any updates on the campaign?';
+              const avatar = inf.profile?.profileImage || inf.profileImage || inf.profilePicture;
+              const isChecked = selected.includes(id);
+              return (
+                <div key={id || idx}>
+                  <div className="flex items-center justify-between py-[10px]">
+                    <div className="flex items-center gap-[8px]">
+                      <div className="w-[48px] h-[48px] rounded-full bg-[#272626] overflow-hidden flex-shrink-0">
+                        {avatar ? <img src={avatar} alt={name} className="w-full h-full object-cover" /> : <span className="flex items-center justify-center w-full h-full text-white text-sm font-semibold">{getInitials(name)}</span>}
+                      </div>
+                      <div className="flex flex-col gap-[4px]">
+                        <p className="text-[16px] font-normal text-white capitalize leading-[1.2]" style={{ fontFamily: 'Bricolage Grotesque, sans-serif' }}>{name}</p>
+                        <p className="text-[12px] font-normal text-[#9b9b9b] leading-[1.2] truncate max-w-[400px]" style={{ fontFamily: 'Inter, sans-serif' }}>{subtitle}</p>
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => toggleSelect(id)}
+                      className={`w-[20px] h-[20px] border rounded-[4px] flex items-center justify-center flex-shrink-0 ${isChecked ? 'border-[#16a34a] bg-[#16a34a]/20' : 'border-[#9b9b9b]'}`}
+                    >
+                      {isChecked && <svg className="w-3 h-3 text-[#16a34a]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7"/></svg>}
+                    </button>
+                  </div>
+                  <div className="h-px bg-white/10" />
+                </div>
+              );
+            })}
           </div>
         </div>
 
-        {/* Empty State */}
-        <div className="flex-1 flex items-center justify-center px-9 py-4">
-          <div className="flex flex-col items-center justify-center p-4">
-            <h2 className="text-2xl font-semibold text-[#242527] leading-8 tracking-[-0.32px]">no lists created yet</h2>
-          </div>
+        <div className="flex justify-end gap-[20px] mt-5">
+          <button onClick={() => setShowCreateList(false)} className="border border-white h-[40px] w-[160px] rounded-full text-[16px] font-normal text-white capitalize hover:bg-white/10 transition-colors" style={{ fontFamily: 'Inter, sans-serif' }}>
+            Cancel
+          </button>
+          <button onClick={handleCreateNow} disabled={creating || !selected.length} className="bg-[#16a34a] hover:bg-[#15803d] h-[40px] w-[160px] rounded-full text-[16px] font-normal text-white capitalize transition-colors disabled:opacity-40" style={{ fontFamily: 'Inter, sans-serif' }}>
+            {creating ? 'Creating…' : 'Create Now'}
+          </button>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col h-screen bg-neutral-base">
-      {/* App Bar */}
-      <div className="flex items-center justify-between px-1 py-2 bg-neutral-base shrink-0">
-        <IconButton
-          icon={ArrowLeftLine}
-          size="lg"
-          variant="default"
-          onClick={handleBack}
-        />
-        <div className="flex-1 px-2">
-          <h1 className="text-xl font-semibold text-[#242527] leading-7 tracking-[-0.14px]">My Lists</h1>
+    <div className={`min-h-screen ${bg} text-white p-5`}>
+      <div className={`${panelCls} p-5`}>
+        <div className="flex items-center justify-between mb-5">
+          <p className="text-[24px] font-normal text-white capitalize leading-[1.2]" style={{ fontFamily: 'Bricolage Grotesque, sans-serif', fontVariationSettings: '"opsz" 14, "wdth" 100' }}>
+            Saved Influencers
+          </p>
+          <button
+            onClick={() => setShowCreateList(true)}
+            className="bg-[#16a34a] hover:bg-[#15803d] h-[40px] w-[200px] rounded-full text-[16px] font-normal text-white capitalize transition-colors"
+            style={{ fontFamily: 'Inter, sans-serif' }}
+          >
+            Create New List
+          </button>
         </div>
-        <div className="flex items-center gap-2 h-12">
-          {selectionMode && (
-            <IconButton
-              icon={DeleteBinLine}
-              size="lg"
-              variant="default"
-              disabled={apiLoading}
-              onClick={handleDelete}
-              title="Delete selected lists"
-            />
-          )}
-          <IconButton
-            icon={MoreLine}
-            size="lg"
-            variant="default"
-            onClick={() => {
-              setSelectionMode(true);
-              setSelectedItems([]);
-            }}
-          />
+
+        <div className="flex gap-[12px] items-center mb-5">
+          {CATEGORIES.map(cat => (
+            <button
+              key={cat}
+              onClick={() => setActiveCategory(cat)}
+              className={`px-[24px] py-[4px] rounded-full text-[14px] capitalize transition-colors ${
+                activeCategory === cat ? 'bg-[#16a34a] text-white' : 'bg-white/12 text-white hover:bg-white/20'
+              }`}
+              style={{ fontFamily: 'Inter, sans-serif' }}
+            >
+              {cat}
+            </button>
+          ))}
         </div>
-      </div>
 
-      {/* Container */}
-      <div className="flex-1 flex flex-col overflow-hidden px-3 sm:px-4 md:px-6 lg:px-9 py-3 sm:py-4">
-        <div className="flex flex-col flex-1 h-full overflow-hidden">
-          {/* Chip Group - Only show when not in selection mode */}
-          {!selectionMode && lists.length > 0 && (
-            <div className="flex items-center gap-2 overflow-x-auto overflow-y-hidden pl-4 py-2 shrink-0 scrollbar-hide">
-              {chips.map((chip, index) => (
-                <button
-                  key={index}
-                  onClick={() => setActiveChip(chip)}
-                  className={`flex items-center justify-center px-3 py-1.5 rounded-lg shrink-0 whitespace-nowrap transition-colors ${
-                    activeChip === chip
-                      ? 'bg-[#43573b] text-white'
-                      : 'bg-[#fbfcfa] text-[#242527] border border-[#f4f6f1] hover:bg-gray-50'
-                  }`}
-                  style={{ fontFamily: 'Work Sans, sans-serif' }}
-                >
-                  <span className="text-sm font-medium leading-5 tracking-[0.2px]">{chip}</span>
-                </button>
-              ))}
-            </div>
-          )}
-
-          {/* List Items */}
-          <div className="flex-1 overflow-y-auto">
-            {/* Select All - Only show in selection mode */}
-            {selectionMode && (
-              <>
-                <div className="flex items-center bg-neutral-base pl-4 hover:bg-gray-50 transition-colors">
-                  <div className="flex-1 flex flex-col justify-center pr-4 py-3">
-                    <p className="text-base font-semibold text-[#242527] leading-6 tracking-[0.24px]" style={{ fontFamily: 'Work Sans, sans-serif' }}>
-                      Select All
-                    </p>
-                  </div>
-                  <div className="flex items-center justify-center shrink-0">
-                    <button
-                      onClick={handleSelectAll}
-                      className="flex items-center justify-center w-12 h-12 rounded-full p-3 hover:bg-gray-100 transition-colors"
-                    >
-                      <div className="w-6 h-6 flex items-center justify-center">
-                        {selectedItems.length === lists.length ? (
-                          <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none">
-                            <rect x="3" y="3" width="18" height="18" rx="3" stroke="#808080" strokeWidth="2" fill="none"/>
-                            <path d="M6 12h12" stroke="#43573b" strokeWidth="2" strokeLinecap="round"/>
-                          </svg>
-                        ) : (
-                          <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none">
-                            <rect x="3" y="3" width="18" height="18" rx="3" stroke="#808080" strokeWidth="2" fill="none"/>
-                          </svg>
-                        )}
-                      </div>
-                    </button>
-                  </div>
-                </div>
-                <div className="h-px bg-[#f0f0f0]"></div>
-              </>
-            )}
-
-            {/* Influencer List */}
-            {lists.map((item, index) => (
-              <React.Fragment key={item.id}>
-                <div 
-                  className={`flex items-center bg-neutral-base ${selectionMode ? 'cursor-pointer hover:bg-gray-50' : ''} transition-colors`}
-                  onClick={() => selectionMode && handleSelectItem(item.id)}
-                  onDoubleClick={() => {
-                    if (!selectionMode) {
-                      setSelectionMode(true);
-                      setSelectedItems([item.id]);
-                    }
-                  }}
-                >
-                  <div className="flex items-center px-4 py-1.5 shrink-0">
-                    <div className="w-12 h-12 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center">
-                      <span className="text-lg font-bold text-white">
-                        {getInitials(item.name)}
-                      </span>
-                    </div>
-                  </div>
-                  <div className="flex-1 flex flex-col justify-center pr-4 py-3 overflow-hidden">
-                    <p className="text-base font-semibold text-[#242527] leading-6 tracking-[0.24px] truncate" style={{ fontFamily: 'Work Sans, sans-serif' }}>
-                      {item.name}
-                    </p>
-                    <p className="text-sm text-[#808080] leading-5 tracking-[0px] truncate" style={{ fontFamily: 'Work Sans, sans-serif' }}>
-                      {item.description}
-                    </p>
-                  </div>
-                  {selectionMode && (
-                    <div className="flex items-center justify-center shrink-0">
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleSelectItem(item.id);
-                        }}
-                        className="flex items-center justify-center w-12 h-12 rounded-full p-3 hover:bg-gray-100 transition-colors"
-                      >
-                        <div className="w-6 h-6 flex items-center justify-center">
-                          {selectedItems.includes(item.id) ? (
-                            <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none">
-                              <rect x="3" y="3" width="18" height="18" rx="3" fill="#43573b"/>
-                              <path d="M7 12L10.5 15.5L17 9" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                            </svg>
-                          ) : (
-                            <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none">
-                              <rect x="3" y="3" width="18" height="18" rx="3" stroke="#808080" strokeWidth="2" fill="none"/>
-                            </svg>
-                          )}
-                        </div>
-                      </button>
-                    </div>
-                  )}
-                </div>
-                {index < lists.length - 1 && (
-                  <div className="h-px bg-[#f0f0f0]"></div>
-                )}
-              </React.Fragment>
+        {loading ? (
+          <div className="flex flex-col gap-[10px]">
+            {[...Array(8)].map((_, i) => (
+              <div key={i} className="flex items-center gap-[8px] animate-pulse py-[10px]">
+                <div className="w-[48px] h-[48px] rounded-full bg-[#272626] flex-shrink-0" />
+                <div className="flex flex-col gap-2 flex-1"><div className="h-3 bg-[#272626] rounded w-24" /><div className="h-2 bg-[#272626] rounded w-48" /></div>
+              </div>
             ))}
           </div>
-
-          {/* Button Container - Only show in selection mode */}
-          {selectionMode && (
-            <div className="flex gap-2 p-4 bg-neutral-base shrink-0">
-              <Button
-                variant="outlined"
-                size="lg"
-                icon={DownloadLine}
-                onClick={handleExport}
-                fullWidth
-              >
-                Export
-              </Button>
-              <Button
-                variant="primary"
-                size="lg"
-                icon={AddLine}
-                onClick={handleCreateNewList}
-                fullWidth
-              >
-                Create New List
-              </Button>
-            </div>
-          )}
-        </div>
+        ) : influencers.length === 0 ? (
+          <p className="text-[#9b9b9b] text-sm text-center py-12">No saved influencers yet.</p>
+        ) : (
+          <div className="flex flex-col gap-[10px]">
+            {influencers.map((inf, idx) => {
+              const id = inf._id || inf.id;
+              const name = inf.profile?.name || inf.name || 'Influencer';
+              const subtitle = inf.profile?.bio || inf.bio || inf.about || 'Hey, any updates on the campaign?';
+              const avatar = inf.profile?.profileImage || inf.profileImage || inf.profilePicture;
+              return (
+                <div key={id || idx}>
+                  <div className="flex items-center gap-[8px] py-[10px] cursor-pointer hover:bg-white/5 rounded-lg px-2 transition-colors" onClick={() => router.push(`/${role}/influencers/${id}`)}>
+                    <div className="w-[48px] h-[48px] rounded-full bg-[#272626] overflow-hidden flex-shrink-0">
+                      {avatar ? <img src={avatar} alt={name} className="w-full h-full object-cover" /> : <span className="flex items-center justify-center w-full h-full text-white text-sm font-semibold">{getInitials(name)}</span>}
+                    </div>
+                    <div className="flex flex-col gap-[4px] min-w-0">
+                      <p className="text-[16px] font-normal text-white capitalize leading-[1.2]" style={{ fontFamily: 'Bricolage Grotesque, sans-serif' }}>{name}</p>
+                      <p className="text-[12px] font-normal text-[#9b9b9b] leading-[1.2] truncate" style={{ fontFamily: 'Inter, sans-serif' }}>{subtitle}</p>
+                    </div>
+                  </div>
+                  {idx < influencers.length - 1 && <div className="h-px bg-white/10" />}
+                </div>
+              );
+            })}
+          </div>
+        )}
       </div>
-
-      {/* New List Modal */}
-      {showNewListModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <Card
-            variant="default"
-            className="w-full sm:w-[400px] sm:max-w-[90vw] md:max-w-[400px] rounded-3xl overflow-hidden"
-          >
-            {/* Header */}
-            <div className="pb-4 border-b border-gray-100">
-              <h2 className="text-xl font-semibold text-[#242527] text-center">
-                New List
-              </h2>
-            </div>
-
-            {/* Content */}
-            <div className="py-6">
-              <input
-                type="text"
-                placeholder="New list"
-                value={newListName}
-                onChange={(e) => setNewListName(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && handleCreateList()}
-                className="w-full px-4 py-3 bg-gray-100 border border-gray-200 rounded-lg text-[#242527] placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#43573B]"
-                autoFocus
-              />
-            </div>
-
-            {/* Actions */}
-            <Card.Footer className="mt-0 pt-0 border-t border-gray-100 flex gap-3 justify-center">
-              <Button
-                variant="outlined"
-                size="md"
-                disabled={apiLoading}
-                onClick={() => {
-                  setShowNewListModal(false);
-                  setNewListName('');
-                }}
-              >
-                Cancel
-              </Button>
-              <Button
-                variant="primary"
-                size="md"
-                disabled={apiLoading || !newListName.trim()}
-                onClick={handleCreateList}
-              >
-                {apiLoading ? 'Creating...' : 'Create'}
-              </Button>
-            </Card.Footer>
-          </Card>
-        </div>
-      )}
-
-      {/* Error/Success Messages */}
-      {error && (
-        <div className="fixed bottom-4 right-4 bg-red-600 text-white px-6 py-3 rounded-lg shadow-lg max-w-md">
-          {error}
-        </div>
-      )}
-
-      {successMessage && (
-        <div className="fixed bottom-4 right-4 bg-green-600 text-white px-6 py-3 rounded-lg shadow-lg max-w-md">
-          {successMessage}
-        </div>
-      )}
     </div>
   );
 }

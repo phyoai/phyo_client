@@ -11,7 +11,6 @@ function UserLayoutContent({ children, pathname }) {
   const noSidebarRoutes = [
     '/user/signup',
     '/user/login',
-    '/user/influencers',
   ];
 
   const isNoSidebarRoute = noSidebarRoutes.some(r => pathname === r || pathname.startsWith(r + '/'));

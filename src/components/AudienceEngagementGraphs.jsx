@@ -42,7 +42,7 @@ function GrowthPercentage({ percentage = "24%", comparisonText = "last month" })
 
 function LeftValues() {
   return (
-    <div className="content-stretch flex flex-col font-['Inter:Regular',sans-serif] font-normal h-[226px] items-end justify-between leading-[16px] not-italic relative shrink-0 text-[#333] text-[12px] tracking-[0.16px] w-[22px]">
+    <div className="content-stretch flex flex-col font-['Inter',sans-serif] font-normal h-[226px] items-end justify-between leading-[16px] not-italic relative shrink-0 text-[#9B9B9B] text-[12px] tracking-[0.16px] w-[22px]">
       <p className="relative shrink-0">10K</p>
       <p className="relative shrink-0">8K</p>
       <p className="relative shrink-0">4K</p>
@@ -56,9 +56,9 @@ function BottomValues({ months = ["July", "Aug", "Sep", "Oct", "Nov", "Dec"] }) 
   return (
     <div className="relative shrink-0 w-full">
       <div className="flex flex-row items-center size-full">
-        <div className="content-stretch flex font-['Inter:Regular',sans-serif] font-normal gap-[28px] items-center leading-[16px] not-italic pl-[32px] pr-[20px] relative text-[#333] text-[12px] text-center tracking-[0.16px] w-full">
+        <div className="content-stretch flex font-['Inter',sans-serif] font-normal items-center leading-[16px] not-italic relative text-[#9B9B9B] text-[12px] text-center tracking-[0.16px] w-full justify-between px-[32px]">
           {months.map((month, index) => (
-            <p key={index} className="relative shrink-0 w-[60px]">{month}</p>
+            <p key={index} className="relative shrink-0 font-medium" style={{ fontSize: '13px', fontWeight: 500, color: '#9B9B9B' }}>{month}</p>
           ))}
         </div>
       </div>
@@ -67,20 +67,20 @@ function BottomValues({ months = ["July", "Aug", "Sep", "Oct", "Nov", "Dec"] }) 
 }
 
 // Bar Chart Component (for Saves and Views)
-export function BarChartGraph({ 
-  title = "3.2K saves", 
+export function BarChartGraph({
+  title = "3.2K saves",
   percentage = "24%",
   barColor = "#dae3d1",
   barHeights = [150, 110, 120, 70, 110, 90]
 }) {
   return (
-    <div className="bg-[#f0f0f0] relative rounded-[12px] shrink-0 w-full">
-      <div aria-hidden="true" className="absolute border-[#e6e6e6] border-[0.5px] border-solid inset-[-0.25px] pointer-events-none rounded-[12.25px]" />
+    <div className="bg-[#181818] relative rounded-[12px] shrink-0 w-full">
+      <div aria-hidden="true" className="absolute border-[#949494]/20 border-[0.5px] border-solid inset-[-0.25px] pointer-events-none rounded-[12.25px]" />
       <div className="content-stretch flex flex-col gap-[8px] items-start p-[8px] relative w-full">
         {/* Header */}
         <div className="content-stretch flex gap-[2px] items-end relative shrink-0 w-full">
           <div className="content-stretch flex flex-[1_0_0] flex-col gap-[2px] items-start min-h-px min-w-px relative">
-            <p className="font-['Work_Sans:Semibold',sans-serif] leading-[24px] not-italic relative shrink-0 text-[#242527] text-[16px] tracking-[0.24px] w-full">{title}</p>
+            <p className="font-['Inter'] font-semibold leading-[24px] not-italic relative shrink-0 text-[#ffffff] text-[16px] tracking-[0.24px] w-full" style={{ fontWeight: 600 }}>{title}</p>
             <GrowthPercentage percentage={percentage} />
           </div>
         </div>
@@ -123,23 +123,23 @@ export function BarChartGraph({
 }
 
 // Line Chart Component (for Likes and Comments)
-export function LineChartGraph({ 
-  title = "9.2K Likes", 
+export function LineChartGraph({
+  title = "9.2K Likes",
   percentage = "24%",
-  strokeColor = "#3D4F36",
-  fillColor = "#43573B",
+  strokeColor = "#16A34A",
+  fillColor = "#16A34A",
   showLabel = false,
   labelText = "5.4k likes",
   months = ["July", "Aug", "Sep", "Oct", "Nov", "Dec"]
 }) {
   return (
-    <div className="bg-[#f0f0f0] relative rounded-[12px] shrink-0 w-full">
-      <div aria-hidden="true" className="absolute border-[#e6e6e6] border-[0.5px] border-solid inset-[-0.25px] pointer-events-none rounded-[12.25px]" />
+    <div className="bg-[#181818] relative rounded-[12px] shrink-0 w-full">
+      <div aria-hidden="true" className="absolute border-[#949494]/20 border-[0.5px] border-solid inset-[-0.25px] pointer-events-none rounded-[12.25px]" />
       <div className="content-stretch flex flex-col gap-[8px] items-start p-[8px] relative w-full">
         {/* Header */}
         <div className="content-stretch flex gap-[2px] items-end relative shrink-0 w-full">
           <div className="content-stretch flex flex-[1_0_0] flex-col gap-[2px] items-start min-h-px min-w-px relative">
-            <p className="font-['Work_Sans:Semibold',sans-serif] leading-[24px] not-italic relative shrink-0 text-[#242527] text-[16px] tracking-[0.24px] w-full">{title}</p>
+            <p className="font-['Inter'] font-semibold leading-[24px] not-italic relative shrink-0 text-[#ffffff] text-[16px] tracking-[0.24px] w-full" style={{ fontWeight: 600 }}>{title}</p>
             <GrowthPercentage percentage={percentage} />
           </div>
         </div>
@@ -177,38 +177,67 @@ export function LineChartGraph({
             )}
             
             {/* Line Graph */}
-            <div className="absolute h-[126px] left-0 top-[92px] w-[352px]">
-              <div className="absolute inset-[-2.06%_-0.27%_0_-0.45%]">
+            <div className="absolute left-0 right-0 bottom-0 top-[20px] w-full">
+              <div className="absolute inset-0">
                 <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 354.513 128.589">
+                  <defs>
+                    <linearGradient
+                      id={`gradient-${title.replace(/\s/g, '')}`}
+                      x1="0"
+                      y1="0"
+                      x2="0"
+                      y2="1"
+                      gradientUnits="objectBoundingBox"
+                    >
+                      <stop offset="0%" stopColor={fillColor} stopOpacity="0.45" />
+                      <stop offset="100%" stopColor={fillColor} stopOpacity="0" />
+                    </linearGradient>
+                  </defs>
+
+                  {/* Grid lines - Horizontal */}
+                  <line x1="0" y1="25.7" x2="354.513" y2="25.7" stroke="#FFFFFF" strokeWidth="0.5" opacity="0.08" />
+                  <line x1="0" y1="51.4" x2="354.513" y2="51.4" stroke="#FFFFFF" strokeWidth="0.5" opacity="0.08" />
+                  <line x1="0" y1="77.1" x2="354.513" y2="77.1" stroke="#FFFFFF" strokeWidth="0.5" opacity="0.08" />
+                  <line x1="0" y1="102.8" x2="354.513" y2="102.8" stroke="#FFFFFF" strokeWidth="0.5" opacity="0.08" />
+
+                  {/* Grid lines - Vertical */}
+                  <line x1="58.9" y1="0" x2="58.9" y2="128.589" stroke="#FFFFFF" strokeWidth="0.5" opacity="0.08" />
+                  <line x1="117.8" y1="0" x2="117.8" y2="128.589" stroke="#FFFFFF" strokeWidth="0.5" opacity="0.08" />
+                  <line x1="176.7" y1="0" x2="176.7" y2="128.589" stroke="#FFFFFF" strokeWidth="0.5" opacity="0.08" />
+                  <line x1="235.6" y1="0" x2="235.6" y2="128.589" stroke="#FFFFFF" strokeWidth="0.5" opacity="0.08" />
+                  <line x1="294.5" y1="0" x2="294.5" y2="128.589" stroke="#FFFFFF" strokeWidth="0.5" opacity="0.08" />
+
                   <g>
-                    <path 
-                      d={svgPaths.p2bb8a000} 
-                      fill={`url(#gradient-${title.replace(/\s/g, '')})`} 
-                      fillOpacity="0.4" 
+                    <path
+                      d={svgPaths.p2bb8a000}
+                      fill={`url(#gradient-${title.replace(/\s/g, '')})`}
                     />
-                    <path 
-                      d={svgPaths.p2aa18400} 
-                      stroke={strokeColor} 
-                      strokeWidth="4" 
+
+                    {/* Line glow effect */}
+                    <path
+                      d={svgPaths.p2aa18400}
+                      stroke={strokeColor}
+                      strokeWidth="12"
+                      strokeOpacity="0.1"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      filter="blur(12px)"
                     />
+
+                    {/* Main line */}
+                    <path
+                      d={svgPaths.p2aa18400}
+                      stroke={strokeColor}
+                      strokeWidth=".8"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+
                     <g>
                       <rect fill={fillColor} height="16" rx="8" width="16" x="263.568" y="76.5895" />
                       <circle cx="271.568" cy="84.5895" fill="#ECEEEB" r="5" />
                     </g>
                   </g>
-                  <defs>
-                    <linearGradient 
-                      gradientUnits="userSpaceOnUse" 
-                      id={`gradient-${title.replace(/\s/g, '')}`}
-                      x1="177.568" 
-                      x2="177.568" 
-                      y1="2.5895" 
-                      y2="192.089"
-                    >
-                      <stop offset="0.495192" stopColor={fillColor} />
-                      <stop offset="1" stopColor="white" />
-                    </linearGradient>
-                  </defs>
                 </svg>
               </div>
             </div>

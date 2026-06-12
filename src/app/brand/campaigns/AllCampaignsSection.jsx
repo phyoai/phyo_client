@@ -6,6 +6,18 @@ import { campaignApi } from '@/api/campaign-api';
 import { uploadAPI } from '@/utils/api';
 import { useSidebar } from '../../context/SidebarContext';
 
+const DUMMY_CAMPAIGNS = [
+  { _id: 'dummy-1', campaignName: 'Summer Vibes', createdAt: new Date(Date.now() - 2 * 3600000).toISOString(), _avatarColor: '#16A34A' },
+  { _id: 'dummy-2', campaignName: 'Fit & Fresh', createdAt: new Date(Date.now() - 5 * 3600000).toISOString(), _avatarColor: '#2563EB' },
+  { _id: 'dummy-3', campaignName: 'Tech Wave', createdAt: new Date(Date.now() - 86400000).toISOString(), _avatarColor: '#7C3AED' },
+];
+
+const DUMMY_APPLICATIONS = [
+  { _id: 'dapp-1', name: 'Alice Chen', niche: 'Lifestyle • Beauty • Wellness' },
+  { _id: 'dapp-2', name: 'Marcus Jay', niche: 'Sports • Fitness • Nutrition' },
+  { _id: 'dapp-3', name: 'Sofia Park', niche: 'Fashion • Travel • Sustainability' },
+];
+
 const AllCampaignsSection = () => {
   const router = useRouter();
   const { setSidebarButtonAction, setSidebarButtonLabel } = useSidebar();
@@ -308,6 +320,7 @@ const AllCampaignsSection = () => {
       ? new Date(campaign.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
       : '3d ago';
     const productImage = campaign.productImages?.[0] || null;
+    const avatarBg = campaign._avatarColor || '#16A34A';
     const menuRef = useRef(null);
 
     React.useEffect(() => {
@@ -331,7 +344,7 @@ const AllCampaignsSection = () => {
         {/* Content — 72px TOP, padding: 12px 4px 12px 16px per Figma */}
         <div className="h-[72px] flex items-center" style={{ padding: '12px 4px 12px 16px' }}>
           <div className="flex items-center gap-4 flex-1 min-w-0">
-            <div className="w-10 h-10 bg-[#16A34A] rounded-full flex items-center justify-center text-white text-base font-medium shrink-0">
+            <div className="w-10 h-10 rounded-full flex items-center justify-center text-white text-base font-medium shrink-0" style={{ backgroundColor: avatarBg }}>
               {initials}
             </div>
             <div className="flex-1 min-w-0">
@@ -1054,10 +1067,10 @@ const AllCampaignsSection = () => {
   ));
 
   return (
-    <div className="bg-[#000201] h-screen overflow-hidden flex flex-col">
+    <div className="bg-[#000201] min-h-full pr-5 py-6 pl-0" style={{ fontFamily: 'Inter, sans-serif' }}>
 
       {/* Page Header: title + search + new campaign */}
-      <div className="flex-shrink-0 pr-4 sm:pr-6 py-4 flex items-center justify-between gap-4 bg-[#000201]" style={{ paddingLeft: 0 }}>
+      <div className="pr-0 pb-4 flex items-center justify-between gap-4 bg-[#000201]" style={{ paddingLeft: 0 }}>
         <h2
           className="shrink-0 capitalize"
           style={{
@@ -1071,38 +1084,46 @@ const AllCampaignsSection = () => {
           Campaigns
         </h2>
         <div className="flex items-center gap-3">
-          {/* Search bar — dark bg, green glow border, green circle icon button */}
-          <div className="relative flex items-center">
-            <input
-              type="text"
-              placeholder="Search campaigns..."
-              className="bg-[#0d1f12] text-white placeholder:text-[#9B9B9B] pl-5 pr-12 py-[9px] rounded-full text-sm w-56 focus:outline-none border border-[#16A34A]"
-              style={{ boxShadow: '0 0 12px rgba(22,163,74,0.35)' }}
-            />
-            <div className="absolute right-1 top-1/2 -translate-y-1/2 w-8 h-8 bg-[#16A34A] rounded-full flex items-center justify-center">
-              <Search className="w-4 h-4 text-white" />
+          {/* Search bar — same as dashboard */}
+          <div
+            className="relative cursor-pointer rounded-full bg-[linear-gradient(270deg,#16A34A_0%,#FFFFFF_52.88%,#16A34A_100%)] p-[1px]"
+            style={{ width: 294, boxShadow: '0 0 28px rgba(22, 163, 74, 0.45)' }}
+          >
+            <div className="flex h-[45px] items-center rounded-full bg-[#010a04]/90 pl-6 pr-1 py-2 backdrop-blur-md" style={{ boxShadow: 'inset 0 0 20px rgba(22, 163, 74, 0.1)' }}>
+              <input
+                type="text"
+                placeholder="Search campaigns..."
+                className="flex-1 min-w-0 bg-transparent text-left text-[15px] leading-[1.6] text-[#9B9B9B] placeholder:text-[#9B9B9B] outline-none"
+                style={{ fontFamily: 'Inter, sans-serif' }}
+              />
+              <button className="flex-shrink-0 w-9 h-9 rounded-full bg-[#16A34A] flex items-center justify-center hover:bg-[#12803A] transition-colors">
+                <Search className="w-5 h-5 text-white" />
+              </button>
             </div>
           </div>
           {/* Start New Campaign pill button */}
           <button
             onClick={() => router.push('/brand/campaigns/create-campaign')}
-            className="bg-[#16A34A] text-white px-5 py-2 rounded-full text-sm font-medium whitespace-nowrap hover:bg-green-700 transition-colors"
+            className="bg-[#16A34A] text-white px-6 py-2.5 rounded-full text-sm font-medium whitespace-nowrap hover:bg-green-700 transition-colors h-[45px] flex items-center"
+            style={{ fontFamily: 'Inter, sans-serif' }}
           >
             Start New Campaign
           </button>
         </div>
       </div>
 
-      {/* Scrollable Content */}
-      <div className="flex-1 overflow-y-auto pr-4 sm:pr-6 pb-8" style={{ paddingLeft: 0 }}>
+      {/* Content */}
+      <div className="pr-0 pb-8" style={{ paddingLeft: 0 }}>
 
         {/* Recent Campaigns */}
         <div className="mb-8 pt-4">
           <div className="flex items-center justify-between mb-3">
-            <h3 className="text-2xl font-normal text-white capitalize leading-[120%]" style={{ fontFamily: 'var(--font-bricolage-grotesque)' }}>Recent Campaigns</h3>
-            <button onClick={() => router.push('/brand/campaigns/all-campaigns')} className="flex items-center gap-0.5">
+            <h3 className="text-2xl font-normal text-white capitalize leading-[120%]" style={{ fontFamily: 'Inter, sans-serif' }}>Recent Campaigns</h3>
+            <button onClick={() => router.push('/brand/campaigns/all-campaigns')} className="flex items-center gap-1.5">
               <span className="text-[#16A34A] text-sm font-medium">View All</span>
-              <ChevronRight className="w-4 h-4 text-[#16A34A]" />
+              <svg width="6" height="10" viewBox="0 0 6 10" fill="none" style={{ flexShrink: 0 }}>
+                <path d="M0 0.81727L0.892353 0L5.75277 4.45412C5.83112 4.5255 5.8933 4.61037 5.93573 4.70385C5.97816 4.79734 6 4.89759 6 4.99884C6 5.1001 5.97816 5.20035 5.93573 5.29384C5.8933 5.38732 5.83112 5.47219 5.75277 5.54356L0.892353 10L0.000840664 9.18273L4.56269 5L0 0.81727Z" fill="#16A34A"/>
+              </svg>
             </button>
           </div>
 
@@ -1129,7 +1150,9 @@ const AllCampaignsSection = () => {
                 <CampaignCard key={campaign._id || campaign.id} campaign={campaign} />
               ))
             ) : (
-              <p className="text-[#9B9B9B] text-sm py-4">No active campaigns. Create your first campaign!</p>
+              DUMMY_CAMPAIGNS.map((campaign) => (
+                <CampaignCard key={campaign._id} campaign={campaign} />
+              ))
             )}
           </div>
         </div>
@@ -1137,7 +1160,7 @@ const AllCampaignsSection = () => {
         {/* New Applications */}
         <div className="mb-8">
           <div className="flex items-center justify-between mb-3">
-            <h3 className="text-2xl font-normal text-white capitalize leading-[120%]" style={{ fontFamily: 'var(--font-bricolage-grotesque)' }}>New Applications</h3>
+            <h3 className="text-2xl font-normal text-white capitalize leading-[120%]" style={{ fontFamily: 'Inter, sans-serif' }}>New Applications</h3>
             <button onClick={() => router.push('/brand/campaigns/new-applications')} className="flex items-center gap-0.5">
               <span className="text-[#16A34A] text-sm font-medium">View All</span>
               <ChevronRight className="w-4 h-4 text-[#16A34A]" />
@@ -1184,7 +1207,30 @@ const AllCampaignsSection = () => {
                 );
               })
             ) : (
-              <p className="text-[#9B9B9B] text-sm py-4">No new applications yet.</p>
+              DUMMY_APPLICATIONS.map((app, idx) => {
+                const initials = app.name.charAt(0).toUpperCase();
+                return (
+                  <div key={app._id || idx} className="bg-[#262626] rounded-xl h-[68px] flex items-center px-4 justify-between">
+                    <div className="flex items-center gap-2 min-w-0 flex-1">
+                      <div className="w-12 h-12 bg-[#16A34A] rounded-full flex items-center justify-center text-white text-base font-medium shrink-0" style={{ fontFamily: 'Inter, sans-serif' }}>
+                        {initials}
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-white text-base font-normal truncate" style={{ fontFamily: 'Inter, sans-serif' }}>{app.name}</p>
+                        <p className="text-[#9B9B9B] text-xs truncate" style={{ fontFamily: 'Inter, sans-serif' }}>{app.niche}</p>
+                      </div>
+                    </div>
+                    <button
+                      onClick={(e) => { e.stopPropagation(); }}
+                      className="bg-[#16A34A] text-white text-xs w-[100px] h-7 rounded-full flex items-center justify-center gap-1 shrink-0 hover:bg-green-700 transition-colors ml-3"
+                      style={{ fontFamily: 'Inter, sans-serif' }}
+                    >
+                      <UserRound className="w-3 h-3" />
+                      <span>View profile</span>
+                    </button>
+                  </div>
+                );
+              })
             )}
           </div>
         </div>
@@ -1192,7 +1238,7 @@ const AllCampaignsSection = () => {
         {/* Previous Campaigns */}
         <div className="mb-8">
           <div className="flex items-center justify-between mb-3">
-            <h3 className="text-2xl font-normal text-white capitalize leading-[120%]" style={{ fontFamily: 'var(--font-bricolage-grotesque)' }}>Previous Campaigns</h3>
+            <h3 className="text-2xl font-normal text-white capitalize leading-[120%]" style={{ fontFamily: 'Inter, sans-serif' }}>Previous Campaigns</h3>
             <button onClick={() => router.push('/brand/campaigns/previous-campaigns')} className="flex items-center gap-0.5">
               <span className="text-[#16A34A] text-sm font-medium">View All</span>
               <ChevronRight className="w-4 h-4 text-[#16A34A]" />
@@ -1212,7 +1258,7 @@ const AllCampaignsSection = () => {
         {/* Draft Campaigns */}
         <div className="mb-8">
           <div className="flex items-center justify-between mb-3">
-            <h3 className="text-2xl font-normal text-white capitalize leading-[120%]" style={{ fontFamily: 'var(--font-bricolage-grotesque)' }}>Draft Campaigns</h3>
+            <h3 className="text-2xl font-normal text-white capitalize leading-[120%]" style={{ fontFamily: 'Inter, sans-serif' }}>Draft Campaigns</h3>
             <button onClick={() => router.push('/brand/campaigns/all-drafts')} className="flex items-center gap-0.5">
               <span className="text-[#16A34A] text-sm font-medium">View All</span>
               <ChevronRight className="w-4 h-4 text-[#16A34A]" />

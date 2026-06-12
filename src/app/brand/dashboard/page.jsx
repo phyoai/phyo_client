@@ -50,56 +50,91 @@ function DashboardContent() {
         .fade-out-dashboard {
           animation: fadeOut 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
         }
-        
         @keyframes fadeOut {
-          from {
-            opacity: 1;
-            transform: scale(1);
-          }
-          to {
-            opacity: 0;
-            transform: scale(0.98);
-          }
+          from { opacity: 1; transform: scale(1); }
+          to { opacity: 0; transform: scale(0.98); }
         }
       `}</style>
-      
-      <div className={`min-h-screen bg-[#000201] text-white transition-all duration-300 ${
+
+      <div className={`min-h-screen bg-[#000201] text-white transition-all duration-300 relative overflow-hidden ${
         isFadingOut ? 'fade-out-dashboard' : ''
       }`}>
-        {/* Scrollable Content Section */}
-        <div className="pr-4 sm:pr-6 lg:pr-8 pt-6 pb-10" style={{ paddingLeft: 0 }}>
+        {/* Green ambient glow — Figma ellipse: rgba(22,163,74,0.28) blur(680px) */}
+        <div
+          aria-hidden
+          style={{
+            position: 'absolute',
+            top: '-308px',
+            right: '-200px',
+            width: 920,
+            height: 926,
+            background: 'rgba(22,163,74,0.28)',
+            filter: 'blur(680px)',
+            borderRadius: '50%',
+            pointerEvents: 'none',
+            zIndex: 0,
+          }}
+        />
 
-          {/* Search Bar */}
-          <div className="relative mb-[17px] cursor-pointer" onClick={handleSearchClick}>
-            <div className="absolute inset-0 rounded-full blur-[8px] border-2 border-[#16a34a] pointer-events-none" />
-            <div className="relative flex items-center bg-[rgba(255,255,255,0.08)] backdrop-blur-[6px] rounded-full border-[0.8px] border-[#16a34a] overflow-hidden pr-[9.6px] py-[10px] pl-[19.6px] gap-3 h-[60px]">
-              <span className="flex-1 text-[#9b9b9b] text-[16px] truncate leading-[1.6]" style={{ fontFamily: 'Inter, sans-serif' }}>
+        {/* Scrollable Content Section */}
+        <div className="pr-4 sm:pr-6 lg:pr-8 pt-6 pb-10 relative z-10" style={{ paddingLeft: 0 }}>
+
+          {/* Search Bar — matches landing page style */}
+          <div
+            className="relative mb-[17px] cursor-pointer overflow-hidden rounded-full bg-[linear-gradient(270deg,#16A34A_0%,#FFFFFF_52.88%,#16A34A_100%)] p-[1px] shadow-[0_0_28px_rgba(22,163,74,0.45)]"
+            onClick={handleSearchClick}
+          >
+            {/* Soft inner glow */}
+            <div className="pointer-events-none absolute inset-0 rounded-full bg-[#16A34A]/25 blur-l" />
+            {/* Search box */}
+            <div className="relative flex h-[72px] items-center gap-3 rounded-full bg-[#010a04]/90 px-5 py-2 backdrop-blur-md sm:pl-6 sm:pr-[10px]" style={{ boxShadow: 'inset 0 0 20px rgba(22, 163, 74, 0.1)' }}>
+              <span className="min-w-0 flex-1 truncate text-left text-base leading-[1.6] text-[#9B9B9B] sm:text-[16px]"
+                style={{ fontFamily: 'Inter, sans-serif' }}>
                 {t('search')} influencers (e.g. I need influencers in Mumbai)...
               </span>
               <button
-                onClick={handleSearchClick}
-                className="flex items-center gap-2 bg-[#16a34a] text-white rounded-[20px] pl-[40px] pr-[16px] py-[8px] text-[16px] font-normal shrink-0 relative h-[40px]"
+                onClick={(e) => { e.stopPropagation(); handleSearchClick(); }}
+                className="inline-flex w-[115px] h-[48px] shrink-0 items-center gap-2 rounded-full bg-[#16A34A] px-3 text-base text-white transition duration-200 hover:bg-[#12803A]"
                 style={{ fontFamily: 'Inter, sans-serif' }}
               >
-                <Search className="absolute left-[10px] h-[24px] w-[24px]" />
-                Search
+                <Search className="h-6 w-6" />
+                <span>Search</span>
               </button>
             </div>
           </div>
 
-          {/* Prompt Suggestion Pills — pyramid: 640 / 580 / 520px, centered */}
+          {/* Prompt Suggestion Pills */}
           <div className="flex flex-col items-center gap-[8px] mb-[68px]">
             {[640, 580, 520].map((maxW, index) => (
               <div
                 key={index}
-                className="bg-[#181818] px-[12px] py-[8px] rounded-[64px] cursor-pointer hover:bg-[#222] transition-colors overflow-hidden"
-                style={{ width: '100%', maxWidth: `${maxW}px` }}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 8,
+                  padding: '8px 12px',
+                  borderRadius: 64,
+                  background: '#181818',
+                  width: '100%',
+                  maxWidth: maxW,
+                  cursor: 'pointer',
+                  overflow: 'hidden',
+                }}
                 onClick={handleSearchClick}
               >
-                <p
-                  className="text-[14px] font-medium text-[#808080] leading-[20px] tracking-[0.2px] overflow-hidden text-ellipsis whitespace-nowrap"
-                  style={{ fontFamily: 'Work Sans, sans-serif' }}
-                >
+                <p style={{
+                  fontFamily: 'Inter, sans-serif',
+                  fontWeight: 500,
+                  fontSize: 14,
+                  lineHeight: '20px',
+                  letterSpacing: '0.2px',
+                  color: '#808080',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                  textAlign: 'center',
+                  margin: 0,
+                }}>
                   {searchSuggestions[index]}
                 </p>
               </div>

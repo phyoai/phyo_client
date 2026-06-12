@@ -6,13 +6,15 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useSidebar } from '../app/context/SidebarContext';
 import {
   Home4Fill,
+  Home4Line,
   InboxLine,
+  CalendarEventFill,
   CalendarEventLine,
   AccountCircleLine,
   Message3Fill,
-  UserLine,
-  ListUnordered,
-  FileList3Line,
+  User3Line,
+  Heart3Line,
+  BankCardLine,
   WalletLine,
   PassExpiredLine,
   CloseCircleLine,
@@ -21,6 +23,7 @@ import {
   Settings3Line,
   GlobalLine,
   LogoutBoxRLine,
+  LockLine,
 } from '@phyoofficial/phyo-icon-library';
 import { useAuth } from '../app/context/AuthContext';
 
@@ -46,7 +49,7 @@ const AppSidebar = () => {
   const pathname = usePathname();
   const router = useRouter();
   const role = getRoleFromPathname(pathname);
-  const { isExpanded, sidebarButtonAction } = useSidebar();
+  const { isExpanded } = useSidebar();
   useAuth();
   const [mounted, setMounted] = React.useState(false);
   const [accountOpen, setAccountOpen] = React.useState(
@@ -59,28 +62,27 @@ const AppSidebar = () => {
   }, [pathname, role]);
 
   const mainNavItems = [
-    { name: 'Home',     href: `/${role}/dashboard`, icon: Home4Fill },
-    { name: 'Inbox',    href: `/${role}/inbox`,     icon: InboxLine, badge: 3 },
-    { name: 'Campaign', href: `/${role}/campaigns`, icon: CalendarEventLine },
+    { name: 'Home',     href: `/${role}/dashboard`, iconActive: Home4Fill,         iconDefault: Home4Line },
+    { name: 'Inbox',    href: `/${role}/inbox`,     iconActive: InboxLine,          iconDefault: InboxLine,         badge: 3 },
+    { name: 'Campaign', href: `/${role}/campaigns`, iconActive: CalendarEventFill,  iconDefault: CalendarEventLine },
   ];
 
   const accountSubItems = [
-    { name: 'Profile',              href: `/${role}/account`,                  icon: UserLine },
-    { name: 'My List',              href: `/${role}/account/my-lists`,          icon: ListUnordered },
-    { name: 'Transactions',         href: `/${role}/account/billing-history`,   icon: FileList3Line },
-    { name: 'Upgrade Plan',         href: `/${role}/account/upgrade-plan`,      icon: WalletLine },
-    { name: 'Pause Subscription',   href: `/${role}/account/pause`,             icon: PassExpiredLine },
-    { name: 'Cancel Subscription',  href: `/${role}/account/cancel`,            icon: CloseCircleLine },
-    { name: 'Help & Support',       href: `/${role}/account/help-support`,      icon: QuestionLine },
-    { name: 'Terms & Conditions',   href: `/${role}/account/terms-conditions`,  icon: FileTextLine },
-    { name: 'Privacy Policy',       href: `/${role}/account/privacy-policy`,    icon: FileTextLine },
-    { name: 'Settings',             href: `/${role}/account/settings`,          icon: Settings3Line },
-    { name: 'Language',             href: `/${role}/account/language`,          icon: GlobalLine },
+    { name: 'Profile',             href: `/${role}/account`,                  icon: User3Line },
+    { name: 'My List',             href: `/${role}/account/my-lists`,          icon: Heart3Line },
+    { name: 'Transactions',        href: `/${role}/account/billing-history`,   icon: BankCardLine },
+    { name: 'Upgrade Plan',        href: `/${role}/account/upgrade-plan`,      icon: WalletLine },
+    { name: 'Pause Subscription',  href: `/${role}/account/pause`,             icon: PassExpiredLine },
+    { name: 'Cancel Subscription', href: `/${role}/account/cancel`,            icon: CloseCircleLine },
+    { name: 'Help & Support',      href: `/${role}/account/help-support`,      icon: QuestionLine },
+    { name: 'Terms & Conditions',  href: `/${role}/account/terms-conditions`,  icon: FileTextLine },
+    { name: 'Privacy Policy',      href: `/${role}/account/privacy-policy`,    icon: LockLine },
+    { name: 'Settings',            href: `/${role}/account/settings`,          icon: Settings3Line },
+    { name: 'Language',            href: `/${role}/account/language`,          icon: GlobalLine },
   ];
 
   const handleStartNewChat = () => {
-    if (sidebarButtonAction) sidebarButtonAction();
-    else router.push(`/${role}/inbox`);
+    router.push(`/${role}/start-new-chat`);
   };
 
   const handleLogout = () => router.push(`/${role}/account/logout`);
@@ -99,32 +101,43 @@ const AppSidebar = () => {
     >
       {/* Logo */}
       <div className="flex items-center justify-center h-[90px] shrink-0">
-        <Image
-          src="/landing/phyo_logo.svg"
-          alt="Phyo"
-          width={120}
-          height={32}
-          priority
-          className={`object-contain transition-all duration-300 ${isExpanded ? 'w-[120px]' : 'w-[28px]'}`}
-        />
+        {isExpanded ? (
+          <Image
+            src="/landing/phyo_logo.svg"
+            alt="Phyo"
+            width={140}
+            height={40}
+            priority
+            className="object-contain"
+          />
+        ) : (
+          <Image
+            src="/logo_white.png"
+            alt="Phyo"
+            width={48}
+            height={48}
+            priority
+            className="object-contain"
+          />
+        )}
       </div>
 
       {/* Nav */}
       <nav className="flex flex-col gap-[10px] mt-[28px] flex-1 px-[10px] overflow-y-auto scrollbar-hide">
 
         {mainNavItems.map((item) => {
-          const Icon = item.icon;
           const isActive = pathname === item.href || pathname.startsWith(item.href + '/');
+          const Icon = isActive ? item.iconActive : item.iconDefault;
           return (
             <Link
               key={item.name}
               href={item.href}
-              className={`relative flex items-center h-[40px] rounded-full no-underline hover:bg-white/5 transition-colors ${
+              className={`relative flex items-center h-[44px] rounded-full no-underline hover:bg-white/5 transition-colors ${
                 isExpanded ? 'pl-[20px] pr-[12px]' : 'justify-center'
               }`}
             >
-              <span className="flex-shrink-0 flex items-center justify-center w-[16px] h-[16px]">
-                <Icon width={16} height={16} fill={isActive ? '#16a34a' : '#9b9b9b'} color={isActive ? '#16a34a' : '#9b9b9b'} />
+              <span className="flex-shrink-0 flex items-center justify-center w-[22px] h-[22px]">
+                <Icon width={22} height={22} fill={isActive ? '#16a34a' : '#9b9b9b'} color={isActive ? '#16a34a' : '#9b9b9b'} />
               </span>
               {isExpanded && (
                 <span className={`ml-[12px] text-[16px] font-normal capitalize leading-[1.2] whitespace-nowrap flex-1 ${isActive ? 'text-[#16a34a]' : 'text-[#9b9b9b]'}`} style={{ fontFamily: 'Inter, sans-serif' }}>
@@ -146,12 +159,12 @@ const AppSidebar = () => {
             if (isExpanded) setAccountOpen((o) => !o);
             else router.push(`/${role}/account`);
           }}
-          className={`relative flex items-center h-[40px] rounded-full hover:bg-white/5 transition-colors w-full ${
+          className={`relative flex items-center h-[44px] rounded-full hover:bg-white/5 transition-colors w-full ${
             isExpanded ? 'pl-[20px] pr-[12px]' : 'justify-center'
           }`}
         >
-          <span className="flex-shrink-0 flex items-center justify-center w-[16px] h-[16px]">
-            <AccountCircleLine width={16} height={16} fill={isAccountActive ? '#16a34a' : '#9b9b9b'} color={isAccountActive ? '#16a34a' : '#9b9b9b'} />
+          <span className="flex-shrink-0 flex items-center justify-center w-[22px] h-[22px]">
+            <AccountCircleLine width={22} height={22} fill={isAccountActive ? '#16a34a' : '#9b9b9b'} color={isAccountActive ? '#16a34a' : '#9b9b9b'} />
           </span>
           {isExpanded && (
             <>
@@ -165,16 +178,15 @@ const AppSidebar = () => {
 
         {isExpanded && accountOpen && (
           <>
-            <div className="h-px bg-white/10 mx-3 my-1" />
             <div className="bg-[#1e1e1e] rounded-[16px] mx-1 overflow-y-auto scrollbar-hide" style={{ maxHeight: 'calc(100vh - 260px)' }}>
-              {accountSubItems.map((sub, idx) => {
+              {accountSubItems.map((sub) => {
                 const Icon = sub.icon;
                 const isActive = pathname === sub.href;
                 return (
                   <Link
                     key={sub.name}
                     href={sub.href}
-                    className={`flex items-center gap-[8px] px-[12px] py-[10px] transition-colors hover:bg-white/5 ${idx === 0 ? 'border-b border-white/10' : ''}`}
+                    className="flex items-center gap-[8px] px-[12px] py-[10px] transition-colors hover:bg-white/5"
                   >
                     <span className="shrink-0 w-[28px] h-[28px] flex items-center justify-center">
                       <Icon width={16} height={16} fill={isActive ? '#ffffff' : '#9b9b9b'} color={isActive ? '#ffffff' : '#9b9b9b'} />
@@ -203,7 +215,6 @@ const AppSidebar = () => {
                 );
               })()}
             </div>
-            <div className="h-px bg-white/10 mx-3 my-1" />
           </>
         )}
       </nav>

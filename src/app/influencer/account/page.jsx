@@ -234,7 +234,7 @@ function BrandAccountContent() {
     ],
   ];
 
-  const subscriptionStatus = user?.subscriptionStatus || 'inactive';
+  const subscriptionStatus = (user?.subscriptionStatus || 'inactive').toLowerCase();
   const currentPlan = user?.currentPlan || 'free';
 
   const CATEGORY_OPTIONS = ['Comedy','Lifestyle','Fashion','Beauty','Tech','Travel','Food','Fitness','Education','Finance','Gaming','Sports','Music'];

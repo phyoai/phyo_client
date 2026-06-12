@@ -640,7 +640,7 @@ const AllCampaignsSection = () => {
       case 1:
         return (
           <div className="space-y-6">
-            <h2 className="text-2xl font-bold text-white text-center">Campaign Details</h2>
+            <h2 className="text-2xl font-bold text-white text-center" style={{ fontFamily: 'Inter, sans-serif' }}>Campaign Details</h2>
             
             {/* Product Images Upload */}
             <div>
@@ -926,7 +926,7 @@ const AllCampaignsSection = () => {
         return (
           <div className="space-y-6">
             <div className="text-center">
-              <h2 className="text-2xl font-bold text-white mb-2">Let's set your targeting details</h2>
+              <h2 className="text-2xl font-bold text-white mb-2" style={{ fontFamily: 'Inter, sans-serif' }}>Let's set your targeting details</h2>
               <p className="text-[#9A9A9A]">
                 Provide some details on influencers you're looking to target. We'll collect campaign 
                 details like content requirements and product descriptions in the next step.
@@ -1277,7 +1277,7 @@ const AllCampaignsSection = () => {
                   >
                     <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6 text-[#9A9A9A]" />
                   </button>
-                  <h1 className="text-lg sm:text-xl font-semibold text-white truncate">
+                  <h1 className="text-lg sm:text-xl font-semibold text-white truncate" style={{ fontFamily: 'var(--font-bricolage-grotesque)' }}>
                     {showAllCampaigns ? 'Campaigns' : 'Draft Campaigns'}
                   </h1>
                 </div>
@@ -1293,7 +1293,7 @@ const AllCampaignsSection = () => {
             ) : (
               <>
                 <div className="flex items-center flex-1 min-w-0">
-                  <h1 className="text-lg sm:text-xl font-semibold text-white">Campaigns</h1>
+                  <h1 className="text-lg sm:text-xl font-semibold text-white" style={{ fontFamily: 'var(--font-bricolage-grotesque)' }}>Campaigns</h1>
                 </div>
                 <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
                   <button className="p-2 hover:bg-[#262626] rounded-full transition-colors">

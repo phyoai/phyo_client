@@ -129,7 +129,7 @@ export default function InfluencerDetailPage() {
   const initial    = name.charAt(0).toUpperCase();
 
   return (
-    <div className="min-h-screen bg-[#000201] px-6 py-6 pb-24">
+    <div className="min-h-screen bg-[#000201] pr-5 py-6 pb-24">
       <div className="w-full flex flex-col gap-5">
 
         {/* ── HERO BANNER + AVATAR ── */}
@@ -235,7 +235,12 @@ export default function InfluencerDetailPage() {
             <div className="bg-[#181818] rounded-3xl p-6 flex flex-col gap-5">
               <div className="flex items-center justify-between">
                 <p className="text-white text-[22px] font-semibold" style={{ fontFamily: 'var(--font-bricolage-grotesque)' }}>Top Campaigns</p>
-                <button className="text-[#16A34A] text-[14px] flex items-center gap-1" style={{ fontFamily: 'Inter,sans-serif', background: 'none', border: 'none', cursor: 'pointer' }}>View All ▶</button>
+                <button className="flex items-center gap-1.5 text-[#16A34A] text-[14px]" style={{ fontFamily: 'Inter,sans-serif', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>
+                  View All
+                  <svg width="6" height="10" viewBox="0 0 6 10" fill="none" style={{ flexShrink: 0 }}>
+                    <path d="M0 0.81727L0.892353 0L5.75277 4.45412C5.83112 4.5255 5.8933 4.61037 5.93573 4.70385C5.97816 4.79734 6 4.89759 6 4.99884C6 5.1001 5.97816 5.20035 5.93573 5.29384C5.8933 5.38732 5.83112 5.47219 5.75277 5.54356L0.892353 10L0.000840664 9.18273L4.56269 5L0 0.81727Z" fill="#16A34A"/>
+                  </svg>
+                </button>
               </div>
               <div className="h-px bg-[#262525]" />
               <div className="flex flex-col gap-2">
@@ -316,7 +321,12 @@ export default function InfluencerDetailPage() {
         <div className="bg-[#181818] rounded-3xl p-6 flex flex-col gap-5">
           <div className="flex items-center justify-between">
             <p className="text-white text-[22px] font-semibold" style={{ fontFamily: 'var(--font-bricolage-grotesque)' }}>Campaign Reviews</p>
-            <button className="text-[#16A34A] text-[14px] flex items-center gap-1" style={{ fontFamily: 'Inter,sans-serif', background: 'none', border: 'none', cursor: 'pointer' }}>View All ▶</button>
+            <button className="flex items-center gap-1.5 text-[#16A34A] text-[14px]" style={{ fontFamily: 'Inter,sans-serif', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>
+              View All
+              <svg width="6" height="10" viewBox="0 0 6 10" fill="none" style={{ flexShrink: 0 }}>
+                <path d="M0 0.81727L0.892353 0L5.75277 4.45412C5.83112 4.5255 5.8933 4.61037 5.93573 4.70385C5.97816 4.79734 6 4.89759 6 4.99884C6 5.1001 5.97816 5.20035 5.93573 5.29384C5.8933 5.38732 5.83112 5.47219 5.75277 5.54356L0.892353 10L0.000840664 9.18273L4.56269 5L0 0.81727Z" fill="#16A34A"/>
+              </svg>
+            </button>
           </div>
           <div className="h-px bg-[#262525]" />
           {/* Overall rating */}

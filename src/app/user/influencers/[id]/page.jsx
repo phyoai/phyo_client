@@ -235,7 +235,7 @@ const TopInfluencersPage = () => {
           >
             <ArrowLeft className="w-6 h-6 text-[#9A9A9A]" />
           </button>
-          <h1 className="text-xl font-semibold text-[#242527] flex-1 px-2">Influencer Not Found</h1>
+          <h1 className="text-xl font-semibold text-[#242527] flex-1 px-2" style={{ fontFamily: 'Inter, sans-serif' }}>Influencer Not Found</h1>
           <div className="w-12"></div>
         </div>
         <div className="flex-1 flex items-center justify-center">
@@ -256,7 +256,7 @@ const TopInfluencersPage = () => {
           <ArrowLeft className="w-6 h-6 text-[#9A9A9A]" />
         </button>
 
-        <h1 className="text-xl font-semibold text-[#242527] flex-1 px-2">
+        <h1 className="text-xl font-semibold text-[#242527] flex-1 px-2" style={{ fontFamily: 'Inter, sans-serif' }}>
           Influencers
         </h1>
 
@@ -357,7 +357,7 @@ const TopInfluencersPage = () => {
               <div className="bg-[#181818] rounded-3xl shadow-xl w-[480px]" onClick={(e) => e.stopPropagation()}>
                 {/* Header */}
                 <div className="px-4 pt-4 pb-3">
-                  <h3 className="text-lg font-semibold text-[#242527]">Save to...</h3>
+                  <h3 className="text-lg font-semibold text-[#242527]" style={{ fontFamily: 'Inter, sans-serif' }}>Save to...</h3>
                 </div>
 
                 {/* List Items */}
@@ -404,7 +404,7 @@ const TopInfluencersPage = () => {
           {showNewListModal && (
             <div className="fixed inset-0 bg-black bg-opacity-25 flex items-center justify-center z-50" onClick={() => setShowNewListModal(false)}>
               <div className="bg-[#f0f0f0] rounded-lg p-6 w-[400px]" onClick={(e) => e.stopPropagation()}>
-                <h3 className="text-lg font-semibold text-[#242527] mb-4">New List</h3>
+                <h3 className="text-lg font-semibold text-[#242527] mb-4" style={{ fontFamily: 'Inter, sans-serif' }}>New List</h3>
 
                 <input
                   type="text"
@@ -442,7 +442,7 @@ const TopInfluencersPage = () => {
             {/* Profile Info */}
             <div className="mb-6">
               <p className="text-[#808080] text-base font-semibold leading-6 tracking-[0.24px] mb-1">{displayInfluencer.username}</p>
-              <h2 className="text-[#242527] text-4xl font-bold leading-[48px] tracking-[-0.32px]">{displayInfluencer.name}</h2>
+              <h2 className="text-[#242527] text-4xl font-bold leading-[48px] tracking-[-0.32px]" style={{ fontFamily: 'var(--font-bricolage-grotesque)' }}>{displayInfluencer.name}</h2>
             </div>
 
             {/* Stats Badges */}
@@ -475,13 +475,13 @@ const TopInfluencersPage = () => {
 
             {/* About Section */}
             <div className="mb-8">
-              <h3 className="text-[#242527] text-xl font-semibold leading-7 tracking-[-0.14px] mb-2">About</h3>
+              <h3 className="text-[#242527] text-xl font-semibold leading-7 tracking-[-0.14px] mb-2" style={{ fontFamily: 'Inter, sans-serif' }}>About</h3>
               <p className="text-[#808080] text-base leading-6">{displayInfluencer.about}</p>
             </div>
 
             {/* Interactions Section */}
             <div className="mb-8">
-              <h3 className="text-[#242527] text-xl font-semibold leading-7 tracking-[-0.14px] mb-4">Interactions</h3>
+              <h3 className="text-[#242527] text-xl font-semibold leading-7 tracking-[-0.14px] mb-4" style={{ fontFamily: 'Inter, sans-serif' }}>Interactions</h3>
 
               {/* Likes Graph */}
               <div className="bg-[#181818] border-[0.5px] border-[#e6e6e6] rounded-xl p-2 min-w-[380px] flex-shrink-0 mb-3">
@@ -568,7 +568,7 @@ const TopInfluencersPage = () => {
 
             {/* Audience Insights */}
             <div className="mb-8">
-              <h3 className="text-[#242527] text-xl font-semibold leading-7 tracking-[-0.14px] mb-3">Audience Insights</h3>
+              <h3 className="text-[#242527] text-xl font-semibold leading-7 tracking-[-0.14px] mb-3" style={{ fontFamily: 'Inter, sans-serif' }}>Audience Insights</h3>
 
               {/* Age Group */}
               <div className="bg-[#181818] border-[0.5px] border-[#e6e6e6] rounded-xl p-2 mb-3">
@@ -715,7 +715,7 @@ const TopInfluencersPage = () => {
 
             {/* Similar Influencers */}
             <div className="mb-20">
-              <h3 className="text-[#242527] text-xl font-semibold leading-7 tracking-[-0.14px] mb-4">Similar Influencers</h3>
+              <h3 className="text-[#242527] text-xl font-semibold leading-7 tracking-[-0.14px] mb-4" style={{ fontFamily: 'Inter, sans-serif' }}>Similar Influencers</h3>
               <div className="flex gap-3 overflow-x-auto pb-2">
                 {[1, 2, 3, 4, 5].map((item) => (
                   <div key={item} className="flex-shrink-0 bg-[#181818] border border-white/10 rounded-xl p-4 w-[220px]">

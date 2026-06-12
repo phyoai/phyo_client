@@ -109,20 +109,21 @@ function DashboardContent() {
       <div className={`min-h-screen bg-[#000201] text-white transition-all duration-300 ${isFadingOut ? 'fade-out-dashboard' : ''}`}>
         <div className="pr-4 sm:pr-6 lg:pr-8 pt-6 pb-10" style={{ paddingLeft: 0 }}>
 
-          {/* Search Bar */}
-          <div className="relative mb-[17px] cursor-pointer" onClick={handleSearchClick}>
-            <div className="absolute inset-0 rounded-full blur-[8px] border-2 border-[#16a34a] pointer-events-none" />
-            <div className="relative flex items-center bg-[rgba(255,255,255,0.08)] backdrop-blur-[6px] rounded-full border-[0.8px] border-[#16a34a] overflow-hidden pr-[9.6px] py-[10px] pl-[19.6px] gap-3 h-[60px]">
-              <span className="flex-1 text-[#9b9b9b] text-[16px] truncate leading-[1.6]" style={{ fontFamily: 'Inter, sans-serif' }}>
+          {/* Search Bar — same as brand dashboard */}
+          <div
+            className="relative cursor-pointer rounded-full bg-[linear-gradient(270deg,#16A34A_0%,#FFFFFF_52.88%,#16A34A_100%)] p-[1px] shadow-[0_0_28px_rgba(22,163,74,0.45)] mb-[17px]"
+            onClick={handleSearchClick}
+          >
+            <div className="flex h-[60px] items-center gap-3 rounded-full bg-[#010a04]/90 px-6 py-2 backdrop-blur-md" style={{ boxShadow: 'inset 0 0 20px rgba(22, 163, 74, 0.1)' }}>
+              <span className="flex-1 min-w-0 bg-transparent text-left text-[16px] leading-[1.6] text-[#9B9B9B] placeholder:text-[#9B9B9B] truncate" style={{ fontFamily: 'Inter, sans-serif' }}>
                 Search influencers (e.g. I need influencers in Mumbai)...
               </span>
               <button
                 onClick={handleSearchClick}
-                className="flex items-center gap-2 bg-[#16a34a] text-white rounded-[20px] pl-[40px] pr-[16px] py-[8px] text-[16px] font-normal shrink-0 relative h-[40px]"
+                className="flex-shrink-0 flex items-center justify-center gap-2 w-10 h-10 rounded-full bg-[#16A34A] text-white hover:bg-[#12803A] transition-colors"
                 style={{ fontFamily: 'Inter, sans-serif' }}
               >
-                <Search className="absolute left-[10px] h-[24px] w-[24px]" />
-                Search
+                <Search className="w-5 h-5" />
               </button>
             </div>
           </div>
@@ -138,7 +139,7 @@ function DashboardContent() {
               >
                 <p
                   className="text-[14px] font-medium text-[#808080] leading-[20px] tracking-[0.2px] overflow-hidden text-ellipsis whitespace-nowrap"
-                  style={{ fontFamily: 'Work Sans, sans-serif' }}
+                  style={{ fontFamily: 'Inter, sans-serif' }}
                 >
                   {searchSuggestions[index]}
                 </p>
